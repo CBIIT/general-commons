@@ -1,0 +1,784 @@
+# Indices settings
+Indices:
+  # First index
+  # Name of the index to be created, existing index with same name will be deleted
+  # Subjects index
+  - index_name: subjects
+    type: neo4j
+    # type mapping for each property of the index
+    mapping:
+      # Filter properties
+      accesses:
+        type: keyword
+      acl:
+        type: keyword
+      experimental_strategies:
+        type: keyword
+      file_types:
+        type: keyword
+      genders:
+        type: keyword
+      instrument_models:
+        type: keyword
+      is_tumor:
+        type: keyword
+      library_layouts:
+        type: keyword
+      library_selections:
+        type: keyword
+      library_sources:
+        type: keyword
+      library_strategies:
+        type: keyword
+      number_of_study_participants:
+        type: integer
+      number_of_study_samples:
+        type: integer
+      phs_accession:
+        type: keyword
+      platforms:
+        type: keyword
+      primary_diagnoses:
+        type: keyword
+      reference_genome_assemblies:
+        type: keyword
+      site:
+        type: keyword
+      studies:
+        type: keyword
+      study_data_types:
+        type: keyword
+      # Global Search properties
+      site_gs:
+        type: search_as_you_type
+      study_gs:
+        type: search_as_you_type
+      subject_id_gs:
+        type: search_as_you_type
+      gender_gs:
+        type: search_as_you_type
+      # Overview properties
+      files:
+        type: keyword
+      samples:
+        type: keyword
+      subject_ids:
+        type: keyword
+    # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
+    cypher_query: "
+      MATCH (p:participant)-->(s:study)
+      OPTIONAL MATCH (samp:sample)-->(p)
+      WITH 
+          s, 
+          COUNT(DISTINCT p) as num_study_participants, 
+          COUNT(DISTINCT samp) as num_study_samples
+      MATCH (p:participant)-->(s)
+      OPTIONAL MATCH (samp:sample)-->(p)
+      OPTIONAL MATCH (samp)<--(f:file)
+      OPTIONAL MATCH (p)<--(diag:diagnosis)
+      OPTIONAL MATCH (f)<--(g:genomic_info)
+      WITH
+          samp, p, s, diag, f, g, num_study_participants, num_study_samples,
+          \"Not specified in data\" AS na
+      WITH
+          num_study_participants,
+          num_study_samples,
+          s.study_access AS access,
+          s.acl AS acl,
+          s.phs_accession AS phs_accession,
+          s.study_name AS studies, 
+          s.study_data_types AS study_data_types,
+
+          p.gender AS genders,
+          p.participant_id AS subject_ids,
+
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_tumor_status, na))) AS is_tumor,
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_type, na))) AS analyte_type,
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_id, na))) AS samples,
+
+          apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT (apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\")), true))) AS experimental_strategies,
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_type, na))) AS file_types,
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_id, na))) AS files,
+
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))) AS library_layouts, 
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))) AS library_selections, 
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source, na))) AS library_sources, 
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))) AS library_strategies,
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))) AS instrument_models,
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.platform, na))) AS platforms,
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.reference_genome_assembly, na))) AS reference_genome_assemblies,
+
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_diagnosis, na))) AS primary_diagnoses,
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na))) AS site
+      RETURN
+          access AS accesses,
+          acl AS acl,
+          experimental_strategies AS experimental_strategies,
+          file_types AS file_types,
+          genders AS genders,
+          genders AS gender_gs,
+          instrument_models AS instrument_models,
+          is_tumor AS is_tumor,
+          library_layouts AS library_layouts,
+          library_selections AS library_selections,
+          library_sources AS library_sources,
+          library_strategies AS library_strategies,
+          num_study_participants AS number_of_study_participants,
+          num_study_samples AS number_of_study_samples,
+          phs_accession AS phs_accession,
+          platforms AS platforms,
+          primary_diagnoses AS primary_diagnoses,
+          reference_genome_assemblies AS reference_genome_assemblies,
+          site AS site,
+          studies AS studies,
+          study_data_types AS study_data_types,
+          site AS site_gs,
+          studies AS study_gs,
+          subject_ids AS subject_id_gs,
+          files AS files,
+          samples AS samples,
+          subject_ids AS subject_ids
+      "
+
+# Samples index
+  - index_name: samples
+    type: neo4j
+    mapping:
+      # Filter properties
+      accesses:
+        type: keyword
+      acl:
+        type: keyword
+      experimental_strategies:
+        type: keyword
+      file_types:
+        type: keyword
+      genders:
+        type: keyword
+      instrument_models:
+        type: keyword
+      is_tumor:
+        type: keyword
+      library_layouts:
+        type: keyword
+      library_selections:
+        type: keyword
+      library_sources:
+        type: keyword
+      library_strategies:
+        type: keyword
+      number_of_study_participants:
+        type: integer
+      number_of_study_samples:
+        type: integer
+      phs_accession:
+        type: keyword
+      platforms:
+        type: keyword
+      primary_diagnoses:
+        type: keyword
+      reference_genome_assemblies:
+        type: keyword
+      site:
+        type: keyword
+      studies:
+        type: keyword
+      study_data_types:
+        type: keyword
+      # Global search properties
+      sample_id_gs:
+        type: search_as_you_type
+      is_tumor_gs:
+        type: search_as_you_type
+      analyte_type_gs:
+        type: search_as_you_type
+      # Overview properties
+      analyte_type:
+        type: keyword
+      files:
+        type: keyword
+      sample_id:
+        type: keyword
+      sample_ids:
+        type: keyword
+      subject_ids:
+        type: keyword
+
+    # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
+    cypher_query: "
+      MATCH (samp:sample)-->(p:participant)-->(s:study)
+      WITH 
+        s, 
+        COUNT(DISTINCT p) as num_study_participants, 
+        COUNT(DISTINCT samp) as num_study_samples
+      MATCH (samp:sample)-->(p:participant)-->(s)
+      OPTIONAL MATCH (samp)<--(f:file)
+      OPTIONAL MATCH (p)<--(diag:diagnosis)
+      OPTIONAL MATCH (f)<--(g:genomic_info)
+      WITH
+        samp, p, s, diag, f, g, num_study_participants, num_study_samples,
+        \"Not specified in data\" AS na
+      WITH
+
+        num_study_participants,
+        num_study_samples,
+        s.study_access AS access,
+        s.acl AS acl,
+        s.phs_accession AS phs_accession,
+        s.study_name AS studies, 
+        s.study_data_types AS study_data_types,
+
+        p.gender AS genders,
+        p.participant_id AS subject_ids,
+
+        samp.sample_tumor_status AS is_tumor,
+        samp.sample_type AS analyte_type,
+        samp.sample_id AS sample_id,
+
+        apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT (apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\")), true))) AS experimental_strategies,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_type, na))) AS file_types,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_id, na))) AS files,
+
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))) AS library_layouts, 
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))) AS library_selections, 
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source, na))) AS library_sources, 
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))) AS library_strategies,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))) AS instrument_models,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.platform, na))) AS platforms,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.reference_genome_assembly, na))) AS reference_genome_assemblies,
+
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_diagnosis, na))) AS primary_diagnoses,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na))) AS site
+      RETURN
+        access AS accesses,
+        acl AS acl,
+        experimental_strategies AS experimental_strategies,
+        file_types AS file_types,
+        genders AS genders,
+        instrument_models AS instrument_models,
+        is_tumor AS is_tumor,
+        library_layouts AS library_layouts,
+        library_selections AS library_selections,
+        library_sources AS library_sources,
+        library_strategies AS library_strategies,
+        num_study_participants AS number_of_study_participants,
+        num_study_samples AS number_of_study_samples,
+        phs_accession AS phs_accession,
+        platforms AS platforms,
+        primary_diagnoses AS primary_diagnoses,
+        reference_genome_assemblies AS reference_genome_assemblies,
+        site AS site,
+        studies AS studies,
+        study_data_types AS study_data_types,
+        sample_id AS sample_id_gs,
+        is_tumor AS is_tumor_gs,
+        analyte_type AS analyte_type_gs,
+        analyte_type AS analyte_type,
+        files AS files,
+        sample_id AS sample_id,
+        sample_id AS sample_ids,
+        subject_ids AS subject_ids
+    "
+  - index_name: file_experimental_strategies
+    type: neo4j
+    mapping:
+      file_id:
+        type: keyword
+      # Filter properties
+      accesses:
+        type: keyword
+      acl:
+        type: keyword
+      experimental_strategies:
+        type: keyword
+      file_types:
+        type: keyword
+      genders:
+        type: keyword
+      instrument_models:
+        type: keyword
+      is_tumor:
+        type: keyword
+      library_layouts:
+        type: keyword
+      library_selections:
+        type: keyword
+      library_sources:
+        type: keyword
+      library_strategies:
+        type: keyword
+      number_of_study_participants:
+        type: integer
+      number_of_study_samples:
+        type: integer
+      phs_accession:
+        type: keyword
+      platforms:
+        type: keyword
+      primary_diagnoses:
+        type: keyword
+      reference_genome_assemblies:
+        type: keyword
+      site:
+        type: keyword
+      studies:
+        type: keyword
+      study_data_types:
+        type: keyword
+    cypher_query: "
+      MATCH (s:study)
+      OPTIONAL MATCH (p:participant)-->(s)
+      OPTIONAL MATCH (samp:sample)-->(p)
+      WITH 
+        s, 
+        COUNT(DISTINCT p) as num_study_participants, 
+        COUNT(DISTINCT samp) as num_study_samples
+      MATCH (f:file)-->(s)
+      OPTIONAL MATCH (f)-->(samp:sample)
+      OPTIONAL MATCH (samp)-->(p:participant)
+      OPTIONAL MATCH (diag:diagnosis)-->(p)
+      OPTIONAL MATCH (g:genomic_info)-->(f)
+      UNWIND apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\") AS experimental_strategies
+      WITH
+        samp, p, s, diag, f, g, num_study_participants, num_study_samples, experimental_strategies,
+        \"Not specified in data\" AS na
+      WITH
+
+        num_study_participants,
+        num_study_samples,
+        s.study_access AS access,
+        s.acl AS acl,
+        s.phs_accession AS phs_accession,
+        s.study_name AS studies, 
+        s.study_data_types AS study_data_types,
+
+        COALESCE(p.gender, na) AS genders,
+        COALESCE(p.participant_id, na) AS subject_ids,
+
+        COALESCE(samp.sample_tumor_status, na) AS is_tumor,
+        COALESCE(samp.sample_type, na) AS analyte_type,
+        COALESCE(samp.sample_id, na) AS sample_ids,
+
+        experimental_strategies,
+        f.file_type AS file_types,
+        f.file_id AS files,
+        f.file_name AS file_name,
+        f.file_type AS file_type,
+        f.file_size AS file_size,
+        f.md5sum AS md5sum,
+
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))) AS library_layouts, 
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))) AS library_selections, 
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source, na))) AS library_sources, 
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))) AS library_strategies,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))) AS instrument_models,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.platform, na))) AS platforms,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.reference_genome_assembly, na))) AS reference_genome_assemblies,
+
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_diagnosis, na))) AS primary_diagnoses,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na))) AS site
+      RETURN
+        access AS accesses,
+        acl AS acl,
+        experimental_strategies AS experimental_strategies,
+        file_types AS file_types,
+        genders AS genders,
+        instrument_models AS instrument_models,
+        is_tumor AS is_tumor,
+        library_layouts AS library_layouts,
+        library_selections AS library_selections,
+        library_sources AS library_sources,
+        library_strategies AS library_strategies,
+        num_study_participants AS number_of_study_participants,
+        num_study_samples AS number_of_study_samples,
+        phs_accession AS phs_accession,
+        platforms AS platforms,
+        primary_diagnoses AS primary_diagnoses,
+        reference_genome_assemblies AS reference_genome_assemblies,
+        site AS site,
+        studies AS studies,
+        study_data_types AS study_data_types,
+        analyte_type AS analyte_type,
+        files AS file_id,
+        files AS file_ids,
+        file_name AS file_name,
+        file_name AS file_names,
+        file_type AS file_type,
+        file_size AS file_size,
+        md5sum AS md5sum,
+        sample_ids AS sample_id,
+        sample_ids AS sample_ids,
+        subject_ids AS subject_ids,
+        files AS file_id_gs,
+        file_name AS file_name_gs,
+        file_type AS file_type_gs,
+        subject_ids AS subject_id_gs,
+        sample_ids AS sample_id_gs,
+        access AS accesses_gs,
+        acl AS acl_gs,
+        experimental_strategies AS experimental_strategies_gs,
+        instrument_models AS instrument_models_gs,
+        library_layouts AS library_layouts_gs,
+        library_selections AS library_selections_gs,
+        library_sources AS library_sources_gs,
+        library_strategies AS library_strategies_gs,
+        platforms AS platforms_gs,
+        reference_genome_assemblies AS reference_genome_assemblies_gs,
+        site AS sites_gs
+    "
+
+# Files index
+  - index_name: files
+    type: neo4j
+    mapping:
+      # Filter properties
+      accesses:
+        type: keyword
+      acl:
+        type: keyword
+      experimental_strategies:
+        type: keyword
+      file_types:
+        type: keyword
+      genders:
+        type: keyword
+      instrument_models:
+        type: keyword
+      is_tumor:
+        type: keyword
+      library_layouts:
+        type: keyword
+      library_selections:
+        type: keyword
+      library_sources:
+        type: keyword
+      library_strategies:
+        type: keyword
+      number_of_study_participants:
+        type: integer
+      number_of_study_samples:
+        type: integer
+      phs_accession:
+        type: keyword
+      platforms:
+        type: keyword
+      primary_diagnoses:
+        type: keyword
+      reference_genome_assemblies:
+        type: keyword
+      site:
+        type: keyword
+      studies:
+        type: keyword
+      study_data_types:
+        type: keyword
+      # Overview properties
+      analyte_type:
+        type: keyword
+      file_id:
+        type: keyword
+      file_ids:
+        type: keyword
+      file_name:
+        type: keyword
+      file_names:
+        type: keyword
+      file_type:
+        type: keyword
+      file_size:
+        type: long
+      md5sum:
+        type: keyword
+      sample_id:
+        type: keyword
+      sample_ids:
+        type: keyword
+      subject_ids:
+        type: keyword
+      # Global search properties
+      file_id_gs:
+        type: search_as_you_type
+      file_name_gs:
+        type: search_as_you_type
+      file_type_gs:
+        type: search_as_you_type
+      subject_id_gs:
+        type: search_as_you_type
+      sample_id_gs:
+        type: search_as_you_type
+      accesses_gs:
+        type: search_as_you_type
+      acl_gs:
+        type: search_as_you_type
+      experimental_strategies_gs:
+        type: search_as_you_type
+      instrument_models_gs:
+        type: search_as_you_type
+      library_layouts_gs:
+        type: search_as_you_type
+      library_selections_gs:
+        type: search_as_you_type
+      library_sources_gs:
+        type: search_as_you_type
+      library_strategies_gs:
+        type: search_as_you_type
+      platforms_gs:
+        type: search_as_you_type
+      reference_genome_assemblies_gs:
+        type: search_as_you_type
+      sites_gs:
+        type: search_as_you_type
+    # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
+    cypher_query: "
+      MATCH (s:study)
+      OPTIONAL MATCH (p:participant)-->(s)
+      OPTIONAL MATCH (samp:sample)-->(p)
+      WITH 
+        s, 
+        COUNT(DISTINCT p) as num_study_participants, 
+        COUNT(DISTINCT samp) as num_study_samples
+      MATCH (f:file)-->(s)
+      OPTIONAL MATCH (f)-->(samp:sample)
+      OPTIONAL MATCH (samp)-->(p:participant)
+      OPTIONAL MATCH (diag:diagnosis)-->(p)
+      OPTIONAL MATCH (g:genomic_info)-->(f)
+      WITH
+        samp, p, s, diag, f, g, num_study_participants, num_study_samples,
+        \"Not specified in data\" AS na
+      WITH
+
+        num_study_participants,
+        num_study_samples,
+        s.study_access AS access,
+        s.acl AS acl,
+        s.phs_accession AS phs_accession,
+        s.study_name AS studies, 
+        s.study_data_types AS study_data_types,
+
+        COALESCE(p.gender, na) AS genders,
+        COALESCE(p.participant_id, na) AS subject_ids,
+
+        COALESCE(samp.sample_tumor_status, na) AS is_tumor,
+        COALESCE(samp.sample_type, na) AS analyte_type,
+        COALESCE(samp.sample_id, na) AS sample_ids,
+
+        apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT (apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\")), true))) AS experimental_strategies,
+        f.file_type AS file_types,
+        f.file_id AS files,
+        f.file_name AS file_name,
+        f.file_type AS file_type,
+        f.file_size AS file_size,
+        f.md5sum AS md5sum,
+
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))) AS library_layouts, 
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))) AS library_selections, 
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source, na))) AS library_sources, 
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))) AS library_strategies,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))) AS instrument_models,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.platform, na))) AS platforms,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.reference_genome_assembly, na))) AS reference_genome_assemblies,
+
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_diagnosis, na))) AS primary_diagnoses,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na))) AS site
+      RETURN
+        access AS accesses,
+        acl AS acl,
+        experimental_strategies AS experimental_strategies,
+        file_types AS file_types,
+        genders AS genders,
+        instrument_models AS instrument_models,
+        is_tumor AS is_tumor,
+        library_layouts AS library_layouts,
+        library_selections AS library_selections,
+        library_sources AS library_sources,
+        library_strategies AS library_strategies,
+        num_study_participants AS number_of_study_participants,
+        num_study_samples AS number_of_study_samples,
+        phs_accession AS phs_accession,
+        platforms AS platforms,
+        primary_diagnoses AS primary_diagnoses,
+        reference_genome_assemblies AS reference_genome_assemblies,
+        site AS site,
+        studies AS studies,
+        study_data_types AS study_data_types,
+        analyte_type AS analyte_type,
+        files AS file_id,
+        files AS file_ids,
+        file_name AS file_name,
+        file_name AS file_names,
+        file_type AS file_type,
+        file_size AS file_size,
+        md5sum AS md5sum,
+        sample_ids AS sample_id,
+        sample_ids AS sample_ids,
+        subject_ids AS subject_ids,
+        files AS file_id_gs,
+        file_name AS file_name_gs,
+        file_type AS file_type_gs,
+        subject_ids AS subject_id_gs,
+        sample_ids AS sample_id_gs,
+        access AS accesses_gs,
+        acl AS acl_gs,
+        experimental_strategies AS experimental_strategies_gs,
+        instrument_models AS instrument_models_gs,
+        library_layouts AS library_layouts_gs,
+        library_selections AS library_selections_gs,
+        library_sources AS library_sources_gs,
+        library_strategies AS library_strategies_gs,
+        platforms AS platforms_gs,
+        reference_genome_assemblies AS reference_genome_assemblies_gs,
+        site AS sites_gs
+    "
+
+  - index_name: programs
+    type: neo4j
+    # type mapping for each property of the index
+    mapping:
+      program_name:
+        type: search_as_you_type
+      program_short_description:
+        type: search_as_you_type
+      program_full_description:
+        type: search_as_you_type
+      program_external_url:
+        type: search_as_you_type
+      program_sort_order:
+        type: search_as_you_type
+      program_sort_order_kw:
+        type: keyword
+    # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
+    cypher_query: "
+      MATCH (p:program)
+      WITH p, \"program\" as type
+      RETURN
+        p.program_name AS program_name,
+        p.program_short_description AS program_short_description,
+        p.program_full_description AS program_full_description,
+        p.program_external_url AS program_external_url,
+        p.program_sort_order AS program_sort_order,
+        p.program_sort_order AS program_sort_order_kw,
+        type
+    "
+
+  - index_name: studies
+    type: neo4j
+    # type mapping for each property of the index
+    mapping:
+      study_code:
+        type: keyword
+      phs_accession:
+        type: keyword
+      study_data_types:
+        type: keyword
+      acl:
+        type: keyword
+      study_code_gs:
+        type: search_as_you_type
+      phs_accession_gs:
+        type: search_as_you_type
+      study_name_gs:
+        type: search_as_you_type
+      study_data_types_gs:
+        type: search_as_you_type
+
+
+    # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
+    cypher_query: "
+      MATCH (s:study)
+      OPTIONAL MATCH (s)<--(p:participant)
+      OPTIONAL MATCH (p)<--(samp:sample)
+      RETURN
+        s.study_name AS study_code,
+        s.study_name AS study_code_gs,
+        s.phs_accession AS phs_accession_gs,
+        s.phs_accession AS phs_accession,
+        s.study_name AS study_name,
+        s.study_name AS study_name_gs,
+        s.study_data_types AS study_data_types,
+        s.study_data_types AS study_data_types_gs,
+        s.acl AS acl,
+        COUNT(DISTINCT p) AS number_of_participants,
+        COUNT(DISTINCT samp) AS number_of_samples
+    "
+
+  - index_name: subject_ids
+    type: neo4j
+    # type mapping for each property of the index
+    mapping:
+      phs_accession:
+        type: keyword
+      subject_id:
+        type: keyword
+      # subject_ids must be converted into lower case
+      subject_ids:
+        type: keyword
+
+    # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
+    cypher_query: "
+      MATCH (p:participant)-->(s:study)
+      RETURN
+        s.phs_accession AS phs_accession,
+        p.participant_id AS subject_id,
+        toLower(p.participant_id) AS subject_ids
+    "
+
+  - index_name: about_page
+    type: about_file
+    # type mapping for each property of the index
+    mapping:
+      page:
+        type: search_as_you_type
+      title:
+        type: search_as_you_type
+      primaryContentImage:
+        type: text
+      content:
+        type: object
+
+  - index_name: model_nodes
+    type: model
+    subtype: node
+    # type mapping for each property of the index
+    mapping:
+      node:
+        type: search_as_you_type
+      node_kw:
+        type: keyword
+
+  - index_name: model_properties
+    type: model
+    subtype: property
+    # type mapping for each property of the index
+    mapping:
+      node:
+        type: search_as_you_type
+      property:
+        type: search_as_you_type
+      property_kw:
+        type: keyword
+      property_description:
+        type: search_as_you_type
+      property_required:
+        type: search_as_you_type
+      property_type:
+        type: search_as_you_type
+
+  - index_name: model_values
+    type: model
+    subtype: value
+    # type mapping for each property of the index
+    mapping:
+      node:
+        type: search_as_you_type
+      property:
+        type: search_as_you_type
+      property_description:
+        type: search_as_you_type
+      property_required:
+        type: search_as_you_type
+      property_type:
+        type: search_as_you_type
+      value:
+        type: search_as_you_type
+      value_kw:
+        type: keyword
