@@ -3,5 +3,5 @@ schema {
 }
 
 type QueryType {
-
+    ping: String @cypher(statement: "RETURN 'pong'")
 }

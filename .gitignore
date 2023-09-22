@@ -1,3 +1,5 @@
 
 .idea
 application.properties
+logs
+target
