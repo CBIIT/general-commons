@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>gov.nih.nci.bento</groupId>
-    <artifactId>Bento</artifactId>
+    <artifactId>CDS</artifactId>
     <version>0.0.1</version>
-    <packaging>war</packaging>
-    <name>Bento</name>
+    <packaging>jar</packaging>
+    <name>CDS</name>
     <description>
         The Bento Backend Framework is a server-side backend written in Java to be used with Bento based applications.
         The Bento Backend is meant to be used in conjunction with the Bento Frontend Framework and a Neo4j database.
