@@ -109,11 +109,14 @@ Indices:
           files: apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_id, na)))
         }) AS opensearch_data
       OPTIONAL MATCH (p)<--(diag:diagnosis)
+      WITH p, na, opensearch_data,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na))) AS primary_site,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_diagnosis, na))) AS primary_diagnosis
       WITH p, na, 
         apoc.map.merge(opensearch_data, {
-          primary_diagnoses: apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_diagnosis, na))),
-          site: apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na))),
-          site_gs: apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na)))
+          primary_diagnoses: primary_diagnosis,
+          site: primary_site,
+          site_gs: primary_site
         }) AS opensearch_data
       OPTIONAL MATCH (p)<--(:sample)<--(:file)<--(g:genomic_info)
       WITH p, na, 
@@ -626,20 +629,29 @@ Indices:
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
     cypher_query: "
       MATCH (s:study)
+      WITH s, {
+        study_code: s.study_name,
+        study_code_gs: s.study_name,
+        phs_accession_gs: s.phs_accession,
+        phs_accession: s.phs_accession,
+        study_name: s.study_name,
+        study_name_gs: s.study_name,
+        study_data_types: s.study_data_types,
+        study_data_types_gs: s.study_data_types,
+        acl: s.acl
+      } AS opensearch_data
       OPTIONAL MATCH (s)<--(p:participant)
-      OPTIONAL MATCH (p)<--(samp:sample)
-      RETURN
-        s.study_name AS study_code,
-        s.study_name AS study_code_gs,
-        s.phs_accession AS phs_accession_gs,
-        s.phs_accession AS phs_accession,
-        s.study_name AS study_name,
-        s.study_name AS study_name_gs,
-        s.study_data_types AS study_data_types,
-        s.study_data_types AS study_data_types_gs,
-        s.acl AS acl,
-        COUNT(DISTINCT p) AS number_of_participants,
-        COUNT(DISTINCT samp) AS number_of_samples
+      WITH s, 
+        apoc.map.merge(opensearch_data, {
+          number_of_participants: COUNT(DISTINCT p)
+        }) AS opensearch_data
+      OPTIONAL MATCH (s)<--(:participant)<--(samp:sample)
+      WITH s, 
+        apoc.map.merge(opensearch_data, {
+          number_of_samples: COUNT(DISTINCT samp)
+        }) AS opensearch_data
+      RETURN opensearch_data
+      ORDER BY opensearch_data.study_code
     "
 # Subject IDs index
   - index_name: subject_ids
