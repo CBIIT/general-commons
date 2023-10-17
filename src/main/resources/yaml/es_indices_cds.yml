@@ -339,17 +339,24 @@ Indices:
           md5sum: f.md5sum
         }) AS opensearch_data
       OPTIONAL MATCH (f)-->(:sample)-->(p:participant)
+      WITH f, na, opensearch_data,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.gender, na))) AS gender,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.participant_id, na))) AS participant_id
       WITH f, na,
         apoc.map.merge(opensearch_data, {
-          genders: COALESCE(p.gender, na),
-          subject_ids: COALESCE(p.participant_id, na)
+          genders: gender,
+          subject_ids: participant_id
         }) AS opensearch_data
       OPTIONAL MATCH (f)-->(samp:sample)
+      WITH f, na, opensearch_data,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_tumor_status, na))) AS sample_tumor_status,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_type, na))) AS sample_type,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_id, na))) AS sample_id
       WITH f, na,
         apoc.map.merge(opensearch_data, {
-          is_tumor: COALESCE(samp.sample_tumor_status, na),
-          analyte_type: COALESCE(samp.sample_type, na),
-          sample_ids: COALESCE(samp.sample_id, na)
+          is_tumor: sample_tumor_status,
+          analyte_type: sample_type,
+          sample_ids: sample_id
         }) AS opensearch_data
       OPTIONAL MATCH (f)<--(g:genomic_info)
       WITH f, na,
@@ -513,8 +520,8 @@ Indices:
         }) AS opensearch_data
       OPTIONAL MATCH (f)-->(:sample)-->(p:participant)
       WITH f, na, opensearch_data,
-        COALESCE(p.gender, na) AS gender,
-        COALESCE(p.participant_id, na) AS participant_id
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.gender, na))) AS gender,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.participant_id, na))) AS participant_id
       WITH f, na,
         apoc.map.merge(opensearch_data, {
           genders: gender,
@@ -523,9 +530,9 @@ Indices:
         }) AS opensearch_data
       OPTIONAL MATCH (f)-->(samp:sample)
       WITH f, na, opensearch_data,
-        COALESCE(samp.sample_tumor_status, na) AS sample_tumor_status,
-        COALESCE(samp.sample_type, na) AS sample_type,
-        COALESCE(samp.sample_id, na) AS sample_id
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_tumor_status, na))) AS sample_tumor_status,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_type, na))) AS sample_type,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_id, na))) AS sample_id
       WITH f, na,
         apoc.map.merge(opensearch_data, {
           is_tumor: sample_tumor_status,
