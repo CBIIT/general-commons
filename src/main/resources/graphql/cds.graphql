@@ -250,53 +250,75 @@ type QueryType {
     "Get lists of all subject ids, used by Local Find"
     idsLists: IdsLists @cypher(statement: """
         MATCH (p:participant)
-        WITH COLLECT(DISTINCT p.participant_id) as study_subjects
         RETURN {
-            subjectIds: study_subjects
-        }
+            subjectIds: COLLECT(DISTINCT p.participant_id)
+        } AS output
     """, passThrough: true)
 
 
     # Study Detail Page
     studyDetail(phs_accession: String): StudyDetail @cypher(statement:  """
         MATCH (s:study {phs_accession: $phs_accession})
-        OPTIONAL MATCH (s)<--(p:participant)
-        OPTIONAL MATCH (p)<--(samp:sample)
-        OPTIONAL MATCH (p)<--(diag:diagnosis)
-        OPTIONAL MATCH (s)<--(f:file)
-        RETURN {
+        WITH s, {
             study_name: s.study_name,
             phs_accession: s.phs_accession,
             study_acronym: s.study_acronym,
             study_description: s.study_description,
             data_types: s.study_data_types,
-            study_external_url: s.study_external_url,
-            numberOfSubjects: COUNT(DISTINCT p),
-            numberOfSamples: COUNT(DISTINCT samp),
-            numberOfDiseaseSites: COUNT(DISTINCT diag.primary_site),
-            numberOfFiles: COUNT(DISTINCT f)
-        }
+            study_external_url: s.study_external_url
+        } AS output
+        OPTIONAL MATCH (s)<--(p:participant)
+        WITH s,
+            apoc.map.merge(output, {
+                numberOfSubjects: COUNT(DISTINCT p)
+            }) AS output
+        OPTIONAL MATCH (s)<--(:participant)<--(samp:sample)
+        WITH s,
+            apoc.map.merge(output, {
+                numberOfSamples: COUNT(DISTINCT samp)
+            }) AS output
+        OPTIONAL MATCH (s)<--(:participant)<--(diag:diagnosis)
+        WITH s,
+            apoc.map.merge(output, {
+                numberOfDiseaseSites: COUNT(DISTINCT diag.primary_site)
+            }) AS output
+        OPTIONAL MATCH (s)<--(f:file)
+        WITH s,
+            apoc.map.merge(output, {
+                numberOfFiles: COUNT(DISTINCT f)
+            }) AS output
+        RETURN output
     """, passThrough: true)
 
 
     # Subject Detail Page
     subjectDetail(subject_id: String): SubjectDetail @cypher(statement:  """
         MATCH (s:study)<--(p:participant {participant_id: $subject_id})
-        OPTIONAL MATCH (p)<--(samp:sample)
-        OPTIONAL MATCH (p)<--(diag:diagnosis)
-        OPTIONAL MATCH (samp)<--(f:file)
-        RETURN {
+        WITH p, {
             subject_id: p.participant_id,
             study_acronym: s.study_acronym,
             study_name: s.study_name,
-            gender: p.gender,
-            site: COLLECT(DISTINCT samp.sample_anatomic_site),
-            samples: COLLECT(DISTINCT samp{.*}),
-            files: COLLECT(DISTINCT f{.*}),
-            numberOfSamples: COUNT(DISTINCT samp),
-            numberOfDiseaseSites: COUNT(DISTINCT diag.primary_site),
-            numberOfFiles: COUNT(DISTINCT f)
-        }
+            gender: p.gender
+        } AS output
+        OPTIONAL MATCH (p)<--(samp:sample)
+        WITH p,
+            apoc.map.merge(output, {
+                site: COLLECT(DISTINCT samp.sample_anatomic_site),
+                samples: COLLECT(DISTINCT samp{.*}),
+                numberOfSamples: COUNT(DISTINCT samp)
+            } AS output
+        OPTIONAL MATCH (p)<--(diag:diagnosis)
+        WITH p,
+            apoc.map.merge(output, {
+                numberOfDiseaseSites: COUNT(DISTINCT diag.primary_site)
+            } AS output
+        OPTIONAL MATCH (samp)<--(f:file)
+        WITH p,
+            apoc.map.merge(output, {
+                files: COLLECT(DISTINCT f{.*}),
+                numberOfFiles: COUNT(DISTINCT f)
+            } AS output
+        RETURN output
     """, passThrough: true)
 
     samplesForSubjectId(subject_id: String!): [sample] @cypher(statement: """
@@ -321,60 +343,69 @@ type QueryType {
     """, passThrough: true)
 
     programDetail(program_name: String!): ProgramDetail @cypher(statement: """
-        MATCH (p:program {program_name: $program_name})
-        OPTIONAL MATCH (p)<-[:of_program]-(s:study)
-        OPTIONAL MATCH (s)<-[:of_study]-(part:participant)
-        OPTIONAL MATCH (part)<-[:of_participant]-(samp:sample)
-        OPTIONAL MATCH (samp)<-[:from_sample]-(f:file)
-        OPTIONAL MATCH (part)<--(diag:diagnosis)
-        WITH p,
-            COUNT(DISTINCT s) AS num_studies,
-            COUNT(DISTINCT part) AS num_participants,
-            COUNT(DISTINCT f) AS num_files,
-            COUNT(DISTINCT samp) AS num_samples,
-            COUNT(DISTINCT diag.primary_site) AS num_disease_sites
-        OPTIONAL MATCH (p)<-[:of_program]-(s:study)
-        OPTIONAL MATCH (s)<-[:of_study]-(part:participant)
-        OPTIONAL MATCH (part)<-[:of_participant]-(samp:sample)
-        OPTIONAL MATCH (samp)<-[:from_sample]-(f:file)
-        WITH p, num_studies, num_participants, num_files, num_samples, num_disease_sites,
+        MATCH (pr:program {program_name: $program_name})
+        OPTIONAL MATCH (pr)<--(s:study)
+        WITH s
+        OPTIONAL MATCH (s)<--(p:participant)
+        WITH s, count(distinct p) as num_participants
+        WITH s,
             {
                 group: s.study_name,
-                subjects: COUNT(DISTINCT part)
+                subjects: num_participants
             } AS study_participants,
             {
-                accession: s.phs_accession, 
+                accession: s.phs_accession,
                 study_access: s.study_access,
                 study_name: s.study_name,
                 study_description: s.study_description,
                 short_description: s.short_description,
-                num_participants: COUNT(DISTINCT part),
-                num_samples: COUNT(DISTINCT samp)
-            } AS study
-        WITH p, num_studies, num_participants, num_files, num_samples, num_disease_sites,
-            COLLECT(DISTINCT study_participants) AS study_participants, COLLECT(DISTINCT study) AS studies
-        RETURN {
-            program: p.program_acronym,
-            program_name: p.program_name,
-            program_url: p.program_external_url,
-            program_short_description: p.program_short_description,
-            num_studies: num_studies,
-            num_participants: num_participants,
-            num_files: num_files,
-            num_samples: num_samples,
-            num_disease_sites: num_disease_sites,
-            study_participants: study_participants,
-            studies: studies
-        }
+                num_participants: num_participants
+            } AS studies
+        OPTIONAL MATCH (s)<--(:participant)<--(samp:sample)
+        WITH s, study_participants,
+            apoc.map.merge(studies, {
+                num_samples: count(distinct samp)
+            }) AS studies
+        OPTIONAL MATCH (pr:program)<--(s)
+        WITH pr, {
+            program: pr.program_acronym,
+            program_name: pr.program_name,
+            program_url: pr.program_external_url,
+            program_short_description: pr.program_short_description,
+            num_studies: COUNT(DISTINCT s),
+            studies: collect(distinct studies),
+            study_participants: collect(distinct study_participants)
+        } as output
+        OPTIONAL MATCH (pr)<--(:study)<--(p:participant)
+        WITH pr,
+            apoc.map.merge(output, {
+                num_participants: count(distinct p)
+            }) as output
+        OPTIONAL MATCH (pr)<--(:study)<--(:participant)<--(samp:sample)
+        WITH pr,
+            apoc.map.merge(output, {
+                num_samples: count(distinct samp)
+            }) as output
+        OPTIONAL MATCH (pr)<--(:study)<--(f:file)
+        WITH pr,
+            apoc.map.merge(output, {
+                num_files: count(distinct f)
+            }) as output
+        OPTIONAL MATCH (pr)<--(:study)<--(:participant)<--(diag:diagnosis)
+        WITH pr,
+            apoc.map.merge(output, {
+                num_disease_sites: COUNT(DISTINCT diag.primary_site)
+            }) as output
+        RETURN output
     """, passThrough: true) 
 
     programList: [ProgramListEntry] @cypher(statement: """
-        MATCH (p:program)
-        OPTIONAL MATCH (p)<-[:of_program]-(s:study)
+        MATCH (pr:program)
+        OPTIONAL MATCH (pr)<--(s:study)
         RETURN DISTINCT {
-            acronym: p.program_acronym,
-            name: p.program_name,
-            website: p.program_external_url,
+            acronym: pr.program_acronym,
+            name: pr.program_name,
+            website: pr.program_external_url,
             num_studies: COUNT(DISTINCT s)
         }
     """, passThrough: true)
