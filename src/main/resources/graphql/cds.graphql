@@ -252,7 +252,7 @@ type QueryType {
         MATCH (p:participant)
         RETURN {
             subjectIds: COLLECT(DISTINCT p.participant_id)
-        } AS output
+        }
     """, passThrough: true)
 
 
