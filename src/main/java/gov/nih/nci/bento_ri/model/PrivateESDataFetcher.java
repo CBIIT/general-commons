@@ -407,7 +407,18 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("md5sum", "md5sum")
         );
 
-        return overview(FILES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
+        ArrayList<String> joinProperties = new ArrayList<>(Arrays.asList(
+                "primary_diagnoses", "site", "sample_id", "analyte_type", "is_tumor", "gender", "subject_id"));
+        List<Map<String, Object>> fileOverview = overview(FILES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
+        fileOverview.forEach( x -> {
+            x.keySet().forEach( k -> {
+                if (joinProperties.contains(k)){
+                    List<String> values = (List<String>) x.get(k);
+                    x.put(k, String.join(", ", values));
+                }
+            });
+        });
+        return fileOverview;
     }
 
     private List<Map<String, Object>> overview(String endpoint, Map<String, Object> params, String[][] properties, String defaultSort, Map<String, String> mapping) throws IOException {
