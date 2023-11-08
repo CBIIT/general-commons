@@ -326,7 +326,7 @@ Indices:
           number_of_study_samples: count(distinct samp)
         }) AS opensearch_data
       MATCH (s)<--(f:file)
-      UNWIND apoc.text.split(coalesce(f.experimental_strategy_and_data_subtypes, na),\"[;,]\\s{0,1}\") AS experimental_strategies
+      UNWIND coalesce(apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\"), na) AS experimental_strategies
       WITH f, na, toUpper(f.file_type) AS file_type, opensearch_data, experimental_strategies
       WITH f, na,
         apoc.map.merge(opensearch_data, {
@@ -500,8 +500,10 @@ Indices:
           number_of_study_samples: count(distinct samp)
         }) AS opensearch_data
       MATCH (s)<--(f:file)
-      WITH f, \"Not specified in data\" AS na, opensearch_data, toUpper(f.file_type) AS file_type,
-        apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT (apoc.text.split(coalesce(f.experimental_strategy_and_data_subtypes, na),\"[;,]\\s{0,1}\")), true))) AS experimental_strategy_and_data_subtypes
+      WITH f, \"Not specified in data\" AS na, opensearch_data
+      WITH f, na, opensearch_data,
+        toUpper(f.file_type) AS file_type, 
+        apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT(coalesce(apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\"), na)),true))) AS experimental_strategy_and_data_subtypes
       WITH f, na, 
         apoc.map.merge(opensearch_data, {
           experimental_strategies: experimental_strategy_and_data_subtypes,
