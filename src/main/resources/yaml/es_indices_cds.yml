@@ -327,7 +327,7 @@ Indices:
         }) AS opensearch_data
       MATCH (s)<--(f:file)
       UNWIND coalesce(apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\"), na) AS experimental_strategies
-      WITH f, na, toUpper(f.file_type) AS file_type, opensearch_data, experimental_strategies
+      WITH f, na, opensearch_data, experimental_strategies, CASE WHEN f.file_type = na THEN na ELSE toUpper(f.file_type) END AS file_type 
       WITH f, na,
         apoc.map.merge(opensearch_data, {
           experimental_strategies: experimental_strategies,
@@ -502,7 +502,7 @@ Indices:
       MATCH (s)<--(f:file)
       WITH f, \"Not specified in data\" AS na, opensearch_data
       WITH f, na, opensearch_data,
-        toUpper(f.file_type) AS file_type, 
+        CASE WHEN f.file_type = na THEN na ELSE toUpper(f.file_type) END AS file_type, 
         apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT(coalesce(apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\"), na)),true))) AS experimental_strategy_and_data_subtypes
       WITH f, na, 
         apoc.map.merge(opensearch_data, {
