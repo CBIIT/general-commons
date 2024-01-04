@@ -3,3 +3,4 @@
 application.properties
 logs
 target
+ignore.*

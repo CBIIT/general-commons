@@ -17,13 +17,13 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.2</version>
+        <version>3.0.12</version>
     </parent>
 
 
     <properties>
         <java.version>17</java.version>
-        <spring.version>6.0.4</spring.version>
+        <spring.version>6.0.13</spring.version>
         <spring.restdocs.version>3.0.0</spring.restdocs.version>
     </properties>
 
@@ -86,7 +86,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>19.2</version>
+            <version>19.9</version>
         </dependency>
         <!-- GSON -->
         <dependency>
@@ -117,7 +117,7 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>10.1.5</version>
+            <version>10.1.14</version>
         </dependency>
         <!-- JUnit -->
         <dependency>
@@ -149,12 +149,12 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-graphql-java</artifactId>
-            <version>1.7.0</version>
+            <version>1.8.0</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j.driver</groupId>
             <artifactId>neo4j-java-driver</artifactId>
-            <version>4.2.0</version>
+            <version>5.14.0</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
@@ -243,7 +243,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20220924</version>
+            <version>20231013</version>
         </dependency>
     </dependencies>
 
@@ -256,13 +256,17 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0-M2</version>
+                <version>3.4.1</version>
                 <executions>
                   <execution>
                     <id>enforce</id>
                     <configuration>
                       <rules>
-                        <dependencyConvergence/>
+                        <dependencyConvergence>
+                          <excludes>
+                              <exclude>com.graphql-java:graphql-java</exclude>
+                          </excludes>
+                      </dependencyConvergence>
                       </rules>
                     </configuration>
                     <goals>
@@ -270,6 +274,11 @@
                     </goals>
                   </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>8.4.2</version>
             </plugin>
         </plugins>
     </build>

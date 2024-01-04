@@ -321,20 +321,21 @@ Indices:
           number_of_study_participants: count(distinct p)
         } AS opensearch_data
       OPTIONAL MATCH (s)<--(:participant)<--(samp:sample)
-      WITH s, 
+      WITH s, \"Not specified in data\" AS na,
         apoc.map.merge(opensearch_data, {
           number_of_study_samples: count(distinct samp)
         }) AS opensearch_data
       MATCH (s)<--(f:file)
-      UNWIND apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\") AS experimental_strategies
-      WITH f, \"Not specified in data\" AS na,
+      UNWIND coalesce(apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\"), na) AS experimental_strategies
+      WITH f, na, opensearch_data, experimental_strategies, CASE WHEN f.file_type = na THEN na ELSE toUpper(f.file_type) END AS file_type 
+      WITH f, na,
         apoc.map.merge(opensearch_data, {
           experimental_strategies: experimental_strategies,
-          file_types: f.file_type ,
+          file_types: file_type ,
           files: f.file_id,
           file_id: f.file_id,
           file_name: f.file_name,
-          file_type: f.file_type,
+          file_type: file_type,
           file_size: f.file_size,
           md5sum: f.md5sum
         }) AS opensearch_data
@@ -499,18 +500,20 @@ Indices:
           number_of_study_samples: count(distinct samp)
         }) AS opensearch_data
       MATCH (s)<--(f:file)
-      WITH f, \"Not specified in data\" AS na, opensearch_data,
-        apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT (apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\")), true))) AS experimental_strategy_and_data_subtypes
+      WITH f, \"Not specified in data\" AS na, opensearch_data
+      WITH f, na, opensearch_data,
+        CASE WHEN f.file_type = na THEN na ELSE toUpper(f.file_type) END AS file_type, 
+        apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT(coalesce(apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\"), na)),true))) AS experimental_strategy_and_data_subtypes
       WITH f, na, 
         apoc.map.merge(opensearch_data, {
           experimental_strategies: experimental_strategy_and_data_subtypes,
-          file_types: f.file_type ,
+          file_types: file_type ,
           files: f.file_id,
           file_id: f.file_id,
           file_ids: f.file_id,
           file_name: f.file_name,
           file_names: f.file_name,
-          file_type: f.file_type,
+          file_type: file_type,
           file_size: f.file_size,
           md5sum: f.md5sum,
           experimental_strategies_gs: experimental_strategy_and_data_subtypes,
