@@ -733,16 +733,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             query.put("sort", Map.of(sortFieldName, "asc"));
             query = addHighlight(query, category);
 
-            if (combinedCategories.contains(resultFieldName)) {
-                query.put("size", ESService.MAX_ES_SIZE);
-                query.put("from", 0);
-            } else {
-                query.put("size", size);
-                query.put("from", offset);
-            }
             request.setJsonEntity(gson.toJson(query));
-            JsonObject jsonObject = esService.send(request);
-            List<Map<String, Object>> objects = esService.collectPage(jsonObject, properties, highlights, (int)query.get("size"), 0);
+            List<Map<String, Object>> objects = esService.collectPage(request, query, properties, highlights, size, offset);
 
             for (var object: objects) {
                 object.put(GS_CATEGORY_TYPE, category.get(GS_CATEGORY_TYPE));
