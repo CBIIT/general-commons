@@ -427,6 +427,8 @@ Indices:
       # Overview properties
       analyte_type:
         type: keyword
+      analyte_type_sort:
+        type: keyword
       file_id:
         type: keyword
       file_ids:
@@ -540,6 +542,7 @@ Indices:
         apoc.map.merge(opensearch_data, {
           is_tumor: sample_tumor_status,
           analyte_type: sample_type,
+          analyte_type_sort: apoc.text.join(sample_type, ''),
           sample_id: sample_id,
           sample_ids: sample_id,
           sample_id_gs: sample_id
