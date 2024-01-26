@@ -279,6 +279,8 @@ Indices:
         type: keyword
       genders:
         type: keyword
+      image_modality:
+        type: keyword
       instrument_models:
         type: keyword
       is_tumor:
@@ -302,6 +304,8 @@ Indices:
       primary_diagnoses:
         type: keyword
       reference_genome_assemblies:
+        type: keyword
+      sample_type:
         type: keyword
       site:
         type: keyword
@@ -376,6 +380,11 @@ Indices:
           primary_diagnoses: apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_diagnosis, na))),
           site: apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na)))
         }) AS opensearch_data
+      OPTIONAL MATCH (f)<--(i:image)
+      WITH f, na, 
+        apoc.map.merge(opensearch_data, {
+          image_modality: COALESCE(i.image_modality, na)
+        }
       RETURN opensearch_data
       ORDER BY opensearch_data.files
     "
@@ -393,6 +402,8 @@ Indices:
       file_types:
         type: keyword
       genders:
+        type: keyword
+      image_modality:
         type: keyword
       instrument_models:
         type: keyword
@@ -417,6 +428,8 @@ Indices:
       primary_diagnoses:
         type: keyword
       reference_genome_assemblies:
+        type: keyword
+      sample_type:
         type: keyword
       site:
         type: keyword

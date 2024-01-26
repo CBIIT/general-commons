@@ -58,10 +58,12 @@ type SearchResult {
     subjectCountByLibrarySelection: [GroupCount]
     subjectCountByLibraryLayout: [GroupCount]
     subjectCountByPlatform: [GroupCount]
+    subjectCountByImageModality: [GroupCount]
     subjectCountByInstrumentModel: [GroupCount]
     subjectCountByReferenceGenomeAssembly: [GroupCount]
     subjectCountByPrimaryDiagnosis: [GroupCount]
     subjectCountByPhsAccession: [GroupCount]
+    subjectCountBySampleType: [GroupCount]
     subjectCountByStudyDataType: [GroupCount]
     subjectCountByAcl: [GroupCount]
 
@@ -78,10 +80,12 @@ type SearchResult {
     filterSubjectCountByLibrarySelection: [GroupCount]
     filterSubjectCountByLibraryLayout: [GroupCount]
     filterSubjectCountByPlatform: [GroupCount]
+    filterSubjectCountByImageModality: [GroupCount]
     filterSubjectCountByInstrumentModel: [GroupCount]
     filterSubjectCountByReferenceGenomeAssembly: [GroupCount]
     filterSubjectCountByPrimaryDiagnosis: [GroupCount]
     filterSubjectCountByPhsAccession: [GroupCount]
+    filterSubjectCountBySampleType: [GroupCount]
     filterSubjectCountByStudyDataType: [GroupCount]
     filterSubjectCountByAcl: [GroupCount]
     filterSubjectCountByNumberOfStudyParticipants: RangeCount
@@ -210,6 +214,7 @@ type QueryType {
         experimental_strategies: [String] = [],
         file_types: [String] = [],
         genders: [String] = [],
+        image_modality: [String] = [],
         instrument_models: [String] = [],
         is_tumor: [String] = [],
         library_layouts: [String] = [],
@@ -222,6 +227,7 @@ type QueryType {
         platforms: [String] = [],
         primary_diagnoses: [String] = [],
         reference_genome_assemblies: [String] = [],
+        sample_types: [String] = [],
         site: [String] = [],
         studies: [String] = [],
         study_data_types: [String] = []
@@ -235,6 +241,7 @@ type QueryType {
         experimental_strategies: [String] = [],
         file_types: [String] = [],
         genders: [String] = [],
+        image_modality: [String] = [],
         instrument_models: [String] = [],
         is_tumor: [String] = [],
         library_layouts: [String] = [],
@@ -247,6 +254,7 @@ type QueryType {
         platforms: [String] = [],
         primary_diagnoses: [String] = [],
         reference_genome_assemblies: [String] = [],
+        sample_types: [String] = [],
         site: [String] = [],
         studies: [String] = [],
         study_data_types: [String] = [],
@@ -266,6 +274,7 @@ type QueryType {
         experimental_strategies: [String] = [],
         file_types: [String] = [],
         genders: [String] = [],
+        image_modality: [String] = [],
         instrument_models: [String] = [],
         is_tumor: [String] = [],
         library_layouts: [String] = [],
@@ -278,9 +287,10 @@ type QueryType {
         platforms: [String] = [],
         primary_diagnoses: [String] = [],
         reference_genome_assemblies: [String] = [],
+        sample_types: [String] = [],
         site: [String] = [],
         studies: [String] = [],
-        study_data_types: [String] = []
+        study_data_types: [String] = [],
 
         order_by: String = "",
         sort_direction: String = "ASC",
@@ -298,6 +308,7 @@ type QueryType {
         experimental_strategies: [String] = [],
         file_types: [String] = [],
         genders: [String] = [],
+        image_modality: [String] = [],
         instrument_models: [String] = [],
         is_tumor: [String] = [],
         library_layouts: [String] = [],
@@ -310,6 +321,7 @@ type QueryType {
         platforms: [String] = [],
         primary_diagnoses: [String] = [],
         reference_genome_assemblies: [String] = [],
+        sample_types: [String] = [],
         site: [String] = [],
         studies: [String] = [],
         study_data_types: [String] = [],
