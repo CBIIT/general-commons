@@ -137,7 +137,7 @@ Indices:
       OPTIONAL MATCH (p)<--(:sample)<--(:file)<--(i:image)
       WITH p, na, 
         apoc.map.merge(opensearch_data, {
-          image_modality: COALESCE(i.image_modality, na)
+          image_modality: apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na)))
         }) AS opensearch_data
       RETURN opensearch_data
       ORDER BY opensearch_data.subject_ids
@@ -277,7 +277,7 @@ Indices:
       OPTIONAL MATCH (samp)<--(:file)<--(i:image)
       WITH samp, na, 
         apoc.map.merge(opensearch_data, {
-          image_modality: COALESCE(i.image_modality, na)
+          image_modality: apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na)))
         }) AS opensearch_data
       RETURN opensearch_data
       ORDER BY opensearch_data.sample_id
@@ -404,7 +404,7 @@ Indices:
       OPTIONAL MATCH (f)<--(i:image)
       WITH f, na, 
         apoc.map.merge(opensearch_data, {
-          image_modality: COALESCE(i.image_modality, na)
+          image_modality: apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na)))
         }) AS opensearch_data
       RETURN opensearch_data
       ORDER BY opensearch_data.files
@@ -621,7 +621,7 @@ Indices:
       OPTIONAL MATCH (f)<--(i:image)
       WITH f, na, 
         apoc.map.merge(opensearch_data, {
-          image_modality: COALESCE(i.image_modality, na)
+          image_modality: apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na)))
         }) AS opensearch_data
       RETURN opensearch_data
       ORDER BY opensearch_data.files
