@@ -236,6 +236,19 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 FILTER_COUNT_QUERY, "filterSubjectCountByAcl",
                 AGG_ENDPOINT, FILES_END_POINT
         ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "sample_types",
+                WIDGET_QUERY, "subjectCountBySampleType",
+                FILTER_COUNT_QUERY, "filterSubjectCountBySampleType",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "image_modality",
+                WIDGET_QUERY, "subjectCountByImageModality",
+                FILTER_COUNT_QUERY, "filterSubjectCountByImageModality",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+
 
 
         List<String> agg_names = new ArrayList<>();

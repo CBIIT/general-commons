@@ -42,7 +42,7 @@ Indices:
         type: keyword
       reference_genome_assemblies:
         type: keyword
-      sample_type:
+      sample_types:
         type: keyword
       site:
         type: keyword
@@ -104,7 +104,7 @@ Indices:
         apoc.map.merge(opensearch_data, {
           is_tumor: apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_tumor_status, na))),
           samples: apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_id, na))),
-          sample_type: apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_type, na))) AS sample_type
+          sample_types: apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_type, na)))
         }) AS opensearch_data
       OPTIONAL MATCH (p)<--(:sample)<--(f:file)
       WITH p, na, 
@@ -183,7 +183,7 @@ Indices:
         type: keyword
       reference_genome_assemblies:
         type: keyword
-      sample_type:
+      sample_types:
         type: keyword
       site:
         type: keyword
@@ -234,7 +234,7 @@ Indices:
         apoc.map.merge(opensearch_data, {
           is_tumor: samp.sample_tumor_status,
           analyte_type: samp.sample_type,
-          sample_type: samp.sample_type,
+          sample_types: samp.sample_type,
           sample_id: samp.sample_id,
           sample_ids: samp.sample_id
         }) AS opensearch_data
@@ -325,7 +325,7 @@ Indices:
         type: keyword
       reference_genome_assemblies:
         type: keyword
-      sample_type:
+      sample_types:
         type: keyword
       site:
         type: keyword
@@ -381,7 +381,7 @@ Indices:
         apoc.map.merge(opensearch_data, {
           is_tumor: sample_tumor_status,
           analyte_type: sample_type,
-          sample_type, sample_type
+          sample_types: sample_type,
           sample_ids: sample_id
         }) AS opensearch_data
       OPTIONAL MATCH (f)<--(g:genomic_info)
@@ -450,7 +450,7 @@ Indices:
         type: keyword
       reference_genome_assemblies:
         type: keyword
-      sample_type:
+      sample_types:
         type: keyword
       site:
         type: keyword
@@ -575,6 +575,7 @@ Indices:
       WITH f, na, 
         apoc.map.merge(opensearch_data, {
           is_tumor: sample_tumor_status,
+          sample_types: sample_type,
           analyte_type: sample_type,
           analyte_type_sort: apoc.text.join(sample_type, ''),
           sample_id: sample_id,
