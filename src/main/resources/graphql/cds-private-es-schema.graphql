@@ -4,7 +4,9 @@ type SubjectOverview {
     phs_accession: String
     gender: String
     site: [String]
-
+    race: String
+    ethnicity: String
+    primary_diagnosis: String
     samples: [String]
     files: [String]
 }
@@ -14,10 +16,11 @@ type SampleOverview {
     phs_accession: String
     subject_id: String
     sample_id: String
-
+    sample_type: String
+    sample_tumor_status: String
+    organ_or_tissue: [String]
     is_tumor: String
     analyte_type: String
-
     files: [String]
 }
 
@@ -36,6 +39,9 @@ type FileOverview {
     file_size: Float
     file_id: String
     md5sum: String
+    study_data_type: String
+    library_strategy: String
+    image_modality: String
 }
 
 type SearchResult {

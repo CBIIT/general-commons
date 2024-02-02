@@ -327,7 +327,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"site", "site"},
                 new String[]{"samples", "samples"},
                 new String[]{"files", "files"},
-                new String[]{"analyte_type", "analyte_type"}
+                new String[]{"analyte_type", "analyte_type"},
+                new String[]{"race", "race"},
+                new String[]{"ethnicity", "ethnicity"},
+                new String[]{"primary_diagnosis", "primary_diagnoses"}
         };
 
         String defaultSort = "subject_ids"; // Default sort order
@@ -338,7 +341,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("phs_accession", "phs_accession"),
                 Map.entry("gender", "genders"),
                 Map.entry("site", "site"),
-                Map.entry("analyte_type", "analyte_type")
+                Map.entry("analyte_type", "analyte_type"),
+                Map.entry("race", "race"),
+                Map.entry("ethnicity", "ethnicity"),
+                Map.entry("primary_diagnosis", "primary_diagnoses")
         );
 
         return overview(SUBJECTS_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
@@ -352,7 +358,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"sample_id", "sample_id"},
                 new String[]{"is_tumor", "is_tumor"},
                 new String[]{"analyte_type", "analyte_type"},
-                new String[]{"files", "files"}
+                new String[]{"files", "files"},
+                new String[]{"sample_type", "analyte_type"},
+                new String[]{"sample_tumor_status", "is_tumor"},
+                new String[]{"organ_or_tissue", "organ_or_tissue"}
         };
 
         String defaultSort = "sample_id"; // Default sort order
@@ -363,7 +372,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("subject_id", "subject_ids"),
                 Map.entry("sample_id", "sample_id"),
                 Map.entry("is_tumor", "is_tumor"),
-                Map.entry("analyte_type", "analyte_type")
+                Map.entry("analyte_type", "analyte_type"),
+                Map.entry("sample_type", "analyte_type"),
+                Map.entry("sample_tumor_status", "is_tumor"),
+                Map.entry("organ_or_tissue", "organ_or_tissue")
         );
 
         return overview(SAMPLES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
@@ -385,7 +397,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"file_type", "file_type"},
                 new String[]{"file_size", "file_size"},
                 new String[]{"file_id", "file_id"},
-                new String[]{"md5sum", "md5sum"}
+                new String[]{"md5sum", "md5sum"},
+                new String[]{"study_data_type", "study_data_types"},
+                new String[]{"library_strategy", "library_strategies"},
+                new String[]{"image_modality", "image_modality"}
         };
 
         String defaultSort = "file_name"; // Default sort order
@@ -404,7 +419,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("file_type", "file_type"),
                 Map.entry("file_size", "file_size"),
                 Map.entry("file_id", "file_id"),
-                Map.entry("md5sum", "md5sum")
+                Map.entry("md5sum", "md5sum"),
+                Map.entry("study_data_type", "study_data_types"),
+                Map.entry("library_strategy", "library_strategies"),
+                Map.entry("image_modality", "image_modality")
         );
 
         ArrayList<String> joinProperties = new ArrayList<>(Arrays.asList(
