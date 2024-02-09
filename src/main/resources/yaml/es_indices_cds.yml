@@ -66,6 +66,10 @@ Indices:
         type: keyword
       subject_ids:
         type: keyword
+      ethnicity:
+        type: keyword
+      race:
+        type: keyword
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
     cypher_query: "
       MATCH (s:study)<--(p:participant)
@@ -88,10 +92,12 @@ Indices:
           number_of_study_samples: count(distinct samp)
         }) AS opensearch_data
       MATCH (s)<--(p:participant)
-      WITH p, 
-        \"Not specified in data\" AS na, 
+      WITH p, \"Not specified in data\" AS na, opensearch_data
+      WITH p, na,
         apoc.map.merge(opensearch_data, {
           genders: p.gender,
+          ethnicity: COALESCE(p.ethnicity, na),
+          race: COALESCE(p.race, na),
           subject_ids: p.participant_id
         }) AS opensearch_data
       WITH p, na, 
@@ -209,7 +215,8 @@ Indices:
         type: keyword
       subject_ids:
         type: keyword
-
+      organ_or_tissue:
+        type: keyword
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
     cypher_query: "
       MATCH (s:study)<--(p:participant)
@@ -277,7 +284,8 @@ Indices:
       OPTIONAL MATCH (samp)<--(:file)<--(i:image)
       WITH samp, na, 
         apoc.map.merge(opensearch_data, {
-          image_modality: apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na)))
+          image_modality: apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na))),
+          organ_or_tissue: apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.organ_or_tissue, na)))
         }) AS opensearch_data
       RETURN opensearch_data
       ORDER BY opensearch_data.sample_id
@@ -475,6 +483,8 @@ Indices:
         type: keyword
       file_size:
         type: long
+      image_modality:
+        type: keyword
       md5sum:
         type: keyword
       sample_id:
