@@ -86,7 +86,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>21.3</version>
+            <version>19.9</version>
         </dependency>
         <!-- GSON -->
         <dependency>
@@ -265,6 +265,7 @@
                         <dependencyConvergence>
                           <excludes>
                               <exclude>commons-logging:commons-logging</exclude>
+                              <exclude>com.graphql-java:graphql-java</exclude>
                           </excludes>
                       </dependencyConvergence>
                       </rules>
