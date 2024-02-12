@@ -134,6 +134,7 @@ type study {
   size_of_data_being_uploaded_original_unit: String
   acl: String
   study_access: String
+  study_version: String
   program: program @relation(name:"of_program", direction:OUT)
   participants: [participant] @relation(name:"of_study", direction:IN)
   files: [file] @relation(name:"of_study", direction:IN)
@@ -174,6 +175,8 @@ type SubjectDetail {
 type StudyDetail {
     study_name: String
     phs_accession: String
+    study_version: String
+    study_access: String
     study_acronym: String
     study_description: String
     data_types: String
@@ -191,6 +194,7 @@ type StudyInfo {
     numberOfSubjects: Int
     numberOfFiles: Int
     study_access: String
+    study_version: String
 }
 
 type IdsLists {
@@ -214,11 +218,14 @@ type ProgramDetail {
 type ProgramDetailStudy {
     accession: String
     study_access: String
+    study_version: String
+    study_data_types: String
     study_name: String
     study_description: String
     short_description: String
     num_participants: Int
     num_samples: Int
+    num_files: Int
 }
 
 type ProgramListEntry {
@@ -372,7 +379,8 @@ type QueryType {
 		size_of_data_being_uploaded_original: Float,
 		size_of_data_being_uploaded_original_unit: String,
 		acl: String,
-		study_access: String
+		study_access: String,
+		study_version: String
     ): [study]
 
     treatment (
@@ -412,7 +420,9 @@ type QueryType {
             study_acronym: s.study_acronym,
             study_description: s.study_description,
             data_types: s.study_data_types,
-            study_external_url: s.study_external_url
+            study_external_url: s.study_external_url,
+            study_version: s.study_version,
+            study_access: s.study_access
         } AS output
         OPTIONAL MATCH (s)<--(p:participant)
         WITH s,
@@ -485,7 +495,8 @@ type QueryType {
             data_type: s.study_data_types,
             study_access: s.study_access,
             numberOfSubjects: num_participants,
-            numberOfFiles: num_files
+            numberOfFiles: num_files,
+            study_version: s.study_version
         }
     """, passThrough: true)
 
@@ -506,12 +517,19 @@ type QueryType {
                 study_name: s.study_name,
                 study_description: s.study_description,
                 short_description: s.short_description,
-                num_participants: num_participants
+                num_participants: num_participants,
+                study_version: s.study_version,
+                study_data_types: s.study_data_types
             } AS studies
         OPTIONAL MATCH (s)<--(:participant)<--(samp:sample)
         WITH s, study_participants,
             apoc.map.merge(studies, {
                 num_samples: count(distinct samp)
+            }) AS studies
+        OPTIONAL MATCH (s)<--(f:file)
+        WITH s, study_participants,
+            apoc.map.merge(studies, {
+                num_files: count(distinct f)
             }) AS studies
         OPTIONAL MATCH (pr:program)<--(s)
         WITH pr, {
