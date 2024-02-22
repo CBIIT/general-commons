@@ -287,7 +287,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         Map<String, JsonArray> aggs = esService.collectTermAggs(subjectResult, TERM_AGG_NAMES);
 
         Map<String, Object> data = new HashMap<>();
-        data.put("numberOfStudies", aggs.get("studies").size());
+        data.put("numberOfStudies", aggs.get("phs_accession").size());
         data.put("numberOfSubjects", numberOfSubjects);
         data.put("numberOfSamples", numberOfSamples);
         data.put("numberOfFiles", numberOfFiles);
