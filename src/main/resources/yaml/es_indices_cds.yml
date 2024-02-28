@@ -53,15 +53,11 @@ Indices:
       # Sort properties
       is_tumor_sort:
         type: keyword
-      samples_sort:
-        type: keyword
       sample_types_sort:
         type: keyword
       experimental_strategies_sort:
         type: keyword
       file_types_sort:
-        type: keyword
-      files_sort:
         type: keyword
       primary_diagnoses_sort:
         type: keyword
@@ -149,7 +145,6 @@ Indices:
           samples: samples,
           sample_types: sample_types,
           is_tumor_sort: apoc.text.join(is_tumor, ''),
-          samples_sort: apoc.text.join(samples, ''),
           sample_types_sort: apoc.text.join(sample_types, '')
         }) AS opensearch_data
       OPTIONAL MATCH (p)<--(:sample)<--(f:file)
@@ -163,8 +158,7 @@ Indices:
           file_types: file_types,
           files: files,
           experimental_strategies_sort: apoc.text.join(experimental_strategies, ''),
-          file_types_sort: apoc.text.join(file_types, ''),
-          files_sort: apoc.text.join(files, '')
+          file_types_sort: apoc.text.join(file_types, '')
         }) AS opensearch_data
       OPTIONAL MATCH (p)<--(diag:diagnosis)
       WITH p, na, opensearch_data,
@@ -269,8 +263,6 @@ Indices:
         type: keyword
       file_types_sort:
         type: keyword
-      files_sort:
-        type: keyword
       library_layouts_sort:
         type: keyword
       library_selections_sort:
@@ -360,8 +352,7 @@ Indices:
           file_types: file_types,
           files: files,
           experimental_strategies_sort: apoc.text.join(experimental_strategies, ''),
-          file_types_sort: apoc.text.join(file_types, ''),
-          files_sort: apoc.text.join(files, '')
+          file_types_sort: apoc.text.join(file_types, '')
         }) AS opensearch_data
       OPTIONAL MATCH (samp)<--(:file)<--(g:genomic_info)
       WITH samp, na, opensearch_data,
@@ -620,13 +611,9 @@ Indices:
         type: keyword
       genders_sort:
         type: keyword
-      subject_ids_sort:
-        type: keyword
       is_tumor_sort:
         type: keyword
       sample_types_sort:
-        type: keyword
-      sample_ids_sort:
         type: keyword
       library_layouts_sort:
         type: keyword
@@ -730,7 +717,6 @@ Indices:
           genders: gender,
           genders_sort: apoc.text.join(gender, ''),
           subject_ids: participant_id,
-          subject_ids_sort: apoc.text.join(participant_id, ''),
           subject_id_gs: participant_id
         }) AS opensearch_data
       OPTIONAL MATCH (f)-->(samp:sample)
@@ -748,7 +734,6 @@ Indices:
           analyte_type_sort: apoc.text.join(sample_type, ''),
           sample_id: sample_id,
           sample_ids: sample_id,
-          sample_ids_sort: apoc.text.join(sample_id, ''),
           sample_id_gs: sample_id
         }) AS opensearch_data
       OPTIONAL MATCH (f)<--(g:genomic_info)
