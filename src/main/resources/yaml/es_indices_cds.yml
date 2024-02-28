@@ -50,6 +50,35 @@ Indices:
         type: keyword
       study_data_types:
         type: keyword
+      # Sort properties
+      is_tumor_sort:
+        type: keyword
+      sample_types_sort:
+        type: keyword
+      experimental_strategies_sort:
+        type: keyword
+      file_types_sort:
+        type: keyword
+      primary_diagnoses_sort:
+        type: keyword
+      site_sort:
+        type: keyword
+      library_layouts_sort:
+        type: keyword
+      library_selections_sort:
+        type: keyword
+      library_sources_sort:
+        type: keyword
+      library_strategies_sort:
+        type: keyword
+      instrument_models_sort:
+        type: keyword
+      platforms_sort:
+        type: keyword
+      reference_genome_assemblies_sort:
+        type: keyword
+      image_modality_sort:
+        type: keyword
       # Global Search properties
       site_gs:
         type: search_as_you_type
@@ -106,18 +135,30 @@ Indices:
           subject_id_gs: opensearch_data.subject_ids
         }) AS opensearch_data
       OPTIONAL MATCH (p)<--(samp:sample)
-      WITH p, na, 
+      WITH p, na, opensearch_data,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_tumor_status, na))) AS is_tumor,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_id, na))) AS samples,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_type, na))) AS sample_types
+      WITH p, na,
         apoc.map.merge(opensearch_data, {
-          is_tumor: apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_tumor_status, na))),
-          samples: apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_id, na))),
-          sample_types: apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_type, na)))
+          is_tumor: is_tumor,
+          samples: samples,
+          sample_types: sample_types,
+          is_tumor_sort: apoc.text.join(is_tumor, ''),
+          sample_types_sort: apoc.text.join(sample_types, '')
         }) AS opensearch_data
       OPTIONAL MATCH (p)<--(:sample)<--(f:file)
-      WITH p, na, 
+      WITH p, na, opensearch_data, 
+          apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT (apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\")), true))) AS experimental_strategies,
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_type, na))) AS file_types,
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_id, na))) AS files
+      WITH p, na,
         apoc.map.merge(opensearch_data, {
-          experimental_strategies: apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT (apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\")), true))),
-          file_types: apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_type, na))),
-          files: apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_id, na)))
+          experimental_strategies: experimental_strategies,
+          file_types: file_types,
+          files: files,
+          experimental_strategies_sort: apoc.text.join(experimental_strategies, ''),
+          file_types_sort: apoc.text.join(file_types, '')
         }) AS opensearch_data
       OPTIONAL MATCH (p)<--(diag:diagnosis)
       WITH p, na, opensearch_data,
@@ -127,23 +168,43 @@ Indices:
         apoc.map.merge(opensearch_data, {
           primary_diagnoses: primary_diagnosis,
           site: primary_site,
-          site_gs: primary_site
+          site_gs: primary_site,
+          primary_diagnoses_sort: apoc.text.join(primary_diagnosis, ''),
+          site_sort: apoc.text.join(primary_site, '')
         }) AS opensearch_data
       OPTIONAL MATCH (p)<--(:sample)<--(:file)<--(g:genomic_info)
+      WITH p, na, opensearch_data,
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))) AS library_layouts,
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))) AS library_selections,
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source, na))) AS library_sources, 
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))) AS library_strategies,
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))) AS instrument_models,
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.platform, na))) AS platforms,
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.reference_genome_assembly, na))) AS reference_genome_assemblies
       WITH p, na, 
         apoc.map.merge(opensearch_data, {
-          library_layouts: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))),
-          library_selections: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))),
-          library_sources: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source, na))), 
-          library_strategies: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))),
-          instrument_models: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))),
-          platforms: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.platform, na))),
-          reference_genome_assemblies: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.reference_genome_assembly, na)))
+          library_layouts: library_layouts,
+          library_selections: library_selections,
+          library_sources: library_sources, 
+          library_strategies: library_strategies,
+          instrument_models: instrument_models,
+          platforms: platforms,
+          reference_genome_assemblies: reference_genome_assemblies,
+          library_layouts_sort: apoc.text.join(library_layouts, ''),
+          library_selections_sort: apoc.text.join(library_selections, ''),
+          library_sources_sort: apoc.text.join(library_sources, ''), 
+          library_strategies_sort: apoc.text.join(library_strategies, ''),
+          instrument_models_sort: apoc.text.join(instrument_models, ''),
+          platforms_sort: apoc.text.join(platforms, ''),
+          reference_genome_assemblies_sort: apoc.text.join(reference_genome_assemblies, '')
         }) AS opensearch_data
       OPTIONAL MATCH (p)<--(:sample)<--(:file)<--(i:image)
+      WITH p, na, opensearch_data, 
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na))) AS image_modality
       WITH p, na, 
         apoc.map.merge(opensearch_data, {
-          image_modality: apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na)))
+          image_modality: image_modality,
+          image_modality_sort: apoc.text.join(image_modality, '')
         }) AS opensearch_data
       RETURN opensearch_data
       ORDER BY opensearch_data.subject_ids
@@ -196,6 +257,29 @@ Indices:
       studies:
         type: keyword
       study_data_types:
+        type: keyword
+      # Sort properties
+      experimental_strategies_sort:
+        type: keyword
+      file_types_sort:
+        type: keyword
+      library_layouts_sort:
+        type: keyword
+      library_selections_sort:
+        type: keyword
+      library_sources_sort:
+        type: keyword
+      library_strategies_sort:
+        type: keyword
+      instrument_models_sort:
+        type: keyword
+      platforms_sort:
+        type: keyword
+      reference_genome_assemblies_sort:
+        type: keyword
+      primary_diagnoses_sort:
+        type: keyword
+      site_sort:
         type: keyword
       # Global search properties
       sample_id_gs:
@@ -258,34 +342,65 @@ Indices:
           subject_ids: p.participant_id
         }) AS opensearch_data
       OPTIONAL MATCH (samp)<--(f:file)
-      WITH samp, na, 
+      WITH samp, na, opensearch_data,
+          apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT (apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\")), true))) AS experimental_strategies,
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_type, na))) AS file_types,
+          apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_id, na))) AS files
+      WITH samp, na,
         apoc.map.merge(opensearch_data, {
-          experimental_strategies: apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT (apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\")), true))),
-          file_types: apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_type, na))),
-          files: apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_id, na)))
+          experimental_strategies: experimental_strategies,
+          file_types: file_types,
+          files: files,
+          experimental_strategies_sort: apoc.text.join(experimental_strategies, ''),
+          file_types_sort: apoc.text.join(file_types, '')
         }) AS opensearch_data
       OPTIONAL MATCH (samp)<--(:file)<--(g:genomic_info)
-      WITH samp, na, 
+      WITH samp, na, opensearch_data,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))) AS library_layouts, 
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))) AS library_selections, 
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source, na))) AS library_sources, 
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))) AS library_strategies,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))) AS instrument_models,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.platform, na))) AS platforms,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.reference_genome_assembly, na))) AS reference_genome_assemblies
+      WITH samp, na,
         apoc.map.merge(opensearch_data, {
-          library_layouts: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))), 
-          library_selections: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))), 
-          library_sources: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source, na))), 
-          library_strategies: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))),
-          instrument_models: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))),
-          platforms: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.platform, na))),
-          reference_genome_assemblies: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.reference_genome_assembly, na)))
+          library_layouts: library_layouts, 
+          library_selections: library_selections, 
+          library_sources: library_sources, 
+          library_strategies: library_strategies,
+          instrument_models: reference_genome_assemblies,
+          platforms: platforms,
+          reference_genome_assemblies: reference_genome_assemblies,
+          library_layouts_sort: apoc.text.join(library_layouts, ''),
+          library_selections_sort: apoc.text.join(library_selections, ''),
+          library_sources_sort: apoc.text.join(library_sources, ''),
+          library_strategies_sort: apoc.text.join(library_strategies,''),
+          instrument_models_sort: apoc.text.join(reference_genome_assemblies,''),
+          platforms_sort: apoc.text.join(platforms,''),
+          reference_genome_assemblies_sort: apoc.text.join(reference_genome_assemblies, '')
         }) AS opensearch_data
       OPTIONAL MATCH (samp)-->(:participant)<--(diag:diagnosis)
+      WITH samp, na, opensearch_data, 
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_diagnosis, na))) AS primary_diagnoses,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na))) AS site
       WITH samp, na, 
         apoc.map.merge(opensearch_data, {
-          primary_diagnoses: apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_diagnosis, na))),
-          site: apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na)))
+          primary_diagnoses: primary_diagnoses,
+          site: site,
+          primary_diagnoses_sort: apoc.text.join(primary_diagnoses, ''),
+          site_sort: apoc.text.join(site, '')
         }) AS opensearch_data
       OPTIONAL MATCH (samp)<--(:file)<--(i:image)
+      WITH samp, na, opensearch_data,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na))) AS image_modality,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.organ_or_tissue, na))) AS organ_or_tissue
       WITH samp, na, 
         apoc.map.merge(opensearch_data, {
-          image_modality: apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na))),
-          organ_or_tissue: apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.organ_or_tissue, na)))
+          image_modality: image_modality,
+          organ_or_tissue: organ_or_tissue,
+          image_modality_sort: apoc.text.join(image_modality, ''),
+          organ_or_tissue_sort: apoc.text.join(organ_or_tissue, '')
         }) AS opensearch_data
       RETURN opensearch_data
       ORDER BY opensearch_data.sample_id
@@ -469,8 +584,6 @@ Indices:
       # Overview properties
       analyte_type:
         type: keyword
-      analyte_type_sort:
-        type: keyword
       file_id:
         type: keyword
       file_ids:
@@ -483,8 +596,6 @@ Indices:
         type: keyword
       file_size:
         type: long
-      image_modality:
-        type: keyword
       md5sum:
         type: keyword
       sample_id:
@@ -492,6 +603,35 @@ Indices:
       sample_ids:
         type: keyword
       subject_ids:
+        type: keyword
+      # Sort properties
+      analyte_type_sort:
+        type: keyword
+      experimental_strategies_sort:
+        type: keyword
+      genders_sort:
+        type: keyword
+      is_tumor_sort:
+        type: keyword
+      sample_types_sort:
+        type: keyword
+      library_layouts_sort:
+        type: keyword
+      library_selections_sort:
+        type: keyword
+      library_sources_sort:
+        type: keyword
+      library_strategies_sort:
+        type: keyword
+      instrument_models_sort:
+        type: keyword
+      platforms_sort:
+        type: keyword
+      primary_diagnoses_sort:
+        type: keyword
+      site_sort:
+        type: keyword
+      image_modality_sort:
         type: keyword
       # Global search properties
       file_id_gs:
@@ -553,6 +693,7 @@ Indices:
       WITH f, na, 
         apoc.map.merge(opensearch_data, {
           experimental_strategies: experimental_strategy_and_data_subtypes,
+          experimental_strategies_sort: apoc.text.join(experimental_strategy_and_data_subtypes, ''),
           file_types: file_type ,
           files: f.file_id,
           file_id: f.file_id,
@@ -574,6 +715,7 @@ Indices:
       WITH f, na, 
         apoc.map.merge(opensearch_data, {
           genders: gender,
+          genders_sort: apoc.text.join(gender, ''),
           subject_ids: participant_id,
           subject_id_gs: participant_id
         }) AS opensearch_data
@@ -585,7 +727,9 @@ Indices:
       WITH f, na, 
         apoc.map.merge(opensearch_data, {
           is_tumor: sample_tumor_status,
+          is_tumor_sort: apoc.text.join(sample_tumor_status, ''),
           sample_types: sample_type,
+          sample_types_sort: apoc.text.join(sample_type, ''),
           analyte_type: sample_type,
           analyte_type_sort: apoc.text.join(sample_type, ''),
           sample_id: sample_id,
@@ -616,7 +760,14 @@ Indices:
           library_strategies_gs: library_strategy,
           instrument_models_gs: instrument_model,
           platforms_gs: platform,
-          reference_genome_assemblies_gs: reference_genome_assembly
+          reference_genome_assemblies_gs: reference_genome_assembly,
+          library_layouts_sort: apoc.text.join(library_layout, ''), 
+          library_selections_sort: apoc.text.join(library_selection, ''), 
+          library_sources_sort: apoc.text.join(library_source, ''), 
+          library_strategies_sort: apoc.text.join(library_strategy, ''),
+          instrument_models_sort: apoc.text.join(instrument_model, ''),
+          platforms_sort: apoc.text.join(platform, ''),
+          reference_genome_assemblies_sort: apoc.text.join(reference_genome_assembly, '')
         }) AS opensearch_data
       OPTIONAL MATCH (f)-->(:sample)-->(:participant)<--(diag:diagnosis)
       WITH f, na, opensearch_data,
@@ -626,12 +777,17 @@ Indices:
         apoc.map.merge(opensearch_data, {
           primary_diagnoses: primary_diagnosis,
           site: primary_site,
-          sites_gs: primary_site
+          sites_gs: primary_site,
+          primary_diagnoses_sort: apoc.text.join(primary_diagnosis, ''),
+          site_sort: apoc.text.join(primary_site, '')
         }) AS opensearch_data
       OPTIONAL MATCH (f)<--(i:image)
-      WITH f, na, 
+      WITH f, na, opensearch_data,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na))) AS image_modality
+      WITH f, na, image_modality,
         apoc.map.merge(opensearch_data, {
-          image_modality: apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na)))
+          image_modality: image_modality,
+          image_modality_sort: apoc.text.join(image_modality, '')
         }) AS opensearch_data
       RETURN opensearch_data
       ORDER BY opensearch_data.files

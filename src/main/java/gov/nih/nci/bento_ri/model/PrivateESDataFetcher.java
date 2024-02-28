@@ -353,11 +353,11 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("study_acronym", "studies"),
                 Map.entry("phs_accession", "phs_accession"),
                 Map.entry("gender", "genders"),
-                Map.entry("site", "site"),
-                Map.entry("analyte_type", "analyte_type"),
+                Map.entry("site", "site_sort"),
+                Map.entry("analyte_type", "sample_types_sort"),
                 Map.entry("race", "race"),
                 Map.entry("ethnicity", "ethnicity"),
-                Map.entry("primary_diagnosis", "primary_diagnoses")
+                Map.entry("primary_diagnosis", "primary_diagnoses_sort")
         );
 
         return overview(SUBJECTS_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
@@ -388,7 +388,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("analyte_type", "analyte_type"),
                 Map.entry("sample_type", "analyte_type"),
                 Map.entry("sample_tumor_status", "is_tumor"),
-                Map.entry("organ_or_tissue", "organ_or_tissue")
+                Map.entry("organ_or_tissue", "organ_or_tissue_sort")
         );
 
         return overview(SAMPLES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
@@ -424,18 +424,18 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("phs_accession", "phs_accession"),
                 Map.entry("subject_id", "subject_ids"),
                 Map.entry("sample_id", "sample_id"),
-                Map.entry("experimental_strategy", "experimental_strategies"),
-                Map.entry("gender", "genders"),
+                Map.entry("experimental_strategy", "experimental_strategies_sort"),
+                Map.entry("gender", "genders_sort"),
                 Map.entry("analyte_type", "analyte_type_sort"),
-                Map.entry("is_tumor", "is_tumor"),
+                Map.entry("is_tumor", "is_tumor_sort"),
                 Map.entry("file_name", "file_name"),
                 Map.entry("file_type", "file_type"),
                 Map.entry("file_size", "file_size"),
                 Map.entry("file_id", "file_id"),
                 Map.entry("md5sum", "md5sum"),
                 Map.entry("study_data_type", "study_data_types"),
-                Map.entry("library_strategy", "library_strategies"),
-                Map.entry("image_modality", "image_modality")
+                Map.entry("library_strategy", "library_strategies_sort"),
+                Map.entry("image_modality", "image_modality_sort")
         );
 
         ArrayList<String> joinProperties = new ArrayList<>(Arrays.asList(
