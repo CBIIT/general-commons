@@ -147,7 +147,7 @@ Indices:
           is_tumor_sort: apoc.text.join(is_tumor, ''),
           sample_types_sort: apoc.text.join(sample_types, '')
         }) AS opensearch_data
-      OPTIONAL MATCH (p)<--(:sample)<--(f:file)
+      OPTIONAL MATCH (p)<-[*1..2]-(f:file)
       WITH p, na, opensearch_data, 
           apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT (apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\")), true))) AS experimental_strategies,
           apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_type, na))) AS file_types,
@@ -172,7 +172,7 @@ Indices:
           primary_diagnoses_sort: apoc.text.join(primary_diagnosis, ''),
           site_sort: apoc.text.join(primary_site, '')
         }) AS opensearch_data
-      OPTIONAL MATCH (p)<--(:sample)<--(:file)<--(g:genomic_info)
+      OPTIONAL MATCH (p)<-[*1..2]-(:file)<--(g:genomic_info)
       WITH p, na, opensearch_data,
           apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))) AS library_layouts,
           apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))) AS library_selections,
@@ -198,7 +198,7 @@ Indices:
           platforms_sort: apoc.text.join(platforms, ''),
           reference_genome_assemblies_sort: apoc.text.join(reference_genome_assemblies, '')
         }) AS opensearch_data
-      OPTIONAL MATCH (p)<--(:sample)<--(:file)<--(i:image)
+      OPTIONAL MATCH (p)<-[*1..2]-(:file)<--(i:image)
       WITH p, na, opensearch_data, 
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na))) AS image_modality
       WITH p, na, 
@@ -486,7 +486,7 @@ Indices:
           file_size: f.file_size,
           md5sum: f.md5sum
         }) AS opensearch_data
-      OPTIONAL MATCH (f)-->(:sample)-->(p:participant)
+      OPTIONAL MATCH (f)-[*1..2]->(p:participant)
       WITH f, na, opensearch_data, 
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.gender, na))) AS gender,
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.participant_id, na))) AS participant_id
@@ -518,7 +518,7 @@ Indices:
           platforms: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.platform, na))),
           reference_genome_assemblies: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.reference_genome_assembly, na)))
         }) AS opensearch_data
-      OPTIONAL MATCH (f)-->(:sample)-->(:participant)<--(diag:diagnosis)
+      OPTIONAL MATCH (f)-[*1..2]->(:participant)<--(diag:diagnosis)
       WITH f, na, 
         apoc.map.merge(opensearch_data, {
           primary_diagnoses: apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_diagnosis, na))),
@@ -708,7 +708,7 @@ Indices:
           file_id_gs: f.file_id,
           file_name_gs: f.file_name
         }) AS opensearch_data
-      OPTIONAL MATCH (f)-->(:sample)-->(p:participant)
+      OPTIONAL MATCH (f)-[*1..2]->(p:participant)
       WITH f, na, opensearch_data,
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.gender, na))) AS gender,
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.participant_id, na))) AS participant_id
@@ -769,7 +769,7 @@ Indices:
           platforms_sort: apoc.text.join(platform, ''),
           reference_genome_assemblies_sort: apoc.text.join(reference_genome_assembly, '')
         }) AS opensearch_data
-      OPTIONAL MATCH (f)-->(:sample)-->(:participant)<--(diag:diagnosis)
+      OPTIONAL MATCH (f)-[*1..2]->(:participant)<--(diag:diagnosis)
       WITH f, na, opensearch_data,
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_diagnosis, na))) AS primary_diagnosis,
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na))) AS primary_site
