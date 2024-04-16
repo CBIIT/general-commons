@@ -136,15 +136,9 @@ Indices:
         }) AS opensearch_data
       OPTIONAL MATCH (p)<--(samp:sample)
       WITH p, na, opensearch_data,
-        COLLECT(DISTINCT COALESCE(samp.sample_tumor_status, na)) AS is_tumor,
-        COLLECT(DISTINCT COALESCE(samp.sample_id, na)) AS samples,
-        COLLECT(DISTINCT COALESCE(samp.sample_type, na)) AS sample_types
-      OPTIONAL MATCH (p)<--(f:file)
-      WITH p, na, opensearch_data, count(distinct f) AS num_files, is_tumor, samples, sample_types
-      WITH p, na, opensearch_data,
-        apoc.coll.sort(apoc.coll.toSet(CASE num_files WHEN 0 THEN is_tumor ELSE is_tumor + na END)) AS is_tumor,
-        apoc.coll.sort(apoc.coll.toSet(CASE num_files WHEN 0 THEN samples ELSE samples + na END)) AS samples,
-        apoc.coll.sort(apoc.coll.toSet(CASE num_files WHEN 0 THEN sample_types ELSE sample_types + na END)) AS sample_types
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_tumor_status, na))) AS is_tumor,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_id, na))) AS samples,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_type, na))) AS sample_types
       WITH p, na,
         apoc.map.merge(opensearch_data, {
           is_tumor: is_tumor,
