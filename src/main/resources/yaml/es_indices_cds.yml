@@ -134,7 +134,9 @@ Indices:
           gender_gs: opensearch_data.genders,
           subject_id_gs: opensearch_data.subject_ids
         }) AS opensearch_data
-      OPTIONAL MATCH (p)<--(samp:sample)
+      OPTIONAL MATCH (p)<--(f:file)
+      OPTIONAL MATCH (f)-->(samp:sample)
+      WITH p, na, opensearch_data, samp
       WITH p, na, opensearch_data,
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_tumor_status, na))) AS is_tumor,
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_id, na))) AS samples,
