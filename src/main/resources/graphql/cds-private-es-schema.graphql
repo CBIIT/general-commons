@@ -33,6 +33,7 @@ type FileOverview {
     sample_types: [String]
     experimental_strategy: String
     gender: String
+    race: String
     primary_diagnoses: String
     analyte_type: String
     is_tumor: String

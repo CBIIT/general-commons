@@ -405,6 +405,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"sample_types", "sample_types"},
                 new String[]{"experimental_strategy", "experimental_strategies"},
                 new String[]{"gender", "genders"},
+                new String[]{"race", "races"},
                 new String[]{"primary_diagnoses", "primary_diagnoses"},
                 new String[]{"analyte_type", "analyte_type"},
                 new String[]{"is_tumor", "is_tumor"},
@@ -430,6 +431,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("sample_types", "sample_types_sort"),
                 Map.entry("experimental_strategy", "experimental_strategies_sort"),
                 Map.entry("gender", "genders_sort"),
+                Map.entry("race", "races_sort"),
                 Map.entry("primary_diagnoses", "primary_diagnoses_sort"),
                 Map.entry("analyte_type", "analyte_type_sort"),
                 Map.entry("is_tumor", "is_tumor_sort"),
@@ -445,7 +447,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         );
 
         ArrayList<String> joinProperties = new ArrayList<>(Arrays.asList(
-                "primary_diagnoses", "site", "sample_id", "analyte_type", "is_tumor", "gender", "subject_id"));
+                "primary_diagnoses", "site", "sample_id", "analyte_type", "is_tumor", "gender", "race", "subject_id"));
         List<Map<String, Object>> fileOverview = overview(FILES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
         fileOverview.forEach( x -> {
             x.keySet().forEach( k -> {

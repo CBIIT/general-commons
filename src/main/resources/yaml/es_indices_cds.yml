@@ -568,6 +568,8 @@ Indices:
         type: keyword
       genders:
         type: keyword
+      races:
+        type: keyword
       image_modality:
         type: keyword
       instrument_models:
@@ -631,6 +633,8 @@ Indices:
       experimental_strategies_sort:
         type: keyword
       genders_sort:
+        type: keyword
+      races_sort:
         type: keyword
       is_tumor_sort:
         type: keyword
@@ -736,11 +740,14 @@ Indices:
       OPTIONAL MATCH (f)-->(p:participant)
       WITH f, na, opensearch_data,
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.gender, na))) AS gender,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.race, na))) AS race,
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.participant_id, na))) AS participant_id
       WITH f, na, 
         apoc.map.merge(opensearch_data, {
           genders: gender,
           genders_sort: apoc.text.join(gender, ''),
+          races: race,
+          races_sort: apoc.text.join(race, ''),
           subject_ids: participant_id,
           subject_id_gs: participant_id
         }) AS opensearch_data
