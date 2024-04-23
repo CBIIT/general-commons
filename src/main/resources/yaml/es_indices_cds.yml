@@ -572,6 +572,8 @@ Indices:
         type: keyword
       image_modality:
         type: keyword
+      organ_or_tissue:
+        type: keyword
       instrument_models:
         type: keyword
       is_tumor:
@@ -657,6 +659,8 @@ Indices:
       site_sort:
         type: keyword
       image_modality_sort:
+        type: keyword
+      organ_or_tissue_sort:
         type: keyword
       # Global search properties
       file_id_gs:
@@ -817,11 +821,14 @@ Indices:
         }) AS opensearch_data
       OPTIONAL MATCH (f)<--(i:image)
       WITH f, na, opensearch_data,
-        apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na))) AS image_modality
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na))) AS image_modality,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.organ_or_tissue, na))) AS organ_or_tissue
       WITH f, na, image_modality,
         apoc.map.merge(opensearch_data, {
           image_modality: image_modality,
-          image_modality_sort: apoc.text.join(image_modality, '')
+          organ_or_tissue: organ_or_tissue,
+          image_modality_sort: apoc.text.join(image_modality, ''),
+          organ_or_tissue_sort: apoc.text.join(organ_or_tissue, '')
         }) AS opensearch_data
       RETURN opensearch_data
       ORDER BY opensearch_data.files

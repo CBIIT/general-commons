@@ -417,7 +417,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"study_data_type", "study_data_types"},
                 new String[]{"library_strategy", "library_strategies"},
                 new String[]{"library_layouts", "library_layouts"},
-                new String[]{"image_modality", "image_modality"}
+                new String[]{"image_modality", "image_modality"},
+                new String[]{"organ_or_tissue", "organ_or_tissue"},
         };
 
         String defaultSort = "file_name"; // Default sort order
@@ -443,7 +444,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("study_data_type", "study_data_types"),
                 Map.entry("library_strategy", "library_strategies_sort"),
                 Map.entry("library_layouts", "library_layouts_sort"),
-                Map.entry("image_modality", "image_modality_sort")
+                Map.entry("image_modality", "image_modality_sort"),
+                Map.entry("organ_or_tissue", "organ_or_tissue_sort")
         );
 
         ArrayList<String> joinProperties = new ArrayList<>(Arrays.asList(
