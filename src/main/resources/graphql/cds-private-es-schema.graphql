@@ -30,8 +30,10 @@ type FileOverview {
     phs_accession: String
     subject_id: String
     sample_id: String
+    sample_types: [String]
     experimental_strategy: String
     gender: String
+    primary_diagnoses: String
     analyte_type: String
     is_tumor: String
     file_name: String
@@ -41,6 +43,7 @@ type FileOverview {
     md5sum: String
     study_data_type: String
     library_strategy: String
+    library_layouts: [String]
     image_modality: String
 }
 

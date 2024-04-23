@@ -402,8 +402,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"phs_accession", "phs_accession"},
                 new String[]{"subject_id", "subject_ids"},
                 new String[]{"sample_id", "sample_id"},
+                new String[]{"sample_types", "sample_types"},
                 new String[]{"experimental_strategy", "experimental_strategies"},
                 new String[]{"gender", "genders"},
+                new String[]{"primary_diagnoses", "primary_diagnoses"},
                 new String[]{"analyte_type", "analyte_type"},
                 new String[]{"is_tumor", "is_tumor"},
                 new String[]{"file_name", "file_name"},
@@ -413,6 +415,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"md5sum", "md5sum"},
                 new String[]{"study_data_type", "study_data_types"},
                 new String[]{"library_strategy", "library_strategies"},
+                new String[]{"library_layouts", "library_layouts"},
                 new String[]{"image_modality", "image_modality"}
         };
 
@@ -424,8 +427,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("phs_accession", "phs_accession"),
                 Map.entry("subject_id", "subject_ids"),
                 Map.entry("sample_id", "sample_id"),
+                Map.entry("sample_types", "sample_types_sort"),
                 Map.entry("experimental_strategy", "experimental_strategies_sort"),
                 Map.entry("gender", "genders_sort"),
+                Map.entry("primary_diagnoses", "primary_diagnoses_sort"),
                 Map.entry("analyte_type", "analyte_type_sort"),
                 Map.entry("is_tumor", "is_tumor_sort"),
                 Map.entry("file_name", "file_name"),
@@ -435,6 +440,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("md5sum", "md5sum"),
                 Map.entry("study_data_type", "study_data_types"),
                 Map.entry("library_strategy", "library_strategies_sort"),
+                Map.entry("library_layouts", "library_layouts_sort"),
                 Map.entry("image_modality", "image_modality_sort")
         );
 
