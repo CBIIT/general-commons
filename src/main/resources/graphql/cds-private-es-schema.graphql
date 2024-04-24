@@ -46,7 +46,8 @@ type FileOverview {
     library_strategy: String
     library_layouts: [String]
     image_modality: String
-    organ_or_tissue: [String]
+    organ_or_tissue: String
+    license: String
 }
 
 type SearchResult {

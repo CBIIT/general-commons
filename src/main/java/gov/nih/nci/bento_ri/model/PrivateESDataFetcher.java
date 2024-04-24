@@ -419,6 +419,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"library_layouts", "library_layouts"},
                 new String[]{"image_modality", "image_modality"},
                 new String[]{"organ_or_tissue", "organ_or_tissue"},
+                new String[]{"license", "license"},
         };
 
         String defaultSort = "file_name"; // Default sort order
@@ -445,11 +446,12 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("library_strategy", "library_strategies_sort"),
                 Map.entry("library_layouts", "library_layouts_sort"),
                 Map.entry("image_modality", "image_modality_sort"),
-                Map.entry("organ_or_tissue", "organ_or_tissue_sort")
+                Map.entry("organ_or_tissue", "organ_or_tissue_sort"),
+                Map.entry("license", "license_sort")
         );
 
         ArrayList<String> joinProperties = new ArrayList<>(Arrays.asList(
-                "primary_diagnoses", "site", "sample_id", "analyte_type", "is_tumor", "gender", "race", "subject_id"));
+                "primary_diagnoses", "site", "sample_id", "analyte_type", "is_tumor", "gender", "race", "subject_id", "organ_or_tissue", "license"));
         List<Map<String, Object>> fileOverview = overview(FILES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
         fileOverview.forEach( x -> {
             x.keySet().forEach( k -> {
