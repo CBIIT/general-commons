@@ -548,7 +548,7 @@ Indices:
       OPTIONAL MATCH (f)<--(i:image)
       WITH f, na, 
         apoc.map.merge(opensearch_data, {
-          image_modality: apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na)))
+          image_modality: COALESCE(i.image_modality, na)
         }) AS opensearch_data
       RETURN opensearch_data
       ORDER BY opensearch_data.files
@@ -659,12 +659,6 @@ Indices:
       primary_diagnoses_sort:
         type: keyword
       site_sort:
-        type: keyword
-      image_modality_sort:
-        type: keyword
-      organ_or_tissue_sort:
-        type: keyword
-      license_sort:
         type: keyword
       # Global search properties
       file_id_gs:
@@ -825,17 +819,14 @@ Indices:
         }) AS opensearch_data
       OPTIONAL MATCH (f)<--(i:image)
       WITH f, na, opensearch_data,
-        apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na))) AS image_modality,
-        apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.organ_or_tissue, na))) AS organ_or_tissue,
-        apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.license, na))) AS license
+        COALESCE(i.image_modality, na) AS image_modality,
+        COALESCE(i.organ_or_tissue, na) AS organ_or_tissue,
+        COALESCE(i.license, na) AS license
       WITH f, na, image_modality,
         apoc.map.merge(opensearch_data, {
           image_modality: image_modality,
           organ_or_tissue: organ_or_tissue,
-          license: license,
-          image_modality_sort: apoc.text.join(image_modality, ''),
-          organ_or_tissue_sort: apoc.text.join(organ_or_tissue, ''),
-          license_sort: apoc.text.join(license, '')
+          license: license
         }) AS opensearch_data
       RETURN opensearch_data
       ORDER BY opensearch_data.files

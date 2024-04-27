@@ -25,29 +25,34 @@ type SampleOverview {
 }
 
 type FileOverview {
-    study_acronym: String
-    accesses: String
-    phs_accession: String
-    subject_id: String
-    sample_id: String
-    sample_types: [String]
-    experimental_strategy: String
-    gender: String
-    race: String
-    primary_diagnoses: String
-    analyte_type: String
-    is_tumor: String
     file_name: String
     file_type: String
     file_size: Float
     file_id: String
     md5sum: String
+    experimental_strategy: String
+
+    study_acronym: String
+    accesses: String
+    phs_accession: String
     study_data_type: String
-    library_strategy: String
-    library_layouts: [String]
+
     image_modality: String
     organ_or_tissue: String
     license: String
+
+    sample_id: [String]
+    analyte_type: [String]
+    is_tumor: [String]
+
+    subject_id: [String]
+    gender: [String]
+    race: [String]
+
+    primary_diagnoses: [String]
+
+    library_strategy: [String]
+    library_layouts: [String]
 }
 
 type SearchResult {

@@ -430,7 +430,6 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("phs_accession", "phs_accession"),
                 Map.entry("subject_id", "subject_ids"),
                 Map.entry("sample_id", "sample_id"),
-                Map.entry("sample_types", "sample_types_sort"),
                 Map.entry("experimental_strategy", "experimental_strategies_sort"),
                 Map.entry("gender", "genders_sort"),
                 Map.entry("race", "races_sort"),
@@ -445,22 +444,12 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("study_data_type", "study_data_types"),
                 Map.entry("library_strategy", "library_strategies_sort"),
                 Map.entry("library_layouts", "library_layouts_sort"),
-                Map.entry("image_modality", "image_modality_sort"),
-                Map.entry("organ_or_tissue", "organ_or_tissue_sort"),
-                Map.entry("license", "license_sort")
+                Map.entry("image_modality", "image_modality"),
+                Map.entry("organ_or_tissue", "organ_or_tissue"),
+                Map.entry("license", "license")
         );
 
-        ArrayList<String> joinProperties = new ArrayList<>(Arrays.asList(
-                "primary_diagnoses", "site", "sample_id", "analyte_type", "is_tumor", "gender", "race", "subject_id", "organ_or_tissue", "license"));
         List<Map<String, Object>> fileOverview = overview(FILES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
-        fileOverview.forEach( x -> {
-            x.keySet().forEach( k -> {
-                if (joinProperties.contains(k)){
-                    List<String> values = (List<String>) x.get(k);
-                    x.put(k, String.join(", ", values));
-                }
-            });
-        });
         return fileOverview;
     }
 
