@@ -1,19 +1,19 @@
 type SubjectOverview {
     subject_id: String
-    study_acronym: String
-    phs_accession: String
+    study_acronym: [String]
+    phs_accession: [String]
     gender: String
     site: [String]
     race: String
     ethnicity: String
-    primary_diagnosis: String
+    primary_diagnosis: [String]
     samples: [String]
     files: [String]
 }
 
 type SampleOverview {
-    study_acronym: String
-    phs_accession: String
+    study_acronym: [String]
+    phs_accession: [String]
     subject_id: String
     sample_id: String
     sample_type: String

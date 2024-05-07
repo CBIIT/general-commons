@@ -101,27 +101,28 @@ Indices:
         type: keyword
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
     cypher_query: "
+      WITH \"Not specified in data\" AS na
       MATCH (s:study)<--(f:file)
       OPTIONAL MATCH (f)-->(p:participant)
-      WITH s,
+      WITH s, na,
         {
-          accesses: s.study_access,
-          acl: s.acl,
-          phs_accession: s.phs_accession,
-          studies: s.study_name,
-          study_data_types: s.study_data_types,
+          accesses: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_access, na))),
+          acl: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.acl, na))),
+          phs_accession: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.phs_accession, na))),
+          studies: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_name, na))),
+          study_data_types: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_data_types, na))),
           number_of_study_participants: count(distinct p),
-          study_gs: s.study_name
+          study_gs: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_name, na)))
         } AS opensearch_data
       MATCH (s:study)<--(f:file)
       OPTIONAL MATCH (f)-->(p:participant)
       OPTIONAL MATCH (p)<--(samp:sample)
-      WITH s, 
+      WITH s, na,
         apoc.map.merge(opensearch_data, {
           number_of_study_samples: count(distinct samp)
         }) AS opensearch_data
       MATCH (s)<--(:file)-->(p:participant)
-      WITH DISTINCT p, \"Not specified in data\" AS na, opensearch_data
+      WITH DISTINCT p, na, opensearch_data
       WITH p, na,
         apoc.map.merge(opensearch_data, {
           genders: COALESCE(p.gender, na),
@@ -305,28 +306,28 @@ Indices:
         type: keyword
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
     cypher_query: "
+      WITH \"Not specified in data\" AS na
       MATCH (s:study)<--(f:file)
       OPTIONAL MATCH (f)-->(p:participant)
-      WITH s,
+      WITH s, na,
         {
-          accesses: s.study_access,
-          acl: s.acl,
-          phs_accession: s.phs_accession,
-          studies: s.study_name,
-          study_data_types: s.study_data_types,
+          accesses: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_access, na))),
+          acl: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.acl, na))),
+          phs_accession: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.phs_accession, na))),
+          studies: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_name, na))),
+          study_data_types: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_data_types, na))),
           number_of_study_participants: count(distinct p),
-          study_gs: s.study_name
+          study_gs: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_name, na)))
         } AS opensearch_data
       MATCH (s:study)<--(f:file)
       OPTIONAL MATCH (f)-->(p:participant)
       OPTIONAL MATCH (p)<--(samp:sample)
-      WITH s, 
+      WITH s, na,
         apoc.map.merge(opensearch_data, {
           number_of_study_samples: count(distinct samp)
         }) AS opensearch_data
       MATCH (s)<--(:file)-->(p:participant)<--(samp:sample)
-      WITH DISTINCT samp, 
-        \"Not specified in data\" AS na, 
+      WITH DISTINCT samp, na, 
         apoc.map.merge(opensearch_data, {
           is_tumor: samp.sample_tumor_status,
           analyte_type: samp.sample_type,
@@ -342,8 +343,8 @@ Indices:
         }) AS opensearch_data
       OPTIONAL MATCH (samp)-->(p:participant)
       WITH samp, na, opensearch_data,
-        apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.gender, na))) AS genders,
-        apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.participant_id, na))) AS subject_ids
+        COALESCE(p.gender, na) AS genders,
+        COALESCE(p.participant_id, na) AS subject_ids
       WITH samp, na, 
         apoc.map.merge(opensearch_data, {
           genders: genders,
