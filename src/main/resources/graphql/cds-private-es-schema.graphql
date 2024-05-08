@@ -55,6 +55,38 @@ type FileOverview {
     library_layouts: [String]
 }
 
+type FilesInList {
+    file_name: String
+    file_type: String
+    file_size: Float
+    file_id: String
+    md5sum: String
+    experimental_strategy: String
+
+    study_acronym: String
+    accesses: String
+    phs_accession: String
+    study_data_type: String
+
+    image_modality: String
+    organ_or_tissue: String
+    license: String
+
+    sample_id: String
+    analyte_type: String
+    is_tumor: String
+
+    subject_id: String
+    gender: String
+    race: String
+
+    primary_diagnoses: String
+
+    library_strategy: String
+    library_layouts: String
+}
+
+
 type SearchResult {
     numberOfStudies: Int
     numberOfSubjects: Int
@@ -348,6 +380,40 @@ type QueryType {
         first: Int = 10,
         offset: Int = 0
     ): [FileOverview]
+
+        filesInList (
+        subject_ids: [String] = [],
+        sample_ids: [String] = [],
+        file_ids: [String] = [],
+
+        accesses: [String] = [],
+        acl: [String] = [],
+        experimental_strategies: [String] = [],
+        file_types: [String] = [],
+        genders: [String] = [],
+        image_modality: [String] = [],
+        instrument_models: [String] = [],
+        is_tumor: [String] = [],
+        library_layouts: [String] = [],
+        library_selections: [String] = [],
+        library_sources: [String] = [],
+        library_strategies: [String] = [],
+        number_of_study_participants: [Float] = [],
+        number_of_study_samples: [Float] = [],
+        phs_accession: [String] = [],
+        platforms: [String] = [],
+        primary_diagnoses: [String] = [],
+        reference_genome_assemblies: [String] = [],
+        sample_types: [String] = [],
+        site: [String] = [],
+        studies: [String] = [],
+        study_data_types: [String] = [],
+
+        order_by: String = "",
+        sort_direction: String = "ASC",
+        first: Int = 10,
+        offset: Int = 0
+    ): [FilesInList]
 
     fileIDsFromList(
         subject_ids: [String] = [""],
