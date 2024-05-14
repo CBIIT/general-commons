@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 COPY . .
 RUN mvn package -DskipTests
 # Stage 2: Production
-FROM tomcat:9.0.89-jdk17-temurin-jammy
+FROM tomcat:10.1.24-jdk17-temurin-jammy
 ENV JAVA_OPTS $JAVA_OPTS -XX:InitialRAMPercentage=25 -XX:MaxRAMPercentage=70
 ENV TZ America/New_York
 
