@@ -5,8 +5,9 @@ COPY . .
 RUN mvn package -DskipTests
 # Stage 2: Production
 FROM tomcat:9.0.89-jdk17-temurin-jammy
+ENV JAVA_OPTS $JAVA_OPTS -XX:InitialRAMPercentage=25 -XX:MaxRAMPercentage=70
+ENV TZ America/New_York
 
-ENV JAVA_OPTS="-Xmx4096m"
 RUN apt-get update && apt-get install -y unzip  
 
 RUN rm -rf /usr/local/tomcat/webapps/ROOT
