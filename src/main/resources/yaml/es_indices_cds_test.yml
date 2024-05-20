@@ -1,6 +1,6 @@
 # Indices settings
 Indices:
-# Subjects index
+  # Subjects index
   - index_name: subjects
     type: neo4j
     # type mapping for each property of the index
@@ -123,7 +123,6 @@ Indices:
         }) AS opensearch_data
       MATCH (s)<--(:file)-->(p:participant)
       WITH DISTINCT p, na, opensearch_data
-      SKIP $skip LIMIT $limit
       WITH p, na,
         apoc.map.merge(opensearch_data, {
           genders: COALESCE(p.gender, na),
@@ -213,7 +212,7 @@ Indices:
       RETURN opensearch_data
       ORDER BY opensearch_data.subject_ids
       "
-# Samples index
+  # Samples index
   - index_name: samples
     type: neo4j
     mapping:
@@ -336,7 +335,6 @@ Indices:
           sample_id: samp.sample_id,
           sample_ids: samp.sample_id
         }) AS opensearch_data
-      SKIP $skip LIMIT $limit
       WITH samp, na, 
       apoc.map.merge(opensearch_data, {
           is_tumor_gs: opensearch_data.is_tumor,
@@ -422,7 +420,7 @@ Indices:
       RETURN opensearch_data
       ORDER BY opensearch_data.sample_id
     "
-# Files index (split by experimental strategies)
+  # Files index (split by experimental strategies)
   - index_name: file_experimental_strategies
     type: neo4j
     mapping:
@@ -497,7 +495,6 @@ Indices:
       WITH DISTINCT f, \"Not specified in data\" AS na, opensearch_data
       UNWIND coalesce(apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\"), na) AS experimental_strategies
       WITH f, na, opensearch_data, experimental_strategies, coalesce(toUpper(f.file_type), na) AS file_type
-      SKIP $skip LIMIT $limit
       WITH f, na,
         apoc.map.merge(opensearch_data, {
           experimental_strategies: experimental_strategies,
@@ -557,7 +554,7 @@ Indices:
       RETURN opensearch_data
       ORDER BY opensearch_data.files
     "
-# Files index
+  # Files index
   - index_name: files
     type: neo4j
     mapping:
@@ -628,8 +625,6 @@ Indices:
       file_size:
         type: long
       md5sum:
-        type: keyword
-      file_url_in_cds:
         type: keyword
       sample_id:
         type: keyword
@@ -724,7 +719,6 @@ Indices:
         }) AS opensearch_data
       MATCH (s)<--(f:file)
       WITH DISTINCT f, \"Not specified in data\" AS na, opensearch_data
-      SKIP $skip LIMIT $limit
       WITH f, na, opensearch_data,
         coalesce(toUpper(f.file_type), na) AS file_type, 
         apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT(coalesce(apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\"), na)),true))) AS experimental_strategy_and_data_subtypes
@@ -744,8 +738,7 @@ Indices:
           experimental_strategies_gs: experimental_strategy_and_data_subtypes,
           file_type_gs: f.file_type ,
           file_id_gs: f.file_id,
-          file_name_gs: f.file_name,
-          file_url_in_cds: f.file_url_in_cds
+          file_name_gs: f.file_name
         }) AS opensearch_data
       OPTIONAL MATCH (f)-->(p:participant)
       WITH f, na, opensearch_data,
@@ -839,7 +832,7 @@ Indices:
       RETURN opensearch_data
       ORDER BY opensearch_data.files
     "
-# Programs index
+  # Programs index
   - index_name: programs
     type: neo4j
     # type mapping for each property of the index
@@ -860,7 +853,6 @@ Indices:
     cypher_query: "
       MATCH (p:program)
       WITH p, \"program\" as type
-      SKIP $skip LIMIT $limit
       RETURN
         p.program_name AS program_name,
         p.program_short_description AS program_short_description,
@@ -870,7 +862,7 @@ Indices:
         p.program_sort_order AS program_sort_order_kw,
         type
     "
-# Studies index
+  # Studies index
   - index_name: studies
     type: neo4j
     # type mapping for each property of the index
@@ -905,7 +897,6 @@ Indices:
         study_data_types_gs: s.study_data_types,
         acl: s.acl
       } AS opensearch_data
-      SKIP $skip LIMIT $limit
       OPTIONAL MATCH (s)<--(f:file)
       OPTIONAL MATCH (f)-->(p:participant)
       WITH s, 
@@ -922,7 +913,7 @@ Indices:
       RETURN opensearch_data
       ORDER BY opensearch_data.study_code
     "
-# Subject IDs index
+  # Subject IDs index
   - index_name: subject_ids
     type: neo4j
     # type mapping for each property of the index
@@ -939,13 +930,12 @@ Indices:
       MATCH (s:study)<--(f:file)
       OPTIONAL MATCH (f)-->(p:participant)
       WITH DISTINCT p, s
-      SKIP $skip LIMIT $limit
       RETURN
         s.phs_accession AS phs_accession,
         p.participant_id AS subject_id,
         toLower(p.participant_id) AS subject_ids
     "
-# About Page index
+  # About Page index
   - index_name: about_page
     type: about_file
     # type mapping for each property of the index
@@ -958,7 +948,7 @@ Indices:
         type: text
       content:
         type: object
-# Model nodes index
+  # Model nodes index
   - index_name: model_nodes
     type: model
     subtype: node
@@ -968,7 +958,7 @@ Indices:
         type: search_as_you_type
       node_kw:
         type: keyword
-# Model properties index
+  # Model properties index
   - index_name: model_properties
     type: model
     subtype: property
@@ -986,7 +976,7 @@ Indices:
         type: search_as_you_type
       property_type:
         type: search_as_you_type
-# Model values index
+  # Model values index
   - index_name: model_values
     type: model
     subtype: value

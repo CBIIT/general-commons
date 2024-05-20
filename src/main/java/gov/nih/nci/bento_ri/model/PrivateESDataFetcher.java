@@ -3,24 +3,20 @@ package gov.nih.nci.bento_ri.model;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import gov.nih.nci.bento.constants.Const;
 import gov.nih.nci.bento.model.AbstractPrivateESDataFetcher;
-import gov.nih.nci.bento.model.search.MultipleRequests;
-import gov.nih.nci.bento.model.search.filter.DefaultFilter;
-import gov.nih.nci.bento.model.search.filter.FilterParam;
 import gov.nih.nci.bento.model.search.mapper.TypeMapperImpl;
 import gov.nih.nci.bento.model.search.mapper.TypeMapperService;
-import gov.nih.nci.bento.model.search.query.QueryParam;
 import gov.nih.nci.bento.model.search.yaml.YamlQueryFactory;
 import gov.nih.nci.bento.service.ESService;
 import graphql.schema.idl.RuntimeWiring;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opensearch.action.search.SearchRequest;
 import org.opensearch.client.Request;
 import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
@@ -71,11 +67,25 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     final String GS_HIGHLIGHT_FIELDS = "highlight_fields";
     final String GS_HIGHLIGHT_DELIMITER = "$";
     final Set<String> RANGE_PARAMS = Set.of("number_of_study_participants", "number_of_study_samples");
-
+    final String ASSOCIATED_FILE_IDS_YAML = "yaml/file_id_associations.yaml";
+    final HashMap<String, String> FILE_ASSOCIATION_MAP;
 
     public PrivateESDataFetcher(ESService esService) {
         super(esService);
         yamlQueryFactory = new YamlQueryFactory(esService);
+        HashMap<String, String> file_ids_map;
+        try{
+            Yaml yaml = new Yaml();
+            InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(ASSOCIATED_FILE_IDS_YAML);
+            HashMap<String, HashMap<String, String>> file_ids_yaml = yaml.load(inputStream);
+            file_ids_map = file_ids_yaml.get("file_associations");
+        }
+        catch (Exception e){
+            logger.warn("Unable to load associated files map");
+            logger.warn(e);
+            file_ids_map = null;
+        }
+        FILE_ASSOCIATION_MAP = file_ids_map;
     }
 
     @Override
@@ -894,7 +904,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         return esService.collectPage(request, query, properties, ESService.MAX_ES_SIZE, 0);
     }
 
-    private List<Map<String, Object>> filesInList(Map<String, Object> params) throws IOException {
+    private List<Map<String, Object>> filesInList(Map<String, Object> params) throws Exception {
         final String[][] PROPERTIES = new String[][]{
             new String[]{"study_acronym", "studies"},
             new String[]{"accesses", "accesses"},
@@ -919,6 +929,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             new String[]{"image_modality", "image_modality"},
             new String[]{"organ_or_tissue", "organ_or_tissue"},
             new String[]{"license", "license"},
+            new String[]{"drs_uri", "file_url_in_cds"}
     };
 
         String defaultSort = "file_name"; // Default sort order
@@ -945,26 +956,96 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("library_layouts", "library_layouts_sort"),
                 Map.entry("image_modality", "image_modality"),
                 Map.entry("organ_or_tissue", "organ_or_tissue"),
-                Map.entry("license", "license")
+                Map.entry("license", "license"),
+                Map.entry("drs_uri", "file_url_in_cds")
         );
 
-        ArrayList<String> joinProperties = new ArrayList<>(Arrays.asList(
-            "experimental_strategy", "library_layouts", "library_strategy", "subject_id", "sample_id", 
-            "gender", "race", "primary_diagnoses", "analyte_type", "is_tumor"));
+        List<Map<String, Object>> filesInListResult = overview(FILES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
 
-        List<Map<String, Object>> filesInList = overview(FILES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
-
-        filesInList.forEach( x -> {
-            x.keySet().forEach( k -> {
-                if (joinProperties.contains(k)){
-                    List<String> values = (List<String>) x.get(k);
-                    x.put(k, String.join(", ", values));
-                }
+        // Transform the specified properties in the "joinProperties" list from an arrays to a comma separated strings
+        try{
+            ArrayList<String> joinProperties = new ArrayList<>(Arrays.asList(
+                    "experimental_strategy", "library_layouts", "library_strategy", "subject_id", "sample_id",
+                    "gender", "race", "primary_diagnoses", "analyte_type", "is_tumor"));
+            filesInListResult.forEach( x -> {
+                x.keySet().forEach( k -> {
+                    if (joinProperties.contains(k)){
+                        List<String> values = (List<String>) x.get(k);
+                        x.put(k, String.join(", ", values));
+                    }
+                });
             });
+        }
+        catch (ClassCastException| NullPointerException e){
+            String message = "An error occurred while joining array values as a comma separated string";
+            logger.error(message);
+            logger.error(e);
+            throw new Exception(message);
+        }
+        // Query and add associated files properties to the original result
+        HashSet<String> associatedFileIds = getAssociatedFileIds(filesInListResult);
+        if (associatedFileIds.isEmpty()){
+            return filesInListResult;
+        }
+        List<Map<String, Object>> associatedFilesResult = overview(
+                FILES_END_POINT,
+                Map.of(
+                        "file_ids", new ArrayList<>(associatedFileIds),
+                        ORDER_BY, "file_id",
+                        SORT_DIRECTION, "ASC",
+                        OFFSET, 0,
+                        PAGE_SIZE, 10000
+                ),
+                new String[][]{
+                        new String[]{"file_name", "file_name"},
+                        new String[]{"file_id", "file_id"},
+                        new String[]{"md5sum", "md5sum"},
+                        new String[]{"uri", "file_url_in_cds"}
+                },
+                "file_id",
+                Map.of("file_id", "file_id")
+        );
+        HashMap<String, AssociatedFile> associatedFilesData = new HashMap<>();
+        associatedFilesResult.forEach(fileResult -> {
+            AssociatedFile associatedFile = new AssociatedFile(fileResult);
+            associatedFilesData.put(associatedFile.getFileId(), associatedFile);
         });
-        //returns files without arrays for csv export
-        return filesInList;
+        filesInListResult.forEach(result -> {
+            String fileId = (String) result.get("file_id");
+            String associatedFileId = FILE_ASSOCIATION_MAP.get(fileId);
+            String associatedFileValue = "";
+            String associatedDrsUriValue = "";
+            String associatedMd5sum = "";
+            if (associatedFileId != null){
+                AssociatedFile associatedFile = associatedFilesData.get(associatedFileId);
+                associatedFileValue = associatedFile.getFileName();
+                associatedDrsUriValue = associatedFile.getUri();
+                associatedMd5sum = associatedFile.getMd5sum();
+            }
+            result.put("associated_file", associatedFileValue);
+            result.put("associated_drs_uri", associatedDrsUriValue);
+            result.put("associated_md5sum", associatedMd5sum);
+        });
+        return filesInListResult;
     }
+
+    private HashSet<String> getAssociatedFileIds(List<Map<String, Object>> baseResult){
+        HashSet<String> fileIdsInResult = new HashSet<>();
+        String fileIdKey = "file_id";
+        baseResult.forEach(x -> {
+            fileIdsInResult.add((String) x.get(fileIdKey));
+        });
+        HashSet<String> associatedFileIds = new HashSet<>();
+        fileIdsInResult.forEach( x -> {
+            String fileId = FILE_ASSOCIATION_MAP.get(x);
+            if (fileId != null){
+                associatedFileIds.add(fileId);
+            }
+        });
+        return associatedFileIds;
+    }
+
+
 
     private List<String> fileIDsFromList(Map<String, Object> params) throws IOException {
         return collectFieldFromList(params, "file_id", FILES_END_POINT);
