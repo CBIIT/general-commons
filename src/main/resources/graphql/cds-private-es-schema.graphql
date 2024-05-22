@@ -62,6 +62,7 @@ type FilesInList {
     file_id: String
     md5sum: String
     experimental_strategy: String
+    drs_uri: String
 
     study_acronym: String
     accesses: String
@@ -84,6 +85,10 @@ type FilesInList {
 
     library_strategy: String
     library_layouts: String
+
+    associated_file: String
+    associated_drs_uri: String
+    associated_md5sum: String
 }
 
 

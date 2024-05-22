@@ -626,6 +626,8 @@ Indices:
         type: long
       md5sum:
         type: keyword
+      file_url_in_cds:
+        type: keyword
       sample_id:
         type: keyword
       sample_ids:
@@ -738,7 +740,8 @@ Indices:
           experimental_strategies_gs: experimental_strategy_and_data_subtypes,
           file_type_gs: f.file_type ,
           file_id_gs: f.file_id,
-          file_name_gs: f.file_name
+          file_name_gs: f.file_name,
+          file_url_in_cds: f.file_url_in_cds
         }) AS opensearch_data
       OPTIONAL MATCH (f)-->(p:participant)
       WITH f, na, opensearch_data,
