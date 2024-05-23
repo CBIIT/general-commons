@@ -936,8 +936,7 @@ Indices:
         type: keyword
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
     cypher_query: "
-      MATCH (s:study)<--(:file)
-      OPTIONAL MATCH (s)<--(:file)-->(p:participant)
+      MATCH (s:study)<--(:file)-->(p:participant)
       WITH DISTINCT p, s
       SKIP $skip LIMIT $limit
       RETURN
