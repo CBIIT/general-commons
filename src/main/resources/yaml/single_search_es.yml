@@ -1,0 +1,175 @@
+queries:
+  - name: numberOfStudies
+    index:
+      - files
+    filter:
+      type: aggregation
+      selectedField: studies
+    result:
+      type: int
+      method: count_bucket_keys
+  - name: numberOfSubjects
+    index:
+      - subjects
+    filter:
+      type: aggregation
+      selectedField: _id
+    result:
+      type: int
+      method: count_bucket_keys
+  - name: numberOfSamples
+    index:
+      - samples
+    filter:
+      type: aggregation
+      selectedField: _id
+    result:
+      type: int
+      method: count_bucket_keys
+  - name: numberOfFiles
+    index:
+      - files
+    filter:
+      type: aggregation
+      selectedField: _id
+    result:
+      type: int
+      method: count_bucket_keys
+  - name: numberOfDiseaseSites
+    index:
+      - diagnosis
+    filter:
+      type: aggregation
+      selectedField: primary_site
+    result:
+      type: int
+      method: count_bucket_keys
+  - name: diagnosis
+    index:
+      - diagnosis
+    filter:
+      type: pagination
+      defaultSortField: diagnosis_id
+    result:
+      type: object_array
+  - name: participant
+    index:
+      - subjects
+    filter:
+      type: pagination
+      defaultSortField: participant_id
+    result:
+      type: object_array
+  - name: file
+    index:
+      - files
+    filter:
+      type: pagination
+      defaultSortField: file_id
+    result:
+      type: object_array
+  - name: study
+    index:
+      - studies
+    filter:
+      type: pagination
+      defaultSortField: phs_accession
+    result:
+      type: object_array
+  - name: sample
+    index:
+      - samples
+    filter:
+      type: pagination
+      defaultSortField: sample_id
+    result:
+      type: object_array
+  - name: genomic_info
+    index:
+      - genomic_info
+    filter:
+      type: pagination
+      defaultSortField: library_id
+    result:
+      type: object_array
+  - name: specimen
+    index:
+      - specimen
+    filter:
+      type: pagination
+      defaultSortField: specimen_id
+    result:
+      type: object_array
+  - name: treatment
+    index:
+      - treatment
+    filter:
+      type: pagination
+      defaultSortField: treatment_id
+    result:
+      type: object_array
+  - name: image
+    index:
+      - image
+    filter:
+      type: pagination
+      defaultSortField: study_link_id
+    result:
+      type: object_array
+  - name: program
+    index:
+      - programs
+    filter:
+      type: pagination
+      defaultSortField: program_name
+    result:
+      type: object_array
+  - name: idsLists
+    index:
+      - subject_ids_list
+    filter:
+      type: default
+    result:
+      type: map
+  - name: programList
+    index:
+      - program_list
+    filter:
+      type: default
+    result:
+      type: object_array
+  - name: programDetail
+    index:
+      - program_detail
+    filter:
+      type: default
+    result:
+      type: map
+  - name: studyList
+    index:
+      - study_list
+    filter:
+      type: default
+    result:
+      type: object_array
+  - name: subjectDetail
+    index:
+      - subject_detail
+    filter:
+      type: default
+    result:
+      type: map
+  - name: samplesForSubjectId
+    index:
+      - samples
+    filter:
+      type: default
+    result:
+      type: object_array
+  - name: studyDetail
+    index:
+      - study_detail
+    filter:
+      type: default
+    result:
+      type: map

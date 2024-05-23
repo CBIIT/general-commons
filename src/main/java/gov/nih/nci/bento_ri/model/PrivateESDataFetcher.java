@@ -3,6 +3,7 @@ package gov.nih.nci.bento_ri.model;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import gov.nih.nci.bento.constants.Const;
 import gov.nih.nci.bento.model.AbstractPrivateESDataFetcher;
 import gov.nih.nci.bento.model.search.mapper.TypeMapperImpl;
 import gov.nih.nci.bento.model.search.mapper.TypeMapperService;
@@ -24,6 +25,7 @@ import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 @Component
 public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     private static final Logger logger = LogManager.getLogger(PrivateESDataFetcher.class);
+    private static final String SCHEMA_VERSION = "2.0.0";
     private final YamlQueryFactory yamlQueryFactory;
     private final TypeMapperService typeMapper = new TypeMapperImpl();
 
@@ -92,7 +94,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     public RuntimeWiring buildRuntimeWiring() throws IOException {
         return RuntimeWiring.newRuntimeWiring()
                 .type(newTypeWiring("QueryType")
-                        //.dataFetchers(yamlQueryFactory.createYamlQueries(Const.ES_ACCESS_TYPE.PRIVATE))
+                        .dataFetcher("schemaVersion", env -> SCHEMA_VERSION)
+                        .dataFetchers(yamlQueryFactory.createYamlQueries(Const.ES_ACCESS_TYPE.PRIVATE))
                         .dataFetcher("searchSubjects", env -> {
                             Map<String, Object> args = env.getArguments();
                             return searchSubjects(args);
@@ -686,16 +689,16 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 GS_COUNT_ENDPOINT, PROGRAMS_COUNT_END_POINT,
                 GS_COUNT_RESULT_FIELD, "program_count",
                 GS_RESULT_FIELD, "programs",
-                GS_SEARCH_FIELD, List.of("program_name", "program_short_description", "program_full_description",
-                        "program_external_url", "program_sort_order"),
-                GS_SORT_FIELD, "program_sort_order_kw",
+                GS_SEARCH_FIELD, List.of("program_name_gs", "program_short_description_gs", "program_full_description_gs",
+                        "program_external_url_gs", "program_sort_order_gs"),
+                GS_SORT_FIELD, "program_sort_order",
                 GS_COLLECT_FIELDS, new String[][]{
-                        new String[]{"program_name", "program_name"},
-                        new String[]{"program_short_description", "program_short_description"},
-                        new String[]{"program_full_description", "program_full_description"},
-                        new String[]{"program_external_url", "program_external_url"},
-                        new String[]{"program_sort_order", "program_sort_order"},
-                        new String[]{"type", "type"}
+                        new String[]{"program_name", "program_name_gs"},
+                        new String[]{"program_short_description", "program_short_description_gs"},
+                        new String[]{"program_full_description", "program_full_description_gs"},
+                        new String[]{"program_external_url", "program_external_url_gs"},
+                        new String[]{"program_sort_order", "program_sort_order_gs"},
+                        new String[]{"type", "type_gs"}
                 },
                 GS_CATEGORY_TYPE, "program"
         ));
@@ -929,7 +932,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             new String[]{"image_modality", "image_modality"},
             new String[]{"organ_or_tissue", "organ_or_tissue"},
             new String[]{"license", "license"},
-            new String[]{"drs_uri", "file_url_in_cds"}
+            new String[]{"drs_uri", "drs_uri"}
     };
 
         String defaultSort = "file_name"; // Default sort order
@@ -1000,7 +1003,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                         new String[]{"file_name", "file_name"},
                         new String[]{"file_id", "file_id"},
                         new String[]{"md5sum", "md5sum"},
-                        new String[]{"uri", "file_url_in_cds"}
+                        new String[]{"drs_uri", "drs_uri"}
                 },
                 "file_id",
                 Map.of("file_id", "file_id")

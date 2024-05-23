@@ -15,7 +15,7 @@ public class AssociatedFile {
     AssociatedFile(Map<String, Object> fileData){
         this.fileId = getStringOrNotSpecified(fileData.get("file_id"));
         this.fileName = getStringOrNotSpecified(fileData.get("file_name"));
-        this.uri = getStringOrNotSpecified(fileData.get("uri"));
+        this.uri = getStringOrNotSpecified(fileData.get("drs_uri"));
         this.md5sum = getStringOrNotSpecified(fileData.get("md5sum"));
     }
 
