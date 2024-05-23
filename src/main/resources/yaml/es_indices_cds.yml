@@ -123,6 +123,7 @@ Indices:
         }) AS opensearch_data
       MATCH (s)<--(:file)-->(p:participant)
       WITH DISTINCT p, na, opensearch_data
+      SKIP $skip LIMIT $limit
       WITH p, na,
         apoc.map.merge(opensearch_data, {
           genders: COALESCE(p.gender, na),
@@ -335,6 +336,7 @@ Indices:
           sample_id: samp.sample_id,
           sample_ids: samp.sample_id
         }) AS opensearch_data
+      SKIP $skip LIMIT $limit
       WITH samp, na, 
       apoc.map.merge(opensearch_data, {
           is_tumor_gs: opensearch_data.is_tumor,
@@ -495,6 +497,7 @@ Indices:
       WITH DISTINCT f, \"Not specified in data\" AS na, opensearch_data
       UNWIND coalesce(apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\"), na) AS experimental_strategies
       WITH f, na, opensearch_data, experimental_strategies, coalesce(toUpper(f.file_type), na) AS file_type
+      SKIP $skip LIMIT $limit
       WITH f, na,
         apoc.map.merge(opensearch_data, {
           experimental_strategies: experimental_strategies,
@@ -721,6 +724,7 @@ Indices:
         }) AS opensearch_data
       MATCH (s)<--(f:file)
       WITH DISTINCT f, \"Not specified in data\" AS na, opensearch_data
+      SKIP $skip LIMIT $limit
       WITH f, na, opensearch_data,
         coalesce(toUpper(f.file_type), na) AS file_type, 
         apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT(coalesce(apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\"), na)),true))) AS experimental_strategy_and_data_subtypes
@@ -856,6 +860,7 @@ Indices:
     cypher_query: "
       MATCH (p:program)
       WITH p, \"program\" as type
+      SKIP $skip LIMIT $limit
       RETURN
         p.program_name AS program_name,
         p.program_short_description AS program_short_description,
@@ -900,6 +905,7 @@ Indices:
         study_data_types_gs: s.study_data_types,
         acl: s.acl
       } AS opensearch_data
+      SKIP $skip LIMIT $limit
       OPTIONAL MATCH (s)<--(f:file)
       OPTIONAL MATCH (f)-->(p:participant)
       WITH s, 
@@ -930,9 +936,10 @@ Indices:
         type: keyword
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
     cypher_query: "
-      MATCH (s:study)<--(f:file)
-      OPTIONAL MATCH (f)-->(p:participant)
+      MATCH (s:study)<--(:file)
+      OPTIONAL MATCH (s)<--(:file)-->(p:participant)
       WITH DISTINCT p, s
+      SKIP $skip LIMIT $limit
       RETURN
         s.phs_accession AS phs_accession,
         p.participant_id AS subject_id,
