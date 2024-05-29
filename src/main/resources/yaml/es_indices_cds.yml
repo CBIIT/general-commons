@@ -149,7 +149,7 @@ Indices:
       WITH p, na, opensearch_data,
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_tumor_status, na))) AS is_tumor,
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_id, na))) AS samples,
-        apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_type, na))) AS sample_types
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc.text.split(samp.sample_type, ':'))), na))) AS sample_types
       WITH p, na,
         apoc.map.merge(opensearch_data, {
           is_tumor: is_tumor,
@@ -174,7 +174,7 @@ Indices:
       OPTIONAL MATCH (p)<--(diag:diagnosis)
       WITH p, na, opensearch_data,
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na))) AS primary_site,
-        apoc.coll.sort(COLLECT(DISTINCT COALESCE(LAST(apoc.text.split(diag.primary_diagnosis, ': ')), na))) AS primary_diagnosis
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc.text.split(diag.primary_diagnosis, ':'))), na))) AS primary_diagnosis
       WITH p, na, 
         apoc.map.merge(opensearch_data, {
           primary_diagnoses: primary_diagnosis,
@@ -352,13 +352,13 @@ Indices:
       WITH DISTINCT samp, na, 
         apoc.map.merge(opensearch_data, {
           is_tumor: samp.sample_tumor_status,
-          analyte_type: samp.sample_type,
-          sample_types: samp.sample_type,
-          sample_type: samp.sample_type,
+          analyte_type: TRIM(LAST(apoc.text.split(samp.sample_type, ':'))),
+          sample_types: TRIM(LAST(apoc.text.split(samp.sample_type, ':'))),
+          sample_type: TRIM(LAST(apoc.text.split(samp.sample_type, ':'))),
           sample_id: samp.sample_id,
           sample_ids: samp.sample_id,
           sample_tumor_status: samp.sample_tumor_status,
-          sample_anatomic_site: LAST(apoc.text.split(samp.sample_anatomic_site, ': ')),
+          sample_anatomic_site: TRIM(LAST(apoc.text.split(samp.sample_anatomic_site, ':'))),
           sample_age_at_collection: samp.sample_age_at_collection,
           derived_from_specimen: samp.derived_from_specimen,
           biosample_accession: samp.biosample_accession
@@ -424,7 +424,7 @@ Indices:
       OPTIONAL MATCH (samp)-->(p:participant)
       OPTIONAL MATCH (p)<--(diag:diagnosis)
       WITH samp, na, opensearch_data, 
-        apoc.coll.sort(COLLECT(DISTINCT COALESCE(LAST(apoc.text.split(diag.primary_diagnosis, ': ')), na))) AS primary_diagnoses,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc.text.split(diag.primary_diagnosis, ':'))), na))) AS primary_diagnoses,
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na))) AS site
       WITH samp, na, 
         apoc.map.merge(opensearch_data, {
@@ -549,7 +549,7 @@ Indices:
       OPTIONAL MATCH (p)<--(samp:sample)
       WITH f, na, opensearch_data,
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_tumor_status, na))) AS sample_tumor_status,
-        apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_type, na))) AS sample_type,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc.text.split(samp.sample_type, ':'))), na))) AS sample_type,
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_id, na))) AS sample_id
       WITH f, na,
         apoc.map.merge(opensearch_data, {
@@ -573,7 +573,7 @@ Indices:
       OPTIONAL MATCH (p)<--(diag:diagnosis)
       WITH f, na, 
         apoc.map.merge(opensearch_data, {
-          primary_diagnoses: apoc.coll.sort(COLLECT(DISTINCT COALESCE(LAST(apoc.text.split(diag.primary_diagnosis, ': ')), na))),
+          primary_diagnoses: apoc.coll.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc.text.split(diag.primary_diagnosis, ':'))), na))),
           site: apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na)))
         }) AS opensearch_data
       OPTIONAL MATCH (f)<--(i:image)
@@ -801,7 +801,7 @@ Indices:
       OPTIONAL MATCH (p)<--(samp:sample)
       WITH f, na, opensearch_data, 
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_tumor_status, na))) AS sample_tumor_status,
-        apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_type, na))) AS sample_type,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc.text.split(samp.sample_type, ':'))), na))) AS sample_type,
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_id, na))) AS sample_id
       WITH f, na, 
         apoc.map.merge(opensearch_data, {
@@ -851,7 +851,7 @@ Indices:
       OPTIONAL MATCH (f)-->(p:participant)
       OPTIONAL MATCH (p)<--(diag:diagnosis)
       WITH f, na, opensearch_data,
-        apoc.coll.sort(COLLECT(DISTINCT COALESCE(LAST(apoc.text.split(diag.primary_diagnosis, ': ')), na))) AS primary_diagnosis,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc.text.split(diag.primary_diagnosis, ':'))), na))) AS primary_diagnosis,
         apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na))) AS primary_site
       WITH f, na, 
         apoc.map.merge(opensearch_data, {
@@ -1124,7 +1124,7 @@ Indices:
         diagnosis_id: d.diagnosis_id,
         disease_type: d.disease_type,
         vital_status: d.vital_status,
-        primary_diagnosis: LAST(apoc.text.split(d.primary_diagnosis, ': ')),
+        primary_diagnosis: TRIM(LAST(apoc.text.split(d.primary_diagnosis, ':'))),
         primary_site: d.primary_site,
         age_at_diagnosis: d.age_at_diagnosis,
         tumor_grade: d.tumor_grade,
@@ -1908,12 +1908,12 @@ Indices:
       OPTIONAL MATCH (p)<--(samp:sample)
       WITH p,
           apoc.map.merge(opensearch_data, {
-              site: COLLECT(DISTINCT LAST(apoc.text.split(samp.sample_anatomic_site, ': '))),
+              site: COLLECT(DISTINCT TRIM(LAST(apoc.text.split(samp.sample_anatomic_site, ':')))),
               samples: CASE WHEN samp IS NOT NULL THEN COLLECT(DISTINCT {
                 sample_id: samp.sample_id,
-                sample_type: samp.sample_type,
+                sample_type: TRIM(LAST(apoc.text.split(samp.sample_type, ':'))),
                 sample_tumor_status: samp.sample_tumor_status,
-                sample_anatomic_site: LAST(apoc.text.split(samp.sample_anatomic_site, ': ')),
+                sample_anatomic_site: TRIM(LAST(apoc.text.split(samp.sample_anatomic_site, ':'))),
                 sample_age_at_collection: samp.sample_age_at_collection,
                 derived_from_specimen: samp.derived_from_specimen,
                 biosample_accession: samp.biosample_accession
