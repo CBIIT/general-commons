@@ -106,7 +106,7 @@ Indices:
       subject_ids:
         type: keyword
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
-    cypher_query: "
+    cypher_query: |
       WITH 'Not specified in data' AS na
       MATCH (s:study)<--(f:file)
       OPTIONAL MATCH (f)-->(p:participant)
@@ -160,7 +160,10 @@ Indices:
         }) AS opensearch_data
       OPTIONAL MATCH (p)<--(f:file)
       WITH p, na, opensearch_data, 
-          apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT (apoc.text.split(f.experimental_strategy_and_data_subtypes,'[;,]\\s{0,1}')), true))) AS experimental_strategies,
+          apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT(apoc.text.split(
+            CASE WHEN f.experimental_strategy_and_data_subtypes = '[]' THEN na ELSE
+            apoc.text.replace(f.experimental_strategy_and_data_subtypes,'\\[|\\]|\\"',
+            '') END, '[;,]\s{0,1}')), true))) AS experimental_strategies,
           apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_type, na))) AS file_types,
           apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_id, na))) AS files
       WITH p, na,
@@ -221,7 +224,6 @@ Indices:
         }) AS opensearch_data
       RETURN opensearch_data
       ORDER BY opensearch_data.subject_ids
-      "
   # Samples index
   - index_name: samples
     type: neo4j
@@ -327,8 +329,8 @@ Indices:
       biosample_accession:
         type: keyword
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
-    cypher_query: "
-      WITH \"Not specified in data\" AS na
+    cypher_query: |
+      WITH 'Not specified in data' AS na
       MATCH (s:study)<--(f:file)
       OPTIONAL MATCH (f)-->(p:participant)
       WITH s, na,
@@ -382,9 +384,12 @@ Indices:
       OPTIONAL MATCH (samp)-->(p:participant)
       OPTIONAL MATCH (p)<--(f:file)
       WITH samp, na, opensearch_data,
-          apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT (apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\")), true))) AS experimental_strategies,
-          apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_type, na))) AS file_types,
-          apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_id, na))) AS files
+        apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT(apoc.text.split(
+          CASE WHEN f.experimental_strategy_and_data_subtypes = '[]' THEN na ELSE 
+          apoc.text.replace(f.experimental_strategy_and_data_subtypes,'\\[|\\]|\\"',
+          '') END, '[;,]\s{0,1}')), true))) AS experimental_strategies,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_type, na))) AS file_types,
+        apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_id, na))) AS files
       WITH samp, na,
         apoc.map.merge(opensearch_data, {
           experimental_strategies: experimental_strategies,
@@ -448,7 +453,6 @@ Indices:
         }) AS opensearch_data
       RETURN opensearch_data
       ORDER BY opensearch_data.sample_id
-    "
   # Files index (split by experimental strategies)
   - index_name: file_experimental_strategies
     type: neo4j
@@ -500,7 +504,7 @@ Indices:
         type: keyword
       study_data_types:
         type: keyword
-    cypher_query: "
+    cypher_query: |
       MATCH (s:study)<--(f:file)
       OPTIONAL MATCH (f)-->(p:participant)
       WITH s,
@@ -521,8 +525,12 @@ Indices:
           number_of_study_samples: count(distinct samp)
         }) AS opensearch_data
       MATCH (s)<--(f:file)
-      WITH DISTINCT f, \"Not specified in data\" AS na, opensearch_data
-      UNWIND coalesce(apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\"), na) AS experimental_strategies
+      WITH DISTINCT f, 'Not specified in data' AS na, opensearch_data
+      UNWIND 
+        apoc.text.split(CASE WHEN f.experimental_strategy_and_data_subtypes = '[]' 
+        THEN na ELSE apoc.text.replace(f.experimental_strategy_and_data_subtypes,
+        '\\[|\\]|\\"','') END, '[;,]\s{0,1}')
+      AS experimental_strategies
       WITH f, na, opensearch_data, experimental_strategies, coalesce(toUpper(f.file_type), na) AS file_type
       SKIP $skip LIMIT $limit
       WITH f, na,
@@ -583,7 +591,6 @@ Indices:
         }) AS opensearch_data
       RETURN opensearch_data
       ORDER BY opensearch_data.files
-    "
   # Files index
   - index_name: files
     type: neo4j
@@ -733,7 +740,7 @@ Indices:
       sites_gs:
         type: search_as_you_type
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
-    cypher_query: "
+    cypher_query: |
       MATCH (s:study)<--(f:file)
       OPTIONAL MATCH (f)-->(p:participant)
       WITH s,
@@ -756,11 +763,13 @@ Indices:
           number_of_study_samples: count(distinct samp)
         }) AS opensearch_data
       MATCH (s)<--(f:file)
-      WITH DISTINCT f, \"Not specified in data\" AS na, opensearch_data
+      WITH DISTINCT f, 'Not specified in data' AS na, opensearch_data
       SKIP $skip LIMIT $limit
       WITH f, na, opensearch_data,
         coalesce(toUpper(f.file_type), na) AS file_type, 
-        apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT(coalesce(apoc.text.split(f.experimental_strategy_and_data_subtypes,\"[;,]\\s{0,1}\"), na)),true))) AS experimental_strategy_and_data_subtypes
+        apoc.text.split(CASE WHEN f.experimental_strategy_and_data_subtypes = '[]' 
+          THEN na ELSE apoc.text.replace(f.experimental_strategy_and_data_subtypes,
+          '\\[|\\]|\\"','') END, '[;,]\s{0,1}') AS experimental_strategy_and_data_subtypes
       WITH f, na, 
         apoc.map.merge(opensearch_data, {
           experimental_strategies: experimental_strategy_and_data_subtypes,
@@ -874,7 +883,6 @@ Indices:
         }) AS opensearch_data
       RETURN opensearch_data
       ORDER BY opensearch_data.files
-    "
   # Programs index
   - index_name: programs
     type: neo4j
@@ -907,9 +915,9 @@ Indices:
       type_gs:
         type: search_as_you_type
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
-    cypher_query: "
+    cypher_query: |
       MATCH (p:program)
-      WITH p, \"program\" as type_gs
+      WITH p, 'program' as type_gs
       SKIP $skip LIMIT $limit
       RETURN
         p.program_name AS program_name,
@@ -924,7 +932,6 @@ Indices:
         p.program_external_url AS program_external_url_gs,
         p.program_sort_order AS program_sort_order_gs,
         type_gs
-    "
   # Studies index
   - index_name: studies
     type: neo4j
@@ -1017,7 +1024,7 @@ Indices:
       study_data_types_gs:
         type: search_as_you_type
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
-    cypher_query: "
+    cypher_query: |
       MATCH (s:study)<--(:file)
       WITH DISTINCT s, {
         study_name: s.study_name,
@@ -1080,7 +1087,6 @@ Indices:
         }) AS opensearch_data
       RETURN opensearch_data
       ORDER BY opensearch_data.study_code
-    "
   - index_name: diagnosis
     type: neo4j
     mapping:
@@ -1118,7 +1124,7 @@ Indices:
         type: keyword
       days_to_last_known_status:
         type: keyword
-    cypher_query: "
+    cypher_query: |
       MATCH (d:diagnosis)
       WITH DISTINCT d, {
         diagnosis_id: d.diagnosis_id,
@@ -1141,7 +1147,6 @@ Indices:
       } AS opensearch_data
       SKIP $skip LIMIT $limit
       RETURN opensearch_data
-    "
   - index_name: genomic_info
     type: neo4j
     mapping:
@@ -1175,7 +1180,7 @@ Indices:
         type: keyword
       sequence_alignment_software:
         type: keyword
-    cypher_query: "
+    cypher_query: |
       MATCH (g:genomic_info)
       WITH DISTINCT g, {
         library_id: g.library_id,
@@ -1196,7 +1201,6 @@ Indices:
       } AS opensearch_data
       SKIP $skip LIMIT $limit
       RETURN opensearch_data
-    "
   - index_name: specimen
     type: neo4j
     mapping:
@@ -1204,7 +1208,7 @@ Indices:
         type: keyword
       participant:
         type: keyword
-    cypher_query: "
+    cypher_query: |
       MATCH (spec:specimen)
       WITH DISTINCT spec, {
         specimen_id: spec.specimen_id,
@@ -1212,7 +1216,6 @@ Indices:
       } AS opensearch_data
       SKIP $skip LIMIT $limit
       RETURN opensearch_data
-    "
   - index_name: treatment
     type: neo4j
     mapping:
@@ -1226,7 +1229,7 @@ Indices:
         type: keyword
       therapeutic_agents:
         type: keyword
-    cypher_query: "
+    cypher_query: |
       MATCH (t:treatment)
       WITH DISTINCT t, {
         treatment_id: t.treatment_id,
@@ -1237,7 +1240,6 @@ Indices:
       } AS opensearch_data
       SKIP $skip LIMIT $limit
       RETURN opensearch_data
-    "
   - index_name: image
     type: neo4j
     mapping:
@@ -1459,7 +1461,7 @@ Indices:
         type: keyword
       crdc_id:
         type: keyword
-    cypher_query: "
+    cypher_query: |
       MATCH (i:image)
       WITH DISTINCT i, {
         study_link_id: i.study_link_id,
@@ -1574,7 +1576,6 @@ Indices:
       } AS opensearch_data
       SKIP $skip LIMIT $limit
       RETURN opensearch_data
-    "
   # Subject IDs index
   - index_name: subject_ids
     type: neo4j
@@ -1588,7 +1589,7 @@ Indices:
       subject_ids:
         type: keyword
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
-    cypher_query: "
+    cypher_query: |
       MATCH (s:study)<--(:file)-->(p:participant)
       WITH DISTINCT p, s
       SKIP $skip LIMIT $limit
@@ -1596,7 +1597,6 @@ Indices:
         s.phs_accession AS phs_accession,
         p.participant_id AS subject_id,
         toLower(p.participant_id) AS subject_ids
-    "
   - index_name: program_detail
     type: neo4j
     # type mapping for each property of the index
@@ -1650,7 +1650,7 @@ Indices:
           num_files:
             type: integer
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
-    cypher_query: "
+    cypher_query: |
       MATCH (pr:program)
       OPTIONAL MATCH (pr)<--(s:study)
       WITH s
@@ -1723,7 +1723,6 @@ Indices:
         output.num_disease_sites AS num_disease_sites,
         output.study_participants AS study_participants,
         output.studies AS studies
-  "
   - index_name: program_list
     type: neo4j
     # type mapping for each property of the index
@@ -1737,7 +1736,7 @@ Indices:
       num_studies:
         type: keyword
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
-    cypher_query: "
+    cypher_query: |
       MATCH (pr:program)
       OPTIONAL MATCH (pr)<--(s:study)
       RETURN DISTINCT
@@ -1745,7 +1744,6 @@ Indices:
         pr.program_name AS name,
         pr.program_external_url AS website,
         COUNT(DISTINCT s) AS num_studies
-    "
   - index_name: study_list
     type: neo4j
     mapping:
@@ -1763,7 +1761,7 @@ Indices:
         type: keyword
       study_version:
         type: keyword
-    cypher_query: "
+    cypher_query: |
       MATCH (s:study)
       OPTIONAL MATCH (p:participant)-->(s)
       WITH s, count(distinct p) AS num_participants
@@ -1777,7 +1775,6 @@ Indices:
         num_participants AS numberOfSubjects,
         num_files AS numberOfFiles,
         s.study_version AS study_version
-    "
   - index_name: study_detail
     type: neo4j
     mapping:
@@ -1805,7 +1802,7 @@ Indices:
         type: keyword
       numberOfFiles:
         type: keyword
-    cypher_query: "
+    cypher_query: |
       MATCH (s:study)
       WITH s, {
           study_name: s.study_name,
@@ -1838,7 +1835,6 @@ Indices:
               numberOfFiles: COUNT(DISTINCT f)
           }) AS opensearch_data
       RETURN opensearch_data
-    "
   - index_name: subject_detail
     type: neo4j
     mapping:
@@ -1894,7 +1890,7 @@ Indices:
             type: keyword
           biosample_accession:
             type: keyword
-    cypher_query: "
+    cypher_query: |
       MATCH (p:participant)
       WITH p
       SKIP $skip LIMIT $limit
@@ -1944,7 +1940,6 @@ Indices:
             numberOfSamples: COUNT(DISTINCT opensearch_data.samples)
         }) AS opensearch_data
       RETURN opensearch_data
-    "
   - index_name: subject_ids_list
     type: neo4j
     # type mapping for each property of the index
@@ -1952,11 +1947,10 @@ Indices:
       subjectIds:
         type: keyword
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
-    cypher_query: "
+    cypher_query: |
       MATCH (p:participant)-->(s:study)
       RETURN
       COLLECT(DISTINCT p.participant_id) AS subjectIds
-    "
   # About Page index
   - index_name: about_page
     type: about_file
