@@ -113,7 +113,7 @@ Indices:
       WITH s, na,
         {
           accesses: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_access, na))),
-          acl: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.acl, na))),
+          acl: apoc.coll.sort(COLLECT(DISTINCT COALESCE(CASE WHEN s.acl = '[]' THEN na ELSE apoc.text.replace(s.acl,'\\[|\\]|\\"|\'','') END, na))),
           phs_accession: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.phs_accession, na))),
           studies: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_name, na))),
           study_data_types: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_data_types, na))),
@@ -336,7 +336,7 @@ Indices:
       WITH s, na,
         {
           accesses: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_access, na))),
-          acl: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.acl, na))),
+          acl: apoc.coll.sort(COLLECT(DISTINCT COALESCE(CASE WHEN s.acl = '[]' THEN na ELSE apoc.text.replace(s.acl,'\\[|\\]|\\"|\'','') END, na))),
           phs_accession: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.phs_accession, na))),
           studies: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_name, na))),
           study_data_types: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_data_types, na))),
@@ -507,10 +507,11 @@ Indices:
     cypher_query: |
       MATCH (s:study)<--(f:file)
       OPTIONAL MATCH (f)-->(p:participant)
-      WITH s,
+      WITH s, p, 'Not specified in data' AS na
+      WITH s, na,
         {
           accesses: s.study_access,
-          acl: s.acl,
+          acl: CASE WHEN s.acl = '[]' THEN na ELSE apoc.text.replace(s.acl,'\\[|\\]|\\"|\'','') END,
           phs_accession: s.phs_accession,
           studies: s.study_name,
           study_data_types: s.study_data_types,
@@ -743,12 +744,14 @@ Indices:
     cypher_query: |
       MATCH (s:study)<--(f:file)
       OPTIONAL MATCH (f)-->(p:participant)
+      WITH s, p, 'Not specified in data' AS na
+      WITH s, p, na, CASE WHEN s.acl = '[]' THEN na ELSE apoc.text.replace(s.acl,'\\[|\\]|\\"|\'','') END AS acl
       WITH s,
         {
           accesses: s.study_access,
           accesses_gs: s.study_access,
-          acl: s.acl,
-          acl_gs: s.acl,
+          acl: acl,
+          acl_gs: acl,
           phs_accession: s.phs_accession,
           studies: s.study_name,
           study_data_types: s.study_data_types,
@@ -1026,6 +1029,7 @@ Indices:
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
     cypher_query: |
       MATCH (s:study)<--(:file)
+      WITH s, 'Not specified in data' AS na
       WITH DISTINCT s, {
         study_name: s.study_name,
         study_code: s.study_name,
@@ -1058,14 +1062,14 @@ Indices:
         number_of_participants: s.number_of_participants,
         number_of_samples: s.number_of_samples,
         study_data_types: s.study_data_types,
-        file_types_and_format: s.file_types_and_format,
+        file_types_and_format: CASE WHEN s.file_types_and_format = '[]' THEN na ELSE apoc.text.replace(s.file_types_and_format,'\\[|\\]|\\"|\'','') END,
         size_of_data_being_uploaded: s.size_of_data_being_uploaded,
         size_of_data_being_uploaded_unit: s.size_of_data_being_uploaded_unit,
         size_of_data_being_uploaded_original: s.size_of_data_being_uploaded_original,
         size_of_data_being_uploaded_original_unit: s.size_of_data_being_uploaded_original_unit,
-        acl: s.acl,
+        acl: CASE WHEN s.acl = '[]' THEN na ELSE apoc.text.replace(s.acl,'\\[|\\]|\\"|\'','') END,
         study_access: s.study_access,
-        study_version: s.study_version,
+        study_version: CASE WHEN s.study_version = '[]' THEN na ELSE apoc.text.replace(s.study_version,'\\[|\\]|\\"|\'','') END,
         study_code_gs: s.study_name,
         phs_accession_gs: s.phs_accession,
         study_name_gs: s.study_name,
@@ -1655,7 +1659,7 @@ Indices:
       OPTIONAL MATCH (pr)<--(s:study)
       WITH s
       OPTIONAL MATCH (s)<--(p:participant)
-      WITH s, count(distinct p) as num_participants
+      WITH s, count(distinct p) as num_participants, 'Not specified in data' AS na
       WITH s,
           {
               group: s.study_name,
@@ -1664,7 +1668,7 @@ Indices:
           {
               accession: s.phs_accession,
               study_access: s.study_access,
-              study_version: s.study_version,
+              study_version: CASE WHEN s.study_version = '[]' THEN na ELSE apoc.text.replace(s.study_version,'\\[|\\]|\\"|\'','') END,
               study_data_types: s.study_data_types,
               study_name: s.study_name,
               study_description: s.study_description,
@@ -1766,7 +1770,7 @@ Indices:
       OPTIONAL MATCH (p:participant)-->(s)
       WITH s, count(distinct p) AS num_participants
       OPTIONAL MATCH (f:file)-->(s)
-      WITH s, num_participants, count(distinct f) as num_files
+      WITH s, num_participants, count(distinct f) as num_files, 'Not specified in data' AS na
       RETURN 
         s.phs_accession AS phs_accession,
         s.study_name AS study_name,
@@ -1774,7 +1778,7 @@ Indices:
         s.study_access AS study_access,
         num_participants AS numberOfSubjects,
         num_files AS numberOfFiles,
-        s.study_version AS study_version
+        CASE WHEN s.study_version = '[]' THEN na ELSE apoc.text.replace(s.study_version,'\\[|\\]|\\"|\'','') END AS study_version
   - index_name: study_detail
     type: neo4j
     mapping:
@@ -1804,6 +1808,7 @@ Indices:
         type: keyword
     cypher_query: |
       MATCH (s:study)
+      WITH s, 'Not specified in data' AS na
       WITH s, {
           study_name: s.study_name,
           phs_accession: s.phs_accession,
@@ -1811,7 +1816,7 @@ Indices:
           study_description: s.study_description,
           data_types: s.study_data_types,
           study_external_url: s.study_external_url,
-          study_version: s.study_version,
+          study_version: CASE WHEN s.study_version = '[]' THEN na ELSE apoc.text.replace(s.study_version,'\\[|\\]|\\"|\'','') END,
           study_access: s.data_access_level
       } AS opensearch_data
       OPTIONAL MATCH (s)<--(p:participant)
