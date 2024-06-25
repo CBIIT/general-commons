@@ -5,22 +5,19 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import gov.nih.nci.bento.constants.Const;
 import gov.nih.nci.bento.model.AbstractPrivateESDataFetcher;
-import gov.nih.nci.bento.model.search.MultipleRequests;
-import gov.nih.nci.bento.model.search.filter.DefaultFilter;
-import gov.nih.nci.bento.model.search.filter.FilterParam;
 import gov.nih.nci.bento.model.search.mapper.TypeMapperImpl;
 import gov.nih.nci.bento.model.search.mapper.TypeMapperService;
-import gov.nih.nci.bento.model.search.query.QueryParam;
 import gov.nih.nci.bento.model.search.yaml.YamlQueryFactory;
 import gov.nih.nci.bento.service.ESService;
 import graphql.schema.idl.RuntimeWiring;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opensearch.action.search.SearchRequest;
 import org.opensearch.client.Request;
 import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
@@ -28,6 +25,7 @@ import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 @Component
 public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     private static final Logger logger = LogManager.getLogger(PrivateESDataFetcher.class);
+    private static final String SCHEMA_VERSION = "2.0.0";
     private final YamlQueryFactory yamlQueryFactory;
     private final TypeMapperService typeMapper = new TypeMapperImpl();
 
@@ -71,18 +69,33 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     final String GS_HIGHLIGHT_FIELDS = "highlight_fields";
     final String GS_HIGHLIGHT_DELIMITER = "$";
     final Set<String> RANGE_PARAMS = Set.of("number_of_study_participants", "number_of_study_samples");
-
+    final String ASSOCIATED_FILE_IDS_YAML = "yaml/file_id_associations.yaml";
+    final HashMap<String, String> FILE_ASSOCIATION_MAP;
 
     public PrivateESDataFetcher(ESService esService) {
         super(esService);
         yamlQueryFactory = new YamlQueryFactory(esService);
+        HashMap<String, String> file_ids_map;
+        try{
+            Yaml yaml = new Yaml();
+            InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(ASSOCIATED_FILE_IDS_YAML);
+            HashMap<String, HashMap<String, String>> file_ids_yaml = yaml.load(inputStream);
+            file_ids_map = file_ids_yaml.get("file_associations");
+        }
+        catch (Exception e){
+            logger.warn("Unable to load associated files map");
+            logger.warn(e);
+            file_ids_map = null;
+        }
+        FILE_ASSOCIATION_MAP = file_ids_map;
     }
 
     @Override
     public RuntimeWiring buildRuntimeWiring() throws IOException {
         return RuntimeWiring.newRuntimeWiring()
                 .type(newTypeWiring("QueryType")
-                        //.dataFetchers(yamlQueryFactory.createYamlQueries(Const.ES_ACCESS_TYPE.PRIVATE))
+                        .dataFetcher("schemaVersion", env -> SCHEMA_VERSION)
+                        .dataFetchers(yamlQueryFactory.createYamlQueries(Const.ES_ACCESS_TYPE.PRIVATE))
                         .dataFetcher("searchSubjects", env -> {
                             Map<String, Object> args = env.getArguments();
                             return searchSubjects(args);
@@ -98,6 +111,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                         .dataFetcher("fileOverview", env -> {
                             Map<String, Object> args = env.getArguments();
                             return fileOverview(args);
+                        })
+                        .dataFetcher("filesInList", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return filesInList(args);
                         })
                         .dataFetcher("globalSearch", env -> {
                             Map<String, Object> args = env.getArguments();
@@ -236,6 +253,19 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 FILTER_COUNT_QUERY, "filterSubjectCountByAcl",
                 AGG_ENDPOINT, FILES_END_POINT
         ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "sample_types",
+                WIDGET_QUERY, "subjectCountBySampleType",
+                FILTER_COUNT_QUERY, "filterSubjectCountBySampleType",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "image_modality",
+                WIDGET_QUERY, "subjectCountByImageModality",
+                FILTER_COUNT_QUERY, "filterSubjectCountByImageModality",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+
 
 
         List<String> agg_names = new ArrayList<>();
@@ -274,7 +304,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         Map<String, JsonArray> aggs = esService.collectTermAggs(subjectResult, TERM_AGG_NAMES);
 
         Map<String, Object> data = new HashMap<>();
-        data.put("numberOfStudies", aggs.get("studies").size());
+        data.put("numberOfStudies", aggs.get("phs_accession").size());
         data.put("numberOfSubjects", numberOfSubjects);
         data.put("numberOfSamples", numberOfSamples);
         data.put("numberOfFiles", numberOfFiles);
@@ -327,7 +357,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"site", "site"},
                 new String[]{"samples", "samples"},
                 new String[]{"files", "files"},
-                new String[]{"analyte_type", "analyte_type"}
+                new String[]{"analyte_type", "analyte_type"},
+                new String[]{"race", "race"},
+                new String[]{"ethnicity", "ethnicity"},
+                new String[]{"primary_diagnosis", "primary_diagnoses"}
         };
 
         String defaultSort = "subject_ids"; // Default sort order
@@ -337,8 +370,11 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("study_acronym", "studies"),
                 Map.entry("phs_accession", "phs_accession"),
                 Map.entry("gender", "genders"),
-                Map.entry("site", "site"),
-                Map.entry("analyte_type", "analyte_type")
+                Map.entry("site", "site_sort"),
+                Map.entry("analyte_type", "sample_types_sort"),
+                Map.entry("race", "race"),
+                Map.entry("ethnicity", "ethnicity"),
+                Map.entry("primary_diagnosis", "primary_diagnoses_sort")
         );
 
         return overview(SUBJECTS_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
@@ -352,7 +388,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"sample_id", "sample_id"},
                 new String[]{"is_tumor", "is_tumor"},
                 new String[]{"analyte_type", "analyte_type"},
-                new String[]{"files", "files"}
+                new String[]{"files", "files"},
+                new String[]{"sample_type", "analyte_type"},
+                new String[]{"sample_tumor_status", "is_tumor"},
+                new String[]{"organ_or_tissue", "organ_or_tissue"}
         };
 
         String defaultSort = "sample_id"; // Default sort order
@@ -363,7 +402,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("subject_id", "subject_ids"),
                 Map.entry("sample_id", "sample_id"),
                 Map.entry("is_tumor", "is_tumor"),
-                Map.entry("analyte_type", "analyte_type")
+                Map.entry("analyte_type", "analyte_type"),
+                Map.entry("sample_type", "analyte_type"),
+                Map.entry("sample_tumor_status", "is_tumor"),
+                Map.entry("organ_or_tissue", "organ_or_tissue_sort")
         );
 
         return overview(SAMPLES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
@@ -372,52 +414,59 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     private List<Map<String, Object>> fileOverview(Map<String, Object> params) throws IOException {
         // Following String array of arrays should be in form of "GraphQL_field_name", "ES_field_name"
         final String[][] PROPERTIES = new String[][]{
-                new String[]{"study_acronym", "studies"},
-                new String[]{"accesses", "accesses"},
-                new String[]{"phs_accession", "phs_accession"},
-                new String[]{"subject_id", "subject_ids"},
-                new String[]{"sample_id", "sample_id"},
-                new String[]{"experimental_strategy", "experimental_strategies"},
-                new String[]{"gender", "genders"},
-                new String[]{"analyte_type", "analyte_type"},
-                new String[]{"is_tumor", "is_tumor"},
-                new String[]{"file_name", "file_name"},
-                new String[]{"file_type", "file_type"},
-                new String[]{"file_size", "file_size"},
-                new String[]{"file_id", "file_id"},
-                new String[]{"md5sum", "md5sum"}
-        };
+            new String[]{"study_acronym", "studies"},
+            new String[]{"accesses", "accesses"},
+            new String[]{"phs_accession", "phs_accession"},
+            new String[]{"subject_id", "subject_ids"},
+            new String[]{"sample_id", "sample_id"},
+            new String[]{"sample_types", "sample_types"},
+            new String[]{"experimental_strategy", "experimental_strategies"},
+            new String[]{"gender", "genders"},
+            new String[]{"race", "races"},
+            new String[]{"primary_diagnoses", "primary_diagnoses"},
+            new String[]{"analyte_type", "analyte_type"},
+            new String[]{"is_tumor", "is_tumor"},
+            new String[]{"file_name", "file_name"},
+            new String[]{"file_type", "file_type"},
+            new String[]{"file_size", "file_size"},
+            new String[]{"file_id", "file_id"},
+            new String[]{"md5sum", "md5sum"},
+            new String[]{"study_data_type", "study_data_types"},
+            new String[]{"library_strategy", "library_strategies"},
+            new String[]{"library_layouts", "library_layouts"},
+            new String[]{"image_modality", "image_modality"},
+            new String[]{"organ_or_tissue", "organ_or_tissue"},
+            new String[]{"license", "license"},
+    };
 
         String defaultSort = "file_name"; // Default sort order
-
+        
         Map<String, String> sortFieldMapping = Map.ofEntries(
                 Map.entry("study_acronym", "studies"),
                 Map.entry("accesses", "accesses"),
                 Map.entry("phs_accession", "phs_accession"),
                 Map.entry("subject_id", "subject_ids"),
                 Map.entry("sample_id", "sample_id"),
-                Map.entry("experimental_strategy", "experimental_strategies"),
-                Map.entry("gender", "genders"),
-                Map.entry("analyte_type", "analyte_type"),
-                Map.entry("is_tumor", "is_tumor"),
+                Map.entry("experimental_strategy", "experimental_strategies_sort"),
+                Map.entry("gender", "genders_sort"),
+                Map.entry("race", "races_sort"),
+                Map.entry("primary_diagnoses", "primary_diagnoses_sort"),
+                Map.entry("analyte_type", "analyte_type_sort"),
+                Map.entry("is_tumor", "is_tumor_sort"),
                 Map.entry("file_name", "file_name"),
                 Map.entry("file_type", "file_type"),
                 Map.entry("file_size", "file_size"),
                 Map.entry("file_id", "file_id"),
-                Map.entry("md5sum", "md5sum")
+                Map.entry("md5sum", "md5sum"),
+                Map.entry("study_data_type", "study_data_types"),
+                Map.entry("library_strategy", "library_strategies_sort"),
+                Map.entry("library_layouts", "library_layouts_sort"),
+                Map.entry("image_modality", "image_modality"),
+                Map.entry("organ_or_tissue", "organ_or_tissue"),
+                Map.entry("license", "license")
         );
 
-        ArrayList<String> joinProperties = new ArrayList<>(Arrays.asList(
-                "primary_diagnoses", "site", "sample_id", "analyte_type", "is_tumor", "gender", "subject_id"));
         List<Map<String, Object>> fileOverview = overview(FILES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
-        fileOverview.forEach( x -> {
-            x.keySet().forEach( k -> {
-                if (joinProperties.contains(k)){
-                    List<String> values = (List<String>) x.get(k);
-                    x.put(k, String.join(", ", values));
-                }
-            });
-        });
         return fileOverview;
     }
 
@@ -640,16 +689,16 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 GS_COUNT_ENDPOINT, PROGRAMS_COUNT_END_POINT,
                 GS_COUNT_RESULT_FIELD, "program_count",
                 GS_RESULT_FIELD, "programs",
-                GS_SEARCH_FIELD, List.of("program_name", "program_short_description", "program_full_description",
-                        "program_external_url", "program_sort_order"),
-                GS_SORT_FIELD, "program_sort_order_kw",
+                GS_SEARCH_FIELD, List.of("program_name_gs", "program_short_description_gs", "program_full_description_gs",
+                        "program_external_url_gs", "program_sort_order_gs"),
+                GS_SORT_FIELD, "program_sort_order",
                 GS_COLLECT_FIELDS, new String[][]{
-                        new String[]{"program_name", "program_name"},
-                        new String[]{"program_short_description", "program_short_description"},
-                        new String[]{"program_full_description", "program_full_description"},
-                        new String[]{"program_external_url", "program_external_url"},
-                        new String[]{"program_sort_order", "program_sort_order"},
-                        new String[]{"type", "type"}
+                        new String[]{"program_name", "program_name_gs"},
+                        new String[]{"program_short_description", "program_short_description_gs"},
+                        new String[]{"program_full_description", "program_full_description_gs"},
+                        new String[]{"program_external_url", "program_external_url_gs"},
+                        new String[]{"program_sort_order", "program_sort_order_gs"},
+                        new String[]{"type", "type_gs"}
                 },
                 GS_CATEGORY_TYPE, "program"
         ));
@@ -858,37 +907,148 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         return esService.collectPage(request, query, properties, ESService.MAX_ES_SIZE, 0);
     }
 
-    private List<Map<String, Object>> filesInList(Map<String, Object> params) throws IOException {
-        final String[][] properties = new String[][]{
-                new String[]{"study_acronym", "studies"},
-                new String[]{"subject_id", "subject_ids"},
-                new String[]{"sample_id", "sample_id"},
-                new String[]{"file_name", "file_name"},
-                new String[]{"file_type", "file_type"},
-                new String[]{"file_size", "file_size"}
-        };
+    private List<Map<String, Object>> filesInList(Map<String, Object> params) throws Exception {
+        final String[][] PROPERTIES = new String[][]{
+            new String[]{"study_acronym", "studies"},
+            new String[]{"accesses", "accesses"},
+            new String[]{"phs_accession", "phs_accession"},
+            new String[]{"subject_id", "subject_ids"},
+            new String[]{"sample_id", "sample_id"},
+            new String[]{"sample_types", "sample_types"},
+            new String[]{"experimental_strategy", "experimental_strategies"},
+            new String[]{"gender", "genders"},
+            new String[]{"race", "races"},
+            new String[]{"primary_diagnoses", "primary_diagnoses"},
+            new String[]{"analyte_type", "analyte_type"},
+            new String[]{"is_tumor", "is_tumor"},
+            new String[]{"file_name", "file_name"},
+            new String[]{"file_type", "file_type"},
+            new String[]{"file_size", "file_size"},
+            new String[]{"file_id", "file_id"},
+            new String[]{"md5sum", "md5sum"},
+            new String[]{"study_data_type", "study_data_types"},
+            new String[]{"library_strategy", "library_strategies"},
+            new String[]{"library_layouts", "library_layouts"},
+            new String[]{"image_modality", "image_modality"},
+            new String[]{"organ_or_tissue", "organ_or_tissue"},
+            new String[]{"license", "license"},
+            new String[]{"drs_uri", "drs_uri"}
+    };
 
         String defaultSort = "file_name"; // Default sort order
-
+        
         Map<String, String> sortFieldMapping = Map.ofEntries(
                 Map.entry("study_acronym", "studies"),
+                Map.entry("accesses", "accesses"),
+                Map.entry("phs_accession", "phs_accession"),
                 Map.entry("subject_id", "subject_ids"),
                 Map.entry("sample_id", "sample_id"),
+                Map.entry("experimental_strategy", "experimental_strategies_sort"),
+                Map.entry("gender", "genders_sort"),
+                Map.entry("race", "races_sort"),
+                Map.entry("primary_diagnoses", "primary_diagnoses_sort"),
+                Map.entry("analyte_type", "analyte_type_sort"),
+                Map.entry("is_tumor", "is_tumor_sort"),
                 Map.entry("file_name", "file_name"),
                 Map.entry("file_type", "file_type"),
-                Map.entry("file_size", "file_size")
+                Map.entry("file_size", "file_size"),
+                Map.entry("file_id", "file_id"),
+                Map.entry("md5sum", "md5sum"),
+                Map.entry("study_data_type", "study_data_types"),
+                Map.entry("library_strategy", "library_strategies_sort"),
+                Map.entry("library_layouts", "library_layouts_sort"),
+                Map.entry("image_modality", "image_modality"),
+                Map.entry("organ_or_tissue", "organ_or_tissue"),
+                Map.entry("license", "license"),
+                Map.entry("drs_uri", "file_url_in_cds")
         );
 
-        Map<String, Object> query = esService.buildListQuery(params, Set.of(PAGE_SIZE, OFFSET, ORDER_BY, SORT_DIRECTION));
-        String order_by = (String)params.get(ORDER_BY);
-        String direction = ((String)params.get(SORT_DIRECTION)).toLowerCase();
-        query.put("sort", mapSortOrder(order_by, direction, defaultSort, sortFieldMapping));
-        int pageSize = (int) params.get(PAGE_SIZE);
-        int offset = (int) params.get(OFFSET);
-        Request request = new Request("GET", FILES_END_POINT);
+        List<Map<String, Object>> filesInListResult = overview(FILES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
 
-        return esService.collectPage(request, query, properties, pageSize, offset);
+        // Transform the specified properties in the "joinProperties" list from an arrays to a comma separated strings
+        try{
+            ArrayList<String> joinProperties = new ArrayList<>(Arrays.asList(
+                    "experimental_strategy", "library_layouts", "library_strategy", "subject_id", "sample_id",
+                    "gender", "race", "primary_diagnoses", "analyte_type", "is_tumor"));
+            filesInListResult.forEach( x -> {
+                x.keySet().forEach( k -> {
+                    if (joinProperties.contains(k)){
+                        List<String> values = (List<String>) x.get(k);
+                        x.put(k, String.join(", ", values));
+                    }
+                });
+            });
+        }
+        catch (ClassCastException| NullPointerException e){
+            String message = "An error occurred while joining array values as a comma separated string";
+            logger.error(message);
+            logger.error(e);
+            throw new Exception(message);
+        }
+        // Query and add associated files properties to the original result
+        HashSet<String> associatedFileIds = getAssociatedFileIds(filesInListResult);
+        if (associatedFileIds.isEmpty()){
+            return filesInListResult;
+        }
+        List<Map<String, Object>> associatedFilesResult = overview(
+                FILES_END_POINT,
+                Map.of(
+                        "file_ids", new ArrayList<>(associatedFileIds),
+                        ORDER_BY, "file_id",
+                        SORT_DIRECTION, "ASC",
+                        OFFSET, 0,
+                        PAGE_SIZE, 10000
+                ),
+                new String[][]{
+                        new String[]{"file_name", "file_name"},
+                        new String[]{"file_id", "file_id"},
+                        new String[]{"md5sum", "md5sum"},
+                        new String[]{"drs_uri", "drs_uri"}
+                },
+                "file_id",
+                Map.of("file_id", "file_id")
+        );
+        HashMap<String, AssociatedFile> associatedFilesData = new HashMap<>();
+        associatedFilesResult.forEach(fileResult -> {
+            AssociatedFile associatedFile = new AssociatedFile(fileResult);
+            associatedFilesData.put(associatedFile.getFileId(), associatedFile);
+        });
+        filesInListResult.forEach(result -> {
+            String fileId = (String) result.get("file_id");
+            String associatedFileId = FILE_ASSOCIATION_MAP.get(fileId);
+            String associatedFileValue = "";
+            String associatedDrsUriValue = "";
+            String associatedMd5sum = "";
+            if (associatedFileId != null){
+                AssociatedFile associatedFile = associatedFilesData.get(associatedFileId);
+                associatedFileValue = associatedFile.getFileName();
+                associatedDrsUriValue = associatedFile.getUri();
+                associatedMd5sum = associatedFile.getMd5sum();
+            }
+            result.put("associated_file", associatedFileValue);
+            result.put("associated_drs_uri", associatedDrsUriValue);
+            result.put("associated_md5sum", associatedMd5sum);
+        });
+        return filesInListResult;
     }
+
+    private HashSet<String> getAssociatedFileIds(List<Map<String, Object>> baseResult){
+        HashSet<String> fileIdsInResult = new HashSet<>();
+        String fileIdKey = "file_id";
+        baseResult.forEach(x -> {
+            fileIdsInResult.add((String) x.get(fileIdKey));
+        });
+        HashSet<String> associatedFileIds = new HashSet<>();
+        fileIdsInResult.forEach( x -> {
+            String fileId = FILE_ASSOCIATION_MAP.get(x);
+            if (fileId != null){
+                associatedFileIds.add(fileId);
+            }
+        });
+        return associatedFileIds;
+    }
+
+
 
     private List<String> fileIDsFromList(Map<String, Object> params) throws IOException {
         return collectFieldFromList(params, "file_id", FILES_END_POINT);
