@@ -274,11 +274,6 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         }
         final String[] TERM_AGG_NAMES = agg_names.toArray(new String[TERM_AGGS.size()]);
 
-        final Map<String, String> RANGE_AGGS = new HashMap<>();
-        RANGE_AGGS.put("number_of_study_participants",  "filterSubjectCountByNumberOfStudyParticipants");
-        RANGE_AGGS.put("number_of_study_samples",  "filterSubjectCountByNumberOfStudySamples");
-        final String[] RANGE_AGG_NAMES = RANGE_AGGS.keySet().toArray(new String[0]);
-
         Map<String, Object> query = esService.buildFacetFilterQuery(params, RANGE_PARAMS);
         Request sampleCountRequest = new Request("GET", SAMPLES_COUNT_END_POINT);
         sampleCountRequest.setJsonEntity(gson.toJson(query));
@@ -297,7 +292,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
 
 
         // Get aggregations
-        Map<String, Object> aggQuery = esService.addAggregations(query, TERM_AGG_NAMES, RANGE_AGG_NAMES);
+        Map<String, Object> aggQuery = esService.addAggregations(query, TERM_AGG_NAMES);
         Request fileRequest = new Request("GET", FILES_END_POINT);
         fileRequest.setJsonEntity(gson.toJson(aggQuery));
         JsonObject subjectResult = esService.send(fileRequest);
@@ -334,16 +329,18 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             }
         }
 
-        Map<String, JsonObject> rangeAggs = esService.collectRangeAggs(subjectResult, RANGE_AGG_NAMES);
+        final Map<String, String> RANGE_MAXIMUMS = new HashMap<>();
+        RANGE_MAXIMUMS.put("number_of_participants",  "filterSubjectCountByNumberOfStudyParticipants");
+        RANGE_MAXIMUMS.put("number_of_samples",  "filterSubjectCountByNumberOfStudySamples");
+        final String[] RANGE_MAX_NAMES = RANGE_MAXIMUMS.keySet().toArray(new String[0]);
 
-        for (String field: RANGE_AGG_NAMES) {
-            String filterCountQueryName = RANGE_AGGS.get(field);
-            if (params.containsKey(field) && ((List<Double>)params.get(field)).size() >= 2) {
-                Map<String, Object> filterCount = rangeFilterSubjectCountBy(field, params);;
-                data.put(filterCountQueryName, filterCount);
-            } else {
-                data.put(filterCountQueryName, getRange(rangeAggs.get(field)));
-            }
+        Map<String, Object> maximumQuery = esService.buildMaximumQuery(RANGE_MAX_NAMES);
+        Request maxRequest = new Request("GET", STUDIES_END_POINT);
+        maxRequest.setJsonEntity(gson.toJson(maximumQuery));
+        JsonObject maxResult = esService.send(maxRequest);
+        Map<String, Integer> maximumValues = esService.collectMaximumAggs(maxResult, RANGE_MAX_NAMES);
+        for (String field: RANGE_MAX_NAMES) {
+            data.put(RANGE_MAXIMUMS.get(field), Map.of("lowerBound", 0,"upperBound", maximumValues.get(field)));
         }
         return data;
     }

@@ -997,9 +997,9 @@ Indices:
       cds_tertiary_bucket:
         type: keyword
       number_of_participants:
-        type: keyword
+        type: integer
       number_of_samples:
-        type: keyword
+        type: integer
       study_data_types:
         type: keyword
       file_types_and_format:
