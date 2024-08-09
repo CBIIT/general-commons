@@ -265,7 +265,37 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 FILTER_COUNT_QUERY, "filterSubjectCountByImageModality",
                 AGG_ENDPOINT, FILES_END_POINT
         ));
-
+        // Donut Count Fields
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "experimental_strategies",
+                WIDGET_QUERY, "donutCountByExperimentalStrategy",
+                AGG_ENDPOINT, FILES_EXPERIMENTAL_STRATEGY_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "genders",
+                WIDGET_QUERY, "donutCountByGender",
+                AGG_ENDPOINT, SUBJECTS_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "file_types",
+                WIDGET_QUERY, "donutCountByFileType",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "study_data_types",
+                WIDGET_QUERY, "donutCountByStudyDataTypes",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "image_modality",
+                WIDGET_QUERY, "donutCountByImageModality",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "sample_types",
+                WIDGET_QUERY, "donutCountBySampleType",
+                AGG_ENDPOINT, SAMPLES_END_POINT
+        ));
 
 
         List<String> agg_names = new ArrayList<>();

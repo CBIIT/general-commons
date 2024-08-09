@@ -385,6 +385,13 @@ type SearchResult {
     filterSubjectCountByAcl: [GroupCount]
     filterSubjectCountByNumberOfStudyParticipants: RangeCount
     filterSubjectCountByNumberOfStudySamples: RangeCount
+
+    donutCountByExperimentalStrategy: [GroupCount]
+    donutCountByGender: [GroupCount]
+    donutCountByFileType: [GroupCount]
+    donutCountByStudyDataTypes: [GroupCount]
+    donutCountByImageModality: [GroupCount]
+    donutCountBySampleType: [GroupCount]
 }
 
 type RangeCount {
