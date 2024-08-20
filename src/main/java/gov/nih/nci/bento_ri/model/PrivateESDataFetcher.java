@@ -663,7 +663,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                         new String[]{"study", "study_gs"},
                         new String[]{"subject_id", "subject_id_gs"},
                         new String[]{"site", "site_gs"},
-                        new String[]{"gender", "gender_gs"}
+                        new String[]{"gender", "gender_gs"},
+                        new String[]{"subject_ids_filter", "subject_ids_filter"},
                 },
                 GS_CATEGORY_TYPE, "subject"
         ));
@@ -677,7 +678,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 GS_COLLECT_FIELDS, new String[][]{
                         new String[]{"sample_id", "sample_id_gs"},
                         new String[]{"is_tumor", "is_tumor_gs"},
-                        new String[]{"analyte_type", "analyte_type_gs"}
+                        new String[]{"analyte_type", "analyte_type_gs"},
+                        new String[]{"subject_ids_filter", "subject_ids_filter"}
                 },
                 GS_CATEGORY_TYPE, "sample"
         ));
@@ -707,7 +709,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                         new String[]{"library_strategies","library_strategies_gs"},
                         new String[]{"platforms","platforms_gs"},
                         new String[]{"reference_genome_assemblies","reference_genome_assemblies_gs"},
-                        new String[]{"sites","sites_gs"}
+                        new String[]{"sites","sites_gs"},
+                        new String[]{"subject_ids_filter", "subject_ids_filter"}
                 },
                 GS_CATEGORY_TYPE, "file"
         ));

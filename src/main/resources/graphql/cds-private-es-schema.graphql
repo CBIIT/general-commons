@@ -419,6 +419,7 @@ type GS_Subject {
     subject_id: String
     site: String
     gender: String
+    subject_ids_filter: [String]
 }
 
 type GS_Sample {
@@ -426,6 +427,7 @@ type GS_Sample {
     sample_id: String
     is_tumor: String
     analyte_type: String
+    subject_ids_filter: [String]
 }
 
 type GS_File {
@@ -446,6 +448,7 @@ type GS_File {
     platforms: [String]
     reference_genome_assemblies: [String]
     sites: [String]
+    subject_ids_filter: [String]
 }
 
 type GS_Model {
