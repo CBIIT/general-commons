@@ -11,4 +11,4 @@ ENV TZ America/New_York
 RUN apt-get update && apt-get install -y unzip  
 
 RUN rm -rf /usr/local/tomcat/webapps/ROOT
-COPY --from=build /usr/src/app/target/CDS-0.0.1.war /usr/local/tomcat/webapps/ROOT.war
+COPY --from=build /usr/src/app/target/CDS-2.2.0.war /usr/local/tomcat/webapps/ROOT.war
