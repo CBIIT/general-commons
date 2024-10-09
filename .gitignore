@@ -1,6 +1,6 @@
 
 .idea
-application.properties
+config
 logs
 target
 ignore.*

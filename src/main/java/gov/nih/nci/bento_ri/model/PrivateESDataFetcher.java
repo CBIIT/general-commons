@@ -18,6 +18,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.OffsetDateTime;
 import java.util.*;
 
 import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
@@ -55,6 +56,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     final String VALUES_COUNT_END_POINT = "/model_values/_count";
     final String GS_ABOUT_END_POINT = "/about_page/_search";
     final String GS_MODEL_END_POINT = "/data_model/_search";
+    final String VERSION_END_POINT = "/version/_search";
 
     final int GS_LIMIT = 10;
     final String GS_END_POINT = "endpoint";
@@ -128,6 +130,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                             Map<String, Object> args = env.getArguments();
                             return findSubjectIdsInList(args);
                         })
+                        .dataFetcher("version", env -> getLatestVersion())
                 )
                 .build();
     }
@@ -1095,14 +1098,41 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         return esService.collectTerms(jsonObject, collectField);
     }
 
-
-
-    private final static class BENTO_INDEX {
-        private static final String SAMPLES = "samples";
-    }
-
-    private final static class BENTO_FIELDS {
-        private static final String SAMPLE_NESTED_FILE_INFO = "file_info";
-        private static final String FILES = "files";
+    private Map<String, Object> getLatestVersion() throws IOException {
+        Map<String, Object> latestVersion = null;
+        Request request = new Request("GET", VERSION_END_POINT);
+        JsonObject jsonObject = esService.send(request);
+        JsonArray searchHits = null;
+        try{
+            searchHits = jsonObject.getAsJsonObject("hits").getAsJsonArray("hits");
+        }
+        catch (Exception e){
+            throw new IOException("Unable to parse the OpenSearch response");
+        }
+        for (JsonElement hit : searchHits) {
+            Map<String, Object> version = null;
+            try{
+                JsonElement source = hit.getAsJsonObject().get("_source");
+                version = gson.fromJson(source, Map.class);
+            }
+            catch (Exception e){
+                throw new IOException("Unable to parse the version from the OpenSearch response");
+            }
+            if (latestVersion == null){
+                latestVersion = version;
+                continue;
+            }
+            try{
+                OffsetDateTime versionDateTime = OffsetDateTime.parse(version.get("datetime").toString());
+                OffsetDateTime latestVersionDateTime = OffsetDateTime.parse(latestVersion.get("datetime").toString());
+                if (versionDateTime.isAfter(latestVersionDateTime)){
+                    latestVersion = version;
+                }
+            }
+            catch (Exception e){
+                throw new IOException("Unable to parse the timestamp from a version in the OpenSearch response");
+            }
+        }
+        return latestVersion;
     }
 }
