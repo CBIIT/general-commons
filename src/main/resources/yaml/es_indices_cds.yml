@@ -1598,6 +1598,29 @@ Indices:
       } AS opensearch_data
       SKIP $skip LIMIT $limit
       RETURN opensearch_data
+  - index_name: version
+    type: neo4j
+    mapping:
+      data_version_id:
+        type: keyword
+      data_version:
+        type: keyword
+      datetime:
+        type: keyword
+      model_version:
+        type: keyword
+      description:
+        type: keyword
+    cypher_query: |
+      MATCH (dv: version)
+      WITH {
+          data_version_id: dv.data_version_id,
+          data_version: dv.data_version,
+          datetime: dv.datetime,
+          model_version: dv.model_version,
+          description: dv.description
+        } AS opensearch_data
+      RETURN opensearch_data
   # Subject IDs index
   - index_name: subject_ids
     type: neo4j

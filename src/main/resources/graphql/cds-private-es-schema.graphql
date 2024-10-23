@@ -239,6 +239,14 @@ type image {
     crdc_id: String
 }
 
+type Version {
+    data_version_id: String
+    data_version: String
+    datetime: String
+    model_version: String
+    description: String
+}
+
 type SubjectOverview {
     subject_id: String
     study_acronym: [String]
@@ -1047,4 +1055,5 @@ type QueryType {
         crdc_id: String
     ): [image]
 
+     version: Version
 }
