@@ -8,7 +8,7 @@ RUN NODE_OPTIONS="--max-old-space-size=4096" npm install --legacy-peer-deps
 
 RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build
 
-FROM nginx:alpine-slim as fnl_base_image
+FROM nginx:mainline as fnl_base_image
 
 COPY --from=build /usr/src/app/dist /usr/share/nginx/html
 COPY --from=build /usr/src/app/conf/inject.template.js /usr/share/nginx/html/inject.template.js
