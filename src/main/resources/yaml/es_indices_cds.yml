@@ -18,6 +18,12 @@ Indices:
         type: keyword
       image_modality:
         type: keyword
+      organ_or_tissue:
+        type: keyword
+      tissue_fixative:
+        type: keyword
+      imaging_assay_type:
+        type: keyword
       instrument_models:
         type: keyword
       is_tumor:
@@ -50,6 +56,16 @@ Indices:
         type: keyword
       study_data_types:
         type: keyword
+      aliquot_ids:
+        type: keyword
+      analytical_fractions:
+        type: keyword
+      instrument_makes:
+        type: keyword
+      proteomic_instrument_models:
+        type: keyword
+      proteomic_design_descriptions:
+        type: keyword
       # Sort properties
       is_tumor_sort:
         type: keyword
@@ -76,6 +92,12 @@ Indices:
       platforms_sort:
         type: keyword
       reference_genome_assemblies_sort:
+        type: keyword
+      imaging_assay_type_sort:
+        type: keyword
+      organ_or_tissue_sort:
+        type: keyword
+      tissue_fixative_sort:
         type: keyword
       image_modality_sort:
         type: keyword
@@ -178,6 +200,21 @@ Indices:
               experimental_strategies_sort: apoc.text.join(experimental_strategies, ''),
               file_types_sort: apoc.text.join(file_types, '')
             }) AS opensearch_data
+          OPTIONAL MATCH (p)<--(:file)<--(pr:proteomic)
+          WITH p, na, opensearch_data, 
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.aliquot_id, na))) AS aliquot_ids,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.analytical_fractions, na))) AS analytical_fractions,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.instrument_make, na))) AS instrument_makes,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.proteomic_instrument_model, na))) AS proteomic_instrument_models,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.proteomic_design_description, na))) AS proteomic_design_descriptions
+          WITH p, na,
+            apoc.map.merge(opensearch_data, {
+              aliquot_ids: aliquot_ids,
+              analytical_fractions: analytical_fractions,
+              instrument_makes: instrument_makes,
+              proteomic_instrument_models: proteomic_instrument_models,
+              proteomic_design_descriptions: proteomic_design_descriptions
+            }) AS opensearch_data
           OPTIONAL MATCH (p)<--(diag:diagnosis)
           WITH p, na, opensearch_data,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na))) AS primary_site,
@@ -220,11 +257,20 @@ Indices:
           OPTIONAL MATCH (p)<--(f:file)
           OPTIONAL MATCH (f)<--(i:image)
           WITH p, na, opensearch_data, 
-            apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na))) AS image_modality
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na))) AS image_modality,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.organ_or_tissue, na))) AS organ_or_tissue,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.tissue_fixative, na))) AS tissue_fixative,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.imaging_assay_type, na))) AS imaging_assay_type
           WITH p, na, 
             apoc.map.merge(opensearch_data, {
               image_modality: image_modality,
-              image_modality_sort: apoc.text.join(image_modality, '')
+              organ_or_tissue: organ_or_tissue,
+              tissue_fixative: tissue_fixative,
+              imaging_assay_type: imaging_assay_type,
+              image_modality_sort: apoc.text.join(image_modality, ''),
+              organ_or_tissue_sort: apoc.text.join(organ_or_tissue, ''),
+              imaging_assay_type_sort: apoc.text.join(imaging_assay_type, ''),
+              tissue_fixative_sort: apoc.text.join(tissue_fixative, '')
             }) AS opensearch_data
           RETURN opensearch_data
           ORDER BY opensearch_data.subject_ids
@@ -245,6 +291,12 @@ Indices:
       genders:
         type: keyword
       image_modality:
+        type: keyword
+      organ_or_tissue:
+        type: keyword
+      tissue_fixative:
+        type: keyword
+      imaging_assay_type:
         type: keyword
       instrument_models:
         type: keyword
@@ -278,6 +330,16 @@ Indices:
         type: keyword
       study_data_types:
         type: keyword
+      aliquot_ids:
+        type: keyword
+      analytical_fractions:
+        type: keyword
+      instrument_makes:
+        type: keyword
+      proteomic_instrument_models:
+        type: keyword
+      proteomic_design_descriptions:
+        type: keyword
       # Sort properties
       experimental_strategies_sort:
         type: keyword
@@ -301,6 +363,14 @@ Indices:
         type: keyword
       site_sort:
         type: keyword
+      imaging_assay_type_sort:
+        type: keyword
+      organ_or_tissue_sort:
+        type: keyword
+      image_modality_sort:
+        type: keyword
+      tissue_fixative_sort:
+        type: keyword
       # Global search properties
       sample_id_gs:
         type: search_as_you_type
@@ -318,8 +388,6 @@ Indices:
       sample_ids:
         type: keyword
       subject_ids:
-        type: keyword
-      organ_or_tissue:
         type: keyword
       sample_type:
         type: keyword
@@ -453,13 +521,34 @@ Indices:
           OPTIONAL MATCH (f)<--(i:image)
           WITH samp, na, opensearch_data,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na))) AS image_modality,
-            apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.organ_or_tissue, na))) AS organ_or_tissue
-          WITH samp, na, 
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.organ_or_tissue, na))) AS organ_or_tissue,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.tissue_fixative, na))) AS tissue_fixative,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.imaging_assay_type, na))) AS imaging_assay_type
+          WITH samp, na,
             apoc.map.merge(opensearch_data, {
               image_modality: image_modality,
               organ_or_tissue: organ_or_tissue,
+              tissue_fixative: tissue_fixative,
+              imaging_assay_type: imaging_assay_type,
               image_modality_sort: apoc.text.join(image_modality, ''),
-              organ_or_tissue_sort: apoc.text.join(organ_or_tissue, '')
+              organ_or_tissue_sort: apoc.text.join(organ_or_tissue, ''),
+              imaging_assay_type_sort: apoc.text.join(imaging_assay_type, ''),
+              tissue_fixative_sort: apoc.text.join(tissue_fixative, '')
+            }) AS opensearch_data
+          OPTIONAL MATCH (samp)-->(:participant)<--(:file)<--(pr:proteomic)
+          WITH samp, na, opensearch_data, 
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.aliquot_id, na))) AS aliquot_ids,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.analytical_fractions, na))) AS analytical_fractions,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.instrument_make, na))) AS instrument_makes,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.proteomic_instrument_model, na))) AS proteomic_instrument_models,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.proteomic_design_description, na))) AS proteomic_design_descriptions
+          WITH samp, na,
+            apoc.map.merge(opensearch_data, {
+              aliquot_ids: aliquot_ids,
+              analytical_fractions: analytical_fractions,
+              instrument_makes: instrument_makes,
+              proteomic_instrument_models: proteomic_instrument_models,
+              proteomic_design_descriptions: proteomic_design_descriptions
             }) AS opensearch_data
           RETURN opensearch_data
           ORDER BY opensearch_data.sample_id
@@ -482,6 +571,12 @@ Indices:
       genders:
         type: keyword
       image_modality:
+        type: keyword
+      organ_or_tissue:
+        type: keyword
+      tissue_fixative:
+        type: keyword
+      imaging_assay_type:
         type: keyword
       instrument_models:
         type: keyword
@@ -514,6 +609,16 @@ Indices:
       studies:
         type: keyword
       study_data_types:
+        type: keyword
+      aliquot_ids:
+        type: keyword
+      analytical_fractions:
+        type: keyword
+      instrument_makes:
+        type: keyword
+      proteomic_instrument_models:
+        type: keyword
+      proteomic_design_descriptions:
         type: keyword
     cypher_queries:
       - query: |
@@ -598,9 +703,32 @@ Indices:
               site: apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na)))
             }) AS opensearch_data
           OPTIONAL MATCH (f)<--(i:image)
+          WITH f, na, opensearch_data, 
+            COALESCE(i.image_modality, na) AS image_modality,
+            COALESCE(i.organ_or_tissue, na) AS organ_or_tissue,
+            COALESCE(i.tissue_fixative, na) AS tissue_fixative,
+            COALESCE(i.imaging_assay_type, na) AS imaging_assay_type
           WITH f, na, 
             apoc.map.merge(opensearch_data, {
-              image_modality: COALESCE(i.image_modality, na)
+              image_modality: image_modality,
+              organ_or_tissue: organ_or_tissue,
+              tissue_fixative: tissue_fixative,
+              imaging_assay_type: imaging_assay_type
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)<--(pr:proteomic)
+          WITH f, na, opensearch_data, 
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.aliquot_id, na))) AS aliquot_ids,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.analytical_fractions, na))) AS analytical_fractions,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.instrument_make, na))) AS instrument_makes,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.proteomic_instrument_model, na))) AS proteomic_instrument_models,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.proteomic_design_description, na))) AS proteomic_design_descriptions
+          WITH f, na,
+            apoc.map.merge(opensearch_data, {
+              aliquot_ids: aliquot_ids,
+              analytical_fractions: analytical_fractions,
+              instrument_makes: instrument_makes,
+              proteomic_instrument_models: proteomic_instrument_models,
+              proteomic_design_descriptions: proteomic_design_descriptions
             }) AS opensearch_data
           RETURN opensearch_data
           ORDER BY opensearch_data.files
@@ -626,7 +754,9 @@ Indices:
         type: keyword
       organ_or_tissue:
         type: keyword
-      license:
+      tissue_fixative:
+        type: keyword
+      imaging_assay_type:
         type: keyword
       instrument_models:
         type: keyword
@@ -659,6 +789,16 @@ Indices:
       studies:
         type: keyword
       study_data_types:
+        type: keyword
+      aliquot_ids:
+        type: keyword
+      analytical_fractions:
+        type: keyword
+      instrument_makes:
+        type: keyword
+      proteomic_instrument_models:
+        type: keyword
+      proteomic_design_descriptions:
         type: keyword
       # Overview properties
       analyte_type:
@@ -891,19 +1031,36 @@ Indices:
               site_sort: apoc.text.join(primary_site, '')
             }) AS opensearch_data
           OPTIONAL MATCH (f)<--(i:image)
-          WITH f, na, opensearch_data,
+          WITH f, na, opensearch_data, 
             COALESCE(i.image_modality, na) AS image_modality,
             COALESCE(i.organ_or_tissue, na) AS organ_or_tissue,
-            COALESCE(i.license, na) AS license
-          WITH f, na, image_modality,
+            COALESCE(i.tissue_fixative, na) AS tissue_fixative,
+            COALESCE(i.imaging_assay_type, na) AS imaging_assay_type
+          WITH f, na, 
             apoc.map.merge(opensearch_data, {
               image_modality: image_modality,
               organ_or_tissue: organ_or_tissue,
-              license: license
+              tissue_fixative: tissue_fixative,
+              imaging_assay_type: imaging_assay_type
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)<--(pr:proteomic)
+          WITH f, na, opensearch_data, 
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.aliquot_id, na))) AS aliquot_ids,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.analytical_fractions, na))) AS analytical_fractions,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.instrument_make, na))) AS instrument_makes,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.proteomic_instrument_model, na))) AS proteomic_instrument_models,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(pr.proteomic_design_description, na))) AS proteomic_design_descriptions
+          WITH f, na,
+            apoc.map.merge(opensearch_data, {
+              aliquot_ids: aliquot_ids,
+              analytical_fractions: analytical_fractions,
+              instrument_makes: instrument_makes,
+              proteomic_instrument_models: proteomic_instrument_models,
+              proteomic_design_descriptions: proteomic_design_descriptions
             }) AS opensearch_data
           RETURN opensearch_data
           ORDER BY opensearch_data.files
-        page_size: 50000
+        page_size: 40000
   # Programs index
   - index_name: programs
     type: neo4j
@@ -1997,6 +2154,38 @@ Indices:
       MATCH (p:participant)-->(s:study)
       RETURN
       COLLECT(DISTINCT p.participant_id) AS subjectIds
+  # Proteomics Index
+  - index_name: proteomics
+    type: neo4j
+    # type mapping for each property of the index
+    mapping:
+      # Filter properties
+      aliquot_id:
+        type: keyword
+      analytical_fractions:
+        type: keyword
+      instrument_make:
+        type: keyword
+      proteomic_instrument_model:
+        type: keyword
+      proteomic_design_description:
+        type: keyword
+    # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
+    cypher_queries:
+      - query: |
+          MATCH (pr:proteomic)
+          WITH DISTINCT pr
+          SKIP $skip LIMIT $limit
+          WITH {
+            aliquot_id: pr.aliquot_id,
+            analytical_fractions: pr.analytical_fractions,
+            instrument_make: pr.instrument_make,
+            proteomic_instrument_model: pr.proteomic_instrument_model,
+            proteomic_design_description: pr.proteomic_design_description
+          } AS opensearch_data
+          RETURN opensearch_data
+          ORDER BY opensearch_data.aliquot_id
+        page_size: 50000
   # About Page index
   - index_name: about_page
     type: about_file

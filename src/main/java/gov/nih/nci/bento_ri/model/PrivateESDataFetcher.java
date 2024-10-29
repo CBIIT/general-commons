@@ -268,6 +268,42 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 FILTER_COUNT_QUERY, "filterSubjectCountByImageModality",
                 AGG_ENDPOINT, FILES_END_POINT
         ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "analytical_fractions",
+                WIDGET_QUERY, "subjectCountByAnalyticalFractions",
+                FILTER_COUNT_QUERY, "filterSubjectCountByAnalyticalFractions",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "instrument_makes",
+                WIDGET_QUERY, "subjectCountByInstrumentMakes",
+                FILTER_COUNT_QUERY, "filterSubjectCountByInstrumentMakes",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "proteomic_design_descriptions",
+                WIDGET_QUERY, "subjectCountByProteomicDesignDescriptions",
+                FILTER_COUNT_QUERY, "filterSubjectCountByProteomicDesignDescriptions",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "tissue_fixative",
+                WIDGET_QUERY, "subjectCountByTissueFixative",
+                FILTER_COUNT_QUERY, "filterSubjectCountByTissueFixative",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "imaging_assay_type",
+                WIDGET_QUERY, "subjectCountByImagingAssayType",
+                FILTER_COUNT_QUERY, "filterSubjectCountByImagingAssayType",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "organ_or_tissue",
+                WIDGET_QUERY, "subjectCountByOrganOrTissue",
+                FILTER_COUNT_QUERY, "filterSubjectCountByOrganOrTissue",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
         // Donut Count Fields
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "experimental_strategies",
@@ -404,7 +440,11 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("analyte_type", "sample_types_sort"),
                 Map.entry("race", "race"),
                 Map.entry("ethnicity", "ethnicity"),
-                Map.entry("primary_diagnosis", "primary_diagnoses_sort")
+                Map.entry("primary_diagnosis", "primary_diagnoses_sort"),
+                Map.entry("image_modality", "image_modality_sort"),
+                Map.entry("organ_or_tissue", "organ_or_tissue_sort"),
+                Map.entry("imaging_assay_type", "imaging_assay_type_sort"),
+                Map.entry("tissue_fixative", "tissue_fixative_sort")
         );
 
         return overview(SUBJECTS_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
@@ -435,7 +475,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("analyte_type", "analyte_type"),
                 Map.entry("sample_type", "analyte_type"),
                 Map.entry("sample_tumor_status", "is_tumor"),
-                Map.entry("organ_or_tissue", "organ_or_tissue_sort")
+                Map.entry("image_modality", "image_modality_sort"),
+                Map.entry("organ_or_tissue", "organ_or_tissue_sort"),
+                Map.entry("imaging_assay_type", "imaging_assay_type_sort"),
+                Map.entry("tissue_fixative", "tissue_fixative_sort")
         );
 
         return overview(SAMPLES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
@@ -465,8 +508,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             new String[]{"library_strategy", "library_strategies"},
             new String[]{"library_layouts", "library_layouts"},
             new String[]{"image_modality", "image_modality"},
-            new String[]{"organ_or_tissue", "organ_or_tissue"},
-            new String[]{"license", "license"},
+            new String[]{"organ_or_tissue", "organ_or_tissue"}
     };
 
         String defaultSort = "file_name"; // Default sort order
@@ -491,9 +533,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("study_data_type", "study_data_types"),
                 Map.entry("library_strategy", "library_strategies_sort"),
                 Map.entry("library_layouts", "library_layouts_sort"),
-                Map.entry("image_modality", "image_modality"),
-                Map.entry("organ_or_tissue", "organ_or_tissue"),
-                Map.entry("license", "license")
+                Map.entry("image_modality", "image_modality_sort"),
+                Map.entry("organ_or_tissue", "organ_or_tissue_sort"),
+                Map.entry("imaging_assay_type", "imaging_assay_type_sort"),
+                Map.entry("tissue_fixative", "tissue_fixative_sort")
         );
 
         List<Map<String, Object>> fileOverview = overview(FILES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
