@@ -703,6 +703,12 @@ type QueryType {
         site: [String] = [],
         studies: [String] = [],
         study_data_types: [String] = [],
+        analytical_fractions: [String] = [],
+        instrument_makes: [String] = [],
+        proteomic_design_descriptions: [String] = []
+        organ_or_tissue: [String] = []
+        tissue_fixative: [String] = []
+        imaging_assay_type: [String] = [],
 
         order_by: String = "",
         sort_direction: String = "ASC",
@@ -736,6 +742,12 @@ type QueryType {
         site: [String] = [],
         studies: [String] = [],
         study_data_types: [String] = [],
+        analytical_fractions: [String] = [],
+        instrument_makes: [String] = [],
+        proteomic_design_descriptions: [String] = []
+        organ_or_tissue: [String] = []
+        tissue_fixative: [String] = []
+        imaging_assay_type: [String] = [],
 
         order_by: String = "",
         sort_direction: String = "ASC",
@@ -770,6 +782,12 @@ type QueryType {
         site: [String] = [],
         studies: [String] = [],
         study_data_types: [String] = [],
+        analytical_fractions: [String] = [],
+        instrument_makes: [String] = [],
+        proteomic_design_descriptions: [String] = []
+        organ_or_tissue: [String] = []
+        tissue_fixative: [String] = []
+        imaging_assay_type: [String] = [],
 
         order_by: String = "",
         sort_direction: String = "ASC",
@@ -804,6 +822,12 @@ type QueryType {
         site: [String] = [],
         studies: [String] = [],
         study_data_types: [String] = [],
+        analytical_fractions: [String] = [],
+        instrument_makes: [String] = [],
+        proteomic_design_descriptions: [String] = []
+        organ_or_tissue: [String] = []
+        tissue_fixative: [String] = []
+        imaging_assay_type: [String] = [],
 
         order_by: String = "",
         sort_direction: String = "ASC",
