@@ -669,7 +669,7 @@ type QueryType {
         sample_types: [String] = [],
         site: [String] = [],
         studies: [String] = [],
-        study_data_type: [String] = [],
+        study_data_types: [String] = [],
         analytical_fractions: [String] = [],
         instrument_makes: [String] = [],
         proteomic_design_descriptions: [String] = []
