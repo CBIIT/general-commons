@@ -87,7 +87,7 @@ export const facetsConfig = [
   },
   {
     section: STUDY,
-    label: "study data types",
+    label: "Study Data Types",
     apiPath: "filterSubjectCountByStudyDataType",
     apiForFiltering: "filterSubjectCountByStudyDataType",
     datafield: "study_data_types",
@@ -109,7 +109,7 @@ export const facetsConfig = [
   },
   {
     section: STUDY,
-    label: "Num of Study Participants",
+    label: "Num Of Study Participants",
     apiPath: "filterSubjectCountByNumberOfStudyParticipants",
     apiForFiltering: "filterSubjectCountByNumberOfStudyParticipants",
     datafield: "number_of_study_participants",
@@ -148,7 +148,7 @@ export const facetsConfig = [
   },
   {
     section: SAMPLES,
-    label: "Num of study Samples",
+    label: "Num Of Study Samples",
     apiPath: "filterSubjectCountByNumberOfStudySamples",
     apiForFiltering: "filterSubjectCountByNumberOfStudySamples",
     datafield: "number_of_study_samples",
@@ -165,7 +165,7 @@ export const facetsConfig = [
   // SEQUENCING
   {
     section: SEQUENCING,
-    label: "library strategy",
+    label: "Library Strategy",
     apiPath: "filterSubjectCountByLibraryStrategy",
     apiForFiltering: "filterSubjectCountByLibraryStrategy",
     datafield: "library_strategies",
@@ -176,7 +176,7 @@ export const facetsConfig = [
   },
   {
     section: SEQUENCING,
-    label: "library source",
+    label: "Library Source",
     apiPath: "filterSubjectCountByLibrarySource",
     apiForFiltering: "filterSubjectCountByLibrarySource",
     datafield: "library_sources",
@@ -187,7 +187,7 @@ export const facetsConfig = [
   },
   {
     section: SEQUENCING,
-    label: "library layout",
+    label: "Library Layout",
     apiPath: "filterSubjectCountByLibraryLayout",
     apiForFiltering: "filterSubjectCountByLibraryLayout",
     datafield: "library_layouts",
@@ -198,7 +198,7 @@ export const facetsConfig = [
   },
   {
     section: SEQUENCING,
-    label: "library selection",
+    label: "Library Selection",
     apiPath: "filterSubjectCountByLibrarySelection",
     apiForFiltering: "filterSubjectCountByLibrarySelection",
     datafield: "library_selections",
@@ -209,7 +209,7 @@ export const facetsConfig = [
   },
   {
     section: SEQUENCING,
-    label: "platform",
+    label: "Platform",
     apiPath: "filterSubjectCountByPlatform",
     apiForFiltering: "filterSubjectCountByPlatform",
     datafield: "platforms",
@@ -220,7 +220,7 @@ export const facetsConfig = [
   },
   {
     section: SEQUENCING,
-    label: "instrument model",
+    label: "Instrument Model",
     apiPath: "filterSubjectCountByInstrumentModel",
     apiForFiltering: "filterSubjectCountByInstrumentModel",
     datafield: "instrument_models",
@@ -231,7 +231,7 @@ export const facetsConfig = [
   },
   {
     section: SEQUENCING,
-    label: "reference genome assembly",
+    label: "Reference Genome Assembly",
     apiPath: "filterSubjectCountByReferenceGenomeAssembly",
     apiForFiltering: "filterSubjectCountByReferenceGenomeAssembly",
     datafield: "reference_genome_assemblies",
@@ -243,7 +243,7 @@ export const facetsConfig = [
   // IMAGING
   {
     section: IMAGING,
-    label: "image modality",
+    label: "Image Modality",
     apiPath: "filterSubjectCountByImageModality",
     apiForFiltering: "filterSubjectCountByImageModality",
     datafield: "image_modality",
@@ -254,7 +254,7 @@ export const facetsConfig = [
   },
   {
     section: IMAGING,
-    label: "tissue fixative",
+    label: "Tissue Fixative",
     apiPath: "filterSubjectCountByTissueFixative",
     apiForFiltering: "filterSubjectCountByTissueFixative",
     datafield: "tissue_fixative",
@@ -265,7 +265,7 @@ export const facetsConfig = [
   },
   {
     section: IMAGING,
-    label: "imaging assay type",
+    label: "Imaging Assay Type",
     apiPath: "filterSubjectCountByImagingAssayType",
     apiForFiltering: "filterSubjectCountByImagingAssayType",
     datafield: "imaging_assay_type",
@@ -276,7 +276,7 @@ export const facetsConfig = [
   },
   {
     section: IMAGING,
-    label: "tissue or organ of origin",
+    label: "Tissue Or Organ Of Origin",
     apiPath: "filterSubjectCountByOrganOrTissue",
     apiForFiltering: "filterSubjectCountByOrganOrTissue",
     datafield: "organ_or_tissue",
@@ -288,7 +288,7 @@ export const facetsConfig = [
   // DIAGNOSIS
   {
     section: DIAGNOSIS,
-    label: "PRIMARY DIAGNOSIS",
+    label: "Primary Diagnosis",
     apiPath: "filterSubjectCountByPrimaryDiagnosis",
     apiForFiltering: "filterSubjectCountByPrimaryDiagnosis",
     datafield: "primary_diagnoses",
