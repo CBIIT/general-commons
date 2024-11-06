@@ -100,7 +100,13 @@ query searchSubjects(
   $sample_types:[String],
   $site:[String],
   $studies:[String],
-  $study_data_types:[String]
+  $study_data_types:[String],
+  $analytical_fractions:[String],
+  $instrument_makes:[String],
+  $proteomic_design_descriptions:[String],
+  $organ_or_tissue:[String],
+  $tissue_fixative:[String],
+  $imaging_assay_type:[String],
 ){
   searchSubjects(
       subject_ids: $subject_ids,
@@ -125,7 +131,13 @@ query searchSubjects(
       sample_types:$sample_types,
       site:$site,
       studies:$studies,
-      study_data_types:$study_data_types
+      study_data_types:$study_data_types,
+      analytical_fractions:$analytical_fractions,
+      instrument_makes:$instrument_makes,
+      proteomic_design_descriptions:$proteomic_design_descriptions,
+      organ_or_tissue:$organ_or_tissue,
+      tissue_fixative:$tissue_fixative,
+      imaging_assay_type:$imaging_assay_type
   ){
       numberOfStudies
       numberOfSubjects
@@ -216,6 +228,31 @@ query searchSubjects(
           group
           subjects
       }
+      subjectCountByAnalyticalFractions{
+          group
+          subjects
+      }
+      subjectCountByInstrumentMakes{
+          group
+          subjects
+      }
+      subjectCountByProteomicDesignDescriptions{
+          group
+          subjects
+      }
+      subjectCountByTissueFixative{
+          group
+          subjects
+      }
+      subjectCountByImagingAssayType{
+          group
+          subjects
+      }
+      subjectCountByOrganOrTissue{
+          group
+          subjects
+      }
+      
       filterSubjectCountByStudy{
           group
           subjects
@@ -306,6 +343,30 @@ query searchSubjects(
           upperBound
           subjects
       }
+      filterSubjectCountByAnalyticalFractions{
+          group
+          subjects
+      }
+      filterSubjectCountByInstrumentMakes{
+          group
+          subjects
+      }
+      filterSubjectCountByProteomicDesignDescriptions{
+          group
+          subjects
+      }
+      filterSubjectCountByTissueFixative{
+          group
+          subjects
+      }
+      filterSubjectCountByImagingAssayType{
+          group
+          subjects
+      }
+      filterSubjectCountByOrganOrTissue{
+          group
+          subjects
+      }
   }
 }
 `;
@@ -337,6 +398,12 @@ query subjectOverview(
   $site:[String],
   $studies:[String],
   $study_data_types:[String],
+  $analytical_fractions:[String],
+  $instrument_makes:[String],
+  $proteomic_design_descriptions:[String],
+  $organ_or_tissue:[String],
+  $tissue_fixative:[String],
+  $imaging_assay_type:[String],
 
   $order_by: String,
   $sort_direction: String,
@@ -367,6 +434,12 @@ query subjectOverview(
       site:$site,
       studies:$studies,
       study_data_types:$study_data_types,
+      analytical_fractions:$analytical_fractions,
+      instrument_makes:$instrument_makes,
+      proteomic_design_descriptions:$proteomic_design_descriptions,
+      organ_or_tissue:$organ_or_tissue,
+      tissue_fixative:$tissue_fixative,
+      imaging_assay_type:$imaging_assay_type,
 
       order_by:$order_by,
       sort_direction:$sort_direction,
@@ -413,6 +486,12 @@ query fileOverview(
   $site:[String],
   $studies:[String],
   $study_data_types:[String],
+  $analytical_fractions:[String],
+  $instrument_makes:[String],
+  $proteomic_design_descriptions:[String],
+  $organ_or_tissue:[String],
+  $tissue_fixative:[String],
+  $imaging_assay_type:[String],
 
   $order_by: String,
   $sort_direction: String,
@@ -444,6 +523,12 @@ query fileOverview(
       site:$site,
       studies:$studies,
       study_data_types:$study_data_types,
+      analytical_fractions:$analytical_fractions,
+      instrument_makes:$instrument_makes,
+      proteomic_design_descriptions:$proteomic_design_descriptions,
+      organ_or_tissue:$organ_or_tissue,
+      tissue_fixative:$tissue_fixative,
+      imaging_assay_type:$imaging_assay_type,
 
       order_by:$order_by,
       sort_direction:$sort_direction,
@@ -496,6 +581,13 @@ query sampleOverview(
   $site:[String],
   $studies:[String],
   $study_data_types:[String],
+  $analytical_fractions:[String],
+  $instrument_makes:[String],
+  $proteomic_design_descriptions:[String],
+  $organ_or_tissue:[String],
+  $tissue_fixative:[String],
+  $imaging_assay_type:[String],
+
   $order_by: String,
   $sort_direction: String,
   $first: Int,
@@ -526,6 +618,12 @@ query sampleOverview(
       site:$site,
       studies:$studies,
       study_data_types:$study_data_types,
+      analytical_fractions:$analytical_fractions,
+      instrument_makes:$instrument_makes,
+      proteomic_design_descriptions:$proteomic_design_descriptions,
+      organ_or_tissue:$organ_or_tissue,
+      tissue_fixative:$tissue_fixative,
+      imaging_assay_type:$imaging_assay_type,
 
       order_by:$order_by,
       sort_direction:$sort_direction,
@@ -744,6 +842,12 @@ query fileOverview(
   $site:[String],
   $studies:[String],
   $study_data_types:[String],
+  $analytical_fractions:[String],
+  $instrument_makes:[String],
+  $proteomic_design_descriptions:[String],
+  $organ_or_tissue:[String],
+  $tissue_fixative:[String],
+  $imaging_assay_type:[String],
 
   $order_by: String,
   $sort_direction: String,
@@ -775,6 +879,12 @@ query fileOverview(
       site:$site,
       studies:$studies,
       study_data_types:$study_data_types,
+      analytical_fractions:$analytical_fractions,
+      instrument_makes:$instrument_makes,
+      proteomic_design_descriptions:$proteomic_design_descriptions,
+      organ_or_tissue:$organ_or_tissue,
+      tissue_fixative:$tissue_fixative,
+      imaging_assay_type:$imaging_assay_type,
 
       order_by:$order_by,
       sort_direction:$sort_direction,

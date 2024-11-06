@@ -7,6 +7,7 @@ const SEQUENCING = 'Sequencing';
 const IMAGING = 'Imaging';
 const DIAGNOSIS = 'Diagnosis';
 const FILES = 'Files';
+const PROTEOMIC = 'Proteomic';
 
 // --------------- Facet resetIcon link configuration --------------
 // Ideal size for resetIcon is 16x16 px
@@ -41,6 +42,9 @@ export const facetSectionVariables = {
     isExpanded: true,
   },
   Extra: {
+    isExpanded: true,
+  },
+  Proteomic: {
     isExpanded: true,
   },
 };
@@ -248,6 +252,39 @@ export const facetsConfig = [
     sort_type: sortType.ALPHABET,
     show: true,
   },
+  {
+    section: IMAGING,
+    label: "tissue fixative",
+    apiPath: "filterSubjectCountByTissueFixative",
+    apiForFiltering: "filterSubjectCountByTissueFixative",
+    datafield: "tissue_fixative",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
+  {
+    section: IMAGING,
+    label: "imaging assay type",
+    apiPath: "filterSubjectCountByImagingAssayType",
+    apiForFiltering: "filterSubjectCountByImagingAssayType",
+    datafield: "imaging_assay_type",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
+  {
+    section: IMAGING,
+    label: "tissue or organ of origin",
+    apiPath: "filterSubjectCountByOrganOrTissue",
+    apiForFiltering: "filterSubjectCountByOrganOrTissue",
+    datafield: "organ_or_tissue",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
   // DIAGNOSIS
   {
     section: DIAGNOSIS,
@@ -267,6 +304,40 @@ export const facetsConfig = [
     apiPath: "filterSubjectCountByFileType",
     apiForFiltering: "filterSubjectCountByFileType",
     datafield: "file_types",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
+  // PROTEOMIC
+  {
+    section: PROTEOMIC,
+    label: "Analytical Fractions",
+    apiPath: "filterSubjectCountByAnalyticalFractions",
+    apiForFiltering: "filterSubjectCountByAnalyticalFractions",
+    datafield: "analytical_fractions",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
+  {
+    section: PROTEOMIC,
+    label: "Instrument Makes",
+    apiPath: "filterSubjectCountByInstrumentMakes",
+    apiForFiltering: "filterSubjectCountByInstrumentMakes",
+    datafield: "instrument_makes",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
+  {
+    section: PROTEOMIC,
+    label: "Proteomic Design Description",
+    apiPath: "filterSubjectCountByProteomicDesignDescriptions",
+    apiForFiltering: "filterSubjectCountByProteomicDesignDescriptions",
+    datafield: "proteomic_design_descriptions",
     field: "group",
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
