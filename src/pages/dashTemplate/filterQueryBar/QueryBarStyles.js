@@ -79,4 +79,14 @@ export const customStyles = {
     backgroundColor: '#DCE9EF',
     border: '1px solid #5FA5C5',
   },
+  facetSectionProteomic: {
+    color: '#942A90',
+    backgroundColor: '#FFFFFF',
+    border: '1px solid #898989',
+  },
+  facetSectionProteomicBackground: {
+    color: '#0E3151',
+    backgroundColor: '#F4E7F3',
+    border: '1px solid #942A90',
+  },
 };
