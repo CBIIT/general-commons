@@ -7,6 +7,7 @@ const SEQUENCING = 'Sequencing';
 const IMAGING = 'Imaging';
 const DIAGNOSIS = 'Diagnosis';
 const FILES = 'Files';
+const PROTEOMIC = 'Proteomic';
 
 // --------------- Facet resetIcon link configuration --------------
 // Ideal size for resetIcon is 16x16 px
@@ -41,6 +42,9 @@ export const facetSectionVariables = {
     isExpanded: true,
   },
   Extra: {
+    isExpanded: true,
+  },
+  Proteomic: {
     isExpanded: true,
   },
 };
@@ -83,7 +87,7 @@ export const facetsConfig = [
   },
   {
     section: STUDY,
-    label: "study data types",
+    label: "Study Data Types",
     apiPath: "filterSubjectCountByStudyDataType",
     apiForFiltering: "filterSubjectCountByStudyDataType",
     datafield: "study_data_types",
@@ -105,7 +109,7 @@ export const facetsConfig = [
   },
   {
     section: STUDY,
-    label: "Num of Study Participants",
+    label: "Num Of Study Participants",
     apiPath: "filterSubjectCountByNumberOfStudyParticipants",
     apiForFiltering: "filterSubjectCountByNumberOfStudyParticipants",
     datafield: "number_of_study_participants",
@@ -144,7 +148,7 @@ export const facetsConfig = [
   },
   {
     section: SAMPLES,
-    label: "Num of study Samples",
+    label: "Num Of Study Samples",
     apiPath: "filterSubjectCountByNumberOfStudySamples",
     apiForFiltering: "filterSubjectCountByNumberOfStudySamples",
     datafield: "number_of_study_samples",
@@ -161,7 +165,7 @@ export const facetsConfig = [
   // SEQUENCING
   {
     section: SEQUENCING,
-    label: "library strategy",
+    label: "Library Strategy",
     apiPath: "filterSubjectCountByLibraryStrategy",
     apiForFiltering: "filterSubjectCountByLibraryStrategy",
     datafield: "library_strategies",
@@ -172,7 +176,7 @@ export const facetsConfig = [
   },
   {
     section: SEQUENCING,
-    label: "library source",
+    label: "Library Source",
     apiPath: "filterSubjectCountByLibrarySource",
     apiForFiltering: "filterSubjectCountByLibrarySource",
     datafield: "library_sources",
@@ -183,7 +187,7 @@ export const facetsConfig = [
   },
   {
     section: SEQUENCING,
-    label: "library layout",
+    label: "Library Layout",
     apiPath: "filterSubjectCountByLibraryLayout",
     apiForFiltering: "filterSubjectCountByLibraryLayout",
     datafield: "library_layouts",
@@ -194,7 +198,7 @@ export const facetsConfig = [
   },
   {
     section: SEQUENCING,
-    label: "library selection",
+    label: "Library Selection",
     apiPath: "filterSubjectCountByLibrarySelection",
     apiForFiltering: "filterSubjectCountByLibrarySelection",
     datafield: "library_selections",
@@ -205,7 +209,7 @@ export const facetsConfig = [
   },
   {
     section: SEQUENCING,
-    label: "platform",
+    label: "Platform",
     apiPath: "filterSubjectCountByPlatform",
     apiForFiltering: "filterSubjectCountByPlatform",
     datafield: "platforms",
@@ -216,7 +220,7 @@ export const facetsConfig = [
   },
   {
     section: SEQUENCING,
-    label: "instrument model",
+    label: "Instrument Model",
     apiPath: "filterSubjectCountByInstrumentModel",
     apiForFiltering: "filterSubjectCountByInstrumentModel",
     datafield: "instrument_models",
@@ -227,7 +231,7 @@ export const facetsConfig = [
   },
   {
     section: SEQUENCING,
-    label: "reference genome assembly",
+    label: "Reference Genome Assembly",
     apiPath: "filterSubjectCountByReferenceGenomeAssembly",
     apiForFiltering: "filterSubjectCountByReferenceGenomeAssembly",
     datafield: "reference_genome_assemblies",
@@ -239,7 +243,7 @@ export const facetsConfig = [
   // IMAGING
   {
     section: IMAGING,
-    label: "image modality",
+    label: "Image Modality",
     apiPath: "filterSubjectCountByImageModality",
     apiForFiltering: "filterSubjectCountByImageModality",
     datafield: "image_modality",
@@ -248,10 +252,43 @@ export const facetsConfig = [
     sort_type: sortType.ALPHABET,
     show: true,
   },
+  {
+    section: IMAGING,
+    label: "Tissue Fixative",
+    apiPath: "filterSubjectCountByTissueFixative",
+    apiForFiltering: "filterSubjectCountByTissueFixative",
+    datafield: "tissue_fixative",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
+  {
+    section: IMAGING,
+    label: "Imaging Assay Type",
+    apiPath: "filterSubjectCountByImagingAssayType",
+    apiForFiltering: "filterSubjectCountByImagingAssayType",
+    datafield: "imaging_assay_type",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
+  {
+    section: IMAGING,
+    label: "Tissue Or Organ Of Origin",
+    apiPath: "filterSubjectCountByOrganOrTissue",
+    apiForFiltering: "filterSubjectCountByOrganOrTissue",
+    datafield: "organ_or_tissue",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
   // DIAGNOSIS
   {
     section: DIAGNOSIS,
-    label: "PRIMARY DIAGNOSIS",
+    label: "Primary Diagnosis",
     apiPath: "filterSubjectCountByPrimaryDiagnosis",
     apiForFiltering: "filterSubjectCountByPrimaryDiagnosis",
     datafield: "primary_diagnoses",
@@ -267,6 +304,40 @@ export const facetsConfig = [
     apiPath: "filterSubjectCountByFileType",
     apiForFiltering: "filterSubjectCountByFileType",
     datafield: "file_types",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
+  // PROTEOMIC
+  {
+    section: PROTEOMIC,
+    label: "Analytical Fractions",
+    apiPath: "filterSubjectCountByAnalyticalFractions",
+    apiForFiltering: "filterSubjectCountByAnalyticalFractions",
+    datafield: "analytical_fractions",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
+  {
+    section: PROTEOMIC,
+    label: "Instrument Makes",
+    apiPath: "filterSubjectCountByInstrumentMakes",
+    apiForFiltering: "filterSubjectCountByInstrumentMakes",
+    datafield: "instrument_makes",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
+  {
+    section: PROTEOMIC,
+    label: "Proteomic Design Description",
+    apiPath: "filterSubjectCountByProteomicDesignDescriptions",
+    apiForFiltering: "filterSubjectCountByProteomicDesignDescriptions",
+    datafield: "proteomic_design_descriptions",
     field: "group",
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,

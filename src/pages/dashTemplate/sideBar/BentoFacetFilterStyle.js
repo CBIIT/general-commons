@@ -124,6 +124,9 @@ export default () => ({
   activeFacetFiles: {
     color: '#0E6292',
   },
+  activeFacetProteomic: {
+    color: '#942A90',
+  },
   searchContainer: {
     paddingTop: '15px',
     margin: '0 2px',

@@ -85,6 +85,12 @@ const theme = {
         '&.filesCheckedOdd': {
           backgroundColor: '#F2FBFF',
         },
+        '&.proteomicCheckedEven': {
+          backgroundColor: '#F4E7F3',
+        },
+        '&.proteomicCheckedOdd': {
+          backgroundColor: '#FFF5FF',
+        },
       },      
     },
     MuiSvgIcon: {
@@ -109,6 +115,9 @@ const theme = {
         },
         '&.filesCheckedIcon': {
           color: '#0E6292',
+        },
+        '&.proteomicCheckedIcon': {
+          color: '#942A90',
         },
       },
     },
@@ -152,6 +161,12 @@ const theme = {
         },
         '&.filesSubjects': {
           color: '#0E6292',
+          fontSize: '12px',
+          fontFamily: 'Nunito',
+          marginRight: '0px',
+        },
+        '&.proteomicSubjects': {
+          color: '#942A90',
           fontSize: '12px',
           fontFamily: 'Nunito',
           marginRight: '0px',
