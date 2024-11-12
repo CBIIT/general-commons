@@ -1,4 +1,4 @@
-FROM node:18.20-slim as build
+FROM node:16.20.2-buster as build
 
 WORKDIR /usr/src/app
 
