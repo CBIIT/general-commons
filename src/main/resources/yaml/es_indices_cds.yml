@@ -145,9 +145,7 @@ Indices:
               number_of_study_participants: count(distinct p),
               study_gs: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_name, na)))
             } AS opensearch_data
-          MATCH (s:study)<--(f:file)
-          OPTIONAL MATCH (f)-->(p:participant)
-          OPTIONAL MATCH (p)<--(samp:sample)
+          MATCH (s:study)<--(:file)-->(:participant)<--(samp:sample)
           WITH s, na,
             apoc.map.merge(opensearch_data, {
               number_of_study_samples: count(distinct samp)
@@ -254,8 +252,7 @@ Indices:
               platforms_sort: apoc.text.join(platforms, ''),
               reference_genome_assemblies_sort: apoc.text.join(reference_genome_assemblies, '')
             }) AS opensearch_data
-          OPTIONAL MATCH (p)<--(f:file)
-          OPTIONAL MATCH (f)<--(i:image)
+          OPTIONAL MATCH (p)<--(:file)<--(i:image)
           WITH p, na, opensearch_data, 
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na))) AS image_modality,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.organ_or_tissue, na))) AS organ_or_tissue,
@@ -268,7 +265,14 @@ Indices:
               tissue_fixative: tissue_fixative,
               imaging_assay_type: imaging_assay_type,
               image_modality_sort: apoc.text.join(image_modality, ''),
-              organ_or_tissue_sort: apoc.text.join(organ_or_tissue, ''),
+              organ_or_tissue_sort: apoc.text.join(organ_or_tissue, '')
+            }) AS opensearch_data
+          OPTIONAL MATCH (p)<--(:file)<--(:image)<--(mm:MultiplexMicroscopy)
+          WITH p, na, opensearch_data, 
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(mm.tissue_fixative, na))) AS tissue_fixative,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(mm.imaging_assay_type, na))) AS imaging_assay_type
+          WITH p, na, 
+            apoc.map.merge(opensearch_data, {
               imaging_assay_type_sort: apoc.text.join(imaging_assay_type, ''),
               tissue_fixative_sort: apoc.text.join(tissue_fixative, '')
             }) AS opensearch_data
@@ -407,8 +411,7 @@ Indices:
     cypher_queries:
       - query: |
           WITH 'Not specified in data' AS na
-          MATCH (s:study)<--(f:file)
-          OPTIONAL MATCH (f)-->(p:participant)
+          MATCH (s:study)<--(:file)-->(p:participant)
           WITH s, na,
             {
               accesses: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_access, na))),
@@ -419,14 +422,12 @@ Indices:
               number_of_study_participants: count(distinct p),
               study_gs: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_name, na)))
             } AS opensearch_data
-          MATCH (s:study)<--(f:file)
-          OPTIONAL MATCH (f)-->(p:participant)
-          OPTIONAL MATCH (p)<--(samp:sample)
+          MATCH (s:study)<--(:file)-->(:participant)<--(samp:sample)
           WITH s, na,
             apoc.map.merge(opensearch_data, {
               number_of_study_samples: count(distinct samp)
             }) AS opensearch_data
-          MATCH (s)<--(:file)-->(p:participant)<--(samp:sample)
+          MATCH (s)<--(:file)-->(:participant)<--(samp:sample)
           WITH DISTINCT samp, na, 
             apoc.map.merge(opensearch_data, {
               is_tumor: samp.sample_tumor_status,
@@ -459,8 +460,7 @@ Indices:
               subject_ids: subject_ids,
               subject_ids_filter: subject_ids_filter
             }) AS opensearch_data
-          OPTIONAL MATCH (samp)-->(p:participant)
-          OPTIONAL MATCH (p)<--(f:file)
+          OPTIONAL MATCH (samp)-->(:participant)<--(f:file)
           WITH samp, na, opensearch_data,
             apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT(apoc.text.split(
               CASE WHEN f.experimental_strategy_and_data_subtypes = '[]' THEN na ELSE 
@@ -476,9 +476,7 @@ Indices:
               experimental_strategies_sort: apoc.text.join(experimental_strategies, ''),
               file_types_sort: apoc.text.join(file_types, '')
             }) AS opensearch_data
-          OPTIONAL MATCH (samp)-->(p:participant)
-          OPTIONAL MATCH (p)<--(f:file)
-          OPTIONAL MATCH (f)<--(g:genomic_info)
+          OPTIONAL MATCH (samp)-->(:participant)<--(:file)<--(g:genomic_info)
           WITH samp, na, opensearch_data,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))) AS library_layouts, 
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))) AS library_selections, 
@@ -504,8 +502,7 @@ Indices:
               platforms_sort: apoc.text.join(platforms,''),
               reference_genome_assemblies_sort: apoc.text.join(reference_genome_assemblies, '')
             }) AS opensearch_data
-          OPTIONAL MATCH (samp)-->(p:participant)
-          OPTIONAL MATCH (p)<--(diag:diagnosis)
+          OPTIONAL MATCH (samp)-->(:participant)<--(diag:diagnosis)
           WITH samp, na, opensearch_data, 
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc.text.split(diag.primary_diagnosis, ':'))), na))) AS primary_diagnoses,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na))) AS site
@@ -516,9 +513,7 @@ Indices:
               primary_diagnoses_sort: apoc.text.join(primary_diagnoses, ''),
               site_sort: apoc.text.join(site, '')
             }) AS opensearch_data
-          OPTIONAL MATCH (samp)-->(p:participant)
-          OPTIONAL MATCH (p)<--(f:file)
-          OPTIONAL MATCH (f)<--(i:image)
+          OPTIONAL MATCH (samp)-->(:participant)<--(:file)<--(i:image)
           WITH samp, na, opensearch_data,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na))) AS image_modality,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.organ_or_tissue, na))) AS organ_or_tissue,
@@ -532,6 +527,15 @@ Indices:
               imaging_assay_type: imaging_assay_type,
               image_modality_sort: apoc.text.join(image_modality, ''),
               organ_or_tissue_sort: apoc.text.join(organ_or_tissue, ''),
+              imaging_assay_type_sort: apoc.text.join(imaging_assay_type, ''),
+              tissue_fixative_sort: apoc.text.join(tissue_fixative, '')
+            }) AS opensearch_data
+          OPTIONAL MATCH (samp)-->(:participant)<--(:file)<--(:image)<--(mm:MultiplexMicroscopy)
+          WITH samp, na, opensearch_data,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(mm.tissue_fixative, na))) AS tissue_fixative,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(mm.imaging_assay_type, na))) AS imaging_assay_type
+          WITH samp, na,
+            apoc.map.merge(opensearch_data, {
               imaging_assay_type_sort: apoc.text.join(imaging_assay_type, ''),
               tissue_fixative_sort: apoc.text.join(tissue_fixative, '')
             }) AS opensearch_data
@@ -622,8 +626,7 @@ Indices:
         type: keyword
     cypher_queries:
       - query: |
-          MATCH (s:study)<--(f:file)
-          OPTIONAL MATCH (f)-->(p:participant)
+          MATCH (s:study)<--(:file)-->(p:participant)
           WITH s, p, 'Not specified in data' AS na
           WITH s, na,
             {
@@ -635,9 +638,7 @@ Indices:
               number_of_study_participants: count(distinct p),
               study_gs: s.study_name
             } AS opensearch_data
-          MATCH (s:study)<--(f:file)
-          OPTIONAL MATCH (f)-->(p:participant)
-          OPTIONAL MATCH (p)<--(samp:sample)
+          MATCH (s:study)<--(:file)-->(:participant)<--(samp:sample)
           WITH s, 
             apoc.map.merge(opensearch_data, {
               number_of_study_samples: count(distinct samp)
@@ -671,8 +672,7 @@ Indices:
               genders: gender,
               subject_ids: participant_id
             }) AS opensearch_data
-          OPTIONAL MATCH (f)-->(p:participant)
-          OPTIONAL MATCH (p)<--(samp:sample)
+          OPTIONAL MATCH (f)-->(:participant)<--(samp:sample)
           WITH f, na, opensearch_data,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_tumor_status, na))) AS sample_tumor_status,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc.text.split(samp.sample_type, ':'))), na))) AS sample_type,
@@ -695,8 +695,7 @@ Indices:
               platforms: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.platform, na))),
               reference_genome_assemblies: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.reference_genome_assembly, na)))
             }) AS opensearch_data
-          OPTIONAL MATCH (f)-->(p:participant)
-          OPTIONAL MATCH (p)<--(diag:diagnosis)
+          OPTIONAL MATCH (f)-->(:participant)<--(diag:diagnosis)
           WITH f, na, 
             apoc.map.merge(opensearch_data, {
               primary_diagnoses: apoc.coll.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc.text.split(diag.primary_diagnosis, ':'))), na))),
@@ -712,6 +711,15 @@ Indices:
             apoc.map.merge(opensearch_data, {
               image_modality: image_modality,
               organ_or_tissue: organ_or_tissue,
+              tissue_fixative: tissue_fixative,
+              imaging_assay_type: imaging_assay_type
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)<--(:image)<--(mm:MultiplexMicroscopy)
+          WITH f, na, opensearch_data, 
+            COALESCE(mm.tissue_fixative, na) AS tissue_fixative,
+            COALESCE(mm.imaging_assay_type, na) AS imaging_assay_type
+          WITH f, na, 
+            apoc.map.merge(opensearch_data, {
               tissue_fixative: tissue_fixative,
               imaging_assay_type: imaging_assay_type
             }) AS opensearch_data
@@ -898,8 +906,7 @@ Indices:
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
     cypher_queries:
       - query: |
-          MATCH (s:study)<--(f:file)
-          OPTIONAL MATCH (f)-->(p:participant)
+          MATCH (s:study)<--(:file)-->(p:participant)
           WITH s, p, 'Not specified in data' AS na
           WITH s, p, na, CASE WHEN s.acl = '[]' THEN na ELSE apoc.text.replace(s.acl,'\\[|\\]|\\"|\'','') END AS acl
           WITH s,
@@ -914,9 +921,7 @@ Indices:
               number_of_study_participants: count(distinct p),
               study_gs: s.study_name
             } AS opensearch_data
-          MATCH (s:study)<--(f:file)
-          OPTIONAL MATCH (f)-->(p:participant)
-          OPTIONAL MATCH (p)<--(samp:sample)
+          MATCH (s:study)<--(:file)-->(:participant)<--(samp:sample)
           WITH s, 
             apoc.map.merge(opensearch_data, {
               number_of_study_samples: count(distinct samp)
@@ -966,8 +971,7 @@ Indices:
               subject_id_gs: participant_id,
               subject_ids_filter: participant_id
             }) AS opensearch_data
-          OPTIONAL MATCH (f)-->(p:participant)
-          OPTIONAL MATCH (p)<--(samp:sample)
+          OPTIONAL MATCH (f)-->(:participant)<--(samp:sample)
           WITH f, na, opensearch_data, 
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(samp.sample_tumor_status, na))) AS sample_tumor_status,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc.text.split(samp.sample_type, ':'))), na))) AS sample_type,
@@ -1017,8 +1021,7 @@ Indices:
               platforms_sort: apoc.text.join(platform, ''),
               reference_genome_assemblies_sort: apoc.text.join(reference_genome_assembly, '')
             }) AS opensearch_data
-          OPTIONAL MATCH (f)-->(p:participant)
-          OPTIONAL MATCH (p)<--(diag:diagnosis)
+          OPTIONAL MATCH (f)-->(:participant)<--(diag:diagnosis)
           WITH f, na, opensearch_data,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc.text.split(diag.primary_diagnosis, ':'))), na))) AS primary_diagnosis,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na))) AS primary_site
@@ -1040,6 +1043,15 @@ Indices:
             apoc.map.merge(opensearch_data, {
               image_modality: image_modality,
               organ_or_tissue: organ_or_tissue,
+              tissue_fixative: tissue_fixative,
+              imaging_assay_type: imaging_assay_type
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)<--(:image)<--(mm:MultiplexMicroscopy)
+          WITH f, na, opensearch_data, 
+            COALESCE(mm.tissue_fixative, na) AS tissue_fixative,
+            COALESCE(mm.imaging_assay_type, na) AS imaging_assay_type
+          WITH f, na, 
+            apoc.map.merge(opensearch_data, {
               tissue_fixative: tissue_fixative,
               imaging_assay_type: imaging_assay_type
             }) AS opensearch_data
@@ -2123,7 +2135,7 @@ Indices:
           apoc.map.merge(opensearch_data, {
               numberOfDiseaseSites: COUNT(DISTINCT diag.primary_site)
           }) AS opensearch_data
-      OPTIONAL MATCH (p)<--(samp)<--(f:file)
+      OPTIONAL MATCH (p)<--(:sample)<--(f:file)
       WITH p,
         apoc.map.merge(opensearch_data, {
             files: CASE WHEN f IS NOT NULL THEN COLLECT(DISTINCT {
