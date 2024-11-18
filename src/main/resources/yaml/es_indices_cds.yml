@@ -133,8 +133,7 @@ Indices:
     cypher_queries:
       - query: |
           WITH 'Not specified in data' AS na
-          MATCH (s:study)<--(f:file)
-          OPTIONAL MATCH (f)-->(p:participant)
+          MATCH (s:study)<--(:file)-->(p:participant)
           WITH s, na,
             {
               accesses: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_access, na))),
@@ -145,7 +144,7 @@ Indices:
               number_of_study_participants: count(distinct p),
               study_gs: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_name, na)))
             } AS opensearch_data
-          MATCH (s:study)<--(:file)-->(:participant)<--(samp:sample)
+          OPTIONAL MATCH (s)<--(:file)-->(:participant)<--(samp:sample)
           WITH s, na,
             apoc.map.merge(opensearch_data, {
               number_of_study_samples: count(distinct samp)
@@ -422,7 +421,7 @@ Indices:
               number_of_study_participants: count(distinct p),
               study_gs: apoc.coll.sort(COLLECT(DISTINCT COALESCE(s.study_name, na)))
             } AS opensearch_data
-          MATCH (s:study)<--(:file)-->(:participant)<--(samp:sample)
+          OPTIONAL MATCH (s)<--(:file)-->(:participant)<--(samp:sample)
           WITH s, na,
             apoc.map.merge(opensearch_data, {
               number_of_study_samples: count(distinct samp)
@@ -638,7 +637,7 @@ Indices:
               number_of_study_participants: count(distinct p),
               study_gs: s.study_name
             } AS opensearch_data
-          MATCH (s:study)<--(:file)-->(:participant)<--(samp:sample)
+          OPTIONAL MATCH (s)<--(:file)-->(:participant)<--(samp:sample)
           WITH s, 
             apoc.map.merge(opensearch_data, {
               number_of_study_samples: count(distinct samp)
@@ -921,7 +920,7 @@ Indices:
               number_of_study_participants: count(distinct p),
               study_gs: s.study_name
             } AS opensearch_data
-          MATCH (s:study)<--(:file)-->(:participant)<--(samp:sample)
+          OPTIONAL MATCH (s)<--(:file)-->(:participant)<--(samp:sample)
           WITH s, 
             apoc.map.merge(opensearch_data, {
               number_of_study_samples: count(distinct samp)
