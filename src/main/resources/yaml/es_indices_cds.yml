@@ -184,9 +184,9 @@ Indices:
           OPTIONAL MATCH (p)<--(f:file)
           WITH p, na, opensearch_data, 
               apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT(apoc.text.split(
-                CASE WHEN f.experimental_strategy_and_data_subtypes = '[]' THEN na ELSE
+                CASE WHEN f.experimental_strategy_and_data_subtypes = '[]' THEN na ELSE 
                 apoc.text.replace(f.experimental_strategy_and_data_subtypes,'\\[|\\]|\\"',
-                '') END, '[;,]\s{0,1}')), true))) AS experimental_strategies,
+                '') END, '[;,]\\s{0,1}')), true))) AS experimental_strategies,
               apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_type, na))) AS file_types,
               apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_id, na))) AS files
           WITH p, na,
@@ -254,15 +254,11 @@ Indices:
           OPTIONAL MATCH (p)<--(:file)<--(i:image)
           WITH p, na, opensearch_data, 
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na))) AS image_modality,
-            apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.organ_or_tissue, na))) AS organ_or_tissue,
-            apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.tissue_fixative, na))) AS tissue_fixative,
-            apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.imaging_assay_type, na))) AS imaging_assay_type
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(i.organ_or_tissue, na))) AS organ_or_tissue
           WITH p, na, 
             apoc.map.merge(opensearch_data, {
               image_modality: image_modality,
               organ_or_tissue: organ_or_tissue,
-              tissue_fixative: tissue_fixative,
-              imaging_assay_type: imaging_assay_type,
               image_modality_sort: apoc.text.join(image_modality, ''),
               organ_or_tissue_sort: apoc.text.join(organ_or_tissue, '')
             }) AS opensearch_data
@@ -272,6 +268,8 @@ Indices:
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(mm.imaging_assay_type, na))) AS imaging_assay_type
           WITH p, na, 
             apoc.map.merge(opensearch_data, {
+              imaging_assay_type: imaging_assay_type,
+              tissue_fixative: tissue_fixative,
               imaging_assay_type_sort: apoc.text.join(imaging_assay_type, ''),
               tissue_fixative_sort: apoc.text.join(tissue_fixative, '')
             }) AS opensearch_data
@@ -464,7 +462,7 @@ Indices:
             apoc.coll.sort(apoc.coll.toSet(apoc.coll.flatten(COLLECT(apoc.text.split(
               CASE WHEN f.experimental_strategy_and_data_subtypes = '[]' THEN na ELSE 
               apoc.text.replace(f.experimental_strategy_and_data_subtypes,'\\[|\\]|\\"',
-              '') END, '[;,]\s{0,1}')), true))) AS experimental_strategies,
+              '') END, '[;,]\\s{0,1}')), true))) AS experimental_strategies,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_type, na))) AS file_types,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_id, na))) AS files
           WITH samp, na,
@@ -522,12 +520,8 @@ Indices:
             apoc.map.merge(opensearch_data, {
               image_modality: image_modality,
               organ_or_tissue: organ_or_tissue,
-              tissue_fixative: tissue_fixative,
-              imaging_assay_type: imaging_assay_type,
               image_modality_sort: apoc.text.join(image_modality, ''),
-              organ_or_tissue_sort: apoc.text.join(organ_or_tissue, ''),
-              imaging_assay_type_sort: apoc.text.join(imaging_assay_type, ''),
-              tissue_fixative_sort: apoc.text.join(tissue_fixative, '')
+              organ_or_tissue_sort: apoc.text.join(organ_or_tissue, '')
             }) AS opensearch_data
           OPTIONAL MATCH (samp)-->(:participant)<--(:file)<--(:image)<--(mm:MultiplexMicroscopy)
           WITH samp, na, opensearch_data,
@@ -535,6 +529,8 @@ Indices:
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(mm.imaging_assay_type, na))) AS imaging_assay_type
           WITH samp, na,
             apoc.map.merge(opensearch_data, {
+              tissue_fixative: tissue_fixative,
+              imaging_assay_type: imaging_assay_type,
               imaging_assay_type_sort: apoc.text.join(imaging_assay_type, ''),
               tissue_fixative_sort: apoc.text.join(tissue_fixative, '')
             }) AS opensearch_data
@@ -647,7 +643,7 @@ Indices:
           UNWIND 
             apoc.text.split(CASE WHEN f.experimental_strategy_and_data_subtypes = '[]' 
             THEN na ELSE apoc.text.replace(f.experimental_strategy_and_data_subtypes,
-            '\\[|\\]|\\"','') END, '[;,]\s{0,1}')
+            '\\[|\\]|\\"','') END, '[;,]\\s{0,1}')
           AS experimental_strategies
           WITH f, na, opensearch_data, experimental_strategies, coalesce(toUpper(f.file_type), na) AS file_type
           SKIP $skip LIMIT $limit
@@ -703,15 +699,11 @@ Indices:
           OPTIONAL MATCH (f)<--(i:image)
           WITH f, na, opensearch_data, 
             COALESCE(i.image_modality, na) AS image_modality,
-            COALESCE(i.organ_or_tissue, na) AS organ_or_tissue,
-            COALESCE(i.tissue_fixative, na) AS tissue_fixative,
-            COALESCE(i.imaging_assay_type, na) AS imaging_assay_type
+            COALESCE(i.organ_or_tissue, na) AS organ_or_tissue
           WITH f, na, 
             apoc.map.merge(opensearch_data, {
               image_modality: image_modality,
-              organ_or_tissue: organ_or_tissue,
-              tissue_fixative: tissue_fixative,
-              imaging_assay_type: imaging_assay_type
+              organ_or_tissue: organ_or_tissue
             }) AS opensearch_data
           OPTIONAL MATCH (f)<--(:image)<--(mm:MultiplexMicroscopy)
           WITH f, na, opensearch_data, 
@@ -932,7 +924,7 @@ Indices:
             coalesce(toUpper(f.file_type), na) AS file_type, 
             apoc.text.split(CASE WHEN f.experimental_strategy_and_data_subtypes = '[]' 
               THEN na ELSE apoc.text.replace(f.experimental_strategy_and_data_subtypes,
-              '\\[|\\]|\\"','') END, '[;,]\s{0,1}') AS experimental_strategy_and_data_subtypes
+              '\\[|\\]|\\"','') END, '[;,]\\s{0,1}') AS experimental_strategy_and_data_subtypes
           WITH f, na, 
             apoc.map.merge(opensearch_data, {
               experimental_strategies: experimental_strategy_and_data_subtypes,
@@ -1035,15 +1027,11 @@ Indices:
           OPTIONAL MATCH (f)<--(i:image)
           WITH f, na, opensearch_data, 
             COALESCE(i.image_modality, na) AS image_modality,
-            COALESCE(i.organ_or_tissue, na) AS organ_or_tissue,
-            COALESCE(i.tissue_fixative, na) AS tissue_fixative,
-            COALESCE(i.imaging_assay_type, na) AS imaging_assay_type
+            COALESCE(i.organ_or_tissue, na) AS organ_or_tissue
           WITH f, na, 
             apoc.map.merge(opensearch_data, {
               image_modality: image_modality,
-              organ_or_tissue: organ_or_tissue,
-              tissue_fixative: tissue_fixative,
-              imaging_assay_type: imaging_assay_type
+              organ_or_tissue: organ_or_tissue
             }) AS opensearch_data
           OPTIONAL MATCH (f)<--(:image)<--(mm:MultiplexMicroscopy)
           WITH f, na, opensearch_data, 
