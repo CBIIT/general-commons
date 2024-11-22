@@ -71,25 +71,11 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     final String GS_HIGHLIGHT_FIELDS = "highlight_fields";
     final String GS_HIGHLIGHT_DELIMITER = "$";
     final Set<String> RANGE_PARAMS = Set.of("number_of_study_participants", "number_of_study_samples");
-    final String ASSOCIATED_FILE_IDS_YAML = "yaml/file_id_associations.yaml";
-    final HashMap<String, String> FILE_ASSOCIATION_MAP;
 
     public PrivateESDataFetcher(ESService esService) {
         super(esService);
         yamlQueryFactory = new YamlQueryFactory(esService);
         HashMap<String, String> file_ids_map;
-        try{
-            Yaml yaml = new Yaml();
-            InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(ASSOCIATED_FILE_IDS_YAML);
-            HashMap<String, HashMap<String, String>> file_ids_yaml = yaml.load(inputStream);
-            file_ids_map = file_ids_yaml.get("file_associations");
-        }
-        catch (Exception e){
-            logger.warn("Unable to load associated files map");
-            logger.warn(e);
-            file_ids_map = null;
-        }
-        FILE_ASSOCIATION_MAP = file_ids_map;
     }
 
     @Override
@@ -1008,7 +994,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             new String[]{"image_modality", "image_modality"},
             new String[]{"organ_or_tissue", "organ_or_tissue"},
             new String[]{"license", "license"},
-            new String[]{"drs_uri", "drs_uri"}
+            new String[]{"drs_uri", "drs_uri"},
+            new String[]{"associated_file", "associated_file"},
+            new String[]{"associated_drs_uri", "associated_drs_uri"},
+            new String[]{"associated_md5sum", "associated_md5sum"}
     };
 
         String defaultSort = "file_name"; // Default sort order
@@ -1061,70 +1050,12 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             logger.error(e);
             throw new Exception(message);
         }
-        // Query and add associated files properties to the original result
-        HashSet<String> associatedFileIds = getAssociatedFileIds(filesInListResult);
-        if (associatedFileIds.isEmpty()){
-            return filesInListResult;
-        }
-        List<Map<String, Object>> associatedFilesResult = overview(
-                FILES_END_POINT,
-                Map.of(
-                        "file_ids", new ArrayList<>(associatedFileIds),
-                        ORDER_BY, "file_id",
-                        SORT_DIRECTION, "ASC",
-                        OFFSET, 0,
-                        PAGE_SIZE, 10000
-                ),
-                new String[][]{
-                        new String[]{"file_name", "file_name"},
-                        new String[]{"file_id", "file_id"},
-                        new String[]{"md5sum", "md5sum"},
-                        new String[]{"drs_uri", "drs_uri"}
-                },
-                "file_id",
-                Map.of("file_id", "file_id")
-        );
-        HashMap<String, AssociatedFile> associatedFilesData = new HashMap<>();
-        associatedFilesResult.forEach(fileResult -> {
-            AssociatedFile associatedFile = new AssociatedFile(fileResult);
-            associatedFilesData.put(associatedFile.getFileId(), associatedFile);
-        });
-        filesInListResult.forEach(result -> {
-            String fileId = (String) result.get("file_id");
-            String associatedFileId = FILE_ASSOCIATION_MAP.get(fileId);
-            String associatedFileValue = "";
-            String associatedDrsUriValue = "";
-            String associatedMd5sum = "";
-            if (associatedFileId != null){
-                AssociatedFile associatedFile = associatedFilesData.get(associatedFileId);
-                associatedFileValue = associatedFile.getFileName();
-                associatedDrsUriValue = associatedFile.getUri();
-                associatedMd5sum = associatedFile.getMd5sum();
-            }
-            result.put("associated_file", associatedFileValue);
-            result.put("associated_drs_uri", associatedDrsUriValue);
-            result.put("associated_md5sum", associatedMd5sum);
-        });
+
+        /*result.put("associated_file", associatedFileValue);
+        result.put("associated_drs_uri", associatedDrsUriValue);
+        result.put("associated_md5sum", associatedMd5sum);*/
         return filesInListResult;
     }
-
-    private HashSet<String> getAssociatedFileIds(List<Map<String, Object>> baseResult){
-        HashSet<String> fileIdsInResult = new HashSet<>();
-        String fileIdKey = "file_id";
-        baseResult.forEach(x -> {
-            fileIdsInResult.add((String) x.get(fileIdKey));
-        });
-        HashSet<String> associatedFileIds = new HashSet<>();
-        fileIdsInResult.forEach( x -> {
-            String fileId = FILE_ASSOCIATION_MAP.get(x);
-            if (fileId != null){
-                associatedFileIds.add(fileId);
-            }
-        });
-        return associatedFileIds;
-    }
-
-
 
     private List<String> fileIDsFromList(Map<String, Object> params) throws IOException {
         return collectFieldFromList(params, "file_id", FILES_END_POINT);

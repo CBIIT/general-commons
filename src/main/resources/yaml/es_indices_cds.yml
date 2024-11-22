@@ -894,6 +894,13 @@ Indices:
         type: search_as_you_type
       subject_ids_filter:
         type: keyword
+      # associated file properties
+      associated_file:
+        type: keyword
+      associated_drs_uri:
+        type: keyword
+      associated_md5sum:
+        type: keyword
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
     cypher_queries:
       - query: |
@@ -1056,6 +1063,17 @@ Indices:
               instrument_makes: instrument_makes,
               proteomic_instrument_models: proteomic_instrument_models,
               proteomic_design_descriptions: proteomic_design_descriptions
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)-->(af:file)
+          WITH f, na, opensearch_data,
+            COALESCE(af.file_name, na) AS associated_file,
+            CASE WHEN af.file_id IS NOT NULL THEN 'drs://nci-crdc.datacommons.io/' + af.file_id ELSE na END AS associated_drs_uri,
+            COALESCE(af.md5sum, na) AS associated_md5sum
+          WITH f, na,
+            apoc.map.merge(opensearch_data, {
+              associated_file: associated_file,
+              associated_drs_uri: associated_drs_uri,
+              associated_md5sum: associated_md5sum
             }) AS opensearch_data
           RETURN opensearch_data
           ORDER BY opensearch_data.files
