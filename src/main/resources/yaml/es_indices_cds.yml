@@ -619,6 +619,8 @@ Indices:
         type: keyword
       proteomic_design_descriptions:
         type: keyword
+      subject_ids:
+        type: keyword
     cypher_queries:
       - query: |
           MATCH (s:study)<--(:file)-->(p:participant)
