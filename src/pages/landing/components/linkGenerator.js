@@ -1,6 +1,6 @@
 import React from 'react';
 
-const linkGenerator = (paragraph) => {
+const linkGenerator = (paragraph, customTitle = "") => {
   const styles = () => ({
     text: {
       color: '#000000',
@@ -34,7 +34,7 @@ const linkGenerator = (paragraph) => {
 
           const link = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+\.[A-Za-z]+$/.test(linkAttrs) ? (
             <a
-              title={title}
+              title={customTitle || title}
               href={mailTo}
               color="inherit"
               className={styles.link}
@@ -43,7 +43,7 @@ const linkGenerator = (paragraph) => {
             </a>
           ) : (
             <a
-              title={title}
+              title={customTitle || title}
               href={linkAttrs}
               target="_blank"
               color="inherit"

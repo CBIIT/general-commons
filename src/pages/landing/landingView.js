@@ -21,11 +21,11 @@ const LandingView = ({ classes, statsData }) => (
             <div className={classes.heroImage} />
             <div className={classes.heroTextContainer}>
               <div className={classes.heroTextWrapper}>
-                <div className={classes.headerTitle}>
+                <h1 className={classes.headerTitle}>
                   { landingPageData.callToActionTitle }
-                </div>
+                </h1>
                 <div className={classes.headerContent}>
-                  {linkGenerator(landingPageData.callToActionDescription)}
+                  {linkGenerator(landingPageData.callToActionDescription, landingPageData.callToActionDescriptionTitle)}
                 </div>
                 <div className={classes.headerButtonSection}>
                   <Link to={landingPageData.callToActionLink} className={classes.headerLink}>
@@ -66,7 +66,7 @@ const LandingView = ({ classes, statsData }) => (
                 ))}
               </div>
               <div className={classes.aboutContent} id="tile1_description">
-                {linkGenerator(landingPageData.tile1.descriptionText)}
+                {linkGenerator(landingPageData.tile1.descriptionText, landingPageData.tile1.descriptionTextTitle)}
 
               </div>
               <div className={classes.aboutButtonSection}>
@@ -124,7 +124,7 @@ const LandingView = ({ classes, statsData }) => (
                   <img
                     className={classes.image}
                     src={landingPageData.tile3.img}
-                    alt={landingPageData.tile3.src}
+                    alt={landingPageData.tile3.alt}
                     id="tile3_image"
                   />
                 </div>
@@ -141,7 +141,7 @@ const LandingView = ({ classes, statsData }) => (
                     </div>
                   </a>
                   <div className={classes.contentContainer} id="tile3_description">
-                    {linkGenerator(landingPageData.tile3.descriptionText)}
+                    {linkGenerator(landingPageData.tile3.descriptionText, landingPageData.tile3.descriptionTextTitle)}
                   </div>
 
                 </div>
@@ -260,6 +260,7 @@ const styles = () => ({
     lineHeight: '35px',
     color: '#942990',
     letterSpacing: '-0.6px',
+    margin: 0,
   },
   paddingLeft50: {
     paddingLeft: '50px',
