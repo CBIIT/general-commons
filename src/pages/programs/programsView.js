@@ -44,7 +44,7 @@ const Programs = ({ classes, data }) => {
             <div className={classes.headerTitle}>
               <div className={classes.headerMainTitle}>
                 <span>
-                  <Typography>
+                  <Typography variant="h1">
                     <span className={classes.headerMainTitle}>{table.title}</span>
                   </Typography>
                 </span>

@@ -2,7 +2,6 @@ import React, { useCallback } from 'react';
 import {
   Button,
   Collapse,
-  FormControlLabel,
   Grid,
   //Switch, //Removed Dark Mode Switch
   withStyles,
@@ -48,13 +47,9 @@ const WidgetView = ({
       <div className={classes.widgetsCollapse}>
         <div className={classes.floatLeft} />
         <div className={classes.floatRight}>
-          <FormControlLabel
-            control={(
-              <Button className={classes.customButton} onClick={handleChange}>
-                {collapse ? 'COLLAPSE VIEW' : 'OPEN VIEW'}
-              </Button>
-            )}
-          />
+        <Button className={classes.customButton} onClick={handleChange}>
+          {collapse ? 'COLLAPSE VIEW' : 'OPEN VIEW'}
+        </Button>
           {/*<Switch //Removed Dark Mode Switch
             classes={{
               root: classes.switchRoot,

@@ -19,6 +19,8 @@ const DashTemplate = ({
   return ( 
     <div className={classes.dashboardContainer}>
       <StatsView data={dashData} />
+      <h1 style={{ display: 'none' }}>Data Exploration Page</h1>
+
       <div>
         <div className={classes.content}>
           <div className={classes.sideBar}>
