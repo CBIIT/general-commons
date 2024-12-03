@@ -9,6 +9,7 @@ const StatsView = ({ data }) => {
     name: e.statTitle,
     val: data[e.statAPI],
     statIconSrc: e.statIconSrc,
+    statIconAlt: e.statIconAlt,
   }));
 
   return (
