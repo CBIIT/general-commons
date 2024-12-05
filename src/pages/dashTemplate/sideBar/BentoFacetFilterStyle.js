@@ -128,9 +128,9 @@ export default () => ({
     color: '#942A90',
   },
   searchContainer: {
-    paddingTop: '15px',
     margin: '0 2px',
     marginRight: 6,
+    width: '100%',
   },
   searchLabel: {
     fontFamily: 'Open Sans',

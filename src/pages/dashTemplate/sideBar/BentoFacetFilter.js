@@ -8,6 +8,7 @@
 /* eslint-disable arrow-body-style */
 import React, { useState } from 'react';
 import {
+  AccordionDetails,
   AccordionSummary,
   Button,
   withStyles,
@@ -48,6 +49,14 @@ const CustomExpansionPanelSummary = withStyles({
   },
   expanded: {},
 })(AccordionSummary);
+
+const CustomAccordionDetails = withStyles({
+  root: {
+    paddingBottom: "14px",
+    paddingLeft: "14px",
+    paddingRight: "14px",
+  },
+})(AccordionDetails);
 
 // Generate SearchBox Component
 const { SearchBox } = SearchBoxGenerator({
@@ -179,7 +188,7 @@ const BentoFacetFilter = ({
 
     return (
       <>
-        <CustomExpansionPanelSummary onClick={collapseHandler} id={section}>
+        <CustomExpansionPanelSummary onClick={collapseHandler} id={section} style={{ marginBottom: hasSearch ? 0 : -1 }}>
           <div className={classes.sectionSummaryTextContainer}>
             {name}
             {hasSearch && (
@@ -188,16 +197,18 @@ const BentoFacetFilter = ({
               </div>
             )}
           </div>
+          </CustomExpansionPanelSummary>
           {hasSearch && (
-            <SearchView
-              classes={classes}
-              SearchBox={SearchBox}
-              UploadModal={UploadModal}
-              hidden={!expanded || !showSearch}
-              config = {searchConfig}
-            />
+            <CustomAccordionDetails>
+                <SearchView
+                  classes={classes}
+                  SearchBox={SearchBox}
+                  UploadModal={UploadModal}
+                  hidden={!expanded || !showSearch}
+                  config = {searchConfig}
+                />
+            </CustomAccordionDetails>
           )}
-        </CustomExpansionPanelSummary>
       </>
     );
   };

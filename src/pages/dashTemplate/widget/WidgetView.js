@@ -48,7 +48,7 @@ const WidgetView = ({
         <div className={classes.floatLeft} />
         <div className={classes.floatRight}>
         <Button className={classes.customButton} onClick={handleChange}>
-          {collapse ? 'COLLAPSE VIEW' : 'OPEN VIEW'}
+          {collapse ? 'Collapse View' : 'Open View'}
         </Button>
           {/*<Switch //Removed Dark Mode Switch
             classes={{
