@@ -44,9 +44,11 @@ export const facetSectionVariables = {
   Extra: {
     isExpanded: true,
   },
+  /* Disabled Temporarily
   Proteomic: {
     isExpanded: true,
   },
+  */
 };
 
 export const facetsConfig = [
@@ -310,6 +312,7 @@ export const facetsConfig = [
     show: true,
   },
   // PROTEOMIC
+  /* Disabled temporarily
   {
     section: PROTEOMIC,
     label: "Analytical Fractions",
@@ -343,6 +346,7 @@ export const facetsConfig = [
     sort_type: sortType.ALPHABET,
     show: true,
   },
+  */
 ];
 
 // --------------- Dashboard Widgets configuration --------------
