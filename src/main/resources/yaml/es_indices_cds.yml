@@ -488,7 +488,7 @@ Indices:
               library_selections: library_selections, 
               library_sources: library_sources, 
               library_strategies: library_strategies,
-              instrument_models: reference_genome_assemblies,
+              instrument_models: instrument_models,
               platforms: platforms,
               reference_genome_assemblies: reference_genome_assemblies,
               library_layouts_sort: apoc.text.join(library_layouts, ''),
