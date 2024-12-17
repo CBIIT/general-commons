@@ -758,6 +758,10 @@ const styles = (theme) => ({
     verticalAlign: 'sub',
     marginLeft: '4px',
   },
+  customTooltipSpan:{
+    display: 'inline-block',
+    margin: '6px 4px 10px 5px',
+  },
 });
 
 export default withStyles(styles, { withTheme: true })(StudyView);
