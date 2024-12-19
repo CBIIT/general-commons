@@ -239,6 +239,22 @@ type image {
     crdc_id: String
 }
 
+type version {
+    data_version_id: String
+    data_version: String
+    datetime: String
+    model_version: String
+    description: String
+}
+
+type proteomic {
+    aliquot_id: String
+    analytical_fractions: String
+    instrument_make: String
+    proteomic_instrument_model: String
+    proteomic_design_description: String
+}
+
 type SubjectOverview {
     subject_id: String
     study_acronym: [String]
@@ -361,6 +377,12 @@ type SearchResult {
     subjectCountBySampleType: [GroupCount]
     subjectCountByStudyDataType: [GroupCount]
     subjectCountByAcl: [GroupCount]
+    subjectCountByAnalyticalFractions: [GroupCount]
+    subjectCountByInstrumentMakes: [GroupCount]
+    subjectCountByProteomicDesignDescriptions: [GroupCount]
+    subjectCountByTissueFixative: [GroupCount]
+    subjectCountByImagingAssayType: [GroupCount]
+    subjectCountByOrganOrTissue: [GroupCount]
 
     filterSubjectCountByStudy: [GroupCount]
     filterSubjectCountByExperimentalStrategy: [GroupCount]
@@ -385,6 +407,19 @@ type SearchResult {
     filterSubjectCountByAcl: [GroupCount]
     filterSubjectCountByNumberOfStudyParticipants: RangeCount
     filterSubjectCountByNumberOfStudySamples: RangeCount
+    filterSubjectCountByAnalyticalFractions: [GroupCount]
+    filterSubjectCountByInstrumentMakes: [GroupCount]
+    filterSubjectCountByProteomicDesignDescriptions: [GroupCount]
+    filterSubjectCountByTissueFixative: [GroupCount]
+    filterSubjectCountByImagingAssayType: [GroupCount]
+    filterSubjectCountByOrganOrTissue: [GroupCount]
+
+    donutCountByExperimentalStrategy: [GroupCount]
+    donutCountByGender: [GroupCount]
+    donutCountByFileType: [GroupCount]
+    donutCountByStudyDataTypes: [GroupCount]
+    donutCountByImageModality: [GroupCount]
+    donutCountBySampleType: [GroupCount]
 }
 
 type RangeCount {
@@ -412,6 +447,7 @@ type GS_Subject {
     subject_id: String
     site: String
     gender: String
+    subject_ids_filter: [String]
 }
 
 type GS_Sample {
@@ -419,6 +455,7 @@ type GS_Sample {
     sample_id: String
     is_tumor: String
     analyte_type: String
+    subject_ids_filter: [String]
 }
 
 type GS_File {
@@ -439,6 +476,7 @@ type GS_File {
     platforms: [String]
     reference_genome_assemblies: [String]
     sites: [String]
+    subject_ids_filter: [String]
 }
 
 type GS_Model {
@@ -584,6 +622,8 @@ type QueryType {
     numberOfSamples: Int
     numberOfFiles: Int
     numberOfDiseaseSites: Int
+    numberOfImages: Int
+    numberOfProteomics: Int
 
     idsLists: IdsLists
 
@@ -629,7 +669,13 @@ type QueryType {
         sample_types: [String] = [],
         site: [String] = [],
         studies: [String] = [],
-        study_data_types: [String] = []
+        study_data_types: [String] = [],
+        analytical_fractions: [String] = [],
+        instrument_makes: [String] = [],
+        proteomic_design_descriptions: [String] = []
+        organ_or_tissue: [String] = []
+        tissue_fixative: [String] = []
+        imaging_assay_type: [String] = []
     ): SearchResult
 
     subjectOverview (
@@ -657,6 +703,12 @@ type QueryType {
         site: [String] = [],
         studies: [String] = [],
         study_data_types: [String] = [],
+        analytical_fractions: [String] = [],
+        instrument_makes: [String] = [],
+        proteomic_design_descriptions: [String] = []
+        organ_or_tissue: [String] = []
+        tissue_fixative: [String] = []
+        imaging_assay_type: [String] = [],
 
         order_by: String = "",
         sort_direction: String = "ASC",
@@ -690,6 +742,12 @@ type QueryType {
         site: [String] = [],
         studies: [String] = [],
         study_data_types: [String] = [],
+        analytical_fractions: [String] = [],
+        instrument_makes: [String] = [],
+        proteomic_design_descriptions: [String] = []
+        organ_or_tissue: [String] = []
+        tissue_fixative: [String] = []
+        imaging_assay_type: [String] = [],
 
         order_by: String = "",
         sort_direction: String = "ASC",
@@ -724,6 +782,12 @@ type QueryType {
         site: [String] = [],
         studies: [String] = [],
         study_data_types: [String] = [],
+        analytical_fractions: [String] = [],
+        instrument_makes: [String] = [],
+        proteomic_design_descriptions: [String] = []
+        organ_or_tissue: [String] = []
+        tissue_fixative: [String] = []
+        imaging_assay_type: [String] = [],
 
         order_by: String = "",
         sort_direction: String = "ASC",
@@ -758,6 +822,12 @@ type QueryType {
         site: [String] = [],
         studies: [String] = [],
         study_data_types: [String] = [],
+        analytical_fractions: [String] = [],
+        instrument_makes: [String] = [],
+        proteomic_design_descriptions: [String] = []
+        organ_or_tissue: [String] = []
+        tissue_fixative: [String] = []
+        imaging_assay_type: [String] = [],
 
         order_by: String = "",
         sort_direction: String = "ASC",
@@ -1037,4 +1107,16 @@ type QueryType {
         crdc_id: String
     ): [image]
 
+
+    proteomic (
+        aliquot_id: String
+        analytical_fractions: String
+        instrument_make: String
+        proteomic_instrument_model: String
+        proteomic_design_description: String
+        first: Int = 2500,
+        offset: Int = 0,
+    ): [proteomic]
+
+     version: version
 }

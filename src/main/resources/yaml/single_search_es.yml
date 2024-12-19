@@ -44,6 +44,24 @@ queries:
     result:
       type: int
       method: count_bucket_keys
+  - name: numberOfImages
+    index:
+      - image
+    filter:
+      type: aggregation
+      selectedField: study_link_id
+    result:
+      type: int
+      method: count_bucket_keys
+  - name: numberOfProteomics
+    index:
+      - proteomics
+    filter:
+      type: aggregation
+      selectedField: aliquot_id
+    result:
+      type: int
+      method: count_bucket_keys
   - name: diagnosis
     index:
       - diagnosis
@@ -122,6 +140,14 @@ queries:
     filter:
       type: pagination
       defaultSortField: program_name
+    result:
+      type: object_array
+  - name: proteomic
+    index:
+      - proteomics
+    filter:
+      type: pagination
+      defaultSortField: aliquot_id
     result:
       type: object_array
   - name: idsLists

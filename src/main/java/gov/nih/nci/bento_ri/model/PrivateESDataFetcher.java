@@ -18,6 +18,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.OffsetDateTime;
 import java.util.*;
 
 import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
@@ -55,6 +56,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     final String VALUES_COUNT_END_POINT = "/model_values/_count";
     final String GS_ABOUT_END_POINT = "/about_page/_search";
     final String GS_MODEL_END_POINT = "/data_model/_search";
+    final String VERSION_END_POINT = "/version/_search";
 
     final int GS_LIMIT = 10;
     final String GS_END_POINT = "endpoint";
@@ -69,25 +71,11 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     final String GS_HIGHLIGHT_FIELDS = "highlight_fields";
     final String GS_HIGHLIGHT_DELIMITER = "$";
     final Set<String> RANGE_PARAMS = Set.of("number_of_study_participants", "number_of_study_samples");
-    final String ASSOCIATED_FILE_IDS_YAML = "yaml/file_id_associations.yaml";
-    final HashMap<String, String> FILE_ASSOCIATION_MAP;
 
     public PrivateESDataFetcher(ESService esService) {
         super(esService);
         yamlQueryFactory = new YamlQueryFactory(esService);
         HashMap<String, String> file_ids_map;
-        try{
-            Yaml yaml = new Yaml();
-            InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(ASSOCIATED_FILE_IDS_YAML);
-            HashMap<String, HashMap<String, String>> file_ids_yaml = yaml.load(inputStream);
-            file_ids_map = file_ids_yaml.get("file_associations");
-        }
-        catch (Exception e){
-            logger.warn("Unable to load associated files map");
-            logger.warn(e);
-            file_ids_map = null;
-        }
-        FILE_ASSOCIATION_MAP = file_ids_map;
     }
 
     @Override
@@ -128,6 +116,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                             Map<String, Object> args = env.getArguments();
                             return findSubjectIdsInList(args);
                         })
+                        .dataFetcher("version", env -> getLatestVersion())
                 )
                 .build();
     }
@@ -265,7 +254,73 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 FILTER_COUNT_QUERY, "filterSubjectCountByImageModality",
                 AGG_ENDPOINT, FILES_END_POINT
         ));
-
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "analytical_fractions",
+                WIDGET_QUERY, "subjectCountByAnalyticalFractions",
+                FILTER_COUNT_QUERY, "filterSubjectCountByAnalyticalFractions",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "instrument_makes",
+                WIDGET_QUERY, "subjectCountByInstrumentMakes",
+                FILTER_COUNT_QUERY, "filterSubjectCountByInstrumentMakes",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "proteomic_design_descriptions",
+                WIDGET_QUERY, "subjectCountByProteomicDesignDescriptions",
+                FILTER_COUNT_QUERY, "filterSubjectCountByProteomicDesignDescriptions",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "tissue_fixative",
+                WIDGET_QUERY, "subjectCountByTissueFixative",
+                FILTER_COUNT_QUERY, "filterSubjectCountByTissueFixative",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "imaging_assay_type",
+                WIDGET_QUERY, "subjectCountByImagingAssayType",
+                FILTER_COUNT_QUERY, "filterSubjectCountByImagingAssayType",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "organ_or_tissue",
+                WIDGET_QUERY, "subjectCountByOrganOrTissue",
+                FILTER_COUNT_QUERY, "filterSubjectCountByOrganOrTissue",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        // Donut Count Fields
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "experimental_strategies",
+                WIDGET_QUERY, "donutCountByExperimentalStrategy",
+                AGG_ENDPOINT, FILES_EXPERIMENTAL_STRATEGY_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "genders",
+                WIDGET_QUERY, "donutCountByGender",
+                AGG_ENDPOINT, SUBJECTS_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "file_types",
+                WIDGET_QUERY, "donutCountByFileType",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "study_data_types",
+                WIDGET_QUERY, "donutCountByStudyDataTypes",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "image_modality",
+                WIDGET_QUERY, "donutCountByImageModality",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "sample_types",
+                WIDGET_QUERY, "donutCountBySampleType",
+                AGG_ENDPOINT, SAMPLES_END_POINT
+        ));
 
 
         List<String> agg_names = new ArrayList<>();
@@ -273,11 +328,6 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             agg_names.add(agg.get(AGG_NAME));
         }
         final String[] TERM_AGG_NAMES = agg_names.toArray(new String[TERM_AGGS.size()]);
-
-        final Map<String, String> RANGE_AGGS = new HashMap<>();
-        RANGE_AGGS.put("number_of_study_participants",  "filterSubjectCountByNumberOfStudyParticipants");
-        RANGE_AGGS.put("number_of_study_samples",  "filterSubjectCountByNumberOfStudySamples");
-        final String[] RANGE_AGG_NAMES = RANGE_AGGS.keySet().toArray(new String[0]);
 
         Map<String, Object> query = esService.buildFacetFilterQuery(params, RANGE_PARAMS);
         Request sampleCountRequest = new Request("GET", SAMPLES_COUNT_END_POINT);
@@ -297,7 +347,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
 
 
         // Get aggregations
-        Map<String, Object> aggQuery = esService.addAggregations(query, TERM_AGG_NAMES, RANGE_AGG_NAMES);
+        Map<String, Object> aggQuery = esService.addAggregations(query, TERM_AGG_NAMES);
         Request fileRequest = new Request("GET", FILES_END_POINT);
         fileRequest.setJsonEntity(gson.toJson(aggQuery));
         JsonObject subjectResult = esService.send(fileRequest);
@@ -334,16 +384,18 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             }
         }
 
-        Map<String, JsonObject> rangeAggs = esService.collectRangeAggs(subjectResult, RANGE_AGG_NAMES);
+        final Map<String, String> RANGE_MAXIMUMS = new HashMap<>();
+        RANGE_MAXIMUMS.put("number_of_participants",  "filterSubjectCountByNumberOfStudyParticipants");
+        RANGE_MAXIMUMS.put("number_of_samples",  "filterSubjectCountByNumberOfStudySamples");
+        final String[] RANGE_MAX_NAMES = RANGE_MAXIMUMS.keySet().toArray(new String[0]);
 
-        for (String field: RANGE_AGG_NAMES) {
-            String filterCountQueryName = RANGE_AGGS.get(field);
-            if (params.containsKey(field) && ((List<Double>)params.get(field)).size() >= 2) {
-                Map<String, Object> filterCount = rangeFilterSubjectCountBy(field, params);;
-                data.put(filterCountQueryName, filterCount);
-            } else {
-                data.put(filterCountQueryName, getRange(rangeAggs.get(field)));
-            }
+        Map<String, Object> maximumQuery = esService.buildMaximumQuery(RANGE_MAX_NAMES);
+        Request maxRequest = new Request("GET", STUDIES_END_POINT);
+        maxRequest.setJsonEntity(gson.toJson(maximumQuery));
+        JsonObject maxResult = esService.send(maxRequest);
+        Map<String, Integer> maximumValues = esService.collectMaximumAggs(maxResult, RANGE_MAX_NAMES);
+        for (String field: RANGE_MAX_NAMES) {
+            data.put(RANGE_MAXIMUMS.get(field), Map.of("lowerBound", 0,"upperBound", maximumValues.get(field)));
         }
         return data;
     }
@@ -374,7 +426,11 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("analyte_type", "sample_types_sort"),
                 Map.entry("race", "race"),
                 Map.entry("ethnicity", "ethnicity"),
-                Map.entry("primary_diagnosis", "primary_diagnoses_sort")
+                Map.entry("primary_diagnosis", "primary_diagnoses_sort"),
+                Map.entry("image_modality", "image_modality_sort"),
+                Map.entry("organ_or_tissue", "organ_or_tissue_sort"),
+                Map.entry("imaging_assay_type", "imaging_assay_type_sort"),
+                Map.entry("tissue_fixative", "tissue_fixative_sort")
         );
 
         return overview(SUBJECTS_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
@@ -405,7 +461,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("analyte_type", "analyte_type"),
                 Map.entry("sample_type", "analyte_type"),
                 Map.entry("sample_tumor_status", "is_tumor"),
-                Map.entry("organ_or_tissue", "organ_or_tissue_sort")
+                Map.entry("image_modality", "image_modality_sort"),
+                Map.entry("organ_or_tissue", "organ_or_tissue_sort"),
+                Map.entry("imaging_assay_type", "imaging_assay_type_sort"),
+                Map.entry("tissue_fixative", "tissue_fixative_sort")
         );
 
         return overview(SAMPLES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
@@ -435,8 +494,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             new String[]{"library_strategy", "library_strategies"},
             new String[]{"library_layouts", "library_layouts"},
             new String[]{"image_modality", "image_modality"},
-            new String[]{"organ_or_tissue", "organ_or_tissue"},
-            new String[]{"license", "license"},
+            new String[]{"organ_or_tissue", "organ_or_tissue"}
     };
 
         String defaultSort = "file_name"; // Default sort order
@@ -461,9 +519,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("study_data_type", "study_data_types"),
                 Map.entry("library_strategy", "library_strategies_sort"),
                 Map.entry("library_layouts", "library_layouts_sort"),
-                Map.entry("image_modality", "image_modality"),
-                Map.entry("organ_or_tissue", "organ_or_tissue"),
-                Map.entry("license", "license")
+                Map.entry("image_modality", "image_modality_sort"),
+                Map.entry("organ_or_tissue", "organ_or_tissue_sort"),
+                Map.entry("imaging_assay_type", "imaging_assay_type_sort"),
+                Map.entry("tissue_fixative", "tissue_fixative_sort")
         );
 
         List<Map<String, Object>> fileOverview = overview(FILES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
@@ -636,7 +695,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                         new String[]{"study", "study_gs"},
                         new String[]{"subject_id", "subject_id_gs"},
                         new String[]{"site", "site_gs"},
-                        new String[]{"gender", "gender_gs"}
+                        new String[]{"gender", "gender_gs"},
+                        new String[]{"subject_ids_filter", "subject_ids_filter"},
                 },
                 GS_CATEGORY_TYPE, "subject"
         ));
@@ -650,7 +710,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 GS_COLLECT_FIELDS, new String[][]{
                         new String[]{"sample_id", "sample_id_gs"},
                         new String[]{"is_tumor", "is_tumor_gs"},
-                        new String[]{"analyte_type", "analyte_type_gs"}
+                        new String[]{"analyte_type", "analyte_type_gs"},
+                        new String[]{"subject_ids_filter", "subject_ids_filter"}
                 },
                 GS_CATEGORY_TYPE, "sample"
         ));
@@ -680,7 +741,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                         new String[]{"library_strategies","library_strategies_gs"},
                         new String[]{"platforms","platforms_gs"},
                         new String[]{"reference_genome_assemblies","reference_genome_assemblies_gs"},
-                        new String[]{"sites","sites_gs"}
+                        new String[]{"sites","sites_gs"},
+                        new String[]{"subject_ids_filter", "subject_ids_filter"}
                 },
                 GS_CATEGORY_TYPE, "file"
         ));
@@ -932,7 +994,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             new String[]{"image_modality", "image_modality"},
             new String[]{"organ_or_tissue", "organ_or_tissue"},
             new String[]{"license", "license"},
-            new String[]{"drs_uri", "drs_uri"}
+            new String[]{"drs_uri", "drs_uri"},
+            new String[]{"associated_file", "associated_file"},
+            new String[]{"associated_drs_uri", "associated_drs_uri"},
+            new String[]{"associated_md5sum", "associated_md5sum"}
     };
 
         String defaultSort = "file_name"; // Default sort order
@@ -985,70 +1050,12 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             logger.error(e);
             throw new Exception(message);
         }
-        // Query and add associated files properties to the original result
-        HashSet<String> associatedFileIds = getAssociatedFileIds(filesInListResult);
-        if (associatedFileIds.isEmpty()){
-            return filesInListResult;
-        }
-        List<Map<String, Object>> associatedFilesResult = overview(
-                FILES_END_POINT,
-                Map.of(
-                        "file_ids", new ArrayList<>(associatedFileIds),
-                        ORDER_BY, "file_id",
-                        SORT_DIRECTION, "ASC",
-                        OFFSET, 0,
-                        PAGE_SIZE, 10000
-                ),
-                new String[][]{
-                        new String[]{"file_name", "file_name"},
-                        new String[]{"file_id", "file_id"},
-                        new String[]{"md5sum", "md5sum"},
-                        new String[]{"drs_uri", "drs_uri"}
-                },
-                "file_id",
-                Map.of("file_id", "file_id")
-        );
-        HashMap<String, AssociatedFile> associatedFilesData = new HashMap<>();
-        associatedFilesResult.forEach(fileResult -> {
-            AssociatedFile associatedFile = new AssociatedFile(fileResult);
-            associatedFilesData.put(associatedFile.getFileId(), associatedFile);
-        });
-        filesInListResult.forEach(result -> {
-            String fileId = (String) result.get("file_id");
-            String associatedFileId = FILE_ASSOCIATION_MAP.get(fileId);
-            String associatedFileValue = "";
-            String associatedDrsUriValue = "";
-            String associatedMd5sum = "";
-            if (associatedFileId != null){
-                AssociatedFile associatedFile = associatedFilesData.get(associatedFileId);
-                associatedFileValue = associatedFile.getFileName();
-                associatedDrsUriValue = associatedFile.getUri();
-                associatedMd5sum = associatedFile.getMd5sum();
-            }
-            result.put("associated_file", associatedFileValue);
-            result.put("associated_drs_uri", associatedDrsUriValue);
-            result.put("associated_md5sum", associatedMd5sum);
-        });
+
+        /*result.put("associated_file", associatedFileValue);
+        result.put("associated_drs_uri", associatedDrsUriValue);
+        result.put("associated_md5sum", associatedMd5sum);*/
         return filesInListResult;
     }
-
-    private HashSet<String> getAssociatedFileIds(List<Map<String, Object>> baseResult){
-        HashSet<String> fileIdsInResult = new HashSet<>();
-        String fileIdKey = "file_id";
-        baseResult.forEach(x -> {
-            fileIdsInResult.add((String) x.get(fileIdKey));
-        });
-        HashSet<String> associatedFileIds = new HashSet<>();
-        fileIdsInResult.forEach( x -> {
-            String fileId = FILE_ASSOCIATION_MAP.get(x);
-            if (fileId != null){
-                associatedFileIds.add(fileId);
-            }
-        });
-        return associatedFileIds;
-    }
-
-
 
     private List<String> fileIDsFromList(Map<String, Object> params) throws IOException {
         return collectFieldFromList(params, "file_id", FILES_END_POINT);
@@ -1065,14 +1072,41 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         return esService.collectTerms(jsonObject, collectField);
     }
 
-
-
-    private final static class BENTO_INDEX {
-        private static final String SAMPLES = "samples";
-    }
-
-    private final static class BENTO_FIELDS {
-        private static final String SAMPLE_NESTED_FILE_INFO = "file_info";
-        private static final String FILES = "files";
+    private Map<String, Object> getLatestVersion() throws IOException {
+        Map<String, Object> latestVersion = null;
+        Request request = new Request("GET", VERSION_END_POINT);
+        JsonObject jsonObject = esService.send(request);
+        JsonArray searchHits = null;
+        try{
+            searchHits = jsonObject.getAsJsonObject("hits").getAsJsonArray("hits");
+        }
+        catch (Exception e){
+            throw new IOException("Unable to parse the OpenSearch response");
+        }
+        for (JsonElement hit : searchHits) {
+            Map<String, Object> version = null;
+            try{
+                JsonElement source = hit.getAsJsonObject().get("_source");
+                version = gson.fromJson(source, Map.class);
+            }
+            catch (Exception e){
+                throw new IOException("Unable to parse the version from the OpenSearch response");
+            }
+            if (latestVersion == null){
+                latestVersion = version;
+                continue;
+            }
+            try{
+                OffsetDateTime versionDateTime = OffsetDateTime.parse(version.get("datetime").toString());
+                OffsetDateTime latestVersionDateTime = OffsetDateTime.parse(latestVersion.get("datetime").toString());
+                if (versionDateTime.isAfter(latestVersionDateTime)){
+                    latestVersion = version;
+                }
+            }
+            catch (Exception e){
+                throw new IOException("Unable to parse the timestamp from a version in the OpenSearch response");
+            }
+        }
+        return latestVersion;
     }
 }
