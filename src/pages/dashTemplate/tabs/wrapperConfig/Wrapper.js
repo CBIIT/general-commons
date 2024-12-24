@@ -62,6 +62,7 @@ export const wrapperConfig = [{
       role: btnTypes.ADD_SELECTED_FILES,
       btnType: btnTypes.ADD_SELECTED_FILES,
       conditional: true,
+      alertMessage,
       buttonTooltipConfig: addSelectedFilesButtonTooltipConfig,
     }],
 },
