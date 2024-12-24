@@ -7,7 +7,7 @@ const SEQUENCING = 'Sequencing';
 const IMAGING = 'Imaging';
 const DIAGNOSIS = 'Diagnosis';
 const FILES = 'Files';
-const PROTEOMIC = 'Proteomic';
+// const PROTEOMIC = 'Proteomic';
 
 // --------------- Facet resetIcon link configuration --------------
 // Ideal size for resetIcon is 16x16 px
