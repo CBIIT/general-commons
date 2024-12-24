@@ -130,6 +130,9 @@ export const tblBody = {
           fontWeight: 'bold',
         },
       },
+      '&.sample_id': {
+        maxWidth: '160px',
+      }
     },
     root: {
       minHeight: '45px',
