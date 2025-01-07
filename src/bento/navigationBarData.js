@@ -2,7 +2,7 @@ import { STATIC_CONTENT } from "../assets/staticContent";
 
 export const navBarstyling = {
   global: {
-    backgroundColor: '#0E6292;',
+    backgroundColor: '#224B6D;',
     height: '39px',
     padding: '9px 20px 0px 20px',
     fontColor: '#bbefff',
@@ -47,7 +47,7 @@ export const navBarstyling = {
     padding: '6px 16px 0px 5px',
   },
   cartLabel: {
-    color: '#FFAC20',
+    color: '#FFA200',
   },
 };
 
