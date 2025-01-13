@@ -280,7 +280,7 @@ const styles = () => ({
     // borderBottom: '1.5px solid #D36000',
     width: "fit-content",
     paddingRight: "19px",
-    background: '#D36000',
+    background: '#C25700',
     borderRadius: '8px',
   },
 
@@ -307,7 +307,7 @@ const styles = () => ({
   },
   DCWords: {
     height: '200px',
-    background: '#29ABE2',
+    background: '#177EAB',
     color: '#FFFFFF',
     fontSize: '26px',
     textTransform: 'capitalize',
@@ -359,7 +359,7 @@ const styles = () => ({
     width: '48px',
   },
   aboutButtonRight: {
-    background: '#CB864C',
+    background: '#A66530',
     float: 'left',
     height: '45px',
     width: '132px',
