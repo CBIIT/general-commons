@@ -99,7 +99,7 @@ export const tblBody = {
     root:{
       color: '#004C73',
       '&:nth-child(even)': {
-        backgroundColor: '#ebebeb',
+        backgroundColor: '#EDEDED',
       },
     },
   },
