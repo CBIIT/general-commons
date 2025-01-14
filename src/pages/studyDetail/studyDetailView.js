@@ -420,7 +420,7 @@ const styles = (theme) => ({
     paddingLeft: '25px !important',
   },
   link: {
-    color: '#DC762F',
+    color: '#CB0000',
     textDecoration: 'none',
     '&:hover': {
       textDecoration: 'underline',
@@ -593,7 +593,7 @@ const styles = (theme) => ({
     fontFamily: 'Lato',
     fontSize: '17px',
     letterSpacing: '0.025em',
-    color: '#AE6CAB',
+    color: '#975392',
   },
   detailContainerHeaderLink: {
     fontFamily: 'Raleway',
@@ -700,7 +700,7 @@ const styles = (theme) => ({
     fontFamily: 'Lato',
     fontSize: '17px',
     letterSpacing: '0.025em',
-    color: '#AE6CAB',
+    color: '#975392',
     paddingBottom: '20px',
   },
   fileContainer: {

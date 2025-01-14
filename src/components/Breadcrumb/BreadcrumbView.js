@@ -56,7 +56,7 @@ const styles = () => ({
     paddingLeft: '3px',
     paddingRight: '3px',
     textDecoration: 'none',
-    color: '#7e92a5',
+    color: '#757575',
     textTransform: 'uppercase',
     // fontWeight: 'bold',
     fontFamily: 'Lato',
