@@ -421,10 +421,14 @@ const styles = () => ({
   contentRightBottom: {
     float: 'left',
     width: '597px',
-    background: '#fff',
-    backgroundImage: `url(${landingPageData.tile4.img})`,
-    backgroundRepeat: 'no-repeat',
-    backgroundSize: 'cover',
+    background: '#fff', 
+    backgroundImage: `
+      linear-gradient(112.95deg, rgba(0, 0, 0, 0) 19.41%, #0B4E75 69.57%), 
+      url(${landingPageData.tile4.img})
+    `,
+    backgroundRepeat: 'no-repeat, no-repeat',
+    backgroundSize: 'cover, cover',
+    backgroundPosition: 'center, center',
   },
   cases: {
     height: '436px',
