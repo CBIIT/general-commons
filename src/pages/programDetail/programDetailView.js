@@ -557,7 +557,7 @@ const styles = (theme) => ({
     fontFamily: 'Inter',
     fontSize: '17px',
     letterSpacing: '0.025em',
-    color: '#0296C9',
+    color: '#177EAB',
   },
   detailContainerHeaderLink: {
     fontFamily: 'Lato',
@@ -597,7 +597,7 @@ const styles = (theme) => ({
   },
 
   tableContainer: {
-    background: '#f3f3f3',
+    background: '#EDEDED',
   },
   tableHeader: {
     paddingLeft: '0px',
@@ -657,7 +657,7 @@ const styles = (theme) => ({
     fontFamily: 'Inter',
     fontSize: '17px',
     letterSpacing: '0.025em',
-    color: '#0296c9',
+    color: '#157199',
     paddingBottom: '20px',
   },
   fileContainer: {

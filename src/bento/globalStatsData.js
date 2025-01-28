@@ -22,7 +22,7 @@ export const statsStyling = {
     margin: '2px 0px 0px -45px',
   },
   statCount: {
-    color: '#0467BD',
+    color: '#045FAF',
     fontFamily: 'Oswald',
     fontSize: '20px',
     margin: '0px 0px -4px 8px',
