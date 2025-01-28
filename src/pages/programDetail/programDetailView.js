@@ -145,7 +145,7 @@ const ProgramView = ({ classes, data, theme }) => {
 
           <Grid container spacing={5}>
             <Grid item lg={7} sm={6} xs={12} container>
-              <Grid container spacing={4} direction="row" className={classes.detailContainerLeft}>
+              <Grid container spacing={4} direction="row" tabIndex={0} className={classes.detailContainerLeft}>
                 {updatedAttributesData.slice(0, 6).map((attribute, index) => (
                   <Grid item xs={12}>
                     <div>
