@@ -27,6 +27,8 @@ type file {
   md5sum: String
   file_url_in_cds: String
   experimental_strategy_and_data_subtypes: String
+  is_supplementary_file: String
+  release_datetime: String
 }
 
 type genomic_info {
@@ -310,6 +312,9 @@ type FileOverview {
 
     library_strategy: [String]
     library_layouts: [String]
+
+    is_supplementary_file: String
+    release_datetime: String
 }
 
 type FilesInList {
@@ -343,9 +348,13 @@ type FilesInList {
     library_strategy: String
     library_layouts: String
 
+    is_supplementary_file: String
+    release_datetime: String
+
     associated_file: String
     associated_drs_uri: String
     associated_md5sum: String
+    associated_is_supplementary_file: String
 }
 
 

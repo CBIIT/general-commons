@@ -832,6 +832,10 @@ Indices:
         type: keyword
       drs_uri:
         type: keyword
+      is_supplementary_file:
+        type: keyword
+      release_datetime:
+        type: keyword
       # Sort properties
       analyte_type_sort:
         type: keyword
@@ -896,12 +900,18 @@ Indices:
         type: search_as_you_type
       subject_ids_filter:
         type: keyword
+      is_supplementary_file_gs:
+        type: search_as_you_type
+      release_datetime_gs:
+        type: search_as_you_type
       # associated file properties
       associated_file:
         type: keyword
       associated_drs_uri:
         type: keyword
       associated_md5sum:
+        type: keyword
+      associated_is_supplementary_file:
         type: keyword
     # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
     cypher_queries:
@@ -954,7 +964,11 @@ Indices:
               file_id_gs: f.file_id,
               file_name_gs: f.file_name,
               file_url_in_cds: f.file_url_in_cds,
-              drs_uri: 'drs://nci-crdc.datacommons.io/' + f.file_id
+              drs_uri: 'drs://nci-crdc.datacommons.io/' + f.file_id,
+              is_supplementary_file: f.is_supplementary_file,
+              is_supplementary_file_gs: f.is_supplementary_file,
+              release_datetime: f.release_datetime,
+              release_datetime_gs: f.release_datetime
             }) AS opensearch_data
           OPTIONAL MATCH (f)-->(p:participant)
           WITH f, na, opensearch_data,
@@ -1070,12 +1084,14 @@ Indices:
           WITH f, na, opensearch_data,
             COALESCE(af.file_name, na) AS associated_file,
             CASE WHEN af.file_id IS NOT NULL THEN 'drs://nci-crdc.datacommons.io/' + af.file_id ELSE na END AS associated_drs_uri,
-            COALESCE(af.md5sum, na) AS associated_md5sum
+            COALESCE(af.md5sum, na) AS associated_md5sum,
+            COALESCE(af.is_supplementary_file, na) AS associated_is_supplementary_file
           WITH f, na,
             apoc.map.merge(opensearch_data, {
               associated_file: associated_file,
               associated_drs_uri: associated_drs_uri,
-              associated_md5sum: associated_md5sum
+              associated_md5sum: associated_md5sum,
+              associated_is_supplementary_file: associated_is_supplementary_file
             }) AS opensearch_data
           RETURN opensearch_data
           ORDER BY opensearch_data.files

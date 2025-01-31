@@ -494,7 +494,9 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             new String[]{"library_strategy", "library_strategies"},
             new String[]{"library_layouts", "library_layouts"},
             new String[]{"image_modality", "image_modality"},
-            new String[]{"organ_or_tissue", "organ_or_tissue"}
+            new String[]{"organ_or_tissue", "organ_or_tissue"},
+            new String[]{"release_datetime", "release_datetime"},
+            new String[]{"is_supplementary_file", "is_supplementary_file"}
     };
 
         String defaultSort = "file_name"; // Default sort order
