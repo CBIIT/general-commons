@@ -42,7 +42,7 @@ const ICDCFooter = () => {
     };
     getSystems();
   }, [FooterData]);
-
+  
   return (
     <CustomThemeProvider>
       <Footer data={footerUpdatedData} />
