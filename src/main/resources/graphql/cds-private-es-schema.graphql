@@ -50,7 +50,7 @@ type genomic_info {
 type participant {
   participant_id: String
   race: String
-  gender: String
+  sex: String
   ethnicity: String
   dbGaP_subject_id: String
 }
@@ -259,7 +259,7 @@ type SubjectOverview {
     subject_id: String
     study_acronym: [String]
     phs_accession: [String]
-    gender: String
+    sex: String
     site: [String]
     race: String
     ethnicity: String
@@ -335,7 +335,7 @@ type FilesInList {
     is_tumor: String
 
     subject_id: String
-    gender: String
+    sex: String
     race: String
 
     primary_diagnoses: String
@@ -359,7 +359,7 @@ type SearchResult {
     subjectCountByStudy: [GroupCount]
     subjectCountByExperimentalStrategy: [GroupCount]
     subjectCountByAccess: [GroupCount]
-    subjectCountByGender: [GroupCount]
+    subjectCountBySex: [GroupCount]
     subjectCountByIsTumor: [GroupCount]
     subjectCountByAnalyteType: [GroupCount]
     subjectCountByFileType: [GroupCount]
@@ -387,7 +387,7 @@ type SearchResult {
     filterSubjectCountByStudy: [GroupCount]
     filterSubjectCountByExperimentalStrategy: [GroupCount]
     filterSubjectCountByAccess: [GroupCount]
-    filterSubjectCountByGender: [GroupCount]
+    filterSubjectCountBySex: [GroupCount]
     filterSubjectCountByIsTumor: [GroupCount]
     filterSubjectCountByFileType: [GroupCount]
     filterSubjectCountByAnalyteType: [GroupCount]
@@ -415,7 +415,7 @@ type SearchResult {
     filterSubjectCountByOrganOrTissue: [GroupCount]
 
     donutCountByExperimentalStrategy: [GroupCount]
-    donutCountByGender: [GroupCount]
+    donutCountBySex: [GroupCount]
     donutCountByFileType: [GroupCount]
     donutCountByStudyDataTypes: [GroupCount]
     donutCountByImageModality: [GroupCount]
@@ -446,7 +446,7 @@ type GS_Subject {
     study: String
     subject_id: String
     site: String
-    gender: String
+    sex: String
     subject_ids_filter: [String]
 }
 
@@ -601,7 +601,7 @@ type SubjectDetail {
     subject_id: String
     study_acronym: String
     study_name: String
-    gender: String
+    sex: String
     site: [String]
     files: [file]
     samples: [sample]
@@ -652,7 +652,7 @@ type QueryType {
         acl: [String] = [],
         experimental_strategies: [String] = [],
         file_types: [String] = [],
-        genders: [String] = [],
+        sex: [String] = [],
         image_modality: [String] = [],
         instrument_models: [String] = [],
         is_tumor: [String] = [],
@@ -685,7 +685,7 @@ type QueryType {
         acl: [String] = [],
         experimental_strategies: [String] = [],
         file_types: [String] = [],
-        genders: [String] = [],
+        sex: [String] = [],
         image_modality: [String] = [],
         instrument_models: [String] = [],
         is_tumor: [String] = [],
@@ -724,7 +724,7 @@ type QueryType {
         acl: [String] = [],
         experimental_strategies: [String] = [],
         file_types: [String] = [],
-        genders: [String] = [],
+        sex: [String] = [],
         image_modality: [String] = [],
         instrument_models: [String] = [],
         is_tumor: [String] = [],
@@ -764,7 +764,7 @@ type QueryType {
         acl: [String] = [],
         experimental_strategies: [String] = [],
         file_types: [String] = [],
-        genders: [String] = [],
+        sex: [String] = [],
         image_modality: [String] = [],
         instrument_models: [String] = [],
         is_tumor: [String] = [],
@@ -804,7 +804,7 @@ type QueryType {
         acl: [String] = [],
         experimental_strategies: [String] = [],
         file_types: [String] = [],
-        genders: [String] = [],
+        sex: [String] = [],
         image_modality: [String] = [],
         instrument_models: [String] = [],
         is_tumor: [String] = [],
@@ -906,7 +906,7 @@ type QueryType {
         offset: Int = 0,
 		participant_id: String,
 		race: String,
-		gender: String,
+		sex: String,
 		ethnicity: String,
 		dbGaP_subject_id: String
     ): [participant]
