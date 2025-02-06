@@ -14,7 +14,7 @@ Indices:
         type: keyword
       file_types:
         type: keyword
-      genders:
+      sex:
         type: keyword
       image_modality:
         type: keyword
@@ -108,14 +108,12 @@ Indices:
         type: search_as_you_type
       subject_id_gs:
         type: search_as_you_type
-      gender_gs:
+      sex_gs:
         type: search_as_you_type
       # Overview properties
       participant_id:
         type: keyword
       race:
-        type: keyword
-      gender:
         type: keyword
       ethnicity:
         type: keyword
@@ -155,8 +153,8 @@ Indices:
           WITH p, na,
             apoc.map.merge(opensearch_data, {
               participant_id: COALESCE(p.participant_id, na),
-              gender: COALESCE(p.gender, na),
-              genders: COALESCE(p.gender, na),
+              sex: COALESCE(p.sex, na),
+              sex: COALESCE(p.sex, na),
               ethnicity: COALESCE(p.ethnicity, na),
               race: COALESCE(p.race, na),
               subject_ids: p.participant_id,
@@ -165,7 +163,7 @@ Indices:
             }) AS opensearch_data
           WITH p, na, 
             apoc.map.merge(opensearch_data, {
-              gender_gs: opensearch_data.genders,
+              sex_gs: opensearch_data.sex,
               subject_id_gs: opensearch_data.subject_ids
             }) AS opensearch_data
           OPTIONAL MATCH (p)<--(samp:sample)
@@ -289,7 +287,7 @@ Indices:
         type: keyword
       file_types:
         type: keyword
-      genders:
+      sex:
         type: keyword
       image_modality:
         type: keyword
@@ -448,12 +446,12 @@ Indices:
             }) AS opensearch_data
           OPTIONAL MATCH (samp)-->(p:participant)
           WITH samp, na, opensearch_data,
-            COALESCE(p.gender, na) AS genders,
+            COALESCE(p.sex, na) AS sex,
             COALESCE(p.participant_id, na) AS subject_ids,
             COLLECT(DISTINCT p.participant_id) AS subject_ids_filter
           WITH samp, na, 
             apoc.map.merge(opensearch_data, {
-              genders: genders,
+              sex: sex,
               subject_ids: subject_ids,
               subject_ids_filter: subject_ids_filter
             }) AS opensearch_data
@@ -567,7 +565,7 @@ Indices:
         type: keyword
       file_types:
         type: keyword
-      genders:
+      sex:
         type: keyword
       image_modality:
         type: keyword
@@ -662,11 +660,11 @@ Indices:
             }) AS opensearch_data
           OPTIONAL MATCH (f)-->(p:participant)
           WITH f, na, opensearch_data, 
-            apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.gender, na))) AS gender,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.sex, na))) AS sex,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.participant_id, na))) AS participant_id
           WITH f, na,
             apoc.map.merge(opensearch_data, {
-              genders: gender,
+              sex: sex,
               subject_ids: participant_id
             }) AS opensearch_data
           OPTIONAL MATCH (f)-->(:participant)<--(samp:sample)
@@ -747,7 +745,7 @@ Indices:
         type: keyword
       file_types:
         type: keyword
-      genders:
+      sex:
         type: keyword
       races:
         type: keyword
@@ -841,7 +839,7 @@ Indices:
         type: keyword
       experimental_strategies_sort:
         type: keyword
-      genders_sort:
+      sex_sort:
         type: keyword
       races_sort:
         type: keyword
@@ -972,13 +970,13 @@ Indices:
             }) AS opensearch_data
           OPTIONAL MATCH (f)-->(p:participant)
           WITH f, na, opensearch_data,
-            apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.gender, na))) AS gender,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.sex, na))) AS sex,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.race, na))) AS race,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(p.participant_id, na))) AS participant_id
           WITH f, na, 
             apoc.map.merge(opensearch_data, {
-              genders: gender,
-              genders_sort: apoc.text.join(gender, ''),
+              sex: sex,
+              sex_sort: apoc.text.join(sex, ''),
               races: race,
               races_sort: apoc.text.join(race, ''),
               subject_ids: participant_id,
@@ -2082,7 +2080,7 @@ Indices:
         type: keyword
       study_name:
         type: keyword
-      gender:
+      sex:
         type: keyword
       site:
         type: keyword
@@ -2137,7 +2135,7 @@ Indices:
           subject_id: p.participant_id,
           study_acronym: s.study_acronym,
           study_name: s.study_name,
-          gender: p.gender
+          sex: p.sex
       } AS opensearch_data
       OPTIONAL MATCH (p)<--(samp:sample)
       WITH p,

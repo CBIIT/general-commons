@@ -368,7 +368,7 @@ type SearchResult {
     subjectCountByStudy: [GroupCount]
     subjectCountByExperimentalStrategy: [GroupCount]
     subjectCountByAccess: [GroupCount]
-    subjectCountByGender: [GroupCount]
+    subjectCountBySex: [GroupCount]
     subjectCountByIsTumor: [GroupCount]
     subjectCountByAnalyteType: [GroupCount]
     subjectCountByFileType: [GroupCount]
@@ -396,7 +396,7 @@ type SearchResult {
     filterSubjectCountByStudy: [GroupCount]
     filterSubjectCountByExperimentalStrategy: [GroupCount]
     filterSubjectCountByAccess: [GroupCount]
-    filterSubjectCountByGender: [GroupCount]
+    filterSubjectCountBySex: [GroupCount]
     filterSubjectCountByIsTumor: [GroupCount]
     filterSubjectCountByFileType: [GroupCount]
     filterSubjectCountByAnalyteType: [GroupCount]
@@ -424,7 +424,7 @@ type SearchResult {
     filterSubjectCountByOrganOrTissue: [GroupCount]
 
     donutCountByExperimentalStrategy: [GroupCount]
-    donutCountByGender: [GroupCount]
+    donutCountBySex: [GroupCount]
     donutCountByFileType: [GroupCount]
     donutCountByStudyDataTypes: [GroupCount]
     donutCountByImageModality: [GroupCount]
@@ -661,7 +661,7 @@ type QueryType {
         acl: [String] = [],
         experimental_strategies: [String] = [],
         file_types: [String] = [],
-        genders: [String] = [],
+        sex: [String] = [],
         image_modality: [String] = [],
         instrument_models: [String] = [],
         is_tumor: [String] = [],
@@ -694,7 +694,7 @@ type QueryType {
         acl: [String] = [],
         experimental_strategies: [String] = [],
         file_types: [String] = [],
-        genders: [String] = [],
+        sex: [String] = [],
         image_modality: [String] = [],
         instrument_models: [String] = [],
         is_tumor: [String] = [],
@@ -733,7 +733,7 @@ type QueryType {
         acl: [String] = [],
         experimental_strategies: [String] = [],
         file_types: [String] = [],
-        genders: [String] = [],
+        sex: [String] = [],
         image_modality: [String] = [],
         instrument_models: [String] = [],
         is_tumor: [String] = [],
@@ -773,7 +773,7 @@ type QueryType {
         acl: [String] = [],
         experimental_strategies: [String] = [],
         file_types: [String] = [],
-        genders: [String] = [],
+        sex: [String] = [],
         image_modality: [String] = [],
         instrument_models: [String] = [],
         is_tumor: [String] = [],
@@ -813,7 +813,7 @@ type QueryType {
         acl: [String] = [],
         experimental_strategies: [String] = [],
         file_types: [String] = [],
-        genders: [String] = [],
+        sex: [String] = [],
         image_modality: [String] = [],
         instrument_models: [String] = [],
         is_tumor: [String] = [],
