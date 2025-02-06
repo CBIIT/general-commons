@@ -52,7 +52,7 @@ type genomic_info {
 type participant {
   participant_id: String
   race: String
-  gender: String
+  sex: String
   ethnicity: String
   dbGaP_subject_id: String
 }
@@ -261,7 +261,7 @@ type SubjectOverview {
     subject_id: String
     study_acronym: [String]
     phs_accession: [String]
-    gender: String
+    sex: String
     site: [String]
     race: String
     ethnicity: String
@@ -340,7 +340,7 @@ type FilesInList {
     is_tumor: String
 
     subject_id: String
-    gender: String
+    sex: String
     race: String
 
     primary_diagnoses: String
@@ -455,7 +455,7 @@ type GS_Subject {
     study: String
     subject_id: String
     site: String
-    gender: String
+    sex: String
     subject_ids_filter: [String]
 }
 
@@ -610,7 +610,7 @@ type SubjectDetail {
     subject_id: String
     study_acronym: String
     study_name: String
-    gender: String
+    sex: String
     site: [String]
     files: [file]
     samples: [sample]
@@ -915,7 +915,7 @@ type QueryType {
         offset: Int = 0,
 		participant_id: String,
 		race: String,
-		gender: String,
+		sex: String,
 		ethnicity: String,
 		dbGaP_subject_id: String
     ): [participant]
