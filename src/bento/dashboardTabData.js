@@ -83,7 +83,7 @@ query searchSubjects(
   $acl:[String],
   $experimental_strategies:[String],
   $file_types:[String],
-  $genders:[String],
+  $sex:[String],
   $image_modality:[String],
   $instrument_models:[String],
   $is_tumor:[String],
@@ -114,7 +114,7 @@ query searchSubjects(
       acl:$acl,
       experimental_strategies:$experimental_strategies,
       file_types:$file_types,
-      genders:$genders,
+      sex:$sex,
       image_modality:$image_modality,
       instrument_models:$instrument_models,
       is_tumor:$is_tumor,
@@ -148,7 +148,7 @@ query searchSubjects(
           group
           subjects
       }
-      donutCountByGender{
+      donutCountBySex{
           group
           subjects
       }
@@ -265,7 +265,7 @@ query searchSubjects(
           group
           subjects
       }
-      filterSubjectCountByGender{
+      filterSubjectCountBySex{
           group
           subjects
       }
@@ -380,7 +380,7 @@ query subjectOverview(
   $acl:[String],
   $experimental_strategies:[String],
   $file_types:[String],
-  $genders:[String],
+  $sex:[String],
   $image_modality:[String],
   $instrument_models:[String],
   $is_tumor:[String],
@@ -416,7 +416,7 @@ query subjectOverview(
       acl:$acl,
       experimental_strategies:$experimental_strategies,
       file_types:$file_types,
-      genders:$genders,
+      sex:$sex,
       image_modality:$image_modality,
       instrument_models:$instrument_models,
       is_tumor:$is_tumor,
@@ -449,7 +449,7 @@ query subjectOverview(
       subject_id
       study_acronym
       phs_accession
-      gender
+      sex
       site
       samples
       files
@@ -468,7 +468,7 @@ query fileOverview(
   $acl:[String],
   $experimental_strategies:[String],
   $file_types:[String],
-  $genders:[String],
+  $sex:[String],
   $image_modality:[String],
   $instrument_models:[String],
   $is_tumor:[String],
@@ -505,7 +505,7 @@ query fileOverview(
       acl:$acl,
       experimental_strategies:$experimental_strategies,
       file_types:$file_types,
-      genders:$genders,
+      sex:$sex,
       image_modality:$image_modality,
       instrument_models:$instrument_models,
       is_tumor:$is_tumor,
@@ -540,7 +540,7 @@ query fileOverview(
       subject_id
       sample_id
       experimental_strategy
-      gender
+      sex
       analyte_type
       is_tumor
       file_name
@@ -563,7 +563,7 @@ query sampleOverview(
   $acl:[String],
   $experimental_strategies:[String],
   $file_types:[String],
-  $genders:[String],
+  $sex:[String],
   $image_modality:[String],
   $instrument_models:[String],
   $is_tumor:[String],
@@ -600,7 +600,7 @@ query sampleOverview(
       acl:$acl,
       experimental_strategies:$experimental_strategies,
       file_types:$file_types,
-      genders:$genders,
+      sex:$sex,
       image_modality:$image_modality,
       instrument_models:$instrument_models,
       is_tumor:$is_tumor,
@@ -824,7 +824,7 @@ query fileOverview(
   $acl:[String],
   $experimental_strategies:[String],
   $file_types:[String],
-  $genders:[String],
+  $sex:[String],
   $image_modality:[String],
   $instrument_models:[String],
   $is_tumor:[String],
@@ -861,7 +861,7 @@ query fileOverview(
       acl:$acl,
       experimental_strategies:$experimental_strategies,
       file_types:$file_types,
-      genders:$genders,
+      sex:$sex,
       image_modality:$image_modality,
       instrument_models:$instrument_models,
       is_tumor:$is_tumor,
@@ -959,10 +959,10 @@ export const tabContainers = [
         cellType: cellTypes.CUSTOM_ELEM,
       },
       {
-        dataField: 'gender',
-        header: 'Gender',
+        dataField: 'sex',
+        header: 'Sex',
         display: true,
-        tooltipText: 'Gender of the participant.',
+        tooltipText: 'Sex of the participant.',
         role: cellTypes.DISPLAY,
       },
       {
