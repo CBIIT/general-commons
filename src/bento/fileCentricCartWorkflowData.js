@@ -54,6 +54,7 @@ export const myFilesPageData = {
           clsName: 'cart_header_text',
           text: 'Cart >',
           type: types.TEXT,
+          component: 'h1',
         },
         {
           clsName: 'cart_sel_files_text',
