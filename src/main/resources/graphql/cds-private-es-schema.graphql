@@ -303,7 +303,7 @@ type FileOverview {
     is_tumor: [String]
 
     subject_id: [String]
-    gender: [String]
+    sex: [String]
     race: [String]
 
     primary_diagnoses: [String]
