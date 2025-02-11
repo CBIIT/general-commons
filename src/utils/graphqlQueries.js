@@ -7,7 +7,7 @@ export const GET_CASE_DETAIL_DATA_QUERY = gql`
         program_acronym
         study_acronym
         study_name
-        gender
+        sex
         race
         ethnicity
         age_at_index
