@@ -20,15 +20,23 @@ export const customTheme = {
           fontWeight: 300,
           lineHeight: '64px',
           letterSpacing: '-0.5px',
-          '&.cart_header_text': {
-            letterSpacing: '-0.5px',
-            fontWeight: '300',
-          },
           '&.cart_sel_files_text': {
             letterSpacing: '-0.5px',
             fontWeight: '1000',
             marginLeft: '6px',
           },
+        },
+        '& .cart_header_text': {
+          letterSpacing: '-0.5px',
+          fontWeight: '300',
+          boxSizing: 'inherit',
+          color: '#AE5E1B',
+          fontSize: '26px',
+          fontFamily: 'Inter',
+          lineHeight: '64px',
+          margin: 0,
+          padding: 0,
+          display: 'inline',
         },
       },
       '&.container_header': {

@@ -30,7 +30,7 @@ const linkGenerator = (paragraph, customTitle = "") => {
         if (splitedParagraph != null && ((/\[(.+)\]\((.+)\)/g.test(splitedParagraph)) || (/\((.+)\)\[(.+)\]/g.test(splitedParagraph)))) {
           const title = splitedParagraph.match(/\[(.*)\]/).pop();
           const mailTo = `mailto:${title}`;
-          const linkAttrs = splitedParagraph.match(/\((.*)\)/).pop().split(' ');
+          const linkAttrs = splitedParagraph.match(/\]\((.*?)\)/).pop().split(' ');
 
           const link = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+\.[A-Za-z]+$/.test(linkAttrs) ? (
             <a
