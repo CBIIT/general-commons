@@ -147,9 +147,9 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 AGG_ENDPOINT, FILES_END_POINT
         ));
         TERM_AGGS.add(Map.of(
-                AGG_NAME, "genders",
-                WIDGET_QUERY, "subjectCountByGender",
-                FILTER_COUNT_QUERY, "filterSubjectCountByGender",
+                AGG_NAME, "sex",
+                WIDGET_QUERY, "subjectCountBySex",
+                FILTER_COUNT_QUERY, "filterSubjectCountBySex",
                 AGG_ENDPOINT, FILES_END_POINT
         ));
         TERM_AGGS.add(Map.of(
@@ -297,8 +297,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 AGG_ENDPOINT, FILES_EXPERIMENTAL_STRATEGY_END_POINT
         ));
         TERM_AGGS.add(Map.of(
-                AGG_NAME, "genders",
-                WIDGET_QUERY, "donutCountByGender",
+                AGG_NAME, "sex",
+                WIDGET_QUERY, "donutCountBySex",
                 AGG_ENDPOINT, SUBJECTS_END_POINT
         ));
         TERM_AGGS.add(Map.of(
@@ -405,7 +405,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"subject_id", "subject_ids"},
                 new String[]{"study_acronym", "studies"},
                 new String[]{"phs_accession", "phs_accession"},
-                new String[]{"gender", "genders"},
+                new String[]{"sex", "sex"},
                 new String[]{"site", "site"},
                 new String[]{"samples", "samples"},
                 new String[]{"files", "files"},
@@ -421,7 +421,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("subject_id", "subject_ids"),
                 Map.entry("study_acronym", "studies"),
                 Map.entry("phs_accession", "phs_accession"),
-                Map.entry("gender", "genders"),
+                Map.entry("sex", "sex"),
                 Map.entry("site", "site_sort"),
                 Map.entry("analyte_type", "sample_types_sort"),
                 Map.entry("race", "race"),
@@ -480,7 +480,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             new String[]{"sample_id", "sample_id"},
             new String[]{"sample_types", "sample_types"},
             new String[]{"experimental_strategy", "experimental_strategies"},
-            new String[]{"gender", "genders"},
+            new String[]{"sex", "sex"},
             new String[]{"race", "races"},
             new String[]{"primary_diagnoses", "primary_diagnoses"},
             new String[]{"analyte_type", "analyte_type"},
@@ -508,7 +508,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("subject_id", "subject_ids"),
                 Map.entry("sample_id", "sample_id"),
                 Map.entry("experimental_strategy", "experimental_strategies_sort"),
-                Map.entry("gender", "genders_sort"),
+                Map.entry("sex", "sex_sort"),
                 Map.entry("race", "races_sort"),
                 Map.entry("primary_diagnoses", "primary_diagnoses_sort"),
                 Map.entry("analyte_type", "analyte_type_sort"),
@@ -691,13 +691,13 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 GS_COUNT_ENDPOINT, SUBJECTS_COUNT_END_POINT,
                 GS_COUNT_RESULT_FIELD, "subject_count",
                 GS_RESULT_FIELD, "subjects",
-                GS_SEARCH_FIELD, List.of("study_gs", "subject_id_gs", "site_gs", "gender_gs"),
+                GS_SEARCH_FIELD, List.of("study_gs", "subject_id_gs", "site_gs", "sex_gs"),
                 GS_SORT_FIELD, "subject_ids",
                 GS_COLLECT_FIELDS, new String[][]{
                         new String[]{"study", "study_gs"},
                         new String[]{"subject_id", "subject_id_gs"},
                         new String[]{"site", "site_gs"},
-                        new String[]{"gender", "gender_gs"},
+                        new String[]{"sex", "sex_gs"},
                         new String[]{"subject_ids_filter", "subject_ids_filter"},
                 },
                 GS_CATEGORY_TYPE, "subject"
@@ -980,7 +980,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             new String[]{"sample_id", "sample_id"},
             new String[]{"sample_types", "sample_types"},
             new String[]{"experimental_strategy", "experimental_strategies"},
-            new String[]{"gender", "genders"},
+            new String[]{"sex", "sex"},
             new String[]{"race", "races"},
             new String[]{"primary_diagnoses", "primary_diagnoses"},
             new String[]{"analyte_type", "analyte_type"},
@@ -1011,7 +1011,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("subject_id", "subject_ids"),
                 Map.entry("sample_id", "sample_id"),
                 Map.entry("experimental_strategy", "experimental_strategies_sort"),
-                Map.entry("gender", "genders_sort"),
+                Map.entry("sex", "sex_sort"),
                 Map.entry("race", "races_sort"),
                 Map.entry("primary_diagnoses", "primary_diagnoses_sort"),
                 Map.entry("analyte_type", "analyte_type_sort"),
@@ -1036,7 +1036,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         try{
             ArrayList<String> joinProperties = new ArrayList<>(Arrays.asList(
                     "experimental_strategy", "library_layouts", "library_strategy", "subject_id", "sample_id",
-                    "gender", "race", "primary_diagnoses", "analyte_type", "is_tumor"));
+                    "sex", "race", "primary_diagnoses", "analyte_type", "is_tumor"));
             filesInListResult.forEach( x -> {
                 x.keySet().forEach( k -> {
                     if (joinProperties.contains(k)){
