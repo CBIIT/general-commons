@@ -42,7 +42,8 @@ type genomic_info {
   design_description: String
   library_strategy: String
   library_layout: String
-  library_source: String
+  library_source_material: String,
+  library_source_molecule: String,
   library_selection: String
   platform: String
   instrument_model: String
@@ -374,7 +375,8 @@ type SearchResult {
     subjectCountByFileType: [GroupCount]
     subjectCountByDiseaseSite: [GroupCount]
     subjectCountByLibraryStrategy: [GroupCount]
-    subjectCountByLibrarySource: [GroupCount]
+    subjectCountByLibrarySourceMaterial: [GroupCount]
+    subjectCountByLibrarySourceMolecule: [GroupCount]
     subjectCountByLibrarySelection: [GroupCount]
     subjectCountByLibraryLayout: [GroupCount]
     subjectCountByPlatform: [GroupCount]
@@ -402,7 +404,8 @@ type SearchResult {
     filterSubjectCountByAnalyteType: [GroupCount]
     filterSubjectCountByDiseaseSite: [GroupCount]
     filterSubjectCountByLibraryStrategy: [GroupCount]
-    filterSubjectCountByLibrarySource: [GroupCount]
+    filterSubjectCountByLibrarySourceMaterial: [GroupCount]
+    filterSubjectCountByLibrarySourceMolecule: [GroupCount]
     filterSubjectCountByLibrarySelection: [GroupCount]
     filterSubjectCountByLibraryLayout: [GroupCount]
     filterSubjectCountByPlatform: [GroupCount]
@@ -480,7 +483,8 @@ type GS_File {
     instrument_models: [String]
     library_layouts: [String]
     library_selections: [String]
-    library_sources: [String]
+    library_source_materials: [String],
+    library_source_molecules: [String],
     library_strategies: [String]
     platforms: [String]
     reference_genome_assemblies: [String]
@@ -667,7 +671,8 @@ type QueryType {
         is_tumor: [String] = [],
         library_layouts: [String] = [],
         library_selections: [String] = [],
-        library_sources: [String] = [],
+        library_source_materials: [String] = [],
+        library_source_molecules: [String] = [],
         library_strategies: [String] = [],
         number_of_study_participants: [Float] = [],
         number_of_study_samples: [Float] = [],
@@ -700,7 +705,8 @@ type QueryType {
         is_tumor: [String] = [],
         library_layouts: [String] = [],
         library_selections: [String] = [],
-        library_sources: [String] = [],
+        library_source_materials: [String] = [],
+        library_source_molecules: [String] = [],
         library_strategies: [String] = [],
         number_of_study_participants: [Float] = [],
         number_of_study_samples: [Float] = [],
@@ -739,7 +745,8 @@ type QueryType {
         is_tumor: [String] = [],
         library_layouts: [String] = [],
         library_selections: [String] = [],
-        library_sources: [String] = [],
+        library_source_materials: [String] = [],
+        library_source_molecules: [String] = [],
         library_strategies: [String] = [],
         number_of_study_participants: [Float] = [],
         number_of_study_samples: [Float] = [],
@@ -779,7 +786,8 @@ type QueryType {
         is_tumor: [String] = [],
         library_layouts: [String] = [],
         library_selections: [String] = [],
-        library_sources: [String] = [],
+        library_source_materials: [String] = [],
+        library_source_molecules: [String] = [],
         library_strategies: [String] = [],
         number_of_study_participants: [Float] = [],
         number_of_study_samples: [Float] = [],
@@ -819,7 +827,8 @@ type QueryType {
         is_tumor: [String] = [],
         library_layouts: [String] = [],
         library_selections: [String] = [],
-        library_sources: [String] = [],
+        library_source_materials: [String] = [],
+        library_source_molecules: [String] = [],
         library_strategies: [String] = [],
         number_of_study_participants: [Float] = [],
         number_of_study_samples: [Float] = [],
@@ -903,7 +912,8 @@ type QueryType {
 		design_description: String,
 		library_strategy: String,
 		library_layout: String,
-		library_source: String,
+		library_source_material: String,
+		library_source_molecule: String,
 		library_selection: String,
 		platform: String,
 		instrument_model: String,

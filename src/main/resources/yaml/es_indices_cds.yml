@@ -32,7 +32,9 @@ Indices:
         type: keyword
       library_selections:
         type: keyword
-      library_sources:
+      library_source_materials:
+        type: keyword
+      library_source_molecules:
         type: keyword
       library_strategies:
         type: keyword
@@ -83,7 +85,9 @@ Indices:
         type: keyword
       library_selections_sort:
         type: keyword
-      library_sources_sort:
+      library_source_materials_sort:
+        type: keyword
+      library_source_molecules_sort:
         type: keyword
       library_strategies_sort:
         type: keyword
@@ -227,7 +231,8 @@ Indices:
           WITH p, na, opensearch_data,
               apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))) AS library_layouts,
               apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))) AS library_selections,
-              apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source, na))) AS library_sources, 
+              apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source_material, na))) AS library_source_materials, 
+              apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source_molecule, na))) AS library_source_molecules, 
               apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))) AS library_strategies,
               apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))) AS instrument_models,
               apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.platform, na))) AS platforms,
@@ -236,14 +241,16 @@ Indices:
             apoc.map.merge(opensearch_data, {
               library_layouts: library_layouts,
               library_selections: library_selections,
-              library_sources: library_sources, 
+              library_source_materials: library_source_materials, 
+              library_source_molecules: library_source_molecules,
               library_strategies: library_strategies,
               instrument_models: instrument_models,
               platforms: platforms,
               reference_genome_assemblies: reference_genome_assemblies,
               library_layouts_sort: apoc.text.join(library_layouts, ''),
               library_selections_sort: apoc.text.join(library_selections, ''),
-              library_sources_sort: apoc.text.join(library_sources, ''), 
+              library_source_materials_sort: apoc.text.join(library_source_materials, ''), 
+              library_source_molecules_sort: apoc.text.join(library_source_molecules, ''), 
               library_strategies_sort: apoc.text.join(library_strategies, ''),
               instrument_models_sort: apoc.text.join(instrument_models, ''),
               platforms_sort: apoc.text.join(platforms, ''),
@@ -305,7 +312,9 @@ Indices:
         type: keyword
       library_selections:
         type: keyword
-      library_sources:
+      library_source_materials:
+        type: keyword
+      library_source_molecules:
         type: keyword
       library_strategies:
         type: keyword
@@ -348,7 +357,9 @@ Indices:
         type: keyword
       library_selections_sort:
         type: keyword
-      library_sources_sort:
+      library_source_materials_sort:
+        type: keyword
+      library_source_molecules_sort:
         type: keyword
       library_strategies_sort:
         type: keyword
@@ -475,7 +486,8 @@ Indices:
           WITH samp, na, opensearch_data,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))) AS library_layouts, 
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))) AS library_selections, 
-            apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source, na))) AS library_sources, 
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source_material, na))) AS library_source_materials,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source_molecule, na))) AS library_source_molecules, 
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))) AS library_strategies,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))) AS instrument_models,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.platform, na))) AS platforms,
@@ -484,14 +496,16 @@ Indices:
             apoc.map.merge(opensearch_data, {
               library_layouts: library_layouts, 
               library_selections: library_selections, 
-              library_sources: library_sources, 
+              library_source_materials: library_source_materials, 
+              library_source_molecules: library_source_molecules, 
               library_strategies: library_strategies,
               instrument_models: instrument_models,
               platforms: platforms,
               reference_genome_assemblies: reference_genome_assemblies,
               library_layouts_sort: apoc.text.join(library_layouts, ''),
               library_selections_sort: apoc.text.join(library_selections, ''),
-              library_sources_sort: apoc.text.join(library_sources, ''),
+              library_source_materials_sort: apoc.text.join(library_source_materials, ''), 
+              library_source_molecules_sort: apoc.text.join(library_source_molecules, ''),
               library_strategies_sort: apoc.text.join(library_strategies,''),
               instrument_models_sort: apoc.text.join(reference_genome_assemblies,''),
               platforms_sort: apoc.text.join(platforms,''),
@@ -583,7 +597,9 @@ Indices:
         type: keyword
       library_selections:
         type: keyword
-      library_sources:
+      library_source_materials:
+        type: keyword
+      library_source_molecules:
         type: keyword
       library_strategies:
         type: keyword
@@ -684,7 +700,8 @@ Indices:
             apoc.map.merge(opensearch_data, {
               library_layouts: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))), 
               library_selections: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))), 
-              library_sources: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source, na))), 
+              library_source_materials: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source_material, na))),
+              library_source_molecules: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source_molecule, na))), 
               library_strategies: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))),
               instrument_models: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))),
               platforms: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.platform, na))),
@@ -765,7 +782,9 @@ Indices:
         type: keyword
       library_selections:
         type: keyword
-      library_sources:
+      library_source_materials:
+        type: keyword
+      library_source_molecules:
         type: keyword
       library_strategies:
         type: keyword
@@ -851,7 +870,9 @@ Indices:
         type: keyword
       library_selections_sort:
         type: keyword
-      library_sources_sort:
+      library_source_materials_sort:
+        type: keyword
+      library_source_molecules_sort:
         type: keyword
       library_strategies_sort:
         type: keyword
@@ -886,7 +907,9 @@ Indices:
         type: search_as_you_type
       library_selections_gs:
         type: search_as_you_type
-      library_sources_gs:
+      library_source_materials_gs:
+        type: search_as_you_type
+      library_source_molecules_gs:
         type: search_as_you_type
       library_strategies_gs:
         type: search_as_you_type
@@ -1004,7 +1027,8 @@ Indices:
           WITH f, na, opensearch_data, 
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))) AS library_layout,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))) AS library_selection,
-            apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source, na))) AS library_source,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source_material, na))) AS library_source_materials,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source_molecule, na))) AS library_source_molecules,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))) AS library_strategy,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))) AS instrument_model,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.platform, na))) AS platform,
@@ -1013,21 +1037,24 @@ Indices:
             apoc.map.merge(opensearch_data, {
               library_layouts: library_layout, 
               library_selections: library_selection, 
-              library_sources: library_source, 
+              library_source_materials: library_source_materials, 
+              library_source_molecules: library_source_molecules, 
               library_strategies: library_strategy,
               instrument_models: instrument_model,
               platforms: platform,
               reference_genome_assemblies: reference_genome_assembly,
               library_layouts_gs: library_layout, 
               library_selections_gs: library_selection, 
-              library_sources_gs: library_source, 
+              library_source_materials_gs: library_source_materials, 
+              library_source_molecules_gs: library_source_molecules,
               library_strategies_gs: library_strategy,
               instrument_models_gs: instrument_model,
               platforms_gs: platform,
               reference_genome_assemblies_gs: reference_genome_assembly,
               library_layouts_sort: apoc.text.join(library_layout, ''), 
               library_selections_sort: apoc.text.join(library_selection, ''), 
-              library_sources_sort: apoc.text.join(library_source, ''), 
+              library_source_materials_sort: apoc.text.join(library_source_materials, ''), 
+              library_source_molecules_sort: apoc.text.join(library_source_molecules, ''), 
               library_strategies_sort: apoc.text.join(library_strategy, ''),
               instrument_models_sort: apoc.text.join(instrument_model, ''),
               platforms_sort: apoc.text.join(platform, ''),
@@ -1382,7 +1409,9 @@ Indices:
         type: keyword
       library_layout:
         type: keyword
-      library_source:
+      library_source_material:
+        type: keyword
+      library_source_molecule:
         type: keyword
       library_selection:
         type: keyword
@@ -1405,7 +1434,8 @@ Indices:
         design_description: g.design_description,
         library_strategy: g.library_strategy,
         library_layout: g.library_layout,
-        library_source: g.library_source,
+        library_source_material: g.library_source_material,
+        library_source_molecule: g.library_source_molecule,
         library_selection: g.library_selection,
         platform: g.platform,
         instrument_model: g.instrument_model,
