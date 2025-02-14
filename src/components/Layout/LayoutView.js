@@ -95,7 +95,7 @@ const Layout = ({ classes, isSidebarOpened }) => {
         <AuthSessionTimeoutController />
         <BannerWrapper>
           <TextBanner
-            heading="Over the next several months, the CDS site will transition to integrate with the central CRDC Data Submission and Data Discovery portals to provide users with a more comprehensive experience."
+            heading="CRDC’s Cancer Data Service (CDS) is now the General Commons (GC): Hosting and sharing NCI data of multiple Data Types not fit for other Data Commons."
             aria-label="CDS announcement banner"
           />
         </BannerWrapper>
