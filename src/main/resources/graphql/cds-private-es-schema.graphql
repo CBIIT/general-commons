@@ -392,6 +392,7 @@ type SearchResult {
     subjectCountByTissueFixative: [GroupCount]
     subjectCountByImagingAssayType: [GroupCount]
     subjectCountByOrganOrTissue: [GroupCount]
+    subjectCountByIsSupplementaryFile: [GroupCount]
 
     filterSubjectCountByStudy: [GroupCount]
     filterSubjectCountByExperimentalStrategy: [GroupCount]
@@ -422,6 +423,7 @@ type SearchResult {
     filterSubjectCountByTissueFixative: [GroupCount]
     filterSubjectCountByImagingAssayType: [GroupCount]
     filterSubjectCountByOrganOrTissue: [GroupCount]
+    filterSubjectCountByIsSupplementaryFile: [GroupCount]
 
     donutCountByExperimentalStrategy: [GroupCount]
     donutCountBySex: [GroupCount]
@@ -624,8 +626,9 @@ schema {
 }
 
 type QueryType {
+    # schema version
     schemaVersion: String
-
+    # node count queries
     numberOfStudies: Int
     numberOfSubjects: Int
     numberOfSamples: Int
@@ -653,201 +656,210 @@ type QueryType {
     samplesForSubjectId(
         subject_id: String!
     ): [sample]
-
+    # dashboard filter query
     searchSubjects (
-        subject_ids: [String] = [],
-
-        accesses: [String] = [],
-        acl: [String] = [],
-        experimental_strategies: [String] = [],
-        file_types: [String] = [],
-        sex: [String] = [],
-        image_modality: [String] = [],
-        instrument_models: [String] = [],
-        is_tumor: [String] = [],
-        library_layouts: [String] = [],
-        library_selections: [String] = [],
-        library_sources: [String] = [],
-        library_strategies: [String] = [],
-        number_of_study_participants: [Float] = [],
-        number_of_study_samples: [Float] = [],
-        phs_accession: [String] = [],
-        platforms: [String] = [],
-        primary_diagnoses: [String] = [],
-        reference_genome_assemblies: [String] = [],
-        sample_types: [String] = [],
-        site: [String] = [],
-        studies: [String] = [],
-        study_data_types: [String] = [],
-        analytical_fractions: [String] = [],
-        instrument_makes: [String] = [],
+        # standard filters
+        subject_ids: [String] = []
+        accesses: [String] = []
+        acl: [String] = []
+        experimental_strategies: [String] = []
+        file_types: [String] = []
+        sex: [String] = []
+        image_modality: [String] = []
+        instrument_models: [String] = []
+        is_tumor: [String] = []
+        library_layouts: [String] = []
+        library_selections: [String] = []
+        library_sources: [String] = []
+        library_strategies: [String] = []
+        number_of_study_participants: [Float] = []
+        number_of_study_samples: [Float] = []
+        phs_accession: [String] = []
+        platforms: [String] = []
+        primary_diagnoses: [String] = []
+        reference_genome_assemblies: [String] = []
+        sample_types: [String] = []
+        site: [String] = []
+        studies: [String] = []
+        study_data_types: [String] = []
+        analytical_fractions: [String] = []
+        instrument_makes: [String] = []
         proteomic_design_descriptions: [String] = []
         organ_or_tissue: [String] = []
         tissue_fixative: [String] = []
         imaging_assay_type: [String] = []
+        is_supplementary_file: [String] = []
     ): SearchResult
 
     subjectOverview (
-        subject_ids: [String] = [],
-
-        accesses: [String] = [],
-        acl: [String] = [],
-        experimental_strategies: [String] = [],
-        file_types: [String] = [],
-        sex: [String] = [],
-        image_modality: [String] = [],
-        instrument_models: [String] = [],
-        is_tumor: [String] = [],
-        library_layouts: [String] = [],
-        library_selections: [String] = [],
-        library_sources: [String] = [],
-        library_strategies: [String] = [],
-        number_of_study_participants: [Float] = [],
-        number_of_study_samples: [Float] = [],
-        phs_accession: [String] = [],
-        platforms: [String] = [],
-        primary_diagnoses: [String] = [],
-        reference_genome_assemblies: [String] = [],
-        sample_types: [String] = [],
-        site: [String] = [],
-        studies: [String] = [],
-        study_data_types: [String] = [],
-        analytical_fractions: [String] = [],
-        instrument_makes: [String] = [],
+        # id filters
+        subject_ids: [String] = []
+        # standard filters
+        accesses: [String] = []
+        acl: [String] = []
+        experimental_strategies: [String] = []
+        file_types: [String] = []
+        sex: [String] = []
+        image_modality: [String] = []
+        instrument_models: [String] = []
+        is_tumor: [String] = []
+        library_layouts: [String] = []
+        library_selections: [String] = []
+        library_sources: [String] = []
+        library_strategies: [String] = []
+        number_of_study_participants: [Float] = []
+        number_of_study_samples: [Float] = []
+        phs_accession: [String] = []
+        platforms: [String] = []
+        primary_diagnoses: [String] = []
+        reference_genome_assemblies: [String] = []
+        sample_types: [String] = []
+        site: [String] = []
+        studies: [String] = []
+        study_data_types: [String] = []
+        analytical_fractions: [String] = []
+        instrument_makes: [String] = []
         proteomic_design_descriptions: [String] = []
         organ_or_tissue: [String] = []
         tissue_fixative: [String] = []
-        imaging_assay_type: [String] = [],
-
-        order_by: String = "",
-        sort_direction: String = "ASC",
-        first: Int = 10,
+        imaging_assay_type: [String] = []
+        is_supplementary_file: [String] = []
+        # pagination and sorting
+        order_by: String = ""
+        sort_direction: String = "ASC"
+        first: Int = 10
         offset: Int = 0
     ): [SubjectOverview]
 
     sampleOverview (
-        subject_ids: [String] = [],
-        sample_ids: [String] = [],
-
-        accesses: [String] = [],
-        acl: [String] = [],
-        experimental_strategies: [String] = [],
-        file_types: [String] = [],
-        sex: [String] = [],
-        image_modality: [String] = [],
-        instrument_models: [String] = [],
-        is_tumor: [String] = [],
-        library_layouts: [String] = [],
-        library_selections: [String] = [],
-        library_sources: [String] = [],
-        library_strategies: [String] = [],
-        number_of_study_participants: [Float] = [],
-        number_of_study_samples: [Float] = [],
-        phs_accession: [String] = [],
-        platforms: [String] = [],
-        primary_diagnoses: [String] = [],
-        reference_genome_assemblies: [String] = [],
-        sample_types: [String] = [],
-        site: [String] = [],
-        studies: [String] = [],
-        study_data_types: [String] = [],
-        analytical_fractions: [String] = [],
-        instrument_makes: [String] = [],
+        # id filters
+        subject_ids: [String] = []
+        sample_ids: [String] = []
+        # standard filters
+        accesses: [String] = []
+        acl: [String] = []
+        experimental_strategies: [String] = []
+        file_types: [String] = []
+        sex: [String] = []
+        image_modality: [String] = []
+        instrument_models: [String] = []
+        is_tumor: [String] = []
+        library_layouts: [String] = []
+        library_selections: [String] = []
+        library_sources: [String] = []
+        library_strategies: [String] = []
+        number_of_study_participants: [Float] = []
+        number_of_study_samples: [Float] = []
+        phs_accession: [String] = []
+        platforms: [String] = []
+        primary_diagnoses: [String] = []
+        reference_genome_assemblies: [String] = []
+        sample_types: [String] = []
+        site: [String] = []
+        studies: [String] = []
+        study_data_types: [String] = []
+        analytical_fractions: [String] = []
+        instrument_makes: [String] = []
         proteomic_design_descriptions: [String] = []
         organ_or_tissue: [String] = []
         tissue_fixative: [String] = []
-        imaging_assay_type: [String] = [],
-
-        order_by: String = "",
-        sort_direction: String = "ASC",
-        first: Int = 10,
+        imaging_assay_type: [String] = []
+        is_supplementary_file: [String] = []
+        # pagination and sorting
+        order_by: String = ""
+        sort_direction: String = "ASC"
+        first: Int = 10
         offset: Int = 0
     ): [SampleOverview]
 
     fileOverview (
-        subject_ids: [String] = [],
-        sample_ids: [String] = [],
-        file_ids: [String] = [],
-
-        accesses: [String] = [],
-        acl: [String] = [],
-        experimental_strategies: [String] = [],
-        file_types: [String] = [],
-        sex: [String] = [],
-        image_modality: [String] = [],
-        instrument_models: [String] = [],
-        is_tumor: [String] = [],
-        library_layouts: [String] = [],
-        library_selections: [String] = [],
-        library_sources: [String] = [],
-        library_strategies: [String] = [],
-        number_of_study_participants: [Float] = [],
-        number_of_study_samples: [Float] = [],
-        phs_accession: [String] = [],
-        platforms: [String] = [],
-        primary_diagnoses: [String] = [],
-        reference_genome_assemblies: [String] = [],
-        sample_types: [String] = [],
-        site: [String] = [],
-        studies: [String] = [],
-        study_data_types: [String] = [],
-        analytical_fractions: [String] = [],
-        instrument_makes: [String] = [],
+        # ids filters
+        subject_ids: [String] = []
+        sample_ids: [String] = []
+        file_ids: [String] = []
+        # standard filters
+        accesses: [String] = []
+        acl: [String] = []
+        experimental_strategies: [String] = []
+        file_types: [String] = []
+        sex: [String] = []
+        image_modality: [String] = []
+        instrument_models: [String] = []
+        is_tumor: [String] = []
+        library_layouts: [String] = []
+        library_selections: [String] = []
+        library_sources: [String] = []
+        library_strategies: [String] = []
+        number_of_study_participants: [Float] = []
+        number_of_study_samples: [Float] = []
+        phs_accession: [String] = []
+        platforms: [String] = []
+        primary_diagnoses: [String] = []
+        reference_genome_assemblies: [String] = []
+        sample_types: [String] = []
+        site: [String] = []
+        studies: [String] = []
+        study_data_types: [String] = []
+        analytical_fractions: [String] = []
+        instrument_makes: [String] = []
         proteomic_design_descriptions: [String] = []
         organ_or_tissue: [String] = []
         tissue_fixative: [String] = []
-        imaging_assay_type: [String] = [],
-
-        order_by: String = "",
-        sort_direction: String = "ASC",
-        first: Int = 10,
+        imaging_assay_type: [String] = []
+        is_supplementary_file: [String] = []
+        # pagination and sorting
+        order_by: String = ""
+        sort_direction: String = "ASC"
+        first: Int = 10
         offset: Int = 0
     ): [FileOverview]
 
-        filesInList (
-        subject_ids: [String] = [],
-        sample_ids: [String] = [],
-        file_ids: [String] = [],
-
-        accesses: [String] = [],
-        acl: [String] = [],
-        experimental_strategies: [String] = [],
-        file_types: [String] = [],
-        sex: [String] = [],
-        image_modality: [String] = [],
-        instrument_models: [String] = [],
-        is_tumor: [String] = [],
-        library_layouts: [String] = [],
-        library_selections: [String] = [],
-        library_sources: [String] = [],
-        library_strategies: [String] = [],
-        number_of_study_participants: [Float] = [],
-        number_of_study_samples: [Float] = [],
-        phs_accession: [String] = [],
-        platforms: [String] = [],
-        primary_diagnoses: [String] = [],
-        reference_genome_assemblies: [String] = [],
-        sample_types: [String] = [],
-        site: [String] = [],
-        studies: [String] = [],
-        study_data_types: [String] = [],
-        analytical_fractions: [String] = [],
-        instrument_makes: [String] = [],
+    filesInList (
+        # id filters
+        subject_ids: [String] = []
+        sample_ids: [String] = []
+        file_ids: [String] = []
+        # standard filters
+        accesses: [String] = []
+        acl: [String] = []
+        experimental_strategies: [String] = []
+        file_types: [String] = []
+        sex: [String] = []
+        image_modality: [String] = []
+        instrument_models: [String] = []
+        is_tumor: [String] = []
+        library_layouts: [String] = []
+        library_selections: [String] = []
+        library_sources: [String] = []
+        library_strategies: [String] = []
+        number_of_study_participants: [Float] = []
+        number_of_study_samples: [Float] = []
+        phs_accession: [String] = []
+        platforms: [String] = []
+        primary_diagnoses: [String] = []
+        reference_genome_assemblies: [String] = []
+        sample_types: [String] = []
+        site: [String] = []
+        studies: [String] = []
+        study_data_types: [String] = []
+        analytical_fractions: [String] = []
+        instrument_makes: [String] = []
         proteomic_design_descriptions: [String] = []
         organ_or_tissue: [String] = []
         tissue_fixative: [String] = []
-        imaging_assay_type: [String] = [],
-
-        order_by: String = "",
-        sort_direction: String = "ASC",
-        first: Int = 10,
+        imaging_assay_type: [String] = []
+        is_supplementary_file: [String] = []
+        # pagination and sorting
+        order_by: String = ""
+        sort_direction: String = "ASC"
+        first: Int = 10
         offset: Int = 0
     ): [FilesInList]
 
     fileIDsFromList(
-        subject_ids: [String] = [""],
-        sample_ids: [String] = [""],
-        file_names: [String] = [""],
+        subject_ids: [String] = [""]
+        sample_ids: [String] = [""]
+        file_names: [String] = [""]
         file_ids: [String] = [""]
     ): [String]
 
@@ -856,263 +868,263 @@ type QueryType {
     globalSearch (input: String, first: Int = 10, offset: Int = 0): GlobalSearchResult
 
     diagnosis(
-        first: Int = 2500,
-        offset: Int = 0,
-        diagnosis_id: String,
-        disease_type: String,
-        vital_status: String,
-        primary_diagnosis: String,
-        primary_site: String,
-        age_at_diagnosis: Int,
-        tumor_grade: String,
-        tumor_stage_clinical_m: String,
-        tumor_stage_clinical_n: String,
-        tumor_stage_clinical_t: String,
-        morphology: String,
-        incidence_type: String,
-        progression_or_recurrence: String,
-        days_to_recurrence: Int,
-        days_to_last_followup: Int,
-        last_known_disease_status: String,
+        first: Int = 2500
+        offset: Int = 0
+        diagnosis_id: String
+        disease_type: String
+        vital_status: String
+        primary_diagnosis: String
+        primary_site: String
+        age_at_diagnosis: Int
+        tumor_grade: String
+        tumor_stage_clinical_m: String
+        tumor_stage_clinical_n: String
+        tumor_stage_clinical_t: String
+        morphology: String
+        incidence_type: String
+        progression_or_recurrence: String
+        days_to_recurrence: Int
+        days_to_last_followup: Int
+        last_known_disease_status: String
         days_to_last_known_status: Int
     ): [diagnosis]
 
     file (
-        first: Int = 2500,
-        offset: Int = 0,
-		file_id: String,
-		file_name: String,
-		file_type: String,
-		file_description: String,
-		file_size: Float,
-		md5sum: String,
-		file_url_in_cds: String,
+        first: Int = 2500
+        offset: Int = 0
+		file_id: String
+		file_name: String
+		file_type: String
+		file_description: String
+		file_size: Float
+		md5sum: String
+		file_url_in_cds: String
 		experimental_strategy_and_data_subtypes: String
     ): [file]
 
     genomic_info (
-        first: Int = 2500,
-        offset: Int = 0,
-		library_id: String,
-		bases: Int,
-		number_of_reads: Int,
-		avg_read_length: Float,
-		coverage: Float,
-		reference_genome_assembly: String,
-		custom_assembly_fasta_file_for_alignment: String,
-		design_description: String,
-		library_strategy: String,
-		library_layout: String,
-		library_source: String,
-		library_selection: String,
-		platform: String,
-		instrument_model: String,
+        first: Int = 2500
+        offset: Int = 0
+		library_id: String
+		bases: Int
+		number_of_reads: Int
+		avg_read_length: Float
+		coverage: Float
+		reference_genome_assembly: String
+		custom_assembly_fasta_file_for_alignment: String
+		design_description: String
+		library_strategy: String
+		library_layout: String
+		library_source: String
+		library_selection: String
+		platform: String
+		instrument_model: String
 		sequence_alignment_software: String
     ): [genomic_info]
 
     participant (
-        first: Int = 2500,
-        offset: Int = 0,
-		participant_id: String,
-		race: String,
-		sex: String,
-		ethnicity: String,
+        first: Int = 2500
+        offset: Int = 0
+		participant_id: String
+		race: String
+		sex: String
+		ethnicity: String
 		dbGaP_subject_id: String
     ): [participant]
 
     program (
-        first: Int = 2500,
-        offset: Int = 0,
-		program_name: String,
-		program_acronym: String,
-		program_short_description: String,
-		program_full_description: String,
-		program_external_url: String,
+        first: Int = 2500
+        offset: Int = 0
+		program_name: String
+		program_acronym: String
+		program_short_description: String
+		program_full_description: String
+		program_external_url: String
 		program_sort_order: Int
     ): [program]
 
     sample (
-        first: Int = 2500,
-        offset: Int = 0,
-		sample_id: String,
-		sample_type: String,
-		sample_tumor_status: String,
-		sample_anatomic_site: String,
-		sample_age_at_collection: Int,
-		derived_from_specimen: String,
+        first: Int = 2500
+        offset: Int = 0
+		sample_id: String
+		sample_type: String
+		sample_tumor_status: String
+		sample_anatomic_site: String
+		sample_age_at_collection: Int
+		derived_from_specimen: String
 		biosample_accession: String
     ): [sample]
 
     specimen (
-        first: Int = 2500,
-        offset: Int = 0,
+        first: Int = 2500
+        offset: Int = 0
 		specimen_id: String
     ): [specimen]
 
     study (
-        first: Int = 2500,
-        offset: Int = 0,
-		study_name: String,
-		study_acronym: String,
-		study_description: String,
-		short_description: String,
-		study_external_url: String,
-		primary_investigator_name: String,
-		primary_investigator_email: String,
-		co_investigator_name: String,
-		co_investigator_email: String,
-		phs_accession: String,
-		bioproject_accession: String,
-		index_date: String,
-		cds_requestor: String,
-		funding_agency: String,
-		funding_source_program_name: String,
-		grant_id: String,
-		clinical_trial_system: String,
-		clinical_trial_identifier: String,
-		clinical_trial_arm: String,
-		organism_species: String,
-		adult_or_childhood_study: String,
-		data_types: String,
-		file_types: String,
-		data_access_level: String,
-		cds_primary_bucket: String,
-		cds_secondary_bucket: String,
-		cds_tertiary_bucket: String,
-		number_of_participants: Float,
-		number_of_samples: Float,
-		study_data_types: String,
-		file_types_and_format: String,
-		size_of_data_being_uploaded: Float,
-		size_of_data_being_uploaded_unit: String,
-		size_of_data_being_uploaded_original: Float,
-		size_of_data_being_uploaded_original_unit: String,
-		acl: String,
-		study_access: String,
+        first: Int = 2500
+        offset: Int = 0
+		study_name: String
+		study_acronym: String
+		study_description: String
+		short_description: String
+		study_external_url: String
+		primary_investigator_name: String
+		primary_investigator_email: String
+		co_investigator_name: String
+		co_investigator_email: String
+		phs_accession: String
+		bioproject_accession: String
+		index_date: String
+		cds_requestor: String
+		funding_agency: String
+		funding_source_program_name: String
+		grant_id: String
+		clinical_trial_system: String
+		clinical_trial_identifier: String
+		clinical_trial_arm: String
+		organism_species: String
+		adult_or_childhood_study: String
+		data_types: String
+		file_types: String
+		data_access_level: String
+		cds_primary_bucket: String
+		cds_secondary_bucket: String
+		cds_tertiary_bucket: String
+		number_of_participants: Float
+		number_of_samples: Float
+		study_data_types: String
+		file_types_and_format: String
+		size_of_data_being_uploaded: Float
+		size_of_data_being_uploaded_unit: String
+		size_of_data_being_uploaded_original: Float
+		size_of_data_being_uploaded_original_unit: String
+		acl: String
+		study_access: String
 		study_version: String
     ): [study]
 
     treatment (
-        first: Int = 2500,
-        offset: Int = 0,
-		treatment_id: String,
-		treatment_type: String,
-		treatment_outcome: String,
-		days_to_treatment: Int,
+        first: Int = 2500
+        offset: Int = 0
+		treatment_id: String
+		treatment_type: String
+		treatment_outcome: String
+		days_to_treatment: Int
 		therapeutic_agents: String
     ): [treatment]
 
     image (
-        first: Int = 2500,
-        offset: Int = 0,
-        study_link_id: String,
-        de_identification_method_type: String,
-        de_identification_method_description: String,
-        de_identification_software: String,
-        license: String,
-        citation_or_DOI: String,
-        species: String,
-        image_modality: String,
-        imaging_equipment_manufacturer: String,
-        imaging_equipment_model: String,
-        imaging_sofware: String,
-        imaging_protocol: String,
-        organ_or_tissue: String,
-        performed_imaging_study_description: String,
-        performed_imaging_study_admittingDiagnosisCode: String,
-        performed_imaging_study_nonAcquisitionModalitiesInStudyCode: String,
-        performed_imaging_study_lossyImageCompressionIndicator: String,
-        performed_imaging_study_summary: String,
-        performed_imaging_study_primaryAnatomicSiteCode: String,
-        performed_imaging_study_acquisitionTypeCode: String,
-        performed_imaging_study_imageTypeCode: String,
-        performed_imaging_study_cardiacSynchronizationTechniqueCode: String,
-        performed_imaging_study_dataCollectionDiameter: String,
-        performed_imaging_study_respiratoryMotionTechniqueCode: String,
-        performed_imaging_study_bodyPositionCode: String,
-        performed_imaging_study_typeCode: String,
-        performed_imaging_study_algorithmCode: String,
-        performed_imaging_study_reconstructionFieldOfViewHeight: String,
-        performed_imaging_study_reconstructionFieldOfViewWidth: String,
-        performed_imaging_study_reconstructionDiameter: String,
-        performed_imaging_study_sliceThickness: String,
-        performed_imaging_study_reconstructionInterval: String,
-        longitudinal_temporal_event_type: String,
-        longitudinal_temporal_event_offset: String,
-        CTAquisitionProtocolElement_singleCollimationWidth: String,
-        CTAquisitionProtocolElement_totalCollimationWidth: String,
-        CTAquisitionProtocolElement_gantryDetectorTilt: String,
-        CTAquisitionProtocolElement_tableSpeed: String,
-        CTAquisitionProtocolElement_spiralPitchFactor: String,
-        CTAquisitionProtocolElement_ctdiVol: String,
-        CTAquisitionProtocolElement_ctdiPhantomTypeCode: String,
-        CTAquisitionProtocolElement_kVp: String,
-        CTAquisitionProtocolElement_exposureModulationType_Code: String,
-        CTImageReconstructionProtocolElement_convolutionKernel: String,
-        CTImageReconstructionProtocolElement_convolutionKernelGroupCode: String,
-        MRImageAcquisitionProtocolElement_echoPulseSequenceCategoryCode: String,
-        MRImageAcquisitionProtocolElement_diffusionBValue: String,
-        MRImageAcquisitionProtocolElement_diffusionDirectionalityCode: String,
-        MRImageAcquisitionProtocolElement_magneticFieldStrength: String,
-        MRImageAcquisitionProtocolElement_resonantNucleusCode: String,
-        MRImageAcquisitionProtocolElement_acquisitionContrastCode: String,
-        MRImageAcquisitionProtocolElement_inversionRecoveryIndicator: String,
-        MRImageAcquisitionProtocolElement_pulseSequenceName: String,
-        MRImageAcquisitionProtocolElement_multipleSpinEchoIndicator: String,
-        MRImageAcquisitionProtocolElement_phaseContrastIndicator: String,
-        MRImageAcquisitionProtocolElement_timeOfFlightContrastIndicator: String,
-        MRImageAcquisitionProtocolElement_arterialSpinLabelingContrastCode: String,
-        MRImageAcquisitionProtocolElement_steadyStatePulseSequenceCode: String,
-        MRImageAcquisitionProtocolElement_echoPlanarPulseSequenceIndicator: String,
-        MRImageAcquisitionProtocolElement_saturationRecoveryIndicator: String,
-        MRImageAcquisitionProtocolElement_spectrallySelectedSuppressionCode: String,
-        MRImageReconstructionProtocolElement_complexImageComponentCode: String,
-        PETImagingAcquisitionProtocolElement_gantryDetectorTilt: String,
-        Radiopharmaceutical_radionuclideCode: String,
-        acquisition_method_type: String,
-        tumor_tissue_type: String,
-        tissue_fixative: String,
-        embedding_medium: String,
-        staining_method: String,
-        objective: String,
-        nominal_magnification: String,
-        immersion: String,
-        lens_numerical_aperture: String,
-        working_distance: String,
-        imaging_assay_type: String,
-        pyramid: String,
-        physical_size_x: String,
-        physical_size_y: String,
-        physical_size_z: String,
-        size_c: String,
-        size_t: String,
-        size_x: String,
-        size_y: String,
-        size_z: String,
-        channel_metadata_filename: String,
-        channel_metadata_file_url_in_cds: String,
-        channel_id: String,
-        channel_name: String,
-        cycle_number: String,
-        sub_cycle_number: String,
-        target_name: String,
-        antibody_name: String,
-        rrid_identifier: String,
-        fluorophore: String,
-        clone: String,
-        lot: String,
-        vendor: String,
-        catalog_number: String,
-        excitation_wavelength: String,
-        emission_wavelength: String,
-        excitation_bandwidth: String,
-        emission_bandwidth: String,
-        metal_isotope_element: String,
-        oligo_barcode_upper_strand: String,
-        oligo_barcode_lower_strand: String,
-        diluation: String,
-        concentration: String,
-        passes_qc: String,
+        first: Int = 2500
+        offset: Int = 0
+        study_link_id: String
+        de_identification_method_type: String
+        de_identification_method_description: String
+        de_identification_software: String
+        license: String
+        citation_or_DOI: String
+        species: String
+        image_modality: String
+        imaging_equipment_manufacturer: String
+        imaging_equipment_model: String
+        imaging_sofware: String
+        imaging_protocol: String
+        organ_or_tissue: String
+        performed_imaging_study_description: String
+        performed_imaging_study_admittingDiagnosisCode: String
+        performed_imaging_study_nonAcquisitionModalitiesInStudyCode: String
+        performed_imaging_study_lossyImageCompressionIndicator: String
+        performed_imaging_study_summary: String
+        performed_imaging_study_primaryAnatomicSiteCode: String
+        performed_imaging_study_acquisitionTypeCode: String
+        performed_imaging_study_imageTypeCode: String
+        performed_imaging_study_cardiacSynchronizationTechniqueCode: String
+        performed_imaging_study_dataCollectionDiameter: String
+        performed_imaging_study_respiratoryMotionTechniqueCode: String
+        performed_imaging_study_bodyPositionCode: String
+        performed_imaging_study_typeCode: String
+        performed_imaging_study_algorithmCode: String
+        performed_imaging_study_reconstructionFieldOfViewHeight: String
+        performed_imaging_study_reconstructionFieldOfViewWidth: String
+        performed_imaging_study_reconstructionDiameter: String
+        performed_imaging_study_sliceThickness: String
+        performed_imaging_study_reconstructionInterval: String
+        longitudinal_temporal_event_type: String
+        longitudinal_temporal_event_offset: String
+        CTAquisitionProtocolElement_singleCollimationWidth: String
+        CTAquisitionProtocolElement_totalCollimationWidth: String
+        CTAquisitionProtocolElement_gantryDetectorTilt: String
+        CTAquisitionProtocolElement_tableSpeed: String
+        CTAquisitionProtocolElement_spiralPitchFactor: String
+        CTAquisitionProtocolElement_ctdiVol: String
+        CTAquisitionProtocolElement_ctdiPhantomTypeCode: String
+        CTAquisitionProtocolElement_kVp: String
+        CTAquisitionProtocolElement_exposureModulationType_Code: String
+        CTImageReconstructionProtocolElement_convolutionKernel: String
+        CTImageReconstructionProtocolElement_convolutionKernelGroupCode: String
+        MRImageAcquisitionProtocolElement_echoPulseSequenceCategoryCode: String
+        MRImageAcquisitionProtocolElement_diffusionBValue: String
+        MRImageAcquisitionProtocolElement_diffusionDirectionalityCode: String
+        MRImageAcquisitionProtocolElement_magneticFieldStrength: String
+        MRImageAcquisitionProtocolElement_resonantNucleusCode: String
+        MRImageAcquisitionProtocolElement_acquisitionContrastCode: String
+        MRImageAcquisitionProtocolElement_inversionRecoveryIndicator: String
+        MRImageAcquisitionProtocolElement_pulseSequenceName: String
+        MRImageAcquisitionProtocolElement_multipleSpinEchoIndicator: String
+        MRImageAcquisitionProtocolElement_phaseContrastIndicator: String
+        MRImageAcquisitionProtocolElement_timeOfFlightContrastIndicator: String
+        MRImageAcquisitionProtocolElement_arterialSpinLabelingContrastCode: String
+        MRImageAcquisitionProtocolElement_steadyStatePulseSequenceCode: String
+        MRImageAcquisitionProtocolElement_echoPlanarPulseSequenceIndicator: String
+        MRImageAcquisitionProtocolElement_saturationRecoveryIndicator: String
+        MRImageAcquisitionProtocolElement_spectrallySelectedSuppressionCode: String
+        MRImageReconstructionProtocolElement_complexImageComponentCode: String
+        PETImagingAcquisitionProtocolElement_gantryDetectorTilt: String
+        Radiopharmaceutical_radionuclideCode: String
+        acquisition_method_type: String
+        tumor_tissue_type: String
+        tissue_fixative: String
+        embedding_medium: String
+        staining_method: String
+        objective: String
+        nominal_magnification: String
+        immersion: String
+        lens_numerical_aperture: String
+        working_distance: String
+        imaging_assay_type: String
+        pyramid: String
+        physical_size_x: String
+        physical_size_y: String
+        physical_size_z: String
+        size_c: String
+        size_t: String
+        size_x: String
+        size_y: String
+        size_z: String
+        channel_metadata_filename: String
+        channel_metadata_file_url_in_cds: String
+        channel_id: String
+        channel_name: String
+        cycle_number: String
+        sub_cycle_number: String
+        target_name: String
+        antibody_name: String
+        rrid_identifier: String
+        fluorophore: String
+        clone: String
+        lot: String
+        vendor: String
+        catalog_number: String
+        excitation_wavelength: String
+        emission_wavelength: String
+        excitation_bandwidth: String
+        emission_bandwidth: String
+        metal_isotope_element: String
+        oligo_barcode_upper_strand: String
+        oligo_barcode_lower_strand: String
+        diluation: String
+        concentration: String
+        passes_qc: String
         crdc_id: String
     ): [image]
 
@@ -1123,8 +1135,8 @@ type QueryType {
         instrument_make: String
         proteomic_instrument_model: String
         proteomic_design_description: String
-        first: Int = 2500,
-        offset: Int = 0,
+        first: Int = 2500
+        offset: Int = 0
     ): [proteomic]
 
      version: version

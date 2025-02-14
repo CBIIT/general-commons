@@ -963,8 +963,8 @@ Indices:
               file_name_gs: f.file_name,
               file_url_in_cds: f.file_url_in_cds,
               drs_uri: 'drs://nci-crdc.datacommons.io/' + f.file_id,
-              is_supplementary_file: f.is_supplementary_file,
-              is_supplementary_file_gs: f.is_supplementary_file,
+              is_supplementary_file: COALESCE(f.is_supplementary_file, na),
+              is_supplementary_file_gs: COALESCE(f.is_supplementary_file, na),
               release_datetime: f.release_datetime,
               release_datetime_gs: f.release_datetime
             }) AS opensearch_data

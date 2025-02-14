@@ -290,6 +290,12 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 FILTER_COUNT_QUERY, "filterSubjectCountByOrganOrTissue",
                 AGG_ENDPOINT, FILES_END_POINT
         ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "is_supplementary_file",
+                WIDGET_QUERY, "subjectCountByIsSupplementaryFile",
+                FILTER_COUNT_QUERY, "filterSubjectCountByIsSupplementaryFile",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
         // Donut Count Fields
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "experimental_strategies",
