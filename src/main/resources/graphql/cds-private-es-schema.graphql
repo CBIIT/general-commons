@@ -488,6 +488,7 @@ type GS_File {
     reference_genome_assemblies: [String]
     sites: [String]
     subject_ids_filter: [String]
+    is_supplementary_file: String
 }
 
 type GS_Model {

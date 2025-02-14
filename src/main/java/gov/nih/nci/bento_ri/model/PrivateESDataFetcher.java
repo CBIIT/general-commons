@@ -530,7 +530,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("image_modality", "image_modality_sort"),
                 Map.entry("organ_or_tissue", "organ_or_tissue_sort"),
                 Map.entry("imaging_assay_type", "imaging_assay_type_sort"),
-                Map.entry("tissue_fixative", "tissue_fixative_sort")
+                Map.entry("tissue_fixative", "tissue_fixative_sort"),
+                Map.entry("is_supplementary_file", "is_supplementary_file")
         );
 
         List<Map<String, Object>> fileOverview = overview(FILES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
@@ -731,7 +732,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 GS_SEARCH_FIELD, List.of("subject_id_gs","sample_id_gs","file_id_gs","file_name_gs",
                         "file_type_gs","accesses_gs","acl_gs","experimental_strategies_gs","instrument_models_gs",
                         "library_layouts_gs","library_selections_gs","library_sources_gs","library_strategies_gs",
-                        "platforms_gs","reference_genome_assemblies_gs","sites_gs"),
+                        "platforms_gs","reference_genome_assemblies_gs","sites_gs", "is_supplementary_file_gs"),
                 GS_SORT_FIELD, "file_id",
                 GS_COLLECT_FIELDS, new String[][]{
                         new String[]{"subject_id", "subject_id_gs"},
@@ -750,7 +751,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                         new String[]{"platforms","platforms_gs"},
                         new String[]{"reference_genome_assemblies","reference_genome_assemblies_gs"},
                         new String[]{"sites","sites_gs"},
-                        new String[]{"subject_ids_filter", "subject_ids_filter"}
+                        new String[]{"subject_ids_filter", "subject_ids_filter"},
+                        new String[]{"is_supplementary_file", "is_supplementary_file_gs"}
                 },
                 GS_CATEGORY_TYPE, "file"
         ));
