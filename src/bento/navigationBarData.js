@@ -81,7 +81,7 @@ export const navBarData = [
     type: 'dropdown',
     dropDownLinks: [
       {
-        labelText: 'About CDS',
+        labelText: 'About the CRDC General Commons',
         link: '/cancerDataService',
       },
       {
@@ -94,16 +94,16 @@ export const navBarData = [
         link: '/resources',
       },
       {
-        labelText: 'Query the CDS Portal Using GraphQL',
+        labelText: 'Query the CRDC GC using GraphQL',
         link: '/graphql',
       },
       {
-        labelText: 'CDS Portal - Release Notes',
+        labelText: 'Release Notes',
         link: '/releases',
       },
       // TODO: Adding sub menu items at root level for now. Need to add support for sub menu items in the future.
       {
-        labelText: 'CDS Portal User Guide',
+        labelText: 'CRDC General Commons User Guide',
         link: STATIC_CONTENT.about.USER_GUIDE_PDF,
         isExternalLink: true,
       },
