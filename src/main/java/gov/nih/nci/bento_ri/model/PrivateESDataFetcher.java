@@ -184,14 +184,14 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         ));
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "library_source_materials",
-                WIDGET_QUERY, "subjectCountByLibrarySourceMaterials",
-                FILTER_COUNT_QUERY, "filterSubjectCountByLibrarySourceMaterials",
+                WIDGET_QUERY, "subjectCountByLibrarySourceMaterial",
+                FILTER_COUNT_QUERY, "filterSubjectCountByLibrarySourceMaterial",
                 AGG_ENDPOINT, FILES_END_POINT
         ));
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "library_source_molecules",
-                WIDGET_QUERY, "subjectCountByLibrarySourceMolecules",
-                FILTER_COUNT_QUERY, "filterSubjectCountByLibrarySourceMolecules",
+                WIDGET_QUERY, "subjectCountByLibrarySourceMolecule",
+                FILTER_COUNT_QUERY, "filterSubjectCountByLibrarySourceMolecule",
                 AGG_ENDPOINT, FILES_END_POINT
         ));
         TERM_AGGS.add(Map.of(
