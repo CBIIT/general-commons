@@ -183,9 +183,15 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 AGG_ENDPOINT, FILES_END_POINT
         ));
         TERM_AGGS.add(Map.of(
-                AGG_NAME, "library_sources",
-                WIDGET_QUERY, "subjectCountByLibrarySource",
-                FILTER_COUNT_QUERY, "filterSubjectCountByLibrarySource",
+                AGG_NAME, "library_source_materials",
+                WIDGET_QUERY, "subjectCountByLibrarySourceMaterials",
+                FILTER_COUNT_QUERY, "filterSubjectCountByLibrarySourceMaterials",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "library_source_molecules",
+                WIDGET_QUERY, "subjectCountByLibrarySourceMolecules",
+                FILTER_COUNT_QUERY, "filterSubjectCountByLibrarySourceMolecules",
                 AGG_ENDPOINT, FILES_END_POINT
         ));
         TERM_AGGS.add(Map.of(
@@ -731,7 +737,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 GS_RESULT_FIELD, "files",
                 GS_SEARCH_FIELD, List.of("subject_id_gs","sample_id_gs","file_id_gs","file_name_gs",
                         "file_type_gs","accesses_gs","acl_gs","experimental_strategies_gs","instrument_models_gs",
-                        "library_layouts_gs","library_selections_gs","library_sources_gs","library_strategies_gs",
+                        "library_layouts_gs","library_selections_gs","library_source_materials_gs","library_source_molecules_gs","library_strategies_gs",
                         "platforms_gs","reference_genome_assemblies_gs","sites_gs", "is_supplementary_file_gs"),
                 GS_SORT_FIELD, "file_id",
                 GS_COLLECT_FIELDS, new String[][]{
@@ -746,7 +752,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                         new String[]{"instrument_models","instrument_models_gs"},
                         new String[]{"library_layouts","library_layouts_gs"},
                         new String[]{"library_selections","library_selections_gs"},
-                        new String[]{"library_sources","library_sources_gs"},
+                        new String[]{"library_source_materials","library_source_materials_gs"},
+                        new String[]{"library_source_molecules", "library_source_molecules_gs"},
                         new String[]{"library_strategies","library_strategies_gs"},
                         new String[]{"platforms","platforms_gs"},
                         new String[]{"reference_genome_assemblies","reference_genome_assemblies_gs"},
