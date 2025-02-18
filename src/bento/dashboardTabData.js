@@ -89,7 +89,8 @@ query searchSubjects(
   $is_tumor:[String],
   $library_layouts:[String],
   $library_selections:[String],
-  $library_sources:[String],
+  $library_source_materials:[String],
+  $library_source_molecules:[String],
   $library_strategies:[String],
   $number_of_study_participants:[Float],
   $number_of_study_samples:[Float],
@@ -120,7 +121,8 @@ query searchSubjects(
       is_tumor:$is_tumor,
       library_layouts:$library_layouts,
       library_selections:$library_selections,
-      library_sources:$library_sources,
+      library_source_materials:$library_source_materials,
+      library_source_molecules:$library_source_molecules,
       library_strategies:$library_strategies,
       number_of_study_participants:$number_of_study_participants,
       number_of_study_samples:$number_of_study_samples,
@@ -192,7 +194,11 @@ query searchSubjects(
           group
           subjects
       }
-      subjectCountByLibrarySource{
+      subjectCountByLibrarySourceMaterial{
+          group
+          subjects
+      }
+      subjectCountByLibrarySourceMolecule{
           group
           subjects
       }
@@ -289,7 +295,11 @@ query searchSubjects(
           group
           subjects
       }
-      filterSubjectCountByLibrarySource{
+      filterSubjectCountByLibrarySourceMaterial{
+          group
+          subjects
+      }
+      filterSubjectCountByLibrarySourceMolecule{
           group
           subjects
       }
@@ -386,7 +396,8 @@ query subjectOverview(
   $is_tumor:[String],
   $library_layouts:[String],
   $library_selections:[String],
-  $library_sources:[String],
+  $library_source_materials:[String],
+  $library_source_molecules:[String],
   $library_strategies:[String],
   $number_of_study_participants:[Float],
   $number_of_study_samples:[Float],
@@ -422,7 +433,8 @@ query subjectOverview(
       is_tumor:$is_tumor,
       library_layouts:$library_layouts,
       library_selections:$library_selections,
-      library_sources:$library_sources,
+      library_source_materials:$library_source_materials,
+      library_source_molecules:$library_source_molecules,
       library_strategies:$library_strategies,
       number_of_study_participants:$number_of_study_participants,
       number_of_study_samples:$number_of_study_samples,
@@ -474,7 +486,8 @@ query fileOverview(
   $is_tumor:[String],
   $library_layouts:[String],
   $library_selections:[String],
-  $library_sources:[String],
+  $library_source_materials:[String],
+  $library_source_molecules:[String],
   $library_strategies:[String],
   $number_of_study_participants:[Float],
   $number_of_study_samples:[Float],
@@ -511,7 +524,8 @@ query fileOverview(
       is_tumor:$is_tumor,
       library_layouts:$library_layouts,
       library_selections:$library_selections,
-      library_sources:$library_sources,
+      library_source_materials:$library_source_materials,
+      library_source_molecules:$library_source_molecules,
       library_strategies:$library_strategies,
       number_of_study_participants:$number_of_study_participants,
       number_of_study_samples:$number_of_study_samples,
@@ -569,7 +583,8 @@ query sampleOverview(
   $is_tumor:[String],
   $library_layouts:[String],
   $library_selections:[String],
-  $library_sources:[String],
+  $library_source_materials:[String],
+  $library_source_molecules:[String],
   $library_strategies:[String],
   $number_of_study_participants:[Float],
   $number_of_study_samples:[Float],
@@ -606,7 +621,8 @@ query sampleOverview(
       is_tumor:$is_tumor,
       library_layouts:$library_layouts,
       library_selections:$library_selections,
-      library_sources:$library_sources,
+      library_source_materials:$library_source_materials,
+      library_source_molecules:$library_source_molecules,
       library_strategies:$library_strategies,
       number_of_study_participants:$number_of_study_participants,
       number_of_study_samples:$number_of_study_samples,
@@ -692,7 +708,8 @@ query subjectOverview(
   $is_tumor:[String],
   $library_layouts:[String],
   $library_selections:[String],
-  $library_sources:[String],
+  $library_source_materials:[String],
+  $library_source_molecules:[String],
   $library_strategies:[String],
   $number_of_study_participants:[Float],
   $number_of_study_samples:[Float],
@@ -722,7 +739,8 @@ subjectOverview(
       is_tumor:$is_tumor,
       library_layouts:$library_layouts,
       library_selections:$library_selections,
-      library_sources:$library_sources,
+      library_source_materials:$library_source_materials,
+      library_source_molecules:$library_source_molecules,
       library_strategies:$library_strategies,
       number_of_study_participants:$number_of_study_participants,
       number_of_study_samples:$number_of_study_samples,
@@ -760,7 +778,8 @@ query sampleOverview(
   $is_tumor:[String],
   $library_layouts:[String],
   $library_selections:[String],
-  $library_sources:[String],
+  $library_source_materials:[String],
+  $library_source_molecules:[String],
   $library_strategies:[String],
   $number_of_study_participants:[Float],
   $number_of_study_samples:[Float],
@@ -791,7 +810,8 @@ query sampleOverview(
       is_tumor:$is_tumor,
       library_layouts:$library_layouts,
       library_selections:$library_selections,
-      library_sources:$library_sources,
+      library_source_materials:$library_source_materials,
+      library_source_molecules:$library_source_molecules,
       library_strategies:$library_strategies,
       number_of_study_participants:$number_of_study_participants,
       number_of_study_samples:$number_of_study_samples,
@@ -830,7 +850,8 @@ query fileOverview(
   $is_tumor:[String],
   $library_layouts:[String],
   $library_selections:[String],
-  $library_sources:[String],
+  $library_source_materials:[String],
+  $library_source_molecules:[String],
   $library_strategies:[String],
   $number_of_study_participants:[Float],
   $number_of_study_samples:[Float],
@@ -867,7 +888,8 @@ query fileOverview(
       is_tumor:$is_tumor,
       library_layouts:$library_layouts,
       library_selections:$library_selections,
-      library_sources:$library_sources,
+      library_source_materials:$library_source_materials,
+      library_source_molecules:$library_source_molecules,
       library_strategies:$library_strategies,
       number_of_study_participants:$number_of_study_participants,
       number_of_study_samples:$number_of_study_samples,
