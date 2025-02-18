@@ -149,9 +149,9 @@ const table = {
       cellType: cellTypes.CUSTOM_ELEM,
     },
     {
-      dataField: 'gender',
-      header: 'Gender',
-      tooltipText: 'Sort by Gender',
+      dataField: 'sex',
+      header: 'Sex',
+      tooltipText: 'Sort by Sex',
       display: true,
       cellType: cellTypes.CUSTOM_ELEM,
     },
@@ -195,7 +195,7 @@ query studyDetail($phs_accession: String) {
     phs_accession
     subject_id
     sample_id
-    gender
+    sex
     analyte_type
     is_tumor
     file_name
@@ -215,7 +215,7 @@ query fileOverview(
   $studies: [String],
   $phs_accession:String,
   $file_types: [String],
-  $genders: [String],
+  $sex: [String],
   $is_tumor: [String],
   $accesses: [String],
   $first: Int, 
@@ -230,7 +230,7 @@ fileOverview(
   studies: $studies,
   phs_accession: [$phs_accession],
   file_types: $file_types,
-  genders: $genders,
+  sex: $sex,
   is_tumor: $is_tumor,
   accesses: $accesses,
   first: $first, 
@@ -242,7 +242,7 @@ fileOverview(
   phs_accession
   subject_id
   sample_id
-  gender
+  sex
   analyte_type
   is_tumor
   file_name
