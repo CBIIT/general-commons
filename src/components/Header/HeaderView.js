@@ -3,35 +3,22 @@ import { useSelector } from 'react-redux';
 import  {Header}  from '@bento-core/header';
 import { withRouter } from 'react-router-dom';
 import { SearchBarGenerator } from '@bento-core/global-search';
-import headerData from '../../bento/globalHeaderData';
+import * as HeaderData from '../../bento/globalHeaderData';
 import { queryAutocompleteAPI, SEARCH_DATAFIELDS, SEARCH_KEYS } from '../../bento/search';
 import { PUBLIC_ACCESS } from '../../bento/siteWideConfig';
 import { accessLevelTypes } from '@bento-core/authentication';
+import CartLink from '../NavBar/CartLink';
+import { navBarCartData } from '../../bento/navigationBarData';
 
-const customStyle = {
-  headerBar: {
-    marginTop: 'calc(var(--site-alert-offset, 0px) + var(--banner-offset, 0px))',
-  },
-  nihLogoImg: {
-    width: '463px',
-    height: '54px',
-    maxWidth: '460px',
-    minWidth: '200px',
-    maxHeight: '80px',
-    minHeight: '54px',
-    marginLeft: '8px',
-  },
-};
 
-const ICDCHeader = (props) => {
-  const { location } = props;
-
+const ICDCHeader = () => {
   const isSignedIn = useSelector((state) => state && state.login.isSignedIn);
   const isAdmin = useSelector((state) => state.login && state.login.role && state.login.role === 'admin');
   const hasApprovedArms = useSelector((state) => state.login.acl
     && state.login.acl.some((arm) => arm.accessStatus === 'approved'));
   const authenticated = PUBLIC_ACCESS === accessLevelTypes.METADATA_ONLY
     || (isSignedIn && (hasApprovedArms || isAdmin));
+  const { filesId: cartFieldIds } = useSelector((state) => state.cartReducer);
 
   const SearchBarConfig = {
     config: {
@@ -42,16 +29,12 @@ const ICDCHeader = (props) => {
       ariaLabel: 'Search CDS',
     },
   };
+  // TODO: Implemented SearchBar
+  // eslint-disable-next-line no-unused-vars
   const { SearchBar } = SearchBarGenerator(SearchBarConfig);
 
   return (
-    <Header
-      logo={headerData.globalHeaderLogo}
-      alt={headerData.globalHeaderLogoAltText}
-      homeLink={headerData.globalHeaderLogoLink}
-      SearchComponent={!location.pathname.match('/search') ? SearchBar : undefined}
-      customStyle={customStyle}
-    />
+    <Header config={HeaderData} endComponent={<CartLink navBarCartData={navBarCartData} numberOfCases={cartFieldIds.length || 0} />} />
   );
 };
 
