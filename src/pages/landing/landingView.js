@@ -195,7 +195,7 @@ const LandingView = ({ classes, statsData }) => (
 );
 const styles = () => ({
   page: {
-    marginTop: '-55px',
+    marginTop: '0',
   },
   hero: {
     width: '100%',

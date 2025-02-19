@@ -1,6 +1,6 @@
 export default () => ({
   marginTopNegative:{
-    marginTop: '-55px',
+    marginTop: '0',
     paddingTop: '51px',
   },
   myFilesWrapper: {

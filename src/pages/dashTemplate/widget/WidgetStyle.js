@@ -92,7 +92,7 @@ const styles = (theme) => ({
     zIndex: '99',
   },
   statsBar: {
-    position: 'fixed',
+    position: 'static',
   },
   switchBase: {
     color: theme.palette.widgetBackground.contrastText,
