@@ -1,11 +1,87 @@
-import Easter from '../assets/header/headerGraphic.png';
+import usaFlagSmall from '../assets/header/US_Flag_Small.svg';
 import { STATIC_CONTENT } from '../assets/staticContent';
 
 // globalHeaderLogo image 468x100
 // globalHeaderImage: image 2200x100
-export default {
+export const headerData = {
   globalHeaderLogo: STATIC_CONTENT.logo.CRDC_LOGO_SVG,
+  globalHeaderLogoSmall: STATIC_CONTENT.logo.CRDC_LOGO_SVG,
   globalHeaderLogoLink: '/',
-  globalHeaderLogoAltText: 'CDS Logo',
-  globalHeaderImage: Easter,
+  globalHeaderLogoAltText: 'Portal Logo',
+  usaFlagSmall,
+  usaFlagSmallAltText: 'usaFlagSmall',
+};
+
+export const HeaderLinks = [
+  {
+    name: 'HOME',
+    link: '/',
+    id: 'navbar-dropdown-home',
+    className: 'navMobileItem',
+  },
+  {
+    name: 'DATA',
+    link: '/data',
+    id: 'navbar-dropdown-data',
+    className: 'navMobileItem',
+  },
+  {
+    name: 'PROGRAMS',
+    link: '/programs',
+    id: 'navbar-dropdown-programs',
+    className: 'navMobileItem',
+  },
+  {
+    name: 'STUDIES',
+    link: '/studies',
+    id: 'navbar-dropdown-studies',
+    className: 'navMobileItem',
+  },
+  {
+    name: 'ABOUT',
+    link: '#',
+    id: 'navbar-dropdown-about',
+    className: 'navMobileItem clickable',
+  },
+];
+
+export const HeaderSubLinks = {
+  ABOUT: [
+    {
+      name: 'About the CRDC General Commons',
+      link: '/cancerDataService',
+      id: 'about-cancer-data-service',
+      className: 'navMobileSubItem',
+    },
+    {
+      name: 'Submission Requests',
+      link: 'https://hub.datacommons.cancer.gov/',
+      id: 'about-submission-requests',
+      className: 'navMobileSubItem',
+    },
+    {
+      name: 'Data Model',
+      link: '/resources',
+      id: 'about-resources',
+      className: 'navMobileSubItem',
+    },
+    {
+      name: 'Query the CRDC GC using GraphQL',
+      link: '/graphql',
+      id: 'about-graphql',
+      className: 'navMobileSubItem',
+    },
+    {
+      name: 'Release Notes',
+      link: '/releases',
+      id: 'about-releases',
+      className: 'navMobileSubItem',
+    },
+    {
+      name: 'CRDC General Commons User Guide',
+      link: STATIC_CONTENT.about.USER_GUIDE_PDF,
+      id: 'about-user-guide',
+      className: 'navMobileSubItem',
+    },
+  ],
 };
