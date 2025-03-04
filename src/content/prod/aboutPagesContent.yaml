@@ -19,7 +19,7 @@
     - paragraph: "Users can search through all the CDS portal using GraphQL queries. There are several queries that users can utilize from the $$[CDS Portal User Guide](<%= USER_GUIDE_PDF %> title: 'Download the User Guide')$$"
   components: ["GraphqlClient"]
 - page: '/cancerDataService'
-  title: "About the General Commons"
+  title: "About The General Commons"
   primaryContentImage: <%= CDS_CONTENT_IMAGE %>
   actionTitle: 'ALSO AVAILABLE:'
   actionButtonLabel: 'DATA MODEL'
