@@ -27,18 +27,21 @@ const styles = () => ({
       borderLeft: '2px solid #CDD4D8',
     },
     '& .MuiTableCell-head': {
-      fontSize: 19,
-      fontWeight: 700,
-      FontFamily: 'Lato',
-      color: '#000',
+      fontSize: 13,
+      fontWeight: 400,
+      lineHeight: '8px',
+      color: '#004C73',
+      fontFamily: 'Nunito Sans',
+      padding: "5px 5px 5px 20px",
+      letterSpacing: "0.025em",
     },
     '& .MuiTableRow-root': { 
-      '&:not(:first-of-type):not(:last-of-type)': { 
+      '&:not(:last-of-type)': { 
         cursor: 'pointer', 
-        '&:nth-of-type(even)': { 
+        '&:nth-of-type(odd)': { 
           backgroundColor: '#DCE9EF', // TODO: color to be updated 
         }, 
-        '&:nth-of-type(odd)': { 
+        '&:nth-of-type(even)': { 
           backgroundColor: '#F2FBFF', // TODO: color to be updated 
         }, 
       },
@@ -49,7 +52,6 @@ const styles = () => ({
       lineHeight: '8px',
       color: '#004C73',
       FontFamily: 'Nunito Sans',
-
     },
   },
   horizontalLine: {
@@ -72,11 +74,17 @@ const styles = () => ({
   }, 
   hiddenRow: { 
     display: 'none', 
-  }, 
+  },
+  tableHead: {
+    padding: "0 0 0 20px",
+  },
   releaseHeading: { 
     fontFamily: 'Inter', 
     fontWeight: 400, 
-    fontSize: '20px', 
+    fontSize: '20px',
+    color: "#004C73",
+    lineHeight: "8px",
+    overflowWrap: "break-word",
   }, 
   dataHeading: { 
     color: '#0E6292', 
