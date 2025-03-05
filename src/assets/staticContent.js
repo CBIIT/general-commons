@@ -2,7 +2,7 @@ import env from "../utils/env";
 
 export const STATIC_CONTENT = {
   about: {
-    USER_GUIDE_PDF: `${env.REACT_APP_STATIC_CONTENT_URL}about/CDSPortalUserGuide.pdf`,
+    USER_GUIDE_PDF: `${env.REACT_APP_STATIC_CONTENT_URL}about/GeneralCommonsUserGuide.pdf`,
     CDS_CONTENT_IMAGE: `${env.REACT_APP_STATIC_CONTENT_URL}about/cds.png`,
     CRDC_CONTENT_IMAGE: `${env.REACT_APP_STATIC_CONTENT_URL}about/crdc.png`,
     LEFT_BG_IMAGE: `${env.REACT_APP_STATIC_CONTENT_URL}about/leftBg.jpg`,
