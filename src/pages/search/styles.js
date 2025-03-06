@@ -35,6 +35,9 @@ const styles = () => ({
     background: '#D9E8F8',
     marginTop: '-47px',
   },
+  globalSearchHeader: {
+    display: 'none',
+  },
   autocomplete: {
     margin: '0 auto',
     paddingTop: '57px',
