@@ -49,7 +49,7 @@
     - paragraph: ""
     - listWithBullets:
       - "Read more about tools for data analysis on the $$[Velsera website](https://docs.cancergenomicscloud.org/docs/workflows-and-tools)$$"
-      - "$$[Learn more about importing files from GC Portal to Velsera](https://raw.githubusercontent.com/CBIIT/bento-cds-static-content/prod/about/CDSPortalUserGuide.pdf)$$"
+      - "$$[Learn more about importing files from GC Portal to Velsera](<%= USER_GUIDE_PDF %>)$$"
 - page: '/cloudresources'
   title: "NCI's Cloud Services"
   primaryContentImage: <%= CRDC_CONTENT_IMAGE %>
