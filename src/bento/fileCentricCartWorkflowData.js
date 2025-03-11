@@ -33,7 +33,7 @@ export const tooltipContent = {
 
 //BENTO-2455 Configuration set for Bento 4.0.
 export const myFilesPageData = {
-  manifestFileName: 'CDS File Manifest',
+  manifestFileName: 'GC File Manifest',
   tooltipIcon: 'https://raw.githubusercontent.com/google/material-design-icons/master/src/action/help/materialicons/24px.svg',
   tooltipAlt: 'tooltip icon',
   tooltipMessage: 'To access and analyze files: select and remove unwanted files,  click the “Download Manifest” button, and upload the resulting Manifest file to your Seven Bridges Genomics account.',
