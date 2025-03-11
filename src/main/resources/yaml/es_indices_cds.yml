@@ -158,7 +158,6 @@ Indices:
             apoc.map.merge(opensearch_data, {
               participant_id: COALESCE(p.participant_id, na),
               sex: COALESCE(p.sex, na),
-              sex: COALESCE(p.sex, na),
               ethnicity: COALESCE(p.ethnicity, na),
               race: COALESCE(p.race, na),
               subject_ids: p.participant_id,
