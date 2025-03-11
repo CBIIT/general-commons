@@ -316,6 +316,7 @@ type FileOverview {
 
     is_supplementary_file: String
     release_datetime: String
+    supplementary_file_names: [String]
 }
 
 type FilesInList {

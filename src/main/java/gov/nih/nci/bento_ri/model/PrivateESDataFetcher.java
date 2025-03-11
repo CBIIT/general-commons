@@ -508,7 +508,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             new String[]{"image_modality", "image_modality"},
             new String[]{"organ_or_tissue", "organ_or_tissue"},
             new String[]{"release_datetime", "release_datetime"},
-            new String[]{"is_supplementary_file", "is_supplementary_file"}
+            new String[]{"is_supplementary_file", "is_supplementary_file"},
+            new String[]{"supplementary_file_names", "supplementary_file_names"}
     };
 
         String defaultSort = "file_name"; // Default sort order
@@ -537,7 +538,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("organ_or_tissue", "organ_or_tissue_sort"),
                 Map.entry("imaging_assay_type", "imaging_assay_type_sort"),
                 Map.entry("tissue_fixative", "tissue_fixative_sort"),
-                Map.entry("is_supplementary_file", "is_supplementary_file")
+                Map.entry("is_supplementary_file", "is_supplementary_file"),
+                Map.entry("supplementary_file_names", "supplementary_file_names_sort")
         );
 
         List<Map<String, Object>> fileOverview = overview(FILES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
