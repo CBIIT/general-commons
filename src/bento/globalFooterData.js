@@ -1,5 +1,5 @@
 import instagramIcon from '../assets/footer/Instgram_Logo.svg';
-import twitterIcon from '../assets/footer/Twitter_Logo.svg';
+import xIcon from '../assets/footer/X_Logo.svg';
 import facebookIcon from '../assets/footer/Facebook_Logo.svg';
 import youtubeIcon from '../assets/footer/Youtube_Logo.svg';
 import linkedInIcon from '../assets/footer/LinkedIn_Logo.svg';
@@ -13,6 +13,9 @@ export default {
   footerStaticText: 'NIH … Turning Discovery Into Health®',
   version: env.REACT_APP_FE_VERSION,
   BEversion: env.REACT_APP_BE_VERSION,
+  signUpTitle: "Sign up for email updates",
+  signUpEnterTitle: "Enter your email address",
+  signUpButtonLabel: "Sign up",
   // A maximum of 3 Subsections (link_sections) are allowed
   // A maximum of 4 Subsection Links ('items' under link_sections) are allowed
   // A maximum of 4 Anchor Links (global_footer_links) are allowed
@@ -69,7 +72,7 @@ export default {
         ],
       },
       {
-        title: 'System Info',
+        title: 'Sysinfo',
         items: [
           {
             text: 'Bento',
@@ -95,9 +98,9 @@ export default {
       description: 'instagramIcon',
     },
     {
-      img: twitterIcon,
-      link: 'https://twitter.com/thenci',
-      description: 'twitterIcon',
+      img: xIcon,
+      link: 'https://x.com/thenci',
+      description: 'xIcon',
     },
     {
       img: facebookIcon,
