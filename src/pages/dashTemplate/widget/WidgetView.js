@@ -69,14 +69,13 @@ const WidgetView = ({
         <Grid container>
           {widgetConfig.slice(0, 6).map((widget, index) => {
             const dataset = displayWidgets[widget.dataName];
-            if (!dataset || dataset.length === 0) {
-              return <></>;
-            }
             if (widget.type === 'sunburst' && (!dataset.children || !dataset.children.length)) {
               return <></>;
             }
             //Sort the Dataset in reverse alphabetical order
-            sortWidgetData(dataset);
+            if (dataset && dataset.length > 0) {
+              sortWidgetData(dataset);
+            }
             return (
               <Grid key={index} item lg={4} md={6} sm={12} xs={12}>
                 <Widget
