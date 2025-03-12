@@ -7,7 +7,7 @@ const GENOMIC = 'Genomic';
 const IMAGING = 'Imaging';
 const DIAGNOSIS = 'Diagnosis';
 const FILES = 'Files';
-// const PROTEOMIC = 'Proteomic';
+const PROTEOMIC = 'Proteomic';
 
 // --------------- Facet resetIcon link configuration --------------
 // Ideal size for resetIcon is 16x16 px
@@ -44,11 +44,9 @@ export const facetSectionVariables = {
   Extra: {
     isExpanded: true,
   },
-  /* Disabled Temporarily
   Proteomic: {
     isExpanded: true,
   },
-  */
 };
 
 export const facetsConfig = [
@@ -323,7 +321,6 @@ export const facetsConfig = [
     show: true,
   },
   // PROTEOMIC
-  /* Disabled temporarily
   {
     section: PROTEOMIC,
     label: "Analytical Fractions",
@@ -346,18 +343,17 @@ export const facetsConfig = [
     sort_type: sortType.ALPHABET,
     show: true,
   },
-  {
-    section: PROTEOMIC,
-    label: "Proteomic Design Description",
-    apiPath: "filterSubjectCountByProteomicDesignDescriptions",
-    apiForFiltering: "filterSubjectCountByProteomicDesignDescriptions",
-    datafield: "proteomic_design_descriptions",
-    field: "group",
-    type: InputTypes.CHECKBOX,
-    sort_type: sortType.ALPHABET,
-    show: true,
-  },
-  */
+  // {
+  //   section: PROTEOMIC,
+  //   label: "Proteomic Design Description",
+  //   apiPath: "filterSubjectCountByProteomicDesignDescriptions",
+  //   apiForFiltering: "filterSubjectCountByProteomicDesignDescriptions",
+  //   datafield: "proteomic_design_descriptions",
+  //   field: "group",
+  //   type: InputTypes.CHECKBOX,
+  //   sort_type: sortType.ALPHABET,
+  //   show: true,
+  // },
 ];
 
 // --------------- Dashboard Widgets configuration --------------

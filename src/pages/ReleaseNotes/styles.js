@@ -20,6 +20,7 @@ const styles = () => ({
     color: '#43779A',
     fontFamily: 'Lato',
     fontStyle: 'normal',
+    margin: "22px 0",
     /* or 114% */
 
     letterSpacing: '0.14994',

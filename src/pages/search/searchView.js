@@ -338,6 +338,7 @@ function searchView(props) {
     <>
       <div className={classes.heroArea}>
         <div>
+          <h1 className={classes.globalSearchHeader} aria-hidden="true">Global Search</h1>
           <SearchBar value={searchText} clearable={!false} style={{ width: 750 }} />
         </div>
       </div>

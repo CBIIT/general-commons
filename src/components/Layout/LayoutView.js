@@ -56,7 +56,7 @@ const Layout = ({ classes, isSidebarOpened }) => {
         <Notifactions />
         <AuthSessionTimeoutController />
         <TextBanner
-          heading="CRDC’s Cancer Data Service (CDS) is now the General Commons (GC): Hosting and sharing NCI data of multiple Data Types not fit for other Data Commons."
+          heading="CRDC’s Cancer Data Service (CDS) is now the General Commons (GC): Hosting and sharing NCI data of multiple data types that are not a match for other Data Commons."
           aria-label="CDS announcement banner"
         />
         <Header />

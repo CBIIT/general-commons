@@ -1,6 +1,6 @@
 // import { withStyles } from "@mui/styles";
 import {
-  Table, TableBody, TableCell, TableRow, withStyles,
+  Table, TableBody, TableCell, TableHead, TableRow, withStyles,
 } from '@material-ui/core';
 import { ArrowDropDown, Launch } from '@material-ui/icons'; 
 import clsx from 'clsx'; 
@@ -46,7 +46,7 @@ const ReleaseVersions = (props) => {
             <div className={classes.wrapper}>
               <div className={classes.tableWrapper}>
                 <Table>
-                  <TableBody>
+                  <TableHead className={classes.tableHead}>
                     <TableRow>
                       <TableCell colSpan={2} > 
                         <span className={clsx(classes.releaseHeading, classes.dataHeading)} onClick={() => setExpanded(!expanded)}>  
@@ -55,6 +55,8 @@ const ReleaseVersions = (props) => {
                         </span> 
                       </TableCell> 
                     </TableRow>
+                  </TableHead>
+                  <TableBody>
                     {jsonData.VERSIONS.map((row) => (
                       <TableRow key={row.id} onClick={() => setVersionDetails(row)} className={expanded ? '' : classes.hiddenRow}>
                         <TableCell align="left"><span className={classes.version}>{"Version: " + row.versionNumber}</span></TableCell> 
