@@ -883,6 +883,10 @@ Indices:
         type: keyword
       site_sort:
         type: keyword
+      supplementary_file_names:
+        type: keyword
+      supplementary_file_names_sort:
+        type: keyword
       # Global search properties
       file_id_gs:
         type: search_as_you_type
@@ -1110,12 +1114,20 @@ Indices:
             CASE WHEN af.file_id IS NOT NULL THEN 'drs://nci-crdc.datacommons.io/' + af.file_id ELSE na END AS associated_drs_uri,
             COALESCE(af.md5sum, na) AS associated_md5sum,
             COALESCE(af.is_supplementary_file, na) AS associated_is_supplementary_file
-          WITH f, na,
+          WITH f, na, 
             apoc.map.merge(opensearch_data, {
               associated_file: associated_file,
               associated_drs_uri: associated_drs_uri,
               associated_md5sum: associated_md5sum,
               associated_is_supplementary_file: associated_is_supplementary_file
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)-->(sf:file {is_supplementary_file: "true"})
+          WITH f, na, opensearch_data,
+             apoc.coll.sort(COLLECT(DISTINCT sf.file_name)) AS supplementary_file_names
+          WITH f, na, 
+            apoc.map.merge(opensearch_data, {
+              supplementary_file_names: supplementary_file_names,
+              supplementary_file_names_sort: apoc.text.join(supplementary_file_names, '')
             }) AS opensearch_data
           RETURN opensearch_data
           ORDER BY opensearch_data.files
