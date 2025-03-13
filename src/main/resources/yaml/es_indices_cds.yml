@@ -188,7 +188,7 @@ Indices:
                 CASE WHEN f.experimental_strategy_and_data_subtypes = '[]' THEN na ELSE 
                 apoc.text.replace(f.experimental_strategy_and_data_subtypes,'\\[|\\]|\\"',
                 '') END, '[;,]\\s{0,1}')), true))) AS experimental_strategies,
-              apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_type, na))) AS file_types,
+              apoc.coll.sort(COLLECT(DISTINCT COALESCE(toUpper(f.file_type), na))) AS file_types,
               apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_id, na))) AS files
           WITH p, na,
             apoc.map.merge(opensearch_data, {
@@ -471,7 +471,7 @@ Indices:
               CASE WHEN f.experimental_strategy_and_data_subtypes = '[]' THEN na ELSE 
               apoc.text.replace(f.experimental_strategy_and_data_subtypes,'\\[|\\]|\\"',
               '') END, '[;,]\\s{0,1}')), true))) AS experimental_strategies,
-            apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_type, na))) AS file_types,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(toUpper(f.file_type), na))) AS file_types,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_id, na))) AS files
           WITH samp, na,
             apoc.map.merge(opensearch_data, {
@@ -980,7 +980,7 @@ Indices:
               file_size: f.file_size,
               md5sum: f.md5sum,
               experimental_strategies_gs: experimental_strategy_and_data_subtypes,
-              file_type_gs: f.file_type ,
+              file_type_gs: toUpper(f.file_type),
               file_id_gs: f.file_id,
               file_name_gs: f.file_name,
               file_url_in_cds: f.file_url_in_cds,
@@ -2191,7 +2191,7 @@ Indices:
             files: CASE WHEN f IS NOT NULL THEN COLLECT(DISTINCT {
               file_id: f.file_id,
               file_name: f.file_name,
-              file_type: f.file_type,
+              file_type: toUpper(f.file_type),
               file_description: f.file_description,
               file_size: f.file_size,
               md5sum: f.md5sum,
