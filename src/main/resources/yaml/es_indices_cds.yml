@@ -1126,8 +1126,8 @@ Indices:
              apoc.coll.sort(COLLECT(DISTINCT sf.file_name)) AS supplementary_file_names
           WITH f, na, 
             apoc.map.merge(opensearch_data, {
-              supplementary_file_names: supplementary_file_names
-              supplementary_file_names_sort: apoc.text.join(supplementary_file_names, ''),
+              supplementary_file_names: supplementary_file_names,
+              supplementary_file_names_sort: apoc.text.join(supplementary_file_names, '')
             }) AS opensearch_data
           RETURN opensearch_data
           ORDER BY opensearch_data.files
