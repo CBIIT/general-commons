@@ -48,7 +48,7 @@ export const HeaderLinks = [
 export const HeaderSubLinks = {
   ABOUT: [
     {
-      name: 'About the CRDC General Commons',
+      name: 'About\nGeneral Commons',
       link: '/cancerDataService',
       id: 'about-cancer-data-service',
       className: 'navMobileSubItem',
@@ -66,19 +66,19 @@ export const HeaderSubLinks = {
       className: 'navMobileSubItem',
     },
     {
-      name: 'Query the CRDC GC using GraphQL',
+      name: 'Query the GC\nusing GraphQL',
       link: '/graphql',
       id: 'about-graphql',
       className: 'navMobileSubItem',
     },
     {
-      name: 'Release Notes',
+      name: 'GC Releases',
       link: '/releases',
       id: 'about-releases',
       className: 'navMobileSubItem',
     },
     {
-      name: 'CRDC General Commons User Guide',
+      name: 'GC User Guide',
       link: STATIC_CONTENT.about.USER_GUIDE_PDF,
       id: 'about-user-guide',
       className: 'navMobileSubItem',
