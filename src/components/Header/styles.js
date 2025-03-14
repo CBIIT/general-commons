@@ -56,11 +56,11 @@ export const styles = () => ({
     width: "100%",
     height: "32px",
     padding: "0px !important",
-    marginTop: "-1px",
+    marginTop: "0px",
 
     "@media (max-width:1024px)": {
       height: "43px",
-      marginTop: "0px",
+      marginTop: "-1px",
     },
 
     "& input": {
