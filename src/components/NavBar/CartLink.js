@@ -56,7 +56,7 @@ const styles = () => ({
       props.navBarstyling.cartLabel &&
       props.navBarstyling.cartLabel.color
         ? props.navBarstyling.cartLabel.color
-        : '#E37B22',
+        : '#942A90',
     lineHeight: '13px',
     minWidth: '16px',
     fontFamily: 'Poppins',
