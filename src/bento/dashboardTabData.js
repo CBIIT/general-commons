@@ -78,306 +78,336 @@ export const tabIndex = [
 
 export const DASHBOARD_QUERY = gql`
 query searchSubjects(
-  $subject_ids: [String],
-  $accesses:[String],
-  $acl:[String],
-  $experimental_strategies:[String],
-  $file_types:[String],
-  $sex:[String],
-  $image_modality:[String],
-  $instrument_models:[String],
-  $is_tumor:[String],
-  $library_layouts:[String],
-  $library_selections:[String],
-  $library_source_materials:[String],
-  $library_source_molecules:[String],
-  $library_strategies:[String],
-  $number_of_study_participants:[Float],
-  $number_of_study_samples:[Float],
-  $phs_accession:[String],
-  $platforms:[String],
-  $primary_diagnoses:[String],
-  $reference_genome_assemblies:[String],
-  $sample_types:[String],
-  $site:[String],
-  $studies:[String],
-  $study_data_types:[String],
-  $analytical_fractions:[String],
-  $instrument_makes:[String],
-  $proteomic_design_descriptions:[String],
-  $organ_or_tissue:[String],
-  $tissue_fixative:[String],
-  $imaging_assay_type:[String],
-){
-  searchSubjects(
-      subject_ids: $subject_ids,
-      accesses:$accesses,
-      acl:$acl,
-      experimental_strategies:$experimental_strategies,
-      file_types:$file_types,
-      sex:$sex,
-      image_modality:$image_modality,
-      instrument_models:$instrument_models,
-      is_tumor:$is_tumor,
-      library_layouts:$library_layouts,
-      library_selections:$library_selections,
-      library_source_materials:$library_source_materials,
-      library_source_molecules:$library_source_molecules,
-      library_strategies:$library_strategies,
-      number_of_study_participants:$number_of_study_participants,
-      number_of_study_samples:$number_of_study_samples,
-      phs_accession:$phs_accession,
-      platforms:$platforms,
-      primary_diagnoses:$primary_diagnoses,
-      reference_genome_assemblies:$reference_genome_assemblies,
-      sample_types:$sample_types,
-      site:$site,
-      studies:$studies,
-      study_data_types:$study_data_types,
-      analytical_fractions:$analytical_fractions,
-      instrument_makes:$instrument_makes,
-      proteomic_design_descriptions:$proteomic_design_descriptions,
-      organ_or_tissue:$organ_or_tissue,
-      tissue_fixative:$tissue_fixative,
-      imaging_assay_type:$imaging_assay_type
-  ){
-      numberOfStudies
-      numberOfSubjects
-      numberOfSamples
-      numberOfFiles
-      numberOfDiseaseSites
-      donutCountByExperimentalStrategy{
-          group
-          subjects
-      }
-      donutCountBySex{
-          group
-          subjects
-      }
-      donutCountByFileType{
-          group
-          subjects
-      }
-      donutCountByImageModality{
-          group
-          subjects
-      }
-      donutCountBySampleType{
-          group
-          subjects
-      }
-      donutCountByStudyDataTypes{
-          group
-          subjects
-      }
-      subjectCountByStudy{
-          group
-          subjects
-      }
-      subjectCountByAccess{
-          group
-          subjects
-      }
-      subjectCountByIsTumor{
-          group
-          subjects
-      }
-      subjectCountByAnalyteType{
-          group
-          subjects
-      }
-      subjectCountByDiseaseSite{
-          group
-          subjects
-      }
-      subjectCountByLibraryStrategy{
-          group
-          subjects
-      }
-      subjectCountByLibrarySourceMaterial{
-          group
-          subjects
-      }
-      subjectCountByLibrarySourceMolecule{
-          group
-          subjects
-      }
-      subjectCountByLibrarySelection{
-          group
-          subjects
-      }
-      subjectCountByLibraryLayout{
-          group
-          subjects
-      }
-      subjectCountByPlatform{
-          group
-          subjects
-      }
-      subjectCountByInstrumentModel{
-          group
-          subjects
-      }
-      subjectCountByReferenceGenomeAssembly{
-          group
-          subjects
-      }
-      subjectCountByPrimaryDiagnosis{
-          group
-          subjects
-      }
-      subjectCountByPhsAccession{
-          group
-          subjects
-      }
-      subjectCountByAcl{
-          group
-          subjects
-      }
-      subjectCountByAnalyticalFractions{
-          group
-          subjects
-      }
-      subjectCountByInstrumentMakes{
-          group
-          subjects
-      }
-      subjectCountByProteomicDesignDescriptions{
-          group
-          subjects
-      }
-      subjectCountByTissueFixative{
-          group
-          subjects
-      }
-      subjectCountByImagingAssayType{
-          group
-          subjects
-      }
-      subjectCountByOrganOrTissue{
-          group
-          subjects
-      }
-      
-      filterSubjectCountByStudy{
-          group
-          subjects
-      }
-      filterSubjectCountByExperimentalStrategy{
-          group
-          subjects
-      }
-      filterSubjectCountByAccess{
-          group
-          subjects
-      }
-      filterSubjectCountBySex{
-          group
-          subjects
-      }
-      filterSubjectCountByIsTumor{
-          group
-          subjects
-      }
-      filterSubjectCountByFileType{
-          group
-          subjects
-      }
-      filterSubjectCountByAnalyteType{
-          group
-          subjects
-      }
-      filterSubjectCountByDiseaseSite{
-          group
-          subjects
-      }
-      filterSubjectCountByLibraryStrategy{
-          group
-          subjects
-      }
-      filterSubjectCountByLibrarySourceMaterial{
-          group
-          subjects
-      }
-      filterSubjectCountByLibrarySourceMolecule{
-          group
-          subjects
-      }
-      filterSubjectCountByLibrarySelection{
-          group
-          subjects
-      }
-      filterSubjectCountByLibraryLayout{
-          group
-          subjects
-      }
-      filterSubjectCountByPlatform{
-          group
-          subjects
-      }
-      filterSubjectCountByImageModality{
-          group
-          subjects
-      }
-      filterSubjectCountByInstrumentModel{
-          group
-          subjects
-      }
-      filterSubjectCountByReferenceGenomeAssembly{
-          group
-          subjects
-      }
-      filterSubjectCountByPrimaryDiagnosis{
-          group
-          subjects
-      }
-      filterSubjectCountByPhsAccession{
-          group
-          subjects
-      }
-      filterSubjectCountBySampleType{
-          group
-          subjects
-      }
-      filterSubjectCountByStudyDataType{
-          group
-          subjects
-      }
-      filterSubjectCountByNumberOfStudyParticipants{
-          lowerBound
-          upperBound
-          subjects
-      }
-      filterSubjectCountByNumberOfStudySamples{
-          lowerBound
-          upperBound
-          subjects
-      }
-      filterSubjectCountByAnalyticalFractions{
-          group
-          subjects
-      }
-      filterSubjectCountByInstrumentMakes{
-          group
-          subjects
-      }
-      filterSubjectCountByProteomicDesignDescriptions{
-          group
-          subjects
-      }
-      filterSubjectCountByTissueFixative{
-          group
-          subjects
-      }
-      filterSubjectCountByImagingAssayType{
-          group
-          subjects
-      }
-      filterSubjectCountByOrganOrTissue{
-          group
-          subjects
-      }
-  }
+  $subject_ids: [String], 
+  $accesses: [String], 
+  $acl: [String], 
+  $experimental_strategies: [String], 
+  $file_types: [String], 
+  $sex: [String], 
+  $image_modality: [String], 
+  $instrument_models: [String], 
+  $is_tumor: [String], 
+  $library_layouts: [String], 
+  $library_selections: [String], 
+  $library_source_materials: [String], 
+  $library_source_molecules: [String], 
+  $library_strategies: [String], 
+  $number_of_study_participants: [Float], 
+  $number_of_study_samples: [Float], 
+  $phs_accession: [String], 
+  $platforms: [String], 
+  $primary_diagnoses: [String], 
+  $reference_genome_assemblies: [String], 
+  $sample_types: [String], 
+  $site: [String], 
+  $studies: [String], 
+  $study_data_types: [String], 
+  $analytical_fractions: [String], 
+  $instrument_makes: [String], 
+  $proteomic_design_descriptions: [String], 
+  $organ_or_tissue: [String], 
+  $tissue_fixative: [String], $imaging_assay_type: [String], 
+  $is_supplementary_file: [String]){
+    searchSubjects(
+    subject_ids: $subject_ids, 
+    accesses: $accesses, 
+    acl: $acl, 
+    experimental_strategies: $experimental_strategies, 
+    file_types: $file_types, 
+    sex: $sex, 
+    image_modality: $image_modality, 
+    instrument_models: $instrument_models, 
+    is_tumor: $is_tumor, 
+    library_layouts: $library_layouts, 
+    library_selections: $library_selections, 
+    library_source_materials: $library_source_materials, 
+    library_source_molecules: $library_source_molecules, 
+    library_strategies: $library_strategies, 
+    number_of_study_participants: $number_of_study_participants, 
+    number_of_study_samples: $number_of_study_samples, 
+    phs_accession: $phs_accession, 
+    platforms: $platforms, 
+    primary_diagnoses: $primary_diagnoses, 
+    reference_genome_assemblies: $reference_genome_assemblies, 
+    sample_types: $sample_types, 
+    site: $site, 
+    studies: $studies, 
+    study_data_types: $study_data_types, 
+    analytical_fractions: $analytical_fractions, 
+    instrument_makes: $instrument_makes, 
+    proteomic_design_descriptions: $proteomic_design_descriptions, 
+    organ_or_tissue: $organ_or_tissue, 
+    tissue_fixative: $tissue_fixative, 
+    imaging_assay_type: $imaging_assay_type, 
+    is_supplementary_file: $is_supplementary_file){
+        numberOfStudies
+        numberOfSubjects
+        numberOfSamples
+        numberOfFiles
+        numberOfDiseaseSites
+        donutCountByExperimentalStrategy{
+            group
+            subjects
+        }
+        donutCountBySex{
+            group
+            subjects
+        }
+        donutCountByFileType{
+            group
+            subjects
+        }
+        donutCountByStudyDataTypes{
+            group
+            subjects
+        }
+        donutCountByImageModality{
+            group
+            subjects
+        }
+        donutCountBySampleType{
+            group
+            subjects
+        }
+        subjectCountByStudy{
+            group
+            subjects
+        }
+        subjectCountByExperimentalStrategy{
+            group
+            subjects
+        }
+        subjectCountByAccess{
+            group
+            subjects
+        }
+        subjectCountBySex{
+            group
+            subjects
+        }
+        subjectCountByIsTumor{
+            group
+            subjects
+        }
+        subjectCountByAnalyteType{
+            group
+            subjects
+        }
+        subjectCountByFileType{
+            group
+            subjects
+        }
+        subjectCountByDiseaseSite{
+            group
+            subjects
+        }
+        subjectCountByLibraryStrategy{
+            group
+            subjects
+        }
+        subjectCountByLibrarySourceMaterial{
+            group
+            subjects
+        }
+        subjectCountByLibrarySourceMolecule{
+            group
+            subjects
+        }
+        subjectCountByLibrarySelection{
+            group
+            subjects
+        }
+        subjectCountByLibraryLayout{
+            group
+            subjects
+        }
+        subjectCountByPlatform{
+            group
+            subjects
+        }
+        subjectCountByImageModality{
+            group
+            subjects
+        }
+        subjectCountByInstrumentModel{
+            group
+            subjects
+        }
+        subjectCountByReferenceGenomeAssembly{
+            group
+            subjects
+        }
+        subjectCountByPrimaryDiagnosis{
+            group
+            subjects
+        }
+        subjectCountByPhsAccession{
+            group
+            subjects
+        }
+        subjectCountBySampleType{
+            group
+            subjects
+        }
+        subjectCountByStudyDataType{
+            group
+            subjects
+        }
+        subjectCountByAcl{
+            group
+            subjects
+        }
+        subjectCountByAnalyticalFractions{
+            group
+            subjects
+        }
+        subjectCountByInstrumentMakes{
+            group
+            subjects
+        }
+        subjectCountByProteomicDesignDescriptions{
+            group
+            subjects
+        }
+        subjectCountByTissueFixative{
+            group
+            subjects
+        }
+        subjectCountByImagingAssayType{
+            group
+            subjects
+        }
+        subjectCountByOrganOrTissue{
+            group
+            subjects
+        }
+        subjectCountByIsSupplementaryFile{
+            group
+            subjects
+        }
+        filterSubjectCountByStudy{
+            group
+            subjects
+        }
+        filterSubjectCountByExperimentalStrategy{
+            group
+            subjects
+        }
+        filterSubjectCountByAccess{
+            group
+            subjects
+        }
+        filterSubjectCountBySex{
+            group
+            subjects
+        }
+        filterSubjectCountByIsTumor{
+            group
+            subjects
+        }
+        filterSubjectCountByFileType{
+            group
+            subjects
+        }
+        filterSubjectCountByAnalyteType{
+            group
+            subjects
+        }
+        filterSubjectCountByDiseaseSite{
+            group
+            subjects
+        }
+        filterSubjectCountByLibraryStrategy{
+            group
+            subjects
+        }
+        filterSubjectCountByLibrarySourceMaterial{
+            group
+            subjects
+        }
+        filterSubjectCountByLibrarySourceMolecule{
+            group
+            subjects
+        }
+        filterSubjectCountByLibrarySelection{
+            group
+            subjects
+        }
+        filterSubjectCountByLibraryLayout{
+            group
+            subjects
+        }
+        filterSubjectCountByPlatform{
+            group
+            subjects
+        }
+        filterSubjectCountByImageModality{
+            group
+            subjects
+        }
+        filterSubjectCountByInstrumentModel{
+            group
+            subjects
+        }
+        filterSubjectCountByReferenceGenomeAssembly{
+            group
+            subjects
+        }
+        filterSubjectCountByPrimaryDiagnosis{
+            group
+            subjects
+        }
+        filterSubjectCountByPhsAccession{
+            group
+            subjects
+        }
+        filterSubjectCountBySampleType{
+            group
+            subjects
+        }
+        filterSubjectCountByStudyDataType{
+            group
+            subjects
+        }
+        filterSubjectCountByNumberOfStudyParticipants{
+            lowerBound
+            upperBound
+            subjects
+        }
+        filterSubjectCountByNumberOfStudySamples{
+            lowerBound
+            upperBound
+            subjects
+        }
+        filterSubjectCountByAnalyticalFractions{
+            group
+            subjects
+        }
+        filterSubjectCountByInstrumentMakes{
+            group
+            subjects
+        }
+        filterSubjectCountByProteomicDesignDescriptions{
+            group
+            subjects
+        }
+        filterSubjectCountByTissueFixative{
+            group
+            subjects
+        }
+        filterSubjectCountByImagingAssayType{
+            group
+            subjects
+        }
+        filterSubjectCountByOrganOrTissue{
+            group
+            subjects
+        }
+        filterSubjectCountByIsSupplementaryFile{
+            group
+            subjects
+        }
+    }
 }
 `;
 
@@ -415,6 +445,7 @@ query subjectOverview(
   $organ_or_tissue:[String],
   $tissue_fixative:[String],
   $imaging_assay_type:[String],
+  $is_supplementary_file: [String],
 
   $order_by: String,
   $sort_direction: String,
@@ -452,6 +483,7 @@ query subjectOverview(
       organ_or_tissue:$organ_or_tissue,
       tissue_fixative:$tissue_fixative,
       imaging_assay_type:$imaging_assay_type,
+      is_supplementary_file: $is_supplementary_file,
 
       order_by:$order_by,
       sort_direction:$sort_direction,
@@ -505,6 +537,7 @@ query fileOverview(
   $organ_or_tissue:[String],
   $tissue_fixative:[String],
   $imaging_assay_type:[String],
+  $is_supplementary_file: [String],
 
   $order_by: String,
   $sort_direction: String,
@@ -543,6 +576,7 @@ query fileOverview(
       organ_or_tissue:$organ_or_tissue,
       tissue_fixative:$tissue_fixative,
       imaging_assay_type:$imaging_assay_type,
+      is_supplementary_file: $is_supplementary_file,
 
       order_by:$order_by,
       sort_direction:$sort_direction,
@@ -565,6 +599,7 @@ query fileOverview(
       study_data_type
       library_strategy
       image_modality
+      supplementary_file_names
   }
 }
 `;
@@ -602,6 +637,7 @@ query sampleOverview(
   $organ_or_tissue:[String],
   $tissue_fixative:[String],
   $imaging_assay_type:[String],
+  $is_supplementary_file: [String],
 
   $order_by: String,
   $sort_direction: String,
@@ -640,6 +676,7 @@ query sampleOverview(
       organ_or_tissue:$organ_or_tissue,
       tissue_fixative:$tissue_fixative,
       imaging_assay_type:$imaging_assay_type,
+      is_supplementary_file: $is_supplementary_file,
 
       order_by:$order_by,
       sort_direction:$sort_direction,
@@ -869,6 +906,7 @@ query fileOverview(
   $organ_or_tissue:[String],
   $tissue_fixative:[String],
   $imaging_assay_type:[String],
+  $is_supplementary_file: [String],
 
   $order_by: String,
   $sort_direction: String,
@@ -907,6 +945,7 @@ query fileOverview(
       organ_or_tissue:$organ_or_tissue,
       tissue_fixative:$tissue_fixative,
       imaging_assay_type:$imaging_assay_type,
+      is_supplementary_file: $is_supplementary_file,
 
       order_by:$order_by,
       sort_direction:$sort_direction,
@@ -970,7 +1009,7 @@ export const tabContainers = [
       {
         dataField: 'phs_accession',
         header: 'Accession',
-        linkAttr : {
+        linkAttr: {
           rootPath: '/study',
           pathParams: ['phs_accession'],
           // i.e: link: '/study/{phs_accession}',
@@ -1104,7 +1143,7 @@ export const tabContainers = [
       {
         dataField: 'phs_accession',
         header: 'Accession',
-        linkAttr : {
+        linkAttr: {
           rootPath: '/study',
           pathParams: ['phs_accession'],
         },
@@ -1212,7 +1251,7 @@ export const tabContainers = [
         dataField: 'phs_accession',
         header: 'Accession',
         cellType: cellTypes.LINK,
-        linkAttr : {
+        linkAttr: {
           rootPath: '/study',
           pathParams: ['phs_accession'],
           // i.e: link: '/study/{phs_accession}',
@@ -1303,6 +1342,13 @@ export const tabContainers = [
         cellType: cellTypes.CUSTOM_ELEM,
       },
       {
+        dataField: 'supplementary_file_names',
+        header: 'Supplementary Files',
+        display: true,
+        tooltipText: 'Supplemental files contain additional data and references supporting the study.',
+        role: cellTypes.DISPLAY,
+      },
+      {
         dataField: 'image_modality',
         header: 'Image Modality',
         display: false,
@@ -1327,4 +1373,3 @@ export const tabContainers = [
 ];
 
 
-  
