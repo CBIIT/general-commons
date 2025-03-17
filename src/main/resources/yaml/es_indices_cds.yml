@@ -68,6 +68,8 @@ Indices:
         type: keyword
       proteomic_design_descriptions:
         type: keyword
+      is_supplementary_file:
+        type: keyword
       # Sort properties
       is_tumor_sort:
         type: keyword
@@ -104,6 +106,8 @@ Indices:
       tissue_fixative_sort:
         type: keyword
       image_modality_sort:
+        type: keyword
+      is_supplementary_file_sort:
         type: keyword
       # Global Search properties
       site_gs:
@@ -189,14 +193,17 @@ Indices:
                 apoc.text.replace(f.experimental_strategy_and_data_subtypes,'\\[|\\]|\\"',
                 '') END, '[;,]\\s{0,1}')), true))) AS experimental_strategies,
               apoc.coll.sort(COLLECT(DISTINCT COALESCE(toUpper(f.file_type), na))) AS file_types,
-              apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_id, na))) AS files
+              apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_id, na))) AS files,
+              apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.is_supplementary_file, na))) AS is_supplementary_file
           WITH p, na,
             apoc.map.merge(opensearch_data, {
               experimental_strategies: experimental_strategies,
               file_types: file_types,
               files: files,
               experimental_strategies_sort: apoc.text.join(experimental_strategies, ''),
-              file_types_sort: apoc.text.join(file_types, '')
+              file_types_sort: apoc.text.join(file_types, ''),
+              is_supplementary_file: is_supplementary_file,
+              is_supplementary_file_sort: apoc.text.join(is_supplementary_file, '')
             }) AS opensearch_data
           OPTIONAL MATCH (p)<--(:file)<--(pr:proteomic)
           WITH p, na, opensearch_data, 
@@ -347,6 +354,8 @@ Indices:
         type: keyword
       proteomic_design_descriptions:
         type: keyword
+      is_supplementary_file:
+        type: keyword
       # Sort properties
       experimental_strategies_sort:
         type: keyword
@@ -379,6 +388,8 @@ Indices:
       image_modality_sort:
         type: keyword
       tissue_fixative_sort:
+        type: keyword
+      is_supplementary_file_sort:
         type: keyword
       # Global search properties
       sample_id_gs:
@@ -472,14 +483,17 @@ Indices:
               apoc.text.replace(f.experimental_strategy_and_data_subtypes,'\\[|\\]|\\"',
               '') END, '[;,]\\s{0,1}')), true))) AS experimental_strategies,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(toUpper(f.file_type), na))) AS file_types,
-            apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_id, na))) AS files
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.file_id, na))) AS files,
+            apoc.coll.sort(COLLECT(DISTINCT COALESCE(f.is_supplementary_file, na))) AS is_supplementary_file
           WITH samp, na,
             apoc.map.merge(opensearch_data, {
               experimental_strategies: experimental_strategies,
               file_types: file_types,
               files: files,
               experimental_strategies_sort: apoc.text.join(experimental_strategies, ''),
-              file_types_sort: apoc.text.join(file_types, '')
+              file_types_sort: apoc.text.join(file_types, ''),
+              is_supplementary_file: is_supplementary_file,
+              is_supplementary_file_sort: apoc.text.join(is_supplementary_file, '')
             }) AS opensearch_data
           OPTIONAL MATCH (samp)-->(:participant)<--(:file)<--(g:genomic_info)
           WITH samp, na, opensearch_data,
