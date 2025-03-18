@@ -44,6 +44,7 @@ const styles = () => ({
     maxWidth: "87.5rem",
   },
   body: ({ iconUrl }) => ({
+    width: "100%",
     position: "relative",
     color: "#1b1b1b",
     margin: 0,

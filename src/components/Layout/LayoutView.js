@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { withStyles, CssBaseline } from '@material-ui/core';
 import { HashRouter, Route, Switch } from 'react-router-dom';
 import aboutPageRoutes from '../../bento/aboutPagesRoutes';
 import Header from '../Header/HeaderView';
-import NavBar from '../NavBar/NavBarContainer';
 import Footer from '../Footer/FooterView';
 import Error from '../../pages/error/Error';
 import CaseDetail from '../../pages/caseDetail/caseDetailController';
@@ -37,7 +36,6 @@ import Notifactions from '../Notifications/NotifactionView';
 import DashTemplate from '../../pages/dashTemplate/DashTemplateController';
 import ReleaseVersions from '../../pages/ReleaseVersions';
 import TextBanner from '../TextBanner';
-import BannerWrapper from '../BannerWrapper';
 
 
 
@@ -49,42 +47,6 @@ const ScrollToTop = () => {
 const Layout = ({ classes, isSidebarOpened }) => {
   // Access control imports
   const { LoginRoute, MixedRoute, PrivateRoute, AdminRoute} = AuthenticationMiddlewareGenerator(AUTH_MIDDLEWARE_CONFIG);
-
-  useEffect(() => {
-    const adjustForSiteAlert = () => {
-      const hostDiv = document.body.children[0];
-      if (!hostDiv || !hostDiv.shadowRoot) {
-        document.documentElement.style.setProperty('--site-alert-offset', '0px');
-        return;
-      }
-
-      const siteAlert = hostDiv.shadowRoot.querySelector('.usa-site-alert');
-      if (siteAlert) {
-        document.documentElement.style.setProperty('--site-alert-offset', `${siteAlert.offsetHeight}px`);
-
-        // Adjust site alert styling to also be fixed
-        siteAlert.style.position = 'fixed';
-        siteAlert.style.top = 0;
-        siteAlert.style.left = 0;
-        siteAlert.style.width = '100%';
-        siteAlert.style.zIndex = '9999';
-      }
-    };
-
-    // Initial check
-    adjustForSiteAlert();
-    const observer = new MutationObserver(adjustForSiteAlert);
-
-    observer.observe(document.body, {
-      childList: true,
-    });
-    window.addEventListener('resize', adjustForSiteAlert);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('resize', adjustForSiteAlert);
-    }
-  }, [])
     
   return (
   <>
@@ -93,15 +55,12 @@ const Layout = ({ classes, isSidebarOpened }) => {
       <>
         <Notifactions />
         <AuthSessionTimeoutController />
-        <BannerWrapper>
-          <TextBanner
-            heading="CRDC’s Cancer Data Service (CDS) is now the General Commons (GC): Hosting and sharing NCI data of multiple data types that are not a match for other Data Commons."
-            aria-label="CDS announcement banner"
-          />
-        </BannerWrapper>
+        <TextBanner
+          heading="CRDC’s Cancer Data Service (CDS) is now the General Commons (GC): Hosting and sharing NCI data of multiple data types that are not a match for other Data Commons."
+          aria-label="CDS announcement banner"
+        />
         <Header />
         <OverlayWindow />
-        <NavBar />
         {/* Reminder: Ajay need to replace the ICDC with env variable and
           change build npm to read env variable */}
         <div
@@ -187,7 +146,7 @@ const styles = (theme) => ({
     // width: `calc(100vw - 240px)`,   // Ajay need to add this on addung side bar
     width: 'calc(100%)', // Remove this on adding sidebar
     background: theme.custom.bodyBackGround,
-    marginTop: 'calc(var(--site-alert-offset, 0px) + var(--banner-offset, 0px) + 196px)',
+    marginTop: '0',
   },
   '@global': {
     '*::-webkit-scrollbar': {
