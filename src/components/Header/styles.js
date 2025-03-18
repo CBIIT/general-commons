@@ -60,7 +60,7 @@ export const styles = () => ({
 
     "@media (max-width:1024px)": {
       height: "43px",
-      marginTop: "-1px",
+      marginTop: "0",
     },
 
     "& input": {
