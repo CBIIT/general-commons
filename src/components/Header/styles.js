@@ -151,7 +151,7 @@ export const styles = () => ({
     lineHeight: "33px",
     textAlign: "center",
     color: "#ffffff",
-    background: "#007bbd",
+    background: "#3A75BD",
     padding: "0 13px",
     borderRadius: "0px 5px 5px 0px",
     "&:hover": {
