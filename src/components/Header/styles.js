@@ -146,7 +146,7 @@ export const styles = () => ({
     zIndex: 1502,
     height: 32,
     fontFamily: "Open Sans",
-    fontWeight: 700,
+    fontWeight: 600,
     fontSize: "1rem",
     lineHeight: "33px",
     textAlign: "center",
