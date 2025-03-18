@@ -14,31 +14,31 @@ export const headerData = {
 
 export const HeaderLinks = [
   {
-    name: 'HOME',
+    name: 'Home',
     link: '/',
     id: 'navbar-dropdown-home',
     className: 'navMobileItem',
   },
   {
-    name: 'DATA',
+    name: 'Data',
     link: '/data',
     id: 'navbar-dropdown-data',
     className: 'navMobileItem',
   },
   {
-    name: 'PROGRAMS',
+    name: 'Programs',
     link: '/programs',
     id: 'navbar-dropdown-programs',
     className: 'navMobileItem',
   },
   {
-    name: 'STUDIES',
+    name: 'Studies',
     link: '/studies',
     id: 'navbar-dropdown-studies',
     className: 'navMobileItem',
   },
   {
-    name: 'ABOUT',
+    name: 'About',
     link: '#',
     id: 'navbar-dropdown-about',
     className: 'navMobileItem clickable',
@@ -46,17 +46,11 @@ export const HeaderLinks = [
 ];
 
 export const HeaderSubLinks = {
-  ABOUT: [
+  About: [
     {
       name: 'About\nGeneral Commons',
       link: '/cancerDataService',
       id: 'about-cancer-data-service',
-      className: 'navMobileSubItem',
-    },
-    {
-      name: 'Submission Requests',
-      link: 'https://hub.datacommons.cancer.gov/',
-      id: 'about-submission-requests',
       className: 'navMobileSubItem',
     },
     {
@@ -66,21 +60,27 @@ export const HeaderSubLinks = {
       className: 'navMobileSubItem',
     },
     {
+      name: 'Submission Requests',
+      link: 'https://hub.datacommons.cancer.gov/',
+      id: 'about-submission-requests',
+      className: 'navMobileSubItem',
+    },
+    {
       name: 'Query the GC\nusing GraphQL',
       link: '/graphql',
       id: 'about-graphql',
       className: 'navMobileSubItem',
     },
     {
-      name: 'GC Releases',
-      link: '/releases',
-      id: 'about-releases',
-      className: 'navMobileSubItem',
-    },
-    {
       name: 'GC User Guide',
       link: STATIC_CONTENT.about.USER_GUIDE_PDF,
       id: 'about-user-guide',
+      className: 'navMobileSubItem',
+    },
+    {
+      name: 'GC Releases',
+      link: '/releases',
+      id: 'about-releases',
       className: 'navMobileSubItem',
     },
   ],
