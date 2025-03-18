@@ -64,6 +64,7 @@ const styles = () => ({
     letterSpacing: '0.08rem',
     textAlign: 'start',
     fontSize: '12px',
+    textTransform: 'capitalize',
   }),
   logotype: (props) => ({
     whiteSpace: 'nowrap',
