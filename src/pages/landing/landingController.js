@@ -7,7 +7,7 @@ import { GET_LANDING_PAGE_DATA_QUERY } from '../../bento/landingPageData';
 import usePageTitle from '../../components/Analytics/usePageTitle';
 
 const landingController = () => {
-  usePageTitle("CDS");
+  usePageTitle("GC");
   const { loading, error, data } = useQuery(GET_LANDING_PAGE_DATA_QUERY);
 
   if (loading) return <CircularProgress />;

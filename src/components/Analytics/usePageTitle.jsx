@@ -48,7 +48,7 @@ const usePageTitle = (title, restore = true) => {
     }
 
     return () => {
-      document.title = "CDS";
+      document.title = "GC";
     };
   }, []);
 };
