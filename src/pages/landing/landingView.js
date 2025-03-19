@@ -285,7 +285,7 @@ const styles = () => ({
     gap: "12px",
     // borderBottom: '1.5px solid #D36000',
     width: "fit-content",
-    background: '#AE5E1B',
+    background: '#A35719',
     borderRadius: '8px',
     padding: '7px 4px 7px 14px',
   },
@@ -364,7 +364,7 @@ const styles = () => ({
   },
   aboutButtonLeft: {
     float: 'left',
-    background: '#AE5E1B',
+    background: '#A35719',
     height: '45px',
     width: '48px',
     marginTop: '-15px',

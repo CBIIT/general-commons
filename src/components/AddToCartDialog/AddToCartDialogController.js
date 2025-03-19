@@ -9,7 +9,7 @@ const useStyles = makeStyles({
     size: '16px',
   },
   okButton: {
-    background: '#98A19E',
+    background: '#6E7776',
     color: '#fff',
     cursor: 'pointer',
     '&:hover': {

@@ -14,7 +14,7 @@ export const customTheme = {
           filter: 'drop-shadow(-3px 2px 6px rgba(27,28,28,0.29))',
         },
         '& span': {
-          color: '#AE5E1B',
+          color: '#A35719',
           fontSize: '26px',
           fontFamily: 'Inter',
           fontWeight: 300,
@@ -30,7 +30,7 @@ export const customTheme = {
           letterSpacing: '-0.5px',
           fontWeight: '300',
           boxSizing: 'inherit',
-          color: '#AE5E1B',
+          color: '#A35719',
           fontSize: '26px',
           fontFamily: 'Inter',
           lineHeight: '64px',

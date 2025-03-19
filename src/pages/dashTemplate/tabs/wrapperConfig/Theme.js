@@ -70,7 +70,7 @@ export const customTheme = {
         width: '133px',
         height: '45px',
         cursor: 'pointer',
-        background: '#98a19e',
+        background: '#6E7776',
       },
       '&.noBtn': {
         width: '133px',

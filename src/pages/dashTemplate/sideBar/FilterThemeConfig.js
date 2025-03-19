@@ -102,7 +102,7 @@ const theme = {
           color: '#942A90',
         },
         '&.samplesCheckedIcon': {
-          color: '#AE5E1B',
+          color: '#A35719',
         },
         '&.genomicCheckedIcon': {
           color: '#0E6292',
@@ -111,7 +111,7 @@ const theme = {
           color: '#942A90',
         },
         '&.diagnosisCheckedIcon': {
-          color: '#AE5E1B',
+          color: '#A35719',
         },
         '&.filesCheckedIcon': {
           color: '#0E6292',
@@ -136,7 +136,7 @@ const theme = {
           marginRight: '0px',
         },
         '&.samplesSubjects': {
-          color: '#AE5E1B',
+          color: '#A35719',
           fontSize: '12px',
           fontFamily: 'Nunito',
           marginRight: '0px',
@@ -154,7 +154,7 @@ const theme = {
           marginRight: '0px',
         },
         '&.diagnosisSubjects': {
-          color: '#AE5E1B',
+          color: '#A35719',
           fontSize: '12px',
           fontFamily: 'Nunito',
           marginRight: '0px',
@@ -187,7 +187,7 @@ const theme = {
           backgroundColor: '#942A90',
         },
         '&.divider2': {
-          backgroundColor: '#AE5E1B',
+          backgroundColor: '#A35719',
         },
         '&.divider3': {
           backgroundColor: '#0E6292',
@@ -196,7 +196,7 @@ const theme = {
           backgroundColor: '#942A90',
         },
         '&.divider5': {
-          backgroundColor: '#AE5E1B',
+          backgroundColor: '#A35719',
         },
         '&.divider6': {
           backgroundColor: '#0E6292',
@@ -205,7 +205,7 @@ const theme = {
           backgroundColor: '#942A90',
         },
         '&.divider8': {
-          backgroundColor: '#AE5E1B',
+          backgroundColor: '#A35719',
         },
         '&.divider9': {
           backgroundColor: '#0E6292',
@@ -214,7 +214,7 @@ const theme = {
           backgroundColor: '#942A90',
         },
         '&.divider11': {
-          backgroundColor: '#AE5E1B',
+          backgroundColor: '#A35719',
         },
       },
     },
