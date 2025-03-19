@@ -320,6 +320,17 @@ export const facetsConfig = [
     sort_type: sortType.ALPHABET,
     show: true,
   },
+  {
+    section: FILES,
+    label: "Is Supplementary File",
+    apiPath: "filterSubjectCountByIsSupplementaryFile",
+    apiForFiltering: "filterSubjectCountByIsSupplementaryFile",
+    datafield: "is_supplementary_file",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
   // PROTEOMIC
   {
     section: PROTEOMIC,
