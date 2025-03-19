@@ -11,11 +11,13 @@ import {
   AccordionDetails,
   AccordionSummary,
   Button,
+  SvgIcon,
   withStyles,
 } from '@material-ui/core';
 import {
   ArrowDropDown as ArrowDropDownIcon,
 } from '@material-ui/icons';
+import RefreshIcon from '@material-ui/icons/Refresh';
 import clsx from 'clsx';
 import {
   resetAllData, chunkSplit,
@@ -143,16 +145,13 @@ const BentoFacetFilter = ({
           }}
           className={classes.customButton}
           classes={{ root: classes.clearAllButtonRoot }}
+          aria-label="Clear all filters"
         >
-          <img
-            src={resetIcon.src}
-            height={resetIcon.size}
-            width={resetIcon.size}
-            alt={resetIcon.alt}
-          />
+          <div className="clear-icon" aria-disabled={disable} />
         </Button>
         <span className={disable
           ? classes.resetTextDisabled : classes.resetText}
+          aria-disabled={disable}
         >
           Clear all filtered selections
         </span>

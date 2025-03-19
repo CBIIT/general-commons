@@ -22,19 +22,32 @@ export const customTheme = {
       width: '250px',
       textTransform: 'none',
       fontFamily: 'Lato',
+      opacity: "1 !important",
+      '&:not(.Mui-selected)': {
+        color: '#686868',
+      },
       '&.Mui-selected': {
         fontWeight: 'bolder',
         '&.participants': {
           background: '#DCE9EF',
           color: '#142D64',
+          '& span.participants_count': {
+            color: '#142D64',
+          }
         },
         '&.samples': {
           background: '#F4E7F3',
           color: '#942A90',
+          '& span.samples_count': {
+            color: '#942A90',
+          }
         },
         '&.files': {
           background: '#F3ECE5',
-          color: '#AE5E1B',
+          color: '#A35719',
+          '& span.files_count': {
+            color: '#A35719',
+          }
         },
         '&.MuiTypography-body1': {
           color: 'red',
@@ -43,19 +56,19 @@ export const customTheme = {
       '& span.participants_count': {
         marginLeft: '12px',
         fontSize: '17px',
-        color: '#142D64',
+        color: '#686868',
         fontWeight: '500',
       },
       '& span.samples_count': {
         marginLeft: '12px',
         fontSize: '17px',
-        color: '#142D64',
+        color: '#686868',
         fontWeight: '500',
       },
       '& span.files_count': {
         marginLeft: '12px',
         fontSize: '17px',
-        color: '#142D64',
+        color: '#686868',
         fontWeight: '500',
       },
     },
