@@ -1,3 +1,5 @@
+import { resetIcon } from '../../../bento/dashboard';
+
 export default () => ({
   clearAllButtonRoot: {
     margin: 'auto',
@@ -13,9 +15,30 @@ export default () => ({
     textTransform: 'none',
     color: '#3d4241',
     marginLeft: '0px',
+    border: '1px solid #ADADAD',
+    '& .clear-icon': {
+      minWidth: '11.5px',
+      width: '11.5px',
+      height: '11.5px',
+      backgroundColor: "#60797B",
+      mask: `url('${resetIcon.src}') no-repeat center`,
+      "-webkit-mask": `url('${resetIcon.src}') no-repeat center`,
+      "-webkit-mask-size": 'contain',
+    },
     '&:hover': {
       backgroundColor: '#60797B',
       color: 'white',
+      "& .clear-icon": {
+        backgroundColor: '#FFFFFF',
+      },
+    },
+    '&:disabled': {
+      border: '1px solid #ADADAD',
+
+      '& .clear-icon': {
+        opacity: 1,
+        backgroundColor: '#AEBDBE',
+      },
     },
   },
   floatRight: {
@@ -24,13 +47,13 @@ export default () => ({
   resetText: {
     marginTop: '0px',
     marginLeft: '8px',
-    color: '#638fb5',
+    color: '#60797B',
     fontSize: 14,
   },
   resetTextDisabled: {
     marginTop: '0px',
     marginLeft: '8px',
-    color: '#a9b2b9',
+    color: '#AEBDBE',
     fontSize: 14,
   },
   cases: {
@@ -110,7 +133,7 @@ export default () => ({
     color: '#942A90',
   },
   activeFacetSamples: {
-    color: '#AE5E1B',
+    color: '#A35719',
   },
   activeFacetGenomic: {
     color: '#0E6292',
@@ -119,7 +142,7 @@ export default () => ({
     color: '#942A90',
   },
   activeFacetDiagnosis: {
-    color: '#AE5E1B',
+    color: '#A35719',
   },
   activeFacetFiles: {
     color: '#0E6292',
