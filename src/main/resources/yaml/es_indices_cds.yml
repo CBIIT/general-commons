@@ -237,8 +237,8 @@ Indices:
           WITH p, na, opensearch_data,
               apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))) AS library_layouts,
               apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))) AS library_selections,
-              apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source_material, na))) AS library_source_materials, 
-              apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source_molecule, na))) AS library_source_molecules, 
+              apoc.coll.sort(COLLECT(DISTINCT g.library_source_material)) AS library_source_materials, 
+              apoc.coll.sort(COLLECT(DISTINCT g.library_source_molecule)) AS library_source_molecules, 
               apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))) AS library_strategies,
               apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))) AS instrument_models,
               apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.platform, na))) AS platforms,
@@ -499,8 +499,8 @@ Indices:
           WITH samp, na, opensearch_data,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))) AS library_layouts, 
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))) AS library_selections, 
-            apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source_material, na))) AS library_source_materials,
-            apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source_molecule, na))) AS library_source_molecules, 
+            apoc.coll.sort(COLLECT(DISTINCT g.library_source_material)) AS library_source_materials,
+            apoc.coll.sort(COLLECT(DISTINCT g.library_source_molecule)) AS library_source_molecules, 
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))) AS library_strategies,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))) AS instrument_models,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.platform, na))) AS platforms,
@@ -648,6 +648,8 @@ Indices:
         type: keyword
       subject_ids:
         type: keyword
+      is_supplementary_file:
+        type: keyword
     cypher_queries:
       - query: |
           MATCH (s:study)<--(:file)-->(p:participant)
@@ -685,7 +687,8 @@ Indices:
               file_name: f.file_name,
               file_type: file_type,
               file_size: f.file_size,
-              md5sum: f.md5sum
+              md5sum: f.md5sum,
+              is_supplementary_file: COALESCE(f.is_supplementary_file, na)
             }) AS opensearch_data
           OPTIONAL MATCH (f)-->(p:participant)
           WITH f, na, opensearch_data, 
@@ -713,8 +716,8 @@ Indices:
             apoc.map.merge(opensearch_data, {
               library_layouts: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))), 
               library_selections: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))), 
-              library_source_materials: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source_material, na))),
-              library_source_molecules: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source_molecule, na))), 
+              library_source_materials: apoc.coll.sort(COLLECT(DISTINCT g.library_source_material)),
+              library_source_molecules: apoc.coll.sort(COLLECT(DISTINCT g.library_source_molecule)), 
               library_strategies: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))),
               instrument_models: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))),
               platforms: apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.platform, na))),
@@ -1044,8 +1047,8 @@ Indices:
           WITH f, na, opensearch_data, 
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))) AS library_layout,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))) AS library_selection,
-            apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source_material, na))) AS library_source_materials,
-            apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_source_molecule, na))) AS library_source_molecules,
+            apoc.coll.sort(COLLECT(DISTINCT g.library_source_material)) AS library_source_materials,
+            apoc.coll.sort(COLLECT(DISTINCT g.library_source_molecule)) AS library_source_molecules,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))) AS library_strategy,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))) AS instrument_model,
             apoc.coll.sort(COLLECT(DISTINCT COALESCE(g.platform, na))) AS platform,
