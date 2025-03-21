@@ -16,7 +16,7 @@
   title: "Query the CDS Portal Using GraphQL"
   imageLocation: "hidden"
   content:
-    - paragraph: "Users can search through all the CDS portal using GraphQL queries. There are several queries that users can utilize from the $$[CDS Portal User Guide](<%= USER_GUIDE_PDF %> title: 'Download the User Guide')$$"
+    - paragraph: "Users can search through all the CDS portal using GraphQL queries. There are several queries that users can utilize from the $$[GC User Guide](<%= USER_GUIDE_PDF %> title: 'Download the User Guide')$$"
   components: ["GraphqlClient"]
 - page: '/cancerDataService'
   title: "About The General Commons"
