@@ -983,7 +983,7 @@ export const tabContainers = [
       },
       download: {
         downloadCsv: 'Download Table Content As CSV',
-        downloadFileName: 'CDS_participant_Download',
+        downloadFileName: 'GC_participant_Download',
       },
     },
     columns: [
@@ -1093,7 +1093,7 @@ export const tabContainers = [
       },
       download: {
         downloadCsv: 'Download Table Content As CSV',
-        downloadFileName: 'CDS_sample_Download',
+        downloadFileName: 'GC_sample_Download',
       },
     },
     saveButtonDefaultStyle: {
@@ -1219,7 +1219,7 @@ export const tabContainers = [
       },
       download: {
         downloadCsv: 'Download Table Content As CSV',
-        downloadFileName: 'CDS_file_Download',
+        downloadFileName: 'GC_file_Download',
       },
     },
     columns: [

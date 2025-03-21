@@ -42,7 +42,7 @@ const aggregateCount = {
 // Ideal size for externalLinkIcon is 16x16 px
 const studyDetailIcon = {
   src: STATIC_CONTENT.icons.STUDIES_ICON_IMAGE,
-  alt: 'CDS study logo',
+  alt: 'GC study logo',
 };
 
 const externalLinkIcon = {

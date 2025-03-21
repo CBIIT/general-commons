@@ -114,7 +114,7 @@ const { UploadModal } = UploadModalGenerator({
     matchedLabel : 'Submitted Participant ID',
     associateId: 'phs_accession',
     associateLabel: 'Associated Study',
-    projectName: 'CDS',
+    projectName: 'GC',
     caseIds: 'Participant IDs',
   },
   customStyles : uploadModalStyles,
