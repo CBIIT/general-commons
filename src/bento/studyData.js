@@ -7,7 +7,7 @@ import { STATIC_CONTENT } from '../assets/staticContent';
 // Ideal size for externalLinkIcon is 16x16 px
 const studyListingIcon = {
   src: STATIC_CONTENT.icons.STUDIES_ICON_IMAGE,
-  alt: 'CDS Study logo',
+  alt: 'GC Study logo',
 };
 
 const externalLinkIcon = {

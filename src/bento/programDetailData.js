@@ -30,7 +30,7 @@ const aggregateCount = {
 // Ideal size for externalLinkIcon is 16x16 px
 const programDetailIcon = {
   src: STATIC_CONTENT.icons.PROGRAM_ICON_IMAGE,
-  alt: 'CDS program logo',
+  alt: 'GC program logo',
 };
 
 const externalLinkIcon = {

@@ -213,7 +213,7 @@ function searchView(props) {
     classes,
     config: {
       placeholder: '',
-      ariaLabel: 'Search CDS',
+      ariaLabel: 'Search GC',
       iconType: 'image',
       maxSuggestions: 0,
       minimumInputLength: 0,
