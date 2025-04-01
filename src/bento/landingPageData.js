@@ -74,7 +74,7 @@ export const landingPageData = {
     descriptionText: 'To get started with a submission please submit a request on the CRDC Submission Portal.',
     descriptionTextTitle: 'CRDC HELPDESK',
     callToActionText: 'CRDC HELPDESK',
-    callToActionLink: 'https://datacommons.cancer.gov/submit#2',
+    callToActionLink: 'mailto:NCICRDC@mail.nih.gov', // Send email to CRDC help desk
   },
   tile4: {
     alt: 'Cancer data serach and cohort building tools',
