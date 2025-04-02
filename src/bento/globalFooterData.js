@@ -26,7 +26,7 @@ export default {
         items: [
           {
             text: 'About GC',
-            link: '/cancerDataService',
+            link: '/GeneralCommons',
           },
           {
             text: 'About CRDC',

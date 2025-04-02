@@ -49,7 +49,7 @@ export const HeaderSubLinks = {
   About: [
     {
       name: 'About\nGeneral Commons',
-      link: '/cancerDataService',
+      link: '/GeneralCommons',
       id: 'about-cancer-data-service',
       className: 'navMobileSubItem',
     },
