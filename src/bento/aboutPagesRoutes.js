@@ -2,6 +2,6 @@ export default [
   '/bento',
   '/resources',
   '/graphql',
-  '/cancerDataService',
+  '/GeneralCommons',
   '/support',
 ];

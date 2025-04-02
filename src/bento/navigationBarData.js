@@ -82,7 +82,7 @@ export const navBarData = [
     dropDownLinks: [
       {
         labelText: 'About the CRDC General Commons',
-        link: '/cancerDataService',
+        link: '/GeneralCommons',
       },
       {
         labelText: 'Submission Requests',
