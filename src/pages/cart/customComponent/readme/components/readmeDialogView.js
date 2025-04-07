@@ -49,7 +49,7 @@ export const downloadMarkdownPdf = async (title, content) => {
   const fileName = createFileName('GC-SELECTED-FILES-CART-README', '');
   /** configure pdf increase pixel of the PDF */
   const options = {
-    margin: [0.5, 0.5, 1, 0.5],
+    margin: [0.5, 0.5, 1.11, 0.5],
     filename: fileName,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: {
@@ -86,7 +86,7 @@ export const downloadMarkdownPdf = async (title, content) => {
         pdf.setFontSize(8);
         pdf.setTextColor(0);
         pdf.text(pgWidth - 2.3, pgHeight - 0.5, `${date}     |      ${i}`);
-        pdf.text(pgWidth - 8, pgHeight - 0.5, 'DATASERVICE.DATACOMMONS.CANCER.GOV/#/FileCentricCart');
+        pdf.text(pgWidth - 8, pgHeight - 0.5, 'GENERAL.DATACOMMONS.CANCER.GOV/#/FileCentricCart');
         pdf.addImage(footerLine, 'JPEG', pgWidth - 8, pgHeight - 0.75, 7.5, 0.05);
         // if (i === 1) {
         // pdf.addImage(nihLogo, 'JPEG', pgWidth - 7.75, pgHeight - 10.75, 4, 0.5);
