@@ -6,7 +6,7 @@ import { STATIC_CONTENT } from '../assets/staticContent';
 export const headerData = {
   globalHeaderLogo: STATIC_CONTENT.logo.CRDC_LOGO_SVG,
   globalHeaderLogoSmall: STATIC_CONTENT.logo.CRDC_LOGO_SVG,
-  globalHeaderLogoLink: '/',
+  globalHeaderLogoLink: '/home',
   globalHeaderLogoAltText: 'Portal Logo',
   usaFlagSmall,
   usaFlagSmallAltText: 'usaFlagSmall',
@@ -15,7 +15,7 @@ export const headerData = {
 export const HeaderLinks = [
   {
     name: 'Home',
-    link: '/',
+    link: '/home',
     id: 'navbar-dropdown-home',
     className: 'navMobileItem',
   },
