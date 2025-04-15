@@ -112,6 +112,9 @@ const styles = () => ({
       '&.Mui-focused fieldset': {
         border: '2px solid #747474',
       },
+      "& input::-webkit-search-cancel-button": {
+        display: "none !important",
+      },
     },
   },
 
