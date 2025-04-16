@@ -40,6 +40,10 @@ export default {
             text: 'GraphQL',
             link: '/graphql',
           },
+          {
+            text: 'CRDC Helpdesk',
+            link: 'mailto:NCICRDC@mail.nih.gov',
+          },
         ],
       },
       {
