@@ -79,6 +79,7 @@ const { SearchBox } = SearchBoxGenerator({
     noOptionsText: 'No matching items found',
     searchType: 'subjectIds',
     ariaLabel: 'Search by Participant IDs',
+    tooltipText: 'Enter Participant ID to search data',
   },
 });
 
