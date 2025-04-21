@@ -73,6 +73,9 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    search: true,
+    disableSearchModal: true,
+    searchPlaceholder: "e.g. Study Name",
   },
   {
     section: STUDY,
@@ -84,6 +87,9 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    search: true,
+    disableSearchModal: true,
+    searchPlaceholder: "e.g. phs000000",
   },
   {
     section: STUDY,
