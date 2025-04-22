@@ -44,6 +44,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     final String SAMPLES_END_POINT = "/samples/_search";
     final String SAMPLES_COUNT_END_POINT = "/samples/_count";
     final String FILES_END_POINT = "/files/_search";
+    final String STUDY_DATA_TYPES_END_POINT = "/study_data_types/_search";
     final String FILES_EXPERIMENTAL_STRATEGY_END_POINT = "/file_experimental_strategies/_search";
     final String FILES_COUNT_END_POINT = "/files/_count";
     final String PROGRAMS_END_POINT = "/programs/_search";
@@ -240,7 +241,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 AGG_NAME, "study_data_types",
                 WIDGET_QUERY, "subjectCountByStudyDataType",
                 FILTER_COUNT_QUERY, "filterSubjectCountByStudyDataType",
-                AGG_ENDPOINT, FILES_END_POINT
+                AGG_ENDPOINT, STUDY_DATA_TYPES_END_POINT
         ));
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "acl",
@@ -321,7 +322,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "study_data_types",
                 WIDGET_QUERY, "donutCountByStudyDataTypes",
-                AGG_ENDPOINT, FILES_END_POINT
+                AGG_ENDPOINT, STUDY_DATA_TYPES_END_POINT
         ));
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "image_modality",
