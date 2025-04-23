@@ -10,6 +10,9 @@ export default ({
   const overridesObj = themes.light.overrides;
 
   const MuiDialog = {
+    root: {
+      zIndex: "999999 !important",
+    },
     paper: {
       width: '770px',
       height: '620px',
