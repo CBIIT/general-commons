@@ -61,7 +61,7 @@ export const HeaderSubLinks = {
     },
     {
       name: 'Submission Requests',
-      link: 'https://datacommons.cancer.gov/submit#2',
+      link: 'https://datacommons.cancer.gov/submit',
       id: 'about-submission-requests',
       className: 'navMobileSubItem',
     },
