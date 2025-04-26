@@ -20,7 +20,11 @@ const ReleaseNotes = (props) => {
       <div className={classes.releaseNotesWrapper}>
         <h2 className={classes.heading}>{releaseNoteDetails.heading}</h2>
         <p className={classes.releaseDateInfo}>{`Release Date: ${releaseNoteDetails.releaseDate}`}</p>
-        <p className={classes.subHeading}>{releaseNoteDetails.subHeading}</p>
+        {releaseNoteDetails.subHeadings.map((text, index) => (
+          <p key={index} className={classes.subHeading}>
+            {text}
+          </p>
+        ))}
         <div className={classes.infoWrapper}>
           {releaseNoteDetails.content.map((item, index) => (
             <div key={index}>

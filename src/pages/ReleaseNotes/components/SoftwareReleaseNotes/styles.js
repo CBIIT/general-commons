@@ -32,8 +32,8 @@ const styles = () => ({
   },
   subHeading: {
     fontSize: 16,
-    fontWeight: 700,
-    marginBottom: 8,
+    fontWeight: 400,
+    //marginBottom: 8,
     fontFamily: 'Nunito',
 
   },

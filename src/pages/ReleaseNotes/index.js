@@ -12,30 +12,47 @@ import Stats from '../../components/Stats/AllStatsController';
 import { Typography } from '../../components/Wrappers/Wrappers';
 import usePageTitle from '../../components/Analytics/usePageTitle';
 
+const releaseNotesURL= jsonLink.substring(0, jsonLink.lastIndexOf('/'));
+const dataReleaseURL = releaseNotesURL + '/DataReleaseNotes.json';
+const softwareReleaseURL = releaseNotesURL + '/SoftwareReleaseNotes.json';
+
 const ReleaseVersions = (props) => {
   usePageTitle("Release Notes");
   const { classes } = props;
-  const [jsonData, setJsonData] = useState(null);
+  const [dataReleaseJsonData, setDataReleaseJsonData] = useState(null);
+  const [softwareReleaseJsonData, setSoftwareReleaseJsonData] = useState(null);
   const [releaseNoteDetails, setReleaseNoteDetails] = useState(null);
   const [releaseNoteType, setReleaseNoteType] = useState(null);
   const [expandedSection, setExpandedSection] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchJsonData = async () => {
+    const fetchDataReleaseData = async () => {
       try {
-        const response = await fetch(jsonLink);
+        const response = await fetch(dataReleaseURL);
         const data = await response.json();
-        setJsonData(data);
+        setDataReleaseJsonData(data);
         setReleaseNoteDetails(data.VERSIONS[0]); // Set initial version details
         setReleaseNoteType('data');
       } catch (error) {
         setError(error);
-        console.error('Error fetching JSON data:', error);
+        console.error('Error fetching Data Release JSON data:', error);
       }
     };
 
-    fetchJsonData();
+    const fetchSoftwareReleaseData = async () => {
+      try {
+        const response = await fetch(softwareReleaseURL);
+        const data = await response.json();
+        setSoftwareReleaseJsonData(data);
+      } catch (error) {
+        setError(error);
+        console.error('Error fetching Software Release JSON data:', error);
+      }
+    };
+
+    fetchDataReleaseData();
+    fetchSoftwareReleaseData();
   }, []); 
 
   const handleReleaseNoteClick = (row, type) => {
@@ -47,9 +64,9 @@ const ReleaseVersions = (props) => {
     <>
       <Stats />
       <div className={classes.container}>
-        {jsonData && (
+        {dataReleaseJsonData && softwareReleaseJsonData && (
           <>
-            <h1>{jsonData.HEADING}</h1>
+            <h1>{dataReleaseJsonData.HEADING}</h1>
             <div className={classes.wrapper}>
               <div className={classes.tableWrapper}>
                 <div className={classes.tableExternal}>
@@ -62,7 +79,7 @@ const ReleaseVersions = (props) => {
                       </span>
                     </div>
                     <div className={classes.dataRows}>
-                      {jsonData.VERSIONS.map((row) => (
+                      {dataReleaseJsonData.VERSIONS.map((row) => (
                         <div key={row.id} onClick={() => handleReleaseNoteClick(row, 'data')} className={expandedSection === 'data' ? classes.visibleRow : classes.hiddenRow}>
                           <div className={classes.dataVersion} align="left">
                             <span className={classes.version}>
@@ -82,7 +99,7 @@ const ReleaseVersions = (props) => {
                       </span>
                     </div>
                     <div className={classes.softwareRows}>
-                      {jsonData.VERSIONS.map((row) => (
+                      {softwareReleaseJsonData.VERSIONS.map((row) => (
                         <div key={row.id} onClick={() => handleReleaseNoteClick(row, 'software')} className={expandedSection === 'software' ? classes.visibleRow : classes.hiddenRow}>
                           <div className={classes.dataVersion} align="left">
                             <span className={classes.version}>
