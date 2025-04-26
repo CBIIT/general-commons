@@ -17,7 +17,7 @@ const ReleaseVersions = (props) => {
   const { classes } = props;
   const [jsonData, setJsonData] = useState(null);
   const [versionDetails, setVersionDetails] = useState(null);
-  const [expanded, setExpanded] = useState(false); 
+  const [expandedSection, setExpandedSection] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -45,34 +45,51 @@ const ReleaseVersions = (props) => {
             <h1>{jsonData.HEADING}</h1>
             <div className={classes.wrapper}>
               <div className={classes.tableWrapper}>
-                <Table>
-                  <TableHead className={classes.tableHead}>
-                    <TableRow>
-                      <TableCell colSpan={2} > 
-                        <span className={clsx(classes.releaseHeading, classes.dataHeading)} onClick={() => setExpanded(!expanded)}>  
-                          {"DATA RELEASE NOTES"} 
-                          <ArrowDropDown className={clsx(classes.releaseDropdown, expanded ? classes.upsideDown : '')}/> 
-                        </span> 
-                      </TableCell> 
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {jsonData.VERSIONS.map((row) => (
-                      <TableRow key={row.id} onClick={() => setVersionDetails(row)} className={expanded ? '' : classes.hiddenRow}>
-                        <TableCell align="left"><span className={classes.version}>{"Version: " + row.versionNumber}</span></TableCell> 
-                        <TableCell align="left">{"(" + row.releaseDate + ")"}</TableCell> 
-                      </TableRow>
-                    ))}
-                    <TableRow className={classes.softwareBorder}> 
-                      <TableCell colSpan={2}> 
-                        <span className={clsx(classes.releaseHeading, classes.softwareHeading)} onClick={() => window.open("https://github.com/CBIIT/bento-cds-frontend/releases")}>  
-                          {"SOFTWARE RELEASE NOTES"} 
-                          <Launch className={classes.softwareDropdown}/> 
-                        </span> 
-                      </TableCell> 
-                    </TableRow> 
-                  </TableBody>
-                </Table>
+                <div className={classes.tableExternal}>
+                  <div className={classes.topBorder}/>
+                  <div className={classes.table}>
+                    <div className={classes.tableHead} onClick={() => setExpandedSection(expandedSection === 'data' ? null : 'data')}>
+                      <span className={clsx(classes.releaseHeading, classes.dataHeading)}>  
+                        {"DATA RELEASE NOTES"} 
+                        <ArrowDropDown className={clsx(classes.releaseDropdown, expandedSection === 'data' ? classes.upsideDown : classes.rightsideUp)}/> 
+                      </span>
+                    </div>
+                    <div className={classes.dataRows}>
+                      {jsonData.VERSIONS.map((row) => (
+                        <div key={row.id} onClick={() => setVersionDetails(row)} className={expandedSection === 'data' ? classes.visibleRow : classes.hiddenRow}>
+                          <div className={classes.dataVersion} align="left">
+                            <span className={classes.version}>
+                              {"Version: " + row.versionNumber}
+                            </span>
+                          </div> 
+                          <div className={classes.dataDate} align="left">
+                            {"(" + row.releaseDate + ")"}
+                          </div> 
+                        </div>
+                      ))}
+                    </div>
+                    <div className={clsx(classes.tableHead, classes.softwareBorder)} onClick={() => setExpandedSection(expandedSection === 'software' ? null : 'software')}>
+                      <span className={clsx(classes.releaseHeading, classes.softwareHeading)}>  
+                        {"SOFTWARE RELEASE NOTES"} 
+                        <ArrowDropDown className={clsx(classes.releaseDropdown, expandedSection === 'software' ? classes.upsideDown : classes.rightsideUp)}/> 
+                      </span>
+                    </div>
+                    <div className={classes.softwareRows}>
+                      {jsonData.VERSIONS.map((row) => (
+                        <div key={row.id} onClick={() => setVersionDetails(row)} className={expandedSection === 'software' ? classes.visibleRow : classes.hiddenRow}>
+                          <div className={classes.dataVersion} align="left">
+                            <span className={classes.version}>
+                              {"Version: " + row.versionNumber}
+                            </span>
+                          </div> 
+                          <div className={classes.dataDate} align="left">
+                            {"(" + row.releaseDate + ")"}
+                          </div> 
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
                 <hr className={classes.horizontalLine} />
               </div>
               {versionDetails && <ReleaseNotes versionDetails={versionDetails} />}

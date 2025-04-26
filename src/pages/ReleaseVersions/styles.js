@@ -17,42 +17,30 @@ const styles = () => ({
     flexDirection: 'row',
     maxWidth: '1200px',
     margin: '0 auto 32px auto',
-    '& .MuiTable-root': {
-      minWidth: 200,
-      width: 362, 
-      height: 'min-content', 
-      borderTop: '5px solid #0E6292', 
-      borderRight: '2px solid #CDD4D8',
-      borderBottom: '2px solid #CDD4D8',
-      borderLeft: '2px solid #CDD4D8',
-    },
-    '& .MuiTableCell-head': {
-      fontSize: 13,
-      fontWeight: 400,
-      lineHeight: '8px',
-      color: '#004C73',
-      fontFamily: 'Nunito Sans',
-      padding: "5px 5px 5px 20px",
-      letterSpacing: "0.025em",
-    },
-    '& .MuiTableRow-root': { 
-      '&:not(:last-of-type)': { 
-        cursor: 'pointer', 
-        '&:nth-of-type(odd)': { 
-          backgroundColor: '#DCE9EF', // TODO: color to be updated 
-        }, 
-        '&:nth-of-type(even)': { 
-          backgroundColor: '#F2FBFF', // TODO: color to be updated 
-        }, 
-      },
-    },
-    '& .MuiTableCell-body': {
-      fontSize: 13,
-      fontWeight: 400,
-      lineHeight: '8px',
-      color: '#004C73',
-      FontFamily: 'Nunito Sans',
-    },
+  },
+  topBorder: {
+    height: 5,
+    backgroundColor: '#0E6292',
+    width: '100%',
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+  },
+  table:{
+    minWidth: 200,
+    width: 362, 
+    height: 'min-content', 
+    border: '2px solid #CDD4D8',
+    borderTop: 'none',
+  },
+  tableHead: {
+    fontSize: 13,
+    fontWeight: 400,
+    lineHeight: '8px',
+    color: '#004C73',
+    fontFamily: 'Nunito Sans',
+    padding: "5px 5px 5px 20px",
+    letterSpacing: "0.025em",
+    cursor: 'pointer', 
   },
   horizontalLine: {
     width: 40,
@@ -71,12 +59,49 @@ const styles = () => ({
     fontSize: '16px', 
     fontWeight: 400, 
     paddingLeft: 20, 
+    lineHeight: '21.5px',
+    boxSizing: 'border-box',
+    letterSpacing: '0.021em',
   }, 
-  hiddenRow: { 
-    display: 'none', 
+  hiddenRow: {
+    maxHeight: 0,
+    opacity: 0,
+    overflow: 'hidden',
+    transition: 'max-height 0.4s ease, opacity 0.4s ease',
   },
-  tableHead: {
-    padding: "0 0 0 20px",
+  visibleRow: {
+    maxHeight: 40,
+    height: 40, // Adjust this height based on your row size
+    opacity: 1,
+    display: 'flex',
+    transition: 'max-height 0.4s ease, opacity 0.4s ease',
+    cursor: 'pointer',
+    boxSizing: 'border-box',
+  },
+  dataRows: {
+    '& > div:nth-of-type(odd)': {
+      backgroundColor: '#DCE9EF',
+    },
+    '& > div:nth-of-type(even)': {
+      backgroundColor: '#F2FBFF',
+    },
+  }, 
+  dataVersion: {
+    width: '50%',
+    lineHeight: '40px',
+    padding: "0px 5px 5px 20px",
+    boxSizing: 'border-box',
+  },
+  dataDate: {
+    width: '50%',
+    fontSize: 13,
+    fontWeight: 400,
+    lineHeight: '40px',
+    color: '#004C73',
+    fontFamily: 'Nunito Sans',
+    padding: "0px 5px 5px 20px",
+    letterSpacing: "0.025em",
+    boxSizing: 'border-box',
   },
   releaseHeading: { 
     fontFamily: 'Inter', 
@@ -98,15 +123,40 @@ const styles = () => ({
     fontSize: 40, 
   }, 
   upsideDown: { 
-    transform: 'rotate(180deg)', 
+    transform: 'rotate(-180deg)', 
+    transition: 'transform 0.4s ease',
   }, 
+  rightsideUp: {
+    transform: 'rotate(0deg)', 
+    transition: 'transform 0.4s ease',
+  },
   softwareBorder: { 
     borderTop: '2px solid #CDD4D8', 
   }, 
   softwareHeading: { 
     color: '#942A90', 
-    cursor: 'pointer', 
-  }, 
+    display: 'inline-block', 
+    paddingBottom: 8, 
+  },
+  softWareDate: {
+    width: '50%',
+    fontSize: 13,
+    fontWeight: 400,
+    lineHeight: '40px',
+    color: '#942A90',
+    fontFamily: 'Nunito Sans',
+    padding: "0px 5px 5px 20px",
+    letterSpacing: "0.025em",
+    boxSizing: 'border-box',
+  },
+  softwareRows: {
+    '& > div:nth-of-type(odd)': {
+      backgroundColor: '#FDE8F4',
+    },
+    '& > div:nth-of-type(even)': {
+      backgroundColor: '#FCF8FA',
+    },
+  },  
   softwareDropdown: { 
     fontSize: 14, 
     marginLeft: 7, 
