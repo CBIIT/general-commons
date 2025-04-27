@@ -27,12 +27,31 @@ const ReleaseNotes = (props) => {
         ))}
         <div className={classes.infoWrapper}>
           {releaseNoteDetails.content.map((item, index) => (
-            <div key={index}>
-              {item.paragraph && <p dangerouslySetInnerHTML={{ __html: convertToAnchorTags(item.paragraph) }} />}
+            <div key={index} className='listSection'>
+              {item.paragraph && (
+                <p dangerouslySetInnerHTML={{ __html: convertToAnchorTags(item.paragraph) }} />
+              )}
               {item.list && (
                 <ul>
                   {item.list.map((listItem, listItemIndex) => (
-                    <li key={listItemIndex} dangerouslySetInnerHTML={{ __html: convertToAnchorTags(listItem) }} />
+                    <li key={listItemIndex}>
+                      {typeof listItem === 'string' ? (
+                        <span className={classes.insideList} dangerouslySetInnerHTML={{ __html: convertToAnchorTags(listItem) }} />
+                      ) : (
+                        <div>
+                          <span dangerouslySetInnerHTML={{ __html: convertToAnchorTags(listItem.paragraph) }} />
+                          {Array.isArray(listItem.list) && listItem.list.length > 0 && (
+                            <ul>
+                              {listItem.list.map((nestedListItem, nestedIndex) => (
+                                <li key={nestedIndex}>
+                                  <span className={classes.insideList} dangerouslySetInnerHTML={{ __html: convertToAnchorTags(nestedListItem) }} />
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      )}
+                    </li>
                   ))}
                 </ul>
               )}

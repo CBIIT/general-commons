@@ -106,7 +106,7 @@ const ReleaseVersions = (props) => {
                               {"Version: " + row.versionNumber}
                             </span>
                           </div> 
-                          <div className={classes.dataDate} align="left">
+                          <div className={classes.softWareDate} align="left">
                             {"(" + row.releaseDate + ")"}
                           </div> 
                         </div>

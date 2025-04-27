@@ -40,7 +40,7 @@ const styles = () => ({
   infoWrapper: {
     color: '#000',
     lineHeight: '24px',
-    '& div': {
+    '& .listSection': {
       fontFamily: 'Nunito',
       marginBottom: 20,
       fontSize: 16,
