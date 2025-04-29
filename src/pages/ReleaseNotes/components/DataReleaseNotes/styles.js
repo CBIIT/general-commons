@@ -3,9 +3,29 @@ const styles = () => ({
     borderWidth: [[0, 0, 0, 2]],
     borderColor: '#CDD4D8',
     borderStyle: 'solid',
+    width: '100%',
   },
   releaseNotesWrapper: {
     paddingLeft: 32,
+    maxHeight: '1024px',
+    overflowY: 'auto',
+    marginTop: '22px',
+  
+    '&::-webkit-scrollbar': {
+      width: '8px', // customize width
+    },
+    '&::-webkit-scrollbar-track': {
+      backgroundColor: '#fff',
+      borderRadius: '5px',
+      '-webkit-box-shadow': 'none',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      backgroundColor: '#D9D9D9',
+      border: 'none',
+      outline: 'none',
+      backgroundClip: 'content-box',
+      borderRadius: '5px',
+    },
   },
   horizontalLine: {
     width: 120,
@@ -20,7 +40,7 @@ const styles = () => ({
     color: '#43779A',
     fontFamily: 'Lato',
     fontStyle: 'normal',
-    margin: "22px 0",
+    margin: "0px 0px 22px 0px",
     /* or 114% */
 
     letterSpacing: '0.14994',
@@ -35,7 +55,6 @@ const styles = () => ({
     fontWeight: 700,
     marginBottom: 8,
     fontFamily: 'Nunito',
-
   },
   infoWrapper: {
     color: '#000',
