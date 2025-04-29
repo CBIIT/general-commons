@@ -1,11 +1,7 @@
-// import { withStyles } from "@mui/styles";
-import {
-  withStyles,
-} from '@material-ui/core';
+import { withStyles } from '@material-ui/core';
 import { ArrowDropDown } from '@material-ui/icons'; 
 import clsx from 'clsx'; 
 import React, { useState, useEffect } from 'react';
-//import jsonLink from '../../bento/releaseNotesData';
 import styles from './styles';
 import ReleaseNotes from './components/releaseNotes';
 import Stats from '../../components/Stats/AllStatsController';
@@ -15,7 +11,7 @@ import usePageTitle from '../../components/Analytics/usePageTitle';
 //TEMPORARY ONLY FOR TEMPORARY DEPLOYMENT OF FEATURE BRANCH
 const jsonLink = 'https://raw.githubusercontent.com/CBIIT/CDS-Data-Releases/software-releases/DataReleaseNotes.json';
 
-const releaseNotesURL= jsonLink.substring(0, jsonLink.lastIndexOf('/'));
+const releaseNotesURL = jsonLink.substring(0, jsonLink.lastIndexOf('/'));
 const dataReleaseURL = releaseNotesURL + '/DataReleaseNotes.json';
 const softwareReleaseURL = releaseNotesURL + '/SoftwareReleaseNotes.json';
 
@@ -27,6 +23,7 @@ const ReleaseVersions = (props) => {
   const [releaseNoteDetails, setReleaseNoteDetails] = useState(null);
   const [releaseNoteType, setReleaseNoteType] = useState(null);
   const [expandedSection, setExpandedSection] = useState(null);
+  const [expandedYear, setExpandedYear] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -63,6 +60,17 @@ const ReleaseVersions = (props) => {
     setReleaseNoteType(type);
   };
 
+  const versionsByYear = dataReleaseJsonData ? dataReleaseJsonData.VERSIONS.reduce((acc, row) => {
+    const year = new Date(row.releaseDate).getFullYear();
+    if (!acc[year]) acc[year] = [];
+    acc[year].push(row);
+    return acc;
+  }, {}) : {};
+
+  const handleYearClick = (year) => {
+    setExpandedYear(prevYear => (prevYear === year ? null : year));
+  };
+
   return (
     <>
       <Stats />
@@ -74,47 +82,69 @@ const ReleaseVersions = (props) => {
               <div className={classes.tableWrapper}>
                 <div className={classes.tableExternal}>
                   <div className={classes.topBorder}/>
-                  <div className={classes.table}>
+                  <div className={classes.tableInside}>
                     <div className={classes.tableHead} onClick={() => setExpandedSection(expandedSection === 'data' ? null : 'data')}>
                       <span className={clsx(classes.releaseHeading, classes.dataHeading)}>  
                         {"DATA RELEASE NOTES"} 
-                        <ArrowDropDown className={clsx(classes.releaseDropdown, expandedSection === 'data' ? classes.upsideDown : classes.rightsideUp)}/> 
+                        <ArrowDropDown className={clsx(classes.releaseDropdown, expandedSection === 'data' ? classes.rightsideUp : classes.upsideDown)}/> 
                       </span>
                     </div>
                     <div className={classes.dataRows}>
-                      {dataReleaseJsonData.VERSIONS.map((row) => (
-                        <div key={row.id} onClick={() => handleReleaseNoteClick(row, 'data')} className={expandedSection === 'data' ? classes.visibleRow : classes.hiddenRow}>
-                          <div className={classes.dataVersion} align="left">
-                            <span className={classes.version}>
-                              {"Version: " + row.versionNumber}
-                            </span>
-                          </div> 
-                          <div className={classes.dataDate} align="left">
-                            {"(" + row.releaseDate + ")"}
-                          </div> 
+                      {Object.keys(versionsByYear).sort((a, b) => b - a).map((year) => (
+                        <div key={year} className={expandedSection === 'data' ? classes.yearSection : ''}>
+                          <div className={clsx(classes.yearHeader, expandedSection === 'data' ? classes.visibleYear : classes.hiddenYear)} onClick={() => handleYearClick(year)}>
+                            <span>{year}</span>
+                            <ArrowDropDown className={clsx(classes.yearDropdown, expandedYear === year ? classes.rightsideUp : classes.upsideDown)} />
+                          </div>
+                          <div>
+                            {versionsByYear[year]
+                              .sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate))
+                              .map((row, idx) => (
+                                <div
+                                  key={row.id}
+                                  onClick={() => handleReleaseNoteClick(row, 'data')}
+                                  className={clsx(
+                                    expandedSection === 'data' && expandedYear === year ? classes.visibleRow : classes.hiddenRow,
+                                    idx % 2 === 0 ? classes.evenRow : classes.oddRow
+                                  )}
+                                >
+                                  <div className={classes.dataVersion} align="left">
+                                    <span className={classes.version}>
+                                      {"Version: " + row.versionNumber}
+                                    </span>
+                                  </div>
+                                  <div className={classes.dataDate} align="left">
+                                    {"(" + row.releaseDate + ")"}
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
                         </div>
                       ))}
                     </div>
-                    <div className={clsx(classes.tableHead, classes.softwareBorder)} onClick={() => setExpandedSection(expandedSection === 'software' ? null : 'software')}>
-                      <span className={clsx(classes.releaseHeading, classes.softwareHeading)}>  
-                        {"SOFTWARE RELEASE NOTES"} 
-                        <ArrowDropDown className={clsx(classes.releaseDropdown, expandedSection === 'software' ? classes.upsideDown : classes.rightsideUp)}/> 
-                      </span>
-                    </div>
-                    <div className={classes.softwareRows}>
-                      {softwareReleaseJsonData.VERSIONS.map((row) => (
-                        <div key={row.id} onClick={() => handleReleaseNoteClick(row, 'software')} className={expandedSection === 'software' ? classes.visibleRow : classes.hiddenRow}>
-                          <div className={classes.dataVersion} align="left">
-                            <span className={classes.version}>
-                              {"Version: " + row.versionNumber}
-                            </span>
-                          </div> 
-                          <div className={classes.softWareDate} align="left">
-                            {"(" + row.releaseDate + ")"}
-                          </div> 
-                        </div>
-                      ))}
-                    </div>
+                  </div>
+                  <div className={classes.softwareBorder}/>
+                  <div className={classes.tableOutside}>
+                    <div className={classes.tableHead} onClick={() => setExpandedSection(expandedSection === 'software' ? null : 'software')}>
+                        <span className={clsx(classes.releaseHeading, classes.softwareHeading)}>  
+                          {"SOFTWARE RELEASE NOTES"} 
+                          <ArrowDropDown className={clsx(classes.releaseDropdown, expandedSection === 'software' ? classes.rightsideUp : classes.upsideDown)}/> 
+                        </span>
+                      </div>
+                      <div className={classes.softwareRows}>
+                        {softwareReleaseJsonData.VERSIONS.map((row) => (
+                          <div key={row.id} onClick={() => handleReleaseNoteClick(row, 'software')} className={expandedSection === 'software' ? classes.visibleRow : classes.hiddenRow}>
+                            <div className={classes.dataVersion} align="left">
+                              <span className={classes.version}>
+                                {"Version: " + row.versionNumber}
+                              </span>
+                            </div> 
+                            <div className={classes.softWareDate} align="left">
+                              {"(" + row.releaseDate + ")"}
+                            </div> 
+                          </div>
+                        ))}
+                      </div>
                   </div>
                 </div>
                 <hr className={classes.horizontalLine} />

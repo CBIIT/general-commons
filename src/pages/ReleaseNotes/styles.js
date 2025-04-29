@@ -25,7 +25,15 @@ const styles = () => ({
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
   },
-  table:{
+  tableInside:{
+    minWidth: 200,
+    width: 362, 
+    height: 'min-content', 
+    border: '2px solid #CDD4D8',
+    borderTop: 'none',
+    borderBottom: 'none',
+  },
+  tableOutside:{
     minWidth: 200,
     width: 362, 
     height: 'min-content', 
@@ -62,7 +70,40 @@ const styles = () => ({
     lineHeight: '21.5px',
     boxSizing: 'border-box',
     letterSpacing: '0.021em',
-  }, 
+  },
+  yearSection:{
+    borderTop: '.5px solid #969696'
+  },
+  yearHeader: {
+    height: '44px',
+    fontFamily: 'Poppins',
+    fontWeight: 600,
+    fontSize: '16px',
+    color: '#000000',
+    backgroundColor: '#FFFFFF',
+    padding: '10px 20px',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    boxSizing: 'border-box',
+    transition: 'background-color 0.3s ease',
+  },
+  hiddenYear: {
+    maxHeight: 0,
+    opacity: 0,
+    overflow: 'hidden',
+    transition: 'max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease',
+    padding: 0,
+    borderTop: 'none',
+  },
+  visibleYear: {
+    maxHeight: '50px',
+    opacity: 1,
+    overflow: 'hidden',
+    transition: 'max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease',
+  },
+  
   hiddenRow: {
     maxHeight: 0,
     opacity: 0,
@@ -78,14 +119,12 @@ const styles = () => ({
     cursor: 'pointer',
     boxSizing: 'border-box',
   },
-  dataRows: {
-    '& > div:nth-of-type(odd)': {
-      backgroundColor: '#DCE9EF',
-    },
-    '& > div:nth-of-type(even)': {
-      backgroundColor: '#F2FBFF',
-    },
-  }, 
+  oddRow: {
+    backgroundColor: '#DCE9EF',
+  },
+  evenRow: {
+    backgroundColor: '#F2FBFF',
+  },  
   dataVersion: {
     width: '50%',
     lineHeight: '40px',
@@ -115,7 +154,12 @@ const styles = () => ({
     color: '#0E6292', 
     display: 'inline-block', 
     paddingBottom: 8, 
-  }, 
+  },
+  yearDropdown: {
+    color: '#000000', 
+    paddingTop: 0, 
+    fontSize: 30,
+  },
   releaseDropdown: { 
     color: '#000000', 
     paddingTop: 0, 
@@ -130,9 +174,13 @@ const styles = () => ({
     transform: 'rotate(0deg)', 
     transition: 'transform 0.4s ease',
   },
-  softwareBorder: { 
-    borderTop: '2px solid #CDD4D8', 
-  }, 
+  softwareBorder: {
+    height: 5,
+    backgroundColor: '#942A90',
+    width: '100%',
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+  },
   softwareHeading: { 
     color: '#942A90', 
     display: 'inline-block', 
