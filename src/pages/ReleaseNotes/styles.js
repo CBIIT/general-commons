@@ -119,10 +119,10 @@ const styles = () => ({
     cursor: 'pointer',
     boxSizing: 'border-box',
   },
-  oddRow: {
+  evenRow: {
     backgroundColor: '#DCE9EF',
   },
-  evenRow: {
+  oddRow: {
     backgroundColor: '#F2FBFF',
   },  
   dataVersion: {
@@ -199,10 +199,10 @@ const styles = () => ({
   },
   softwareRows: {
     '& > div:nth-of-type(odd)': {
-      backgroundColor: '#FDE8F4',
+      backgroundColor: '#EFE8EC',
     },
     '& > div:nth-of-type(even)': {
-      backgroundColor: '#FCF8FA',
+      backgroundColor: '#FFFAFC',
     },
   },  
   softwareDropdown: { 
