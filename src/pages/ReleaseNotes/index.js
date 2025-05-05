@@ -2,18 +2,15 @@ import { withStyles } from '@material-ui/core';
 import { ArrowDropDown } from '@material-ui/icons'; 
 import clsx from 'clsx'; 
 import React, { useState, useEffect } from 'react';
+import jsonLink from '../../bento/releaseNotesData';
 import styles from './styles';
 import ReleaseNotes from './components/releaseNotes';
 import Stats from '../../components/Stats/AllStatsController';
 import { Typography } from '../../components/Wrappers/Wrappers';
 import usePageTitle from '../../components/Analytics/usePageTitle';
 
-//TEMPORARY ONLY FOR TEMPORARY DEPLOYMENT OF FEATURE BRANCH
-const jsonLink = 'https://raw.githubusercontent.com/CBIIT/CDS-Data-Releases/software-releases/DataReleaseNotes.json';
-
-const releaseNotesURL = jsonLink.substring(0, jsonLink.lastIndexOf('/'));
-const dataReleaseURL = releaseNotesURL + '/DataReleaseNotes.json';
-const softwareReleaseURL = releaseNotesURL + '/SoftwareReleaseNotes.json';
+const dataReleaseURL = jsonLink + 'DataReleaseNotes.json';
+const softwareReleaseURL = jsonLink + 'SoftwareReleaseNotes.json';
 
 const ReleaseVersions = (props) => {
   usePageTitle("Release Notes");
