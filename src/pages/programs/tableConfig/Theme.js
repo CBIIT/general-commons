@@ -16,12 +16,15 @@ export const tblHeader = {
   },
   MuiTableCell: {
     root: {
-      padding: '0px 0px 0px 20px',
-      paddingRight: '5px',
+      padding: '0px 5px 0px 20px',
       color: '#13344A',
       '&.del_all_row': {
         minWidth: '150px',
         cursor: 'pointer',
+      },
+      '&.num_studies': {
+        padding: '0',
+        textAlign: 'center',
       },
     },
   },
@@ -107,20 +110,22 @@ export const tblBody = {
     body: {
       color: 'inherit',
       fontSize: '16px',
-      maxWidth: '150px',
       fontStyle: 'normal',
       fontFamily: 'Nunito',
       fontWeight: 'normal',
-      paddingLeft: '20px',
+      padding: '16px 0px 16px 20px',
       overflowWrap: 'break-word',
       letterSpacing: '0.025em',
+      lineHeight: '22px',
       '&.acronym': {
+        maxWidth: '151px',
         '& p':{
           fontWeight: 'bold',
         }
       },
       '&.num_studies': {
-        paddingLeft: '55px',
+        padding: '0',
+        textAlign: 'center'
       },
     },
     root: {
@@ -134,7 +139,7 @@ export const tblBody = {
       borderBottom: '0px',
       letterSpacing: '0.01071em',
       verticalAlign: 'inherit',
-      height: '90px',
+      height: '54px',
     },
   },
   MuiLink: {
@@ -150,6 +155,7 @@ export const tblBody = {
     body1: {
       fontSize: '16px',
       fontFamily: 'Nunito',
+      lineHeight: '22px',
     },
   },
 };
