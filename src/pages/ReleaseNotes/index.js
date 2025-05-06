@@ -153,7 +153,7 @@ const ReleaseVersions = (props) => {
         {
           error && (
             <Typography variant="h5" color="error" size="sm">
-              {error ? `An error has occurred in loading release notes data: ${error}` : 'Recieved wrong data'}
+              {`An error has occurred in loading release notes data: ${error}`}
             </Typography>
           )
         }
