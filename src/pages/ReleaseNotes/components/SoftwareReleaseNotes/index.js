@@ -3,16 +3,11 @@ import React from 'react';
 import {
   withStyles,
 } from '@material-ui/core';
+import { convertTextToAnchors } from '../../components/util';
 import styles from './styles';
 
 const ReleaseNotes = (props) => {
   const { classes, releaseNoteDetails } = props;
-
-  // Function to convert URLs to anchor tags
-  const convertToAnchorTags = (text) => {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    return text.replace(urlRegex, (url) => `<a href="${url}" target="_blank">${url}</a>`);
-  };
 
   return (
     <div className={classes.releaseNotesContainer}>
@@ -29,22 +24,22 @@ const ReleaseNotes = (props) => {
           {releaseNoteDetails.content.map((item, index) => (
             <div key={index} className='listSection'>
               {item.paragraph && (
-                <p dangerouslySetInnerHTML={{ __html: convertToAnchorTags(item.paragraph) }} />
+               <p>{convertTextToAnchors(item.paragraph)}</p>
               )}
               {item.list && (
                 <ul>
                   {item.list.map((listItem, listItemIndex) => (
                     <li key={listItemIndex}>
                       {typeof listItem === 'string' ? (
-                        <span className={classes.insideList} dangerouslySetInnerHTML={{ __html: convertToAnchorTags(listItem) }} />
+                        <span className={classes.insideList}>{convertTextToAnchors(listItem)}</span>
                       ) : (
                         <div>
-                          <span dangerouslySetInnerHTML={{ __html: convertToAnchorTags(listItem.paragraph) }} />
+                          <span>{convertTextToAnchors(item.paragraph)}</span>
                           {Array.isArray(listItem.list) && listItem.list.length > 0 && (
                             <ul>
                               {listItem.list.map((nestedListItem, nestedIndex) => (
                                 <li key={nestedIndex}>
-                                  <span className={classes.insideList} dangerouslySetInnerHTML={{ __html: convertToAnchorTags(nestedListItem) }} />
+                                 <span className={classes.insideList}>{convertTextToAnchors(nestedListItem)}</span>
                                 </li>
                               ))}
                             </ul>

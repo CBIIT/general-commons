@@ -3,16 +3,11 @@ import React from 'react';
 import {
   withStyles,
 } from '@material-ui/core';
+import { convertTextToAnchors } from '../../components/util';
 import styles from './styles';
 
 const ReleaseNotes = (props) => {
   const { classes, releaseNoteDetails } = props;
-
-  // Function to convert URLs to anchor tags
-  const convertToAnchorTags = (text) => {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    return text.replace(urlRegex, (url) => `<a href="${url}" target="_blank">${url}</a>`);
-  };
 
   return (
     <div className={classes.releaseNotesContainer}>
@@ -24,13 +19,15 @@ const ReleaseNotes = (props) => {
         <div className={classes.infoWrapper}>
           {releaseNoteDetails.content.map((item, index) => (
             <div key={index}>
-              {item.paragraph && <p dangerouslySetInnerHTML={{ __html: convertToAnchorTags(item.paragraph) }} />}
+              {item.paragraph && <p>{convertTextToAnchors(item.paragraph)}</p>}
               {item.list && (
                 <ul>
                   {item.list.map((listItem, listItemIndex) => (
-                    <li key={listItemIndex} dangerouslySetInnerHTML={{ __html: convertToAnchorTags(listItem) }} />
+                    <li key={listItemIndex}>
+                      {convertTextToAnchors(listItem)}
+                    </li>
                   ))}
-                </ul>
+                </ul>              
               )}
             </div>
           ))}
