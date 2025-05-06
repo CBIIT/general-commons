@@ -16,20 +16,20 @@ const ReleaseNotes = (props) => {
         <h2 className={classes.heading}>{releaseNoteDetails.heading}</h2>
         <p className={classes.releaseDateInfo}>{`Release Date: ${releaseNoteDetails.releaseDate}`}</p>
         {releaseNoteDetails.subHeadings.map((text, index) => (
-          <p key={index} className={classes.subHeading}>
+          <p key={"SoftwareReleaseNotes-SubHeading-"+index} className={classes.subHeading}>
             {text}
           </p>
         ))}
         <div className={classes.infoWrapper}>
           {releaseNoteDetails.content.map((item, index) => (
-            <div key={index} className='listSection'>
+            <div key={"SoftwareReleaseNotes-ListSection-"+index} className='listSection'>
               {item.paragraph && (
                <p>{convertTextToAnchors(item.paragraph)}</p>
               )}
               {item.list && (
                 <ul>
                   {item.list.map((listItem, listItemIndex) => (
-                    <li key={listItemIndex}>
+                    <li key={"SoftwareReleaseNotes-ListSection-"+index+"-SoftwareReleaseNotes-ListItem-"+listItemIndex}>
                       {typeof listItem === 'string' ? (
                         <span className={classes.insideList}>{convertTextToAnchors(listItem)}</span>
                       ) : (
@@ -38,7 +38,7 @@ const ReleaseNotes = (props) => {
                           {Array.isArray(listItem.list) && listItem.list.length > 0 && (
                             <ul>
                               {listItem.list.map((nestedListItem, nestedIndex) => (
-                                <li key={nestedIndex}>
+                                <li key={"SoftwareReleaseNotes-ListSection-"+index+"-SoftwareReleaseNotes-ListItem-"+listItemIndex+"-SoftwareReleaseNotes-NestedItem-"+nestedIndex}>
                                  <span className={classes.insideList}>{convertTextToAnchors(nestedListItem)}</span>
                                 </li>
                               ))}

@@ -18,12 +18,12 @@ const ReleaseNotes = (props) => {
         <p className={classes.subHeading}>{releaseNoteDetails.subHeading}</p>
         <div className={classes.infoWrapper}>
           {releaseNoteDetails.content.map((item, index) => (
-            <div key={index}>
+            <div key={"DataReleaseNotes-ListSection-"+index}>
               {item.paragraph && <p>{convertTextToAnchors(item.paragraph)}</p>}
               {item.list && (
                 <ul>
                   {item.list.map((listItem, listItemIndex) => (
-                    <li key={listItemIndex}>
+                    <li key={"DataReleaseNotes-ListSection-"+index+"-DataReleaseNotes-ListItem-"+listItemIndex}>
                       {convertTextToAnchors(listItem)}
                     </li>
                   ))}
