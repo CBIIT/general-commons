@@ -105,12 +105,12 @@ const ReleaseVersions = (props) => {
                                     idx % 2 === 0 ? classes.evenRow : classes.oddRow
                                   )}
                                 >
-                                  <div className={classes.dataVersion} align="left">
+                                  <div className={classes.dataVersion}>
                                     <span className={classes.version}>
                                       {"Version: " + row.versionNumber}
                                     </span>
                                   </div>
-                                  <div className={classes.dataDate} align="left">
+                                  <div className={classes.dataDate}>
                                     {"(" + row.releaseDate + ")"}
                                   </div>
                                 </div>
@@ -131,12 +131,12 @@ const ReleaseVersions = (props) => {
                       <div className={classes.softwareRows}>
                         {softwareReleaseJsonData.VERSIONS.map((row) => (
                           <div key={row.id} onClick={() => handleReleaseNoteClick(row, 'software')} className={expandedSection === 'software' ? classes.visibleRow : classes.hiddenRow}>
-                            <div className={classes.dataVersion} align="left">
+                            <div className={classes.dataVersion}>
                               <span className={classes.version}>
                                 {"Version: " + row.versionNumber}
                               </span>
                             </div> 
-                            <div className={classes.softWareDate} align="left">
+                            <div className={classes.softWareDate}>
                               {"(" + row.releaseDate + ")"}
                             </div> 
                           </div>
