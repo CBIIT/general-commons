@@ -108,6 +108,7 @@ const styles = () => ({
     maxHeight: 0,
     opacity: 0,
     overflow: 'hidden',
+    border: 'none !important',
     transition: 'max-height 0.4s ease, opacity 0.4s ease',
   },
   visibleRow: {
@@ -124,7 +125,16 @@ const styles = () => ({
   },
   oddRow: {
     backgroundColor: '#F2FBFF',
-  },  
+  },
+  unselectedRow:{
+    border: 'none',
+  },
+  dataSelectedRow:{
+    //border: '1px solid #0E6292', //uncomment this if we want borders around selected rows
+  }, 
+  softwareSelectedRow:{
+   //border: '1px solid #942A90', //uncomment this if we want borders around selected rows
+  }, 
   dataVersion: {
     width: '50%',
     lineHeight: '40px',
