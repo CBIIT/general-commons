@@ -68,6 +68,31 @@ const ReleaseVersions = (props) => {
     setExpandedYear(prevYear => (prevYear === year ? null : year));
   };
 
+  const renderRow = (type, row, idx = null, expansionRequirement = true) => {
+    return (
+      <div
+        key={row.id}
+        onClick={() => handleReleaseNoteClick(row, type)}
+        className={clsx(
+          releaseNoteDetails &&
+            releaseNoteDetails.id &&
+            releaseNoteDetails.id === row.id
+            ? classes[`${type}SelectedRow`]
+            : classes.unselectedRow,
+          expandedSection === type && expansionRequirement
+            ? classes.visibleRow
+            : classes.hiddenRow,
+          idx !== null ? (idx % 2 === 0 ? classes.evenRow : classes.oddRow) : "",
+        )}
+      >
+        <div className={classes.dataVersion}>
+          <span className={classes.version}>{"Version: " + row.versionNumber}</span>
+        </div>
+        <div className={classes[`${type}Date`]}>{"(" + row.releaseDate + ")"}</div>
+      </div>
+    );
+  };
+
   return (
     <>
       <Stats />
@@ -97,24 +122,7 @@ const ReleaseVersions = (props) => {
                             {versionsByYear[year]
                               .sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate))
                               .map((row, idx) => (
-                                <div
-                                  key={row.id}
-                                  onClick={() => handleReleaseNoteClick(row, 'data')}
-                                  className={clsx(
-                                    releaseNoteDetails && releaseNoteDetails.id && releaseNoteDetails.id === row.id ? classes.dataSelectedRow : classes.unselectedRow,
-                                    expandedSection === 'data' && expandedYear === year ? classes.visibleRow : classes.hiddenRow,
-                                    idx % 2 === 0 ? classes.evenRow : classes.oddRow
-                                  )}
-                                >
-                                  <div className={classes.dataVersion}>
-                                    <span className={classes.version}>
-                                      {"Version: " + row.versionNumber}
-                                    </span>
-                                  </div>
-                                  <div className={classes.dataDate}>
-                                    {"(" + row.releaseDate + ")"}
-                                  </div>
-                                </div>
+                                renderRow("data", row, idx, expandedYear === year)
                               ))}
                           </div>
                         </div>
@@ -130,23 +138,8 @@ const ReleaseVersions = (props) => {
                         </span>
                       </div>
                       <div className={classes.softwareRows}>
-                        {softwareReleaseJsonData.VERSIONS.map((row) => (
-                          <div 
-                            key={row.id} 
-                            onClick={() => handleReleaseNoteClick(row, 'software')} 
-                            className={clsx(
-                              releaseNoteDetails && releaseNoteDetails.id && releaseNoteDetails.id === row.id ? classes.softwareSelectedRow : classes.unselectedRow,
-                              expandedSection === 'software' ? classes.visibleRow : classes.hiddenRow
-                              )}>
-                            <div className={classes.dataVersion}>
-                              <span className={classes.version}>
-                                {"Version: " + row.versionNumber}
-                              </span>
-                            </div> 
-                            <div className={classes.softWareDate}>
-                              {"(" + row.releaseDate + ")"}
-                            </div> 
-                          </div>
+                        {softwareReleaseJsonData.VERSIONS.map((row, idx) => (
+                          renderRow("software", row)
                         ))}
                       </div>
                   </div>

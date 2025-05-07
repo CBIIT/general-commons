@@ -196,7 +196,7 @@ const styles = () => ({
     display: 'inline-block', 
     paddingBottom: 8, 
   },
-  softWareDate: {
+  softwareDate: {
     width: '50%',
     fontSize: 13,
     fontWeight: 400,
