@@ -9,6 +9,35 @@ import styles from './styles';
 const ReleaseNotes = (props) => {
   const { classes, releaseNoteDetails } = props;
 
+  const renderList = (list, keyPrefix = '') => {
+    return (
+      <ul>
+        {list.map((item, index) => {
+          const itemKey = `${keyPrefix}-item-${index}`;
+          if (typeof item === 'string') { // if the item is a string, we will just add it to the list
+            return (
+              <li key={itemKey}>
+                <span className={classes.insideList}>{convertTextToAnchors(item)}</span>
+              </li>
+            );
+          } else if (typeof item === 'object' && Array.isArray(item.list)) { // if the item is an object with a list, we will render it recursively
+            return (
+              <li key={itemKey}>
+                <div>
+                  {item.paragraph && (
+                    <span>{convertTextToAnchors(item.paragraph)}</span>
+                  )}
+                  {renderList(item.list, itemKey)}
+                </div>
+              </li>
+            );
+          }
+          return null;
+        })}
+      </ul>
+    );
+  };
+  
   return (
     <div className={classes.releaseNotesContainer}>
       <hr className={classes.horizontalLine} />
@@ -27,28 +56,7 @@ const ReleaseNotes = (props) => {
                <p>{convertTextToAnchors(item.paragraph)}</p>
               )}
               {item.list && (
-                <ul>
-                  {item.list.map((listItem, listItemIndex) => (
-                    <li key={"SoftwareReleaseNotes-ListSection-"+index+"-SoftwareReleaseNotes-ListItem-"+listItemIndex}>
-                      {typeof listItem === 'string' ? (
-                        <span className={classes.insideList}>{convertTextToAnchors(listItem)}</span>
-                      ) : (
-                        <div>
-                          <span>{convertTextToAnchors(item.paragraph)}</span>
-                          {Array.isArray(listItem.list) && listItem.list.length > 0 && (
-                            <ul>
-                              {listItem.list.map((nestedListItem, nestedIndex) => (
-                                <li key={"SoftwareReleaseNotes-ListSection-"+index+"-SoftwareReleaseNotes-ListItem-"+listItemIndex+"-SoftwareReleaseNotes-NestedItem-"+nestedIndex}>
-                                 <span className={classes.insideList}>{convertTextToAnchors(nestedListItem)}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                        </div>
-                      )}
-                    </li>
-                  ))}
-                </ul>
+                renderList(item.list, `list-${index}`)
               )}
             </div>
           ))}
