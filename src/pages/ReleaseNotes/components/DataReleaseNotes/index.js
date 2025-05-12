@@ -3,7 +3,7 @@ import React from 'react';
 import {
   withStyles,
 } from '@material-ui/core';
-import { convertTextToAnchors } from '../../components/util';
+import DynamicTag from '../DynamicTag';
 import styles from './styles';
 
 const ReleaseNotes = (props) => {
@@ -21,14 +21,19 @@ const ReleaseNotes = (props) => {
             const listSectionKey = "DataReleaseNotes-ListSection-" + index
             return (
               <div key={listSectionKey}>
-                {item.paragraph && <p>{convertTextToAnchors(item.paragraph, listSectionKey)}</p>}
+                {
+                  item.paragraph && 
+                  <p>
+                    <DynamicTag text={item.paragraph} keyPrefix={listSectionKey}/>
+                  </p>
+                }
                 {item.list && (
                   <ul>
                     {item.list.map((listItem, listItemIndex) => {
                       const itemKey = "DataReleaseNotes-ListSection-" + index+"-DataReleaseNotes-ListItem-" + listItemIndex
                       return (
                         <li key={itemKey}>
-                          {convertTextToAnchors(listItem, itemKey)}
+                          <DynamicTag text={listItem} keyPrefix={itemKey}/>
                         </li>
                     )})}
                   </ul>              

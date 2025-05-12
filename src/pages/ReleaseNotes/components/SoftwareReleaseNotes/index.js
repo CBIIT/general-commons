@@ -2,7 +2,7 @@ import React from 'react';
 import {
   withStyles,
 } from '@material-ui/core';
-import { convertTextToAnchors } from '../../components/util';
+import DynamicTag from '../DynamicTag';
 import styles from './styles';
 
 const ReleaseNotes = (props) => {
@@ -16,7 +16,9 @@ const ReleaseNotes = (props) => {
           if (typeof item === 'string') { // if the item is a string, we will just add it to the list
             return (
               <li key={itemKey}>
-                <span className={classes.insideList}>{convertTextToAnchors(item, itemKey)}</span>
+                <span className={classes.insideList}>
+                  <DynamicTag text={item} keyPrefix={itemKey}/>
+                </span>
               </li>
             );
           } else if (typeof item === 'object' && Array.isArray(item.list)) { // if the item is an object with a list, we will render it recursively
@@ -24,7 +26,9 @@ const ReleaseNotes = (props) => {
               <li key={itemKey}>
                 <div>
                   {item.paragraph && (
-                    <span>{convertTextToAnchors(item.paragraph, itemKey)}</span>
+                    <span>
+                      <DynamicTag text={item.paragraph} keyPrefix={itemKey}/>
+                    </span>
                   )}
                   {renderList(item.list, itemKey)}
                 </div>
@@ -56,7 +60,9 @@ const ReleaseNotes = (props) => {
             return (
               <div key={listSectionKey} className='listSection'>
                 {item.paragraph && (
-                <p>{convertTextToAnchors(item.paragraph, listSectionKey)}</p>
+                <p>
+                  <DynamicTag text={item.paragraph} keyPrefix={listSectionKey}/>
+                </p>
                 )}
                 {item.list && (
                   renderList(item.list, `list-${index}`)
