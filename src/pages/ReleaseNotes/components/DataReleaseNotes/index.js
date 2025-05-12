@@ -1,4 +1,4 @@
-/* eslint-disable react/no-danger */
+
 import React from 'react';
 import {
   withStyles,
@@ -17,20 +17,24 @@ const ReleaseNotes = (props) => {
         <p className={classes.releaseDateInfo}>{`Release Date: ${releaseNoteDetails.releaseDate}`}</p>
         <p className={classes.subHeading}>{releaseNoteDetails.subHeading}</p>
         <div className={classes.infoWrapper}>
-          {releaseNoteDetails.content.map((item, index) => (
-            <div key={"DataReleaseNotes-ListSection-"+index}>
-              {item.paragraph && <p>{convertTextToAnchors(item.paragraph)}</p>}
-              {item.list && (
-                <ul>
-                  {item.list.map((listItem, listItemIndex) => (
-                    <li key={"DataReleaseNotes-ListSection-"+index+"-DataReleaseNotes-ListItem-"+listItemIndex}>
-                      {convertTextToAnchors(listItem)}
-                    </li>
-                  ))}
-                </ul>              
-              )}
-            </div>
-          ))}
+          {releaseNoteDetails.content.map((item, index) => {
+            const listSectionKey = "DataReleaseNotes-ListSection-" + index
+            return (
+              <div key={listSectionKey}>
+                {item.paragraph && <p>{convertTextToAnchors(item.paragraph, listSectionKey)}</p>}
+                {item.list && (
+                  <ul>
+                    {item.list.map((listItem, listItemIndex) => {
+                      const itemKey = "DataReleaseNotes-ListSection-" + index+"-DataReleaseNotes-ListItem-" + listItemIndex
+                      return (
+                        <li key={itemKey}>
+                          {convertTextToAnchors(listItem, itemKey)}
+                        </li>
+                    )})}
+                  </ul>              
+                )}
+              </div>
+          )})}
         </div>
       </div>
       <hr className={classes.horizontalLine} />

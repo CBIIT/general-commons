@@ -1,6 +1,6 @@
 import React from "react";
 
-export const convertTextToAnchors = (text) => {
+export const convertTextToAnchors = (text, keyPrefix = '') => {
     const regex = /\$\{([^}]+)\}/g; //Check if we have any ${} -- if so will turn them to anchor tags with hrefs
     const allText = [];
     let currentIndex = 0;
@@ -13,7 +13,7 @@ export const convertTextToAnchors = (text) => {
   
       if (start > currentIndex) { // add text before match
         allText.push(
-          <span key={key++}>
+          <span key={keyPrefix + "-TextContent-" + ++key}>
             {text.slice(currentIndex, start)}
           </span>
         );
@@ -21,7 +21,7 @@ export const convertTextToAnchors = (text) => {
   
       allText.push( //add the url (matched via ${})
         <a
-          key={key++}
+          key={keyPrefix + "-TextContentAnchor-" + ++key}
           href={placeholder.startsWith("http") ? placeholder : `https://${placeholder}`}
           target="_blank"
           rel="noopener noreferrer"
@@ -35,7 +35,7 @@ export const convertTextToAnchors = (text) => {
   
     if (currentIndex < text.length) { // once we finish the while loop add the rest of the text if applicable
         allText.push(
-        <span key={key++}>
+        <span key={keyPrefix + "-TextContent-" + ++key}>
           {text.slice(currentIndex)}
         </span>
       );
