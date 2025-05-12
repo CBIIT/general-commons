@@ -34,7 +34,18 @@ const styles = () => ({
     border: 'none',
     height: 2,
   },
-  heading: {
+  dataHeading: {
+    fontSize: 22,
+    fontWeight: 600,
+    color: '#43779A',
+    fontFamily: 'Lato',
+    fontStyle: 'normal',
+    margin: "0px 0px 22px 0px",
+    /* or 114% */
+
+    letterSpacing: '0.14994',
+  },
+  softwareHeading: {
     fontSize: 22,
     fontWeight: 600,
     color: '#942A90',

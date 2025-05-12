@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import React, { useState, useEffect } from 'react';
 import jsonLink from '../../bento/releaseNotesData';
 import styles from './styles';
-import ReleaseNotes from './components/releaseNotes';
+import ReleaseNotes from './components/ReleaseNotes';
 import Stats from '../../components/Stats/AllStatsController';
 import { Typography } from '../../components/Wrappers/Wrappers';
 import usePageTitle from '../../components/Analytics/usePageTitle';
