@@ -49,12 +49,12 @@ export const downloadMarkdownPdf = async (title, content) => {
   const fileName = createFileName('GC-SELECTED-FILES-CART-README', '');
   /** configure pdf increase pixel of the PDF */
   const options = {
-    margin: [0.5, 0.5, 1.11, 0.5],
+    margin: [0.5, 0.5, 1.0, 0.5],
     filename: fileName,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: {
       dpi: 192,
-      scale: 4,
+      scale: 5,
       letterRendering: true,
       useCORS: true,
     },
