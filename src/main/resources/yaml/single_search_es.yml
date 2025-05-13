@@ -70,30 +70,6 @@ queries:
       defaultSortField: diagnosis_id
     result:
       type: object_array
-  - name: participant
-    index:
-      - subjects
-    filter:
-      type: pagination
-      defaultSortField: participant_id
-    result:
-      type: object_array
-  - name: file
-    index:
-      - files
-    filter:
-      type: pagination
-      defaultSortField: file_id
-    result:
-      type: object_array
-  - name: study
-    index:
-      - studies
-    filter:
-      type: pagination
-      defaultSortField: phs_accession
-    result:
-      type: object_array
   - name: sample
     index:
       - samples

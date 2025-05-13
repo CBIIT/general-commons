@@ -74,7 +74,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>19.11</version>
+            <version>21.5</version>
         </dependency>
         <!-- GSON -->
         <dependency>
@@ -161,7 +161,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.22</version>
+            <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
         <!-- JSON -->
@@ -223,6 +223,14 @@
             <artifactId>protobuf-java</artifactId>
             <version>3.25.5</version>
         </dependency>
+
+        <!-- Neo4j Java Driver - required for connecting to Memgraph -->
+        <dependency>
+            <groupId>org.neo4j.driver</groupId>
+            <artifactId>neo4j-java-driver</artifactId>
+            <version>4.4.9</version> <!-- Use the latest version available -->
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>

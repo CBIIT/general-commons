@@ -3,31 +3,22 @@ package gov.nih.nci.bento_ri.model;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import gov.nih.nci.bento.constants.Const;
 import gov.nih.nci.bento.model.AbstractPrivateESDataFetcher;
 import gov.nih.nci.bento.model.search.mapper.TypeMapperImpl;
 import gov.nih.nci.bento.model.search.mapper.TypeMapperService;
-import gov.nih.nci.bento.model.search.yaml.YamlQueryFactory;
 import gov.nih.nci.bento.service.ESService;
-import graphql.schema.idl.RuntimeWiring;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.client.Request;
 import org.springframework.stereotype.Component;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.util.*;
-
-import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 
 @Component
 public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     private static final Logger logger = LogManager.getLogger(PrivateESDataFetcher.class);
-    private static final String SCHEMA_VERSION = "2.0.0";
-    private final YamlQueryFactory yamlQueryFactory;
     private final TypeMapperService typeMapper = new TypeMapperImpl();
 
     final String PAGE_SIZE = "first";
@@ -73,56 +64,15 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     final String GS_HIGHLIGHT_DELIMITER = "$";
     final Set<String> RANGE_PARAMS = Set.of("number_of_study_participants", "number_of_study_samples");
 
-    public PrivateESDataFetcher(ESService esService) {
+    private MemgraphDataFetcher memgraphDataFetcher;
+
+    public PrivateESDataFetcher(ESService esService, MemgraphDataFetcher memgraphDataFetcher) {
         super(esService);
-        yamlQueryFactory = new YamlQueryFactory(esService);
         HashMap<String, String> file_ids_map;
     }
 
-    @Override
-    public RuntimeWiring buildRuntimeWiring() throws IOException {
-        return RuntimeWiring.newRuntimeWiring()
-                .type(newTypeWiring("QueryType")
-                        .dataFetcher("schemaVersion", env -> SCHEMA_VERSION)
-                        .dataFetchers(yamlQueryFactory.createYamlQueries(Const.ES_ACCESS_TYPE.PRIVATE))
-                        .dataFetcher("searchSubjects", env -> {
-                            Map<String, Object> args = env.getArguments();
-                            return searchSubjects(args);
-                        })
-                        .dataFetcher("subjectOverview", env -> {
-                            Map<String, Object> args = env.getArguments();
-                            return subjectOverview(args);
-                        })
-                        .dataFetcher("sampleOverview", env -> {
-                            Map<String, Object> args = env.getArguments();
-                            return sampleOverview(args);
-                        })
-                        .dataFetcher("fileOverview", env -> {
-                            Map<String, Object> args = env.getArguments();
-                            return fileOverview(args);
-                        })
-                        .dataFetcher("filesInList", env -> {
-                            Map<String, Object> args = env.getArguments();
-                            return filesInList(args);
-                        })
-                        .dataFetcher("globalSearch", env -> {
-                            Map<String, Object> args = env.getArguments();
-                            return globalSearch(args);
-                        })
-                        .dataFetcher("fileIDsFromList", env -> {
-                            Map<String, Object> args = env.getArguments();
-                            return fileIDsFromList(args);
-                        })
-                        .dataFetcher("findSubjectIdsInList", env -> {
-                            Map<String, Object> args = env.getArguments();
-                            return findSubjectIdsInList(args);
-                        })
-                        .dataFetcher("version", env -> getLatestVersion())
-                )
-                .build();
-    }
 
-    private Map<String, Object> searchSubjects(Map<String, Object> params) throws IOException {
+    Map<String, Object> searchSubjects(Map<String, Object> params) throws IOException {
         final String AGG_NAME = "agg_name";
         final String AGG_ENDPOINT = "agg_endpoint";
         final String WIDGET_QUERY = "widgetQueryName";
@@ -413,7 +363,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         return data;
     }
 
-    private List<Map<String, Object>> subjectOverview(Map<String, Object> params) throws IOException {
+    List<Map<String, Object>> subjectOverview(Map<String, Object> params) throws IOException {
         final String[][] PROPERTIES = new String[][]{
                 new String[]{"subject_id", "subject_ids"},
                 new String[]{"study_acronym", "studies"},
@@ -449,7 +399,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         return overview(SUBJECTS_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
     }
 
-    private List<Map<String, Object>> sampleOverview(Map<String, Object> params) throws IOException {
+    List<Map<String, Object>> sampleOverview(Map<String, Object> params) throws IOException {
         final String[][] PROPERTIES = new String[][]{
                 new String[]{"study_acronym", "studies"},
                 new String[]{"phs_accession", "phs_accession"},
@@ -483,7 +433,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         return overview(SAMPLES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
     }
 
-    private List<Map<String, Object>> fileOverview(Map<String, Object> params) throws IOException {
+    List<Map<String, Object>> fileOverview(Map<String, Object> params) throws IOException {
         // Following String array of arrays should be in form of "GraphQL_field_name", "ES_field_name"
         final String[][] PROPERTIES = new String[][]{
             new String[]{"study_acronym", "studies"},
@@ -680,7 +630,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         return range;
     }
 
-    private Map<String, Object> globalSearch(Map<String, Object> params) throws IOException {
+    Map<String, Object> globalSearch(Map<String, Object> params) throws IOException {
         Map<String, Object> result = new HashMap<>();
         String input = (String) params.get("input");
         int size = (int) params.get("first");
@@ -977,7 +927,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         return result;
     }
 
-    private List<Map<String, Object>> findSubjectIdsInList(Map<String, Object> params) throws IOException {
+    List<Map<String, Object>> findSubjectIdsInList(Map<String, Object> params) throws IOException {
         final String[][] properties = new String[][]{
                 new String[]{"subject_id", "subject_id"},
                 new String[]{"phs_accession", "phs_accession"}
@@ -989,7 +939,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         return esService.collectPage(request, query, properties, ESService.MAX_ES_SIZE, 0);
     }
 
-    private List<Map<String, Object>> filesInList(Map<String, Object> params) throws Exception {
+    List<Map<String, Object>> filesInList(Map<String, Object> params) throws Exception {
         final String[][] PROPERTIES = new String[][]{
             new String[]{"study_acronym", "studies"},
             new String[]{"accesses", "accesses"},
@@ -1077,7 +1027,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         return filesInListResult;
     }
 
-    private List<String> fileIDsFromList(Map<String, Object> params) throws IOException {
+    List<String> fileIDsFromList(Map<String, Object> params) throws IOException {
         return collectFieldFromList(params, "file_id", FILES_END_POINT);
     }
 
@@ -1092,41 +1042,4 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         return esService.collectTerms(jsonObject, collectField);
     }
 
-    private Map<String, Object> getLatestVersion() throws IOException {
-        Map<String, Object> latestVersion = null;
-        Request request = new Request("GET", VERSION_END_POINT);
-        JsonObject jsonObject = esService.send(request);
-        JsonArray searchHits = null;
-        try{
-            searchHits = jsonObject.getAsJsonObject("hits").getAsJsonArray("hits");
-        }
-        catch (Exception e){
-            throw new IOException("Unable to parse the OpenSearch response");
-        }
-        for (JsonElement hit : searchHits) {
-            Map<String, Object> version = null;
-            try{
-                JsonElement source = hit.getAsJsonObject().get("_source");
-                version = gson.fromJson(source, Map.class);
-            }
-            catch (Exception e){
-                throw new IOException("Unable to parse the version from the OpenSearch response");
-            }
-            if (latestVersion == null){
-                latestVersion = version;
-                continue;
-            }
-            try{
-                OffsetDateTime versionDateTime = OffsetDateTime.parse(version.get("datetime").toString());
-                OffsetDateTime latestVersionDateTime = OffsetDateTime.parse(latestVersion.get("datetime").toString());
-                if (versionDateTime.isAfter(latestVersionDateTime)){
-                    latestVersion = version;
-                }
-            }
-            catch (Exception e){
-                throw new IOException("Unable to parse the timestamp from a version in the OpenSearch response");
-            }
-        }
-        return latestVersion;
-    }
 }
