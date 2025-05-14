@@ -34,7 +34,7 @@ import { AuthenticationMiddlewareGenerator } from '@bento-core/authentication';
 
 import Notifactions from '../Notifications/NotifactionView';
 import DashTemplate from '../../pages/dashTemplate/DashTemplateController';
-import ReleaseVersions from '../../pages/ReleaseVersions';
+import ReleaseNotes from '../../pages/ReleaseNotes';
 import TextBanner from '../TextBanner';
 
 
@@ -120,7 +120,7 @@ const Layout = ({ classes, isSidebarOpened }) => {
                 />
               ),
             )}
-            <Route path="/releases" component={ReleaseVersions} />
+            <Route path="/releases" component={ReleaseNotes} />
             <Route path="/data-dictionary" component={DataDictonary} />
             <Route path="/graphql" component={GraphqlClient} />
             <LoginRoute path="/login" component={Login} />
