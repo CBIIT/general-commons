@@ -1,0 +1,33 @@
+#Spring
+spring.mvc.view.prefix=/WEB-INF/
+spring.mvc.view.suffix=.jsp
+error.redirect_url=http://localhost/error.html
+
+#Memgraph
+memgraph.endpoint=
+memgraph.port=
+memgraph.username=
+memgraph.password=
+
+#GraphQL
+graphql.es_schema = graphql/general-commons-schema.graphql
+
+#Query Restrictions
+allow_graphql_query = true
+allow_graphql_mutation =false
+
+# Elasticsearch Filtering
+es.host =
+es.port = 443
+es.scheme = https
+es.filter.enabled = true
+# use es.sign.requests = true if running AWS OpenSearch
+es.sign.requests = true
+es.service_name = es
+es.region = us-east-1
+
+#Testing
+test.queries_file=placeholder
+
+#Validations
+validations.max_page_size=10000
