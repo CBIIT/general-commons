@@ -72,10 +72,23 @@ export const HeaderSubLinks = {
       className: 'navMobileSubItem',
     },
     {
-      name: 'GC User Guide',
-      link: STATIC_CONTENT.about.USER_GUIDE_PDF,
-      id: 'about-user-guide',
+      name: 'GC Documents',
+      id: 'about-documents',
       className: 'navMobileSubItem',
+      items: [
+        {
+          name: 'GC User Guide',
+          link: STATIC_CONTENT.about.USER_GUIDE_PDF,
+          id: 'about-user-guide',
+          className: 'navMobileSubItem',
+        },
+        {
+          name: 'Query GC Database',
+          link: STATIC_CONTENT.about.QUERY_GC_DATABASE_PDF,
+          id: 'about-query-gc-database',
+          className: 'navMobileSubItem',
+        },
+      ]
     },
     {
       name: 'GC Releases',

@@ -3,6 +3,8 @@ import env from "../utils/env";
 export const STATIC_CONTENT = {
   about: {
     USER_GUIDE_PDF: `${env.REACT_APP_STATIC_CONTENT_URL}about/GeneralCommonsUserGuide.pdf`,
+    QUERY_GC_DATABASE_PDF: `${env.REACT_APP_STATIC_CONTENT_URL}about/QueryGCDatabase.pdf`,
+    GC_DOCUMENTS_PDF: `${env.REACT_APP_STATIC_CONTENT_URL}about/GCDocuments.pdf`,
     CDS_CONTENT_IMAGE: `${env.REACT_APP_STATIC_CONTENT_URL}about/cds.png`,
     CRDC_CONTENT_IMAGE: `${env.REACT_APP_STATIC_CONTENT_URL}about/crdc.png`,
     LEFT_BG_IMAGE: `${env.REACT_APP_STATIC_CONTENT_URL}about/leftBg.jpg`,
@@ -43,5 +45,6 @@ export const STATIC_CONTENT = {
   },
   logo: {
     CRDC_LOGO_SVG: `${env.REACT_APP_STATIC_CONTENT_URL}logo/crdc-logo.svg`,
-  }
+  },
 };
+
