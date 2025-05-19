@@ -16,7 +16,7 @@
   title: "Query the GC Portal Using GraphQL"
   imageLocation: "hidden"
   content:
-    - paragraph: "Users can search through all the GC portal using GraphQL queries. There are several queries that users can utilize from the $$[GC User Guide](<%= USER_GUIDE_PDF %> title: 'Download the User Guide')$$"
+    - paragraph: "Users can search through all the GC portal using GraphQL queries. There are several queries that users can utilize from the tutorial to $$[Query GC Database](<%= QUERY_GC_DATABASE_PDF %> title: 'Download the Query GC Database PDF')$$"
   components: ["GraphqlClient"]
 - page: '/GeneralCommons'
   title: "About The General Commons"
