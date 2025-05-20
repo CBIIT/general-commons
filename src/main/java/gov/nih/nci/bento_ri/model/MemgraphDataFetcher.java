@@ -54,16 +54,25 @@ public class MemgraphDataFetcher implements AutoCloseable{
 
     public List<Map<String, Object>> fileDataFetcher(Map<String, Object> params){
         // validate date inputs
+        final String startKey = "released_range_start";
+        final String endKey = "released_range_end";
+        Map<String, Object> modifiedParams = new HashMap<>(params);
         String dateError = "The optional parameter %s must be a valid date in the format YYYY-MM-DD";
-        String releasedAfter = params.get("released_after").toString();
-        if (!releasedAfter.isEmpty() && !validateDateInput(releasedAfter)){
-            throw new IllegalArgumentException(String.format(dateError, "released_after"));
+        String releasedRangeStart = params.get(startKey).toString();
+        if (!releasedRangeStart.isEmpty()){
+            if (!validateDateInput(releasedRangeStart)){
+                throw new IllegalArgumentException(String.format(dateError, startKey));
+            }
+            modifiedParams.put(startKey, releasedRangeStart+"T00:00:00Z");
         }
-        String releasedBefore = params.get("released_before").toString();
-        if (!releasedBefore.isEmpty() && !validateDateInput(releasedBefore)){
-            throw new IllegalArgumentException(String.format(dateError, "released_before"));
+        String releasedRangeEnd = params.get(endKey).toString();
+        if (!releasedRangeEnd.isEmpty()){
+            if (!validateDateInput(releasedRangeEnd)){
+                throw new IllegalArgumentException(String.format(dateError, endKey));
+            }
+            modifiedParams.put(endKey, releasedRangeEnd+"T23:59:59Z");
         }
-        return listQuery(FilesQuery.FILES_QUERY, params);
+        return listQuery(FilesQuery.FILES_QUERY, modifiedParams);
     }
 
     public List<Map<String, Object>> participantDataFetcher(Map<String, Object> params){
@@ -130,18 +139,6 @@ public class MemgraphDataFetcher implements AutoCloseable{
     }
 
     private List<Map<String, Object>> listQuery(String query, Map<String, Object> params){
-        // add sort cypher to query if applicable
-        Object orderByParam = params.get("order_by");
-        if (orderByParam != null){
-            String orderBy = orderByParam.toString();
-            if (!orderBy.isEmpty()){
-                String sortDirection = params.get("sort_direction").toString();
-                if (!sortDirection.equalsIgnoreCase("DESC")){
-                    sortDirection = "ASC";
-                }
-                query += "\n" + String.format("ORDER BY output.%s %s", orderBy, sortDirection);
-            }
-        }
         // add pagination cypher to query
         int first = parseIntParameter(params.get("first"), "$first", 0, MAX_PAGE_SIZE);
         int offset = parseIntParameter(params.get("offset"), "$offset", 0, Integer.MAX_VALUE);
@@ -165,7 +162,7 @@ public class MemgraphDataFetcher implements AutoCloseable{
     }
 
     private boolean validateDateInput(String date){
-        String dateRegex = "^\\d{4}-\\d{1,2}-\\d{1,2}$";
+        String dateRegex = "^\\d{4}-\\d{2}-\\d{2}$";
         if (!date.matches(dateRegex)) {
             return false;
         }

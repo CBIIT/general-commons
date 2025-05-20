@@ -438,8 +438,6 @@ type File {
     # relationship properties
     phs_accession: String
     participant_ids: [String]
-    sample_ids: [String]
-    associated_file_id: String
 }
 
 type Participant {
@@ -1001,42 +999,39 @@ type QueryType {
     version: Version
 
     studies (
+        # study filters
         study_names: [String]
         study_acronyms: [String]
         phs_accessions: [String]
         # formatting
         first: Int = 10,
-        offset: Int = 0,
-        order_by: String = ""
-        sort_direction: String = "ASC"
+        offset: Int = 0
     ): [Study]
 
     participants (
+        # study filter
+        phs_accession: String!,
+        # participant filter
         participant_ids: [String] = []
-        # relationship filters
-        phs_accessions: [String] = [],
         # formatting
         first: Int = 10,
-        offset: Int = 0,
-        order_by: String = ""
-        sort_direction: String = "ASC"
+        offset: Int = 0
     ): [Participant]
 
     files(
-        # file filter
+        # study filter
+        phs_accession: String!,
+        # file filters
         file_ids: [String] = [],
         file_names: [String] = []
         file_types: [String] = [],
-        released_after: String = "",
-        released_before: String = "",
+        released_range_start: String = "",
+        released_range_end: String = "",
         # relationship filters
         participant_ids: [String] = [],
-        phs_accessions: [String] = [],
         # formatting
         first: Int = 10,
-        offset: Int = 0,
-        order_by: String = ""
-        sort_direction: String = "ASC"
+        offset: Int = 0
     ): [File]
 
     samples(
@@ -1093,7 +1088,7 @@ type QueryType {
 
     proteomics(
         # proteomic filter
-        proteomic_info_id: [String] = [],
+        proteomic_info_ids: [String] = [],
         # relationship filters
         file_ids: [String] = [],
         phs_accessions: [String] = [],

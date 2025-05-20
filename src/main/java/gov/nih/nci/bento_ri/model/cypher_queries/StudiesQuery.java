@@ -8,5 +8,6 @@ public class StudiesQuery {
             ($study_acronyms = [] OR s.study_acronym IN $study_acronyms) AND
             ($phs_accessions = [] OR s.phs_accession IN $phs_accessions)
         RETURN s{.*} AS output
+        ORDER BY output.phs_accession ASC
     """;
 }

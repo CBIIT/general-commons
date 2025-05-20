@@ -2,7 +2,7 @@ package gov.nih.nci.bento_ri.model.cypher_queries;
 
 public class ProteomicsQuery {
     public static final String PROTEOMICS_QUERY = """
-        MATCH (p:proteomics)
+        MATCH (p:proteomic)
         WHERE
             $proteomic_info_ids = [] OR p.proteomic_info_id IN $proteomic_info_ids
         WITH p, p {.*} AS output
