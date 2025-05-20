@@ -17,7 +17,7 @@
     </parent>
     <properties>
         <java.version>17</java.version>
-        <spring.version>6.2.5</spring.version>
+        <spring.version>6.2.7</spring.version>
         <spring.restdocs.version>3.0.1</spring.restdocs.version>
     </properties>
     <dependencies>
@@ -68,7 +68,7 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>10.1.39</version>
+            <version>10.1.41</version>
         </dependency>
         <!-- GraphQL -->
         <dependency>
@@ -228,7 +228,7 @@
         <dependency>
             <groupId>org.neo4j.driver</groupId>
             <artifactId>neo4j-java-driver</artifactId>
-            <version>4.4.9</version> <!-- Use the latest version available -->
+            <version>4.4.20</version> <!-- Use the latest version available -->
         </dependency>
 
     </dependencies>
@@ -249,6 +249,7 @@
                             <rules>
                                 <dependencyConvergence>
                                     <excludes>
+                                        <exclude>org.springframework</exclude>
                                     </excludes>
                                 </dependencyConvergence>
                             </rules>
