@@ -27,6 +27,7 @@ public class GeneralCommonsRuntimeWiring {
         this.runtimeWiring = RuntimeWiring.newRuntimeWiring()
                 .type(newTypeWiring("QueryType")
                         .dataFetcher("schemaVersion", env -> "3.0.0")
+                        .dataFetcher("schemaModelVersion", env -> "8.0.0")
                         .dataFetchers(yamlQueryFactory.createYamlQueries(Const.ES_ACCESS_TYPE.PRIVATE))
                         .dataFetcher("searchSubjects", env -> {
                             Map<String, Object> args = env.getArguments();

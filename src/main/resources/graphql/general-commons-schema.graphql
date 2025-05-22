@@ -371,11 +371,17 @@ type SubjectDetail {
 }
 
 # Node types
-type Version {
-    data_version: String
-    datetime: String
-    model_version: String
-    description: String
+type Program {
+    # id property
+    program_name: String
+    # node properties
+    program_acronym: String
+    program_short_description: String
+    program_full_description: String
+    program_external_url: String
+    program_short_name: String
+    institution: String
+    crdc_id: String
 }
 
 type Study {
@@ -417,29 +423,6 @@ type Study {
     crdc_id: String
 }
 
-type File {
-    # id property
-    file_id: String
-    # node properties
-    file_name: String
-    file_type: String
-    file_description: String
-    file_size: String
-    md5sum: String
-    file_url_in_cds: String
-    experimental_strategy_and_data_subtypes: String
-    submission_version: String
-    checksum_value: String
-    checksum_algorithm: String
-    crdc_id: String
-    file_mapping_level: String
-    release_datetime: String
-    is_supplementary_file: String
-    # relationship properties
-    phs_accession: String
-    participant_ids: [String]
-}
-
 type Participant {
     # id property
     participant_id: String
@@ -452,38 +435,6 @@ type Participant {
     crdc_id: String
     # relationship properties
     phs_accession: String
-}
-
-type Sample {
-    # id property
-    sample_id: String
-    # node properties
-    sample_type: String
-    sample_description: String
-    sample_type_category: String
-    sample_tumor_status: String # tumor or normal
-    sample_anatomic_site: String
-    sample_age_at_collection: String
-    derived_from_specimen: String
-    biosample_accession: String
-    crdc_id: String
-    # relationship properties
-    phs_accession: String
-    participant_id: String
-}
-
-type Treatment {
-    # id property
-    treatment_id: String
-    # node properties
-    treatment_type: String
-    days_to_treatment: String
-    therapeutic_agents: String
-    response: String
-    crdc_id: String
-    # relationship properties
-    phs_accession: String
-    participant_id: String
 }
 
 type Diagnosis {
@@ -516,6 +467,61 @@ type Diagnosis {
     participant_id: String
 }
 
+type Treatment {
+    # id property
+    treatment_id: String
+    # node properties
+    treatment_type: String
+    days_to_treatment: String
+    therapeutic_agents: String
+    response: String
+    crdc_id: String
+    # relationship properties
+    phs_accession: String
+    participant_id: String
+}
+
+type Sample {
+    # id property
+    sample_id: String
+    # node properties
+    sample_type: String
+    sample_description: String
+    sample_type_category: String
+    sample_tumor_status: String # tumor or normal
+    sample_anatomic_site: String
+    sample_age_at_collection: String
+    derived_from_specimen: String
+    biosample_accession: String
+    crdc_id: String
+    # relationship properties
+    phs_accession: String
+    participant_id: String
+}
+
+type File {
+    # id property
+    file_id: String
+    # node properties
+    file_name: String
+    file_type: String
+    file_description: String
+    file_size: String
+    md5sum: String
+    file_url_in_cds: String
+    experimental_strategy_and_data_subtypes: String
+    submission_version: String
+    checksum_value: String
+    checksum_algorithm: String
+    crdc_id: String
+    file_mapping_level: String
+    release_datetime: String
+    is_supplementary_file: String
+    # relationship properties
+    phs_accession: String
+    participant_ids: [String]
+}
+
 type Genomic_Info {
     # id property
     genomic_info_id: String
@@ -538,22 +544,6 @@ type Genomic_Info {
     methylation_platform: String
     library_source_material: String
     library_source_molecule: String
-    crdc_id: String
-    # relationship properties
-    phs_accession: String
-    file_id: String
-}
-
-type Proteomic {
-    # id property
-    proteomic_info_id: String
-    # node properties
-    aliquot_id: String
-    analytical_fractions: String
-    instrument_make: String
-    proteomic_instrument_model: String
-    proteomic_design_description: String
-    manufacturer_model_name: String
     crdc_id: String
     # relationship properties
     phs_accession: String
@@ -743,6 +733,43 @@ type NonDICOMradiologyAllModalities {
     study_link_id: String
 }
 
+type Proteomic {
+    # id property
+    proteomic_info_id: String
+    # node properties
+    aliquot_id: String
+    analytical_fractions: String
+    instrument_make: String
+    proteomic_instrument_model: String
+    proteomic_design_description: String
+    manufacturer_model_name: String
+    crdc_id: String
+    # relationship properties
+    phs_accession: String
+    file_id: String
+}
+
+type PDX {
+    # id property
+    pdx_id: String
+    # node properties
+    model_id: String
+    implantation_type: String
+    implantation_site: String
+    mouse_strain: String
+    sample_type_for_implantation: String
+    tumor_not_mus_or_ebv_origin: String
+    # relationship properties
+    phs_accession: String
+    sample_id: String
+}
+
+type Version {
+    data_version: String
+    datetime: String
+    model_version: String
+    description: String
+}
 
 schema {
     query: QueryType
@@ -751,6 +778,8 @@ schema {
 type QueryType {
     # schema version
     schemaVersion: String
+    # schema model version
+    schemaModelVersion: String
     # node count queries
     numberOfStudies: Int
     numberOfSubjects: Int
@@ -996,7 +1025,12 @@ type QueryType {
     globalSearch (input: String, first: Int = 10, offset: Int = 0): GlobalSearchResult
 
     # Memgraph Queries
-    version: Version
+    programs(
+        program_names: [String],
+        # formatting
+        first: Int = 10,
+        offset: Int = 0
+    ): [Program]
 
     studies (
         # id filter
@@ -1019,6 +1053,39 @@ type QueryType {
         offset: Int = 0
     ): [Participant]
 
+    diagnoses(
+        # id filter
+        diagnosis_ids: [String] = [],
+        # relationship filters
+        phs_accession: String!,
+        participant_ids: [String] = [],
+        # formatting
+        first: Int = 10,
+        offset: Int = 0
+    ): [Diagnosis]
+
+    treatments(
+        # id filter
+        treatment_ids: [String] = [],
+        # relationship filters
+        phs_accession: String!,
+        participant_ids: [String] = [],
+        # formatting
+        first: Int = 10,
+        offset: Int = 0
+    ): [Treatment]
+
+    samples(
+        # id filter
+        sample_ids: [String] = [],
+        # relationship filters
+        phs_accession: String!,
+        participant_ids: [String] = [],
+        # formatting
+        first: Int = 10,
+        offset: Int = 0
+    ): [Sample]
+
     files(
         # id filter
         file_ids: [String] = [],
@@ -1035,39 +1102,6 @@ type QueryType {
         offset: Int = 0
     ): [File]
 
-    samples(
-        # id filter
-        sample_ids: [String] = [],
-        # relationship filters
-        phs_accession: String!,
-        participant_ids: [String] = [],
-        # formatting
-        first: Int = 10,
-        offset: Int = 0
-    ): [Sample]
-
-    treatments(
-        # id filter
-        treatment_ids: [String] = [],
-        # relationship filters
-        phs_accession: String!,
-        participant_ids: [String] = [],
-        # formatting
-        first: Int = 10,
-        offset: Int = 0
-    ): [Treatment]
-
-    diagnoses(
-        # id filter
-        diagnosis_ids: [String] = [],
-        # relationship filters
-        phs_accession: String!,
-        participant_ids: [String] = [],
-        # formatting
-        first: Int = 10,
-        offset: Int = 0
-    ): [Diagnosis]
-
     genomic_info(
         # id filter
         genomic_info_ids: [String] = [],
@@ -1078,17 +1112,6 @@ type QueryType {
         first: Int = 10,
         offset: Int = 0
     ): [Genomic_Info]
-
-    proteomics(
-        # id filter
-        proteomic_info_ids: [String] = [],
-        # relationship filters
-        phs_accession: String!,
-        file_ids: [String] = [],
-        # formatting
-        first: Int = 10,
-        offset: Int = 0
-    ): [Proteomic]
 
     images(
         # id filter
@@ -1167,4 +1190,27 @@ type QueryType {
         offset: Int = 0
     ): [NonDICOMradiologyAllModalities]
 
+    proteomics(
+        # id filter
+        proteomic_info_ids: [String] = [],
+        # relationship filters
+        phs_accession: String!,
+        file_ids: [String] = [],
+        # formatting
+        first: Int = 10,
+        offset: Int = 0
+    ): [Proteomic]
+
+    pdx(
+        # id filter
+        pdx_ids: [String]
+        # relationship filters
+        phs_accession: String!,
+        sample_ids: [String],
+        # formatting
+        first: Int = 10,
+        offset: Int = 0
+    ): [PDX]
+
+    version: Version
 }
