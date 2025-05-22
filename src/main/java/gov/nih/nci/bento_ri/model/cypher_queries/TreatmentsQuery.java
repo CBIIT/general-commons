@@ -2,24 +2,19 @@ package gov.nih.nci.bento_ri.model.cypher_queries;
 
 public class TreatmentsQuery {
     public static final String TREATMENTS_QUERY = """
-        MATCH (t:treatment)
+        MATCH (t:treatment)-->(:participant)-->(s:study {phs_accession: $phs_accession})
         WHERE
             $treatment_ids = [] OR t.treatment_id IN $treatment_ids
-        WITH t, t {.*} AS output
-        OPTIONAL MATCH (t)-->(:participant)-->(s:study)
-        WITH t, s, output
-        WHERE
-            $phs_accessions = [] OR s.phs_accession in $phs_accessions
-        WITH t, apoc_replacement_poc.merge(output, {
+        WITH DISTINCT t, {
             phs_accession: s.phs_accession
-        }) AS output
-        OPTIONAL MATCH (t)-->(p:participant)
-        WITH t, p, output
+        } AS output
+        MATCH (t)-->(p:participant)
         WHERE
             $participant_ids = [] OR p.participant_id IN $participant_ids
         WITH t, apoc_replacement_poc.merge(output, {
             participant_id: p.participant_id
         }) AS output
-        RETURN output
+        RETURN apoc_replacement_poc.merge(output, t {.*}) AS output
+        ORDER BY output.treatment_id ASC
     """;
 }

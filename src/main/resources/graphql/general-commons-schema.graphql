@@ -999,35 +999,36 @@ type QueryType {
     version: Version
 
     studies (
-        # study filters
+        # id filter
+        phs_accessions: [String]
+        # property filters
         study_names: [String]
         study_acronyms: [String]
-        phs_accessions: [String]
         # formatting
         first: Int = 10,
         offset: Int = 0
     ): [Study]
 
     participants (
-        # study filter
-        phs_accession: String!,
-        # participant filter
+        # id filter
         participant_ids: [String] = []
+        # relationship filters
+        phs_accession: String!,
         # formatting
         first: Int = 10,
         offset: Int = 0
     ): [Participant]
 
     files(
-        # study filter
-        phs_accession: String!,
-        # file filters
+        # id filter
         file_ids: [String] = [],
+        # property filters
         file_names: [String] = []
         file_types: [String] = [],
         released_range_start: String = "",
         released_range_end: String = "",
         # relationship filters
+        phs_accession: String!,
         participant_ids: [String] = [],
         # formatting
         first: Int = 10,
@@ -1035,153 +1036,135 @@ type QueryType {
     ): [File]
 
     samples(
-        # sample filter
+        # id filter
         sample_ids: [String] = [],
         # relationship filters
+        phs_accession: String!,
         participant_ids: [String] = [],
-        phs_accessions: [String] = [],
         # formatting
         first: Int = 10,
-        offset: Int = 0,
-        order_by: String = ""
-        sort_direction: String = "ASC"
+        offset: Int = 0
     ): [Sample]
 
     treatments(
-        # treatment filter
+        # id filter
         treatment_ids: [String] = [],
         # relationship filters
+        phs_accession: String!,
         participant_ids: [String] = [],
-        phs_accessions: [String] = [],
         # formatting
         first: Int = 10,
-        offset: Int = 0,
-        order_by: String = ""
-        sort_direction: String = "ASC"
+        offset: Int = 0
     ): [Treatment]
 
     diagnoses(
-        # diagnosis filter
+        # id filter
         diagnosis_ids: [String] = [],
         # relationship filters
+        phs_accession: String!,
         participant_ids: [String] = [],
-        phs_accessions: [String] = [],
         # formatting
         first: Int = 10,
-        offset: Int = 0,
-        order_by: String = ""
-        sort_direction: String = "ASC"
+        offset: Int = 0
     ): [Diagnosis]
 
     genomic_info(
-        # genomic_info filter
+        # id filter
         genomic_info_ids: [String] = [],
         # relationship filters
+        phs_accession: String!,
         file_ids: [String] = [],
-        phs_accessions: [String] = [],
         # formatting
         first: Int = 10,
-        offset: Int = 0,
-        order_by: String = ""
-        sort_direction: String = "ASC"
+        offset: Int = 0
     ): [Genomic_Info]
 
     proteomics(
-        # proteomic filter
+        # id filter
         proteomic_info_ids: [String] = [],
         # relationship filters
+        phs_accession: String!,
         file_ids: [String] = [],
-        phs_accessions: [String] = [],
         # formatting
         first: Int = 10,
-        offset: Int = 0,
-        order_by: String = ""
-        sort_direction: String = "ASC"
+        offset: Int = 0
     ): [Proteomic]
 
     images(
-        # image filter
+        # id filter
         study_link_ids: [String] = []
         # relationship filters
+        phs_accession: String!,
         file_ids: [String] = [],
-        phs_accessions: [String] = [],
         # formatting
         first: Int = 10,
-        offset: Int = 0,
-        order_by: String = ""
-        sort_direction: String = "ASC"
+        offset: Int = 0
     ): [Image]
 
     multiplex_microscopies(
+        # id filter
         multiplex_microscopy_ids: [String] = [],
         # relationship filters
-        study_link_ids: [String] = []
-        phs_accessions: [String] = [],
+        phs_accession: String!,
+        file_ids: [String] = [],
         # formatting
         first: Int = 10,
-        offset: Int = 0,
-        order_by: String = ""
-        sort_direction: String = "ASC"
+        offset: Int = 0
     ): [MultiplexMicroscopy]
 
     non_dicomct_images(
+        # id filter
         non_dicomct_images_ids: [String] = [],
         # relationship filters
-        study_link_ids: [String] = [],
-        phs_accessions: [String] = [],
+        phs_accession: String!,
+        file_ids: [String] = [],
         # formatting
         first: Int = 10,
-        offset: Int = 0,
-        order_by: String = ""
-        sort_direction: String = "ASC"
+        offset: Int = 0
     ): [NonDICOMCTimages]
 
     non_dicommr_images(
+        # id filter
         non_dicommr_images_ids: [String] = [],
         # relationship filters
-        study_link_ids: [String] = [],
-        phs_accessions: [String] = [],
+        phs_accession: String!,
+        file_ids: [String] = [],
         # formatting
         first: Int = 10,
-        offset: Int = 0,
-        order_by: String = ""
-        sort_direction: String = "ASC"
+        offset: Int = 0
     ): [NonDICOMMRimages]
 
     non_dicom_pathology_images(
+        # id filter
         non_dicom_pathology_images_ids: [String] = [],
         # relationship filters
-        study_link_ids: [String] = [],
-        phs_accessions: [String] = [],
+        phs_accession: String!,
+        file_ids: [String] = [],
         # formatting
         first: Int = 10,
-        offset: Int = 0,
-        order_by: String = ""
-        sort_direction: String = "ASC"
+        offset: Int = 0
     ): [NonDICOMpathologyImages]
 
     non_dicompet_images(
+        # id filter
         non_dicompet_images_ids: [String] = [],
         # relationship filters
-        study_link_ids: [String] = [],
-        phs_accessions: [String] = [],
+        phs_accession: String!,
+        file_ids: [String] = [],
         # formatting
         first: Int = 10,
-        offset: Int = 0,
-        order_by: String = ""
-        sort_direction: String = "ASC"
+        offset: Int = 0
     ): [NonDICOMPETimages]
 
     non_dicom_radiology_all_modalities(
+        # id filter
         non_dicom_radiology_all_modalities_ids: [String] = [],
         # relationship filters
-        study_link_ids: [String] = [],
-        phs_accessions: [String] = [],
+        phs_accession: String!,
+        file_ids: [String] = [],
         # formatting
         first: Int = 10,
-        offset: Int = 0,
-        order_by: String = ""
-        sort_direction: String = "ASC"
+        offset: Int = 0
     ): [NonDICOMradiologyAllModalities]
 
 }
