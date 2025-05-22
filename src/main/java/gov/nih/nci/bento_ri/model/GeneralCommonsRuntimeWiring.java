@@ -62,6 +62,10 @@ public class GeneralCommonsRuntimeWiring {
                             return privateESDataFetcher.findSubjectIdsInList(args);
                         })
                         // memgraph queries
+                        .dataFetcher("programs", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.programDataFetcher(args);
+                        })
                         .dataFetcher("version", env -> {
                             return memgraphDataFetcher.versionDataFetcher();
                         })

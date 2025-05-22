@@ -44,6 +44,10 @@ public class MemgraphDataFetcher implements AutoCloseable{
         driver.close();
     }
 
+    public List<Map<String, Object>> programDataFetcher(Map<String, Object> params){
+        return listQuery(ProgramsQuery.PROGRAMS_QUERY, params);
+    }
+
     public Map<String, Object> versionDataFetcher(){
         return mapQuery(VersionQuery.VERSION_QUERY, new HashMap<>());
     }
