@@ -2,24 +2,19 @@ package gov.nih.nci.bento_ri.model.cypher_queries;
 
 public class NonDICOMCTimagesQuery {
     public static final String NON_DICOMCT_IMAGES_QUERY = """
-        MATCH (n:NonDICOMCTimages)
+        MATCH (x:NonDICOMCTimages)-->(:image)-->(:file)-->(s:study {phs_accession: $phs_accession})
         WHERE
-            $non_dicomct_images_ids = [] OR n.NonDICOMCTimages_id IN $non_dicomct_images_ids
-        WITH n, n {.*} AS output
-        OPTIONAL MATCH (n)-->(i:image)
-        WITH n, i, output
+            $non_dicomct_images_ids = [] OR x.non_dicomct_images_id IN $non_dicomct_images_ids
+        WITH x, {phs_accession: s.phs_accession} AS output
+        OPTIONAL MATCH (x)-->(:image)-->(f:file)
+        WITH x, f, output
         WHERE
-            $study_link_ids = [] OR i.study_link_id IN $study_link_ids
-        WITH n, apoc_replacement_poc.merge(output, {
-            study_link_id: i.study_link_id
-            }) AS output
-        OPTIONAL MATCH (n)-->(:image)-->(:file)-->(s:study)
-        WITH n, s, output
-        WHERE
-            $phs_accessions = [] OR s.phs_accession in $phs_accessions
-        WITH n, apoc_replacement_poc.merge(output, {
-            phs_accession: s.phs_accession
+            $file_ids = [] OR f.file_id IN $file_ids
+        WITH x, apoc_replacement_poc.merge(output, {
+            file_id: f.file_id
         }) AS output
+        WITH apoc_replacement_poc.merge(output, x {.*}) AS output
         RETURN output
+        ORDER BY output.multiplex_microscopy_id ASC
     """;
 }

@@ -129,6 +129,10 @@ public class GeneralCommonsRuntimeWiring {
                             Map<String, Object> args = env.getArguments();
                             return memgraphDataFetcher.nonDICOMradiologyAllModalitiesDataFetcher(args);
                         })
+                        .dataFetcher("pdx", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.pdxDataFetcher(args);
+                        })
                 )
                 .build();
     }

@@ -2,10 +2,10 @@ package gov.nih.nci.bento_ri.model.cypher_queries;
 
 public class ImagesQuery {
     public static final String IMAGES_QUERY = """
-        MATCH (i:image)
+        MATCH (i:image)-->(:file)-->(s:study {phs_accession: $phs_accession})
         WHERE
             $study_link_ids = [] OR i.study_link_id IN $study_link_ids
-        WITH i, i {.*} AS output
+        WITH i, {phs_accession: s.phs_accession} AS output
         OPTIONAL MATCH (i)-->(f:file)
         WITH i, f, output
         WHERE
@@ -13,13 +13,8 @@ public class ImagesQuery {
         WITH i, apoc_replacement_poc.merge(output, {
             file_id: f.file_id
         }) AS output
-        OPTIONAL MATCH (i)-->(:file)-->(s:study)
-        WITH i, s, output
-        WHERE
-            $phs_accessions = [] OR s.phs_accession in $phs_accessions
-        WITH i, apoc_replacement_poc.merge(output, {
-            phs_accession: s.phs_accession
-        }) AS output
+        WITH apoc_replacement_poc.merge(output, i {.*}) AS output
         RETURN output
+        ORDER BY output.study_link_id ASC
     """;
 }

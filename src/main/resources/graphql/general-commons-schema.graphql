@@ -1203,10 +1203,10 @@ type QueryType {
 
     pdx(
         # id filter
-        pdx_ids: [String]
+        pdx_ids: [String] = []
         # relationship filters
         phs_accession: String!,
-        sample_ids: [String],
+        sample_ids: [String] = [],
         # formatting
         first: Int = 10,
         offset: Int = 0

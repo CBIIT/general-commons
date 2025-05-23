@@ -131,6 +131,10 @@ public class MemgraphDataFetcher implements AutoCloseable{
         return listQuery(NonDICOMradiologyAllModalitiesQuery.NON_DICOM_RADIOLOGY_ALL_MODALITIES_QUERY, params);
     }
 
+    public List<Map<String, Object>> pdxDataFetcher(Map<String, Object> params){
+        return listQuery(PDXQuery.PDX_QUERY, params);
+    }
+
     private Map<String, Object> mapQuery(String query, Map<String, Object> params){
         try (Session session = driver.session()) {
             Result result = session.run(query, params);
