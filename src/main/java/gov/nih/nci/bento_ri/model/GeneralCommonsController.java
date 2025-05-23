@@ -26,10 +26,10 @@ public class GeneralCommonsController {
     }
 
     @CrossOrigin
-    @RequestMapping(value = "/schema", method = {RequestMethod.GET},
+    @RequestMapping(value = "/v1/graphql/", method = {RequestMethod.GET},
             produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> getSchema() throws IOException {
-        logger.info("Hit end point: /schema");
+        logger.info("GET request sent to /v1/graphql/");
         Resource schemaFile = new DefaultResourceLoader().getResource("classpath:"+this.schemaFilePath);
         if (!schemaFile.isReadable()){
             logger.error("Schema documentation file not found: "+this.schemaFilePath);
