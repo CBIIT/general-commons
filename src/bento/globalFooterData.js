@@ -133,7 +133,7 @@ export default {
     },
     {
       text: 'NCIinfo@nih.gov',
-      link: 'mailto:+NCIinfo@nih.gov',
+      link: 'mailto:NCIinfo@nih.gov',
     },
     {
       text: 'Site Feedback',
