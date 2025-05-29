@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { withStyles, CssBaseline } from '@material-ui/core';
-import { HashRouter, Route, Switch, Prompt, Redirect, useHistory, useLocation } from 'react-router-dom';
+import { HashRouter, Route, Switch, Prompt, useHistory, useLocation } from 'react-router-dom';
 import aboutPageRoutes from '../../bento/aboutPagesRoutes';
 import Header from '../Header/HeaderView';
 import Footer from '../Footer/FooterView';
