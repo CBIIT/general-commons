@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { withStyles, CssBaseline } from '@material-ui/core';
-import { HashRouter, Route, Switch, Prompt, Redirect } from 'react-router-dom';
+import { HashRouter, Route, Switch, Prompt, Redirect, useLocation } from 'react-router-dom';
 import aboutPageRoutes from '../../bento/aboutPagesRoutes';
 import Header from '../Header/HeaderView';
 import Footer from '../Footer/FooterView';
@@ -52,6 +52,7 @@ const Layout = ({ classes, isSidebarOpened }) => {
   const { LoginRoute, MixedRoute, PrivateRoute, AdminRoute } = AuthenticationMiddlewareGenerator(AUTH_MIDDLEWARE_CONFIG);
 
   const [isMaintenanceModeEnabled, setIsMaintenanceModeEnabled] = useState(false);
+  const { hash } = useLocation();
 
   useEffect(() => {
     axios.get(STATIC_CONTENT.siteWideSettings)
@@ -69,7 +70,7 @@ const Layout = ({ classes, isSidebarOpened }) => {
       <HashRouter>
         <>
           <Prompt
-            when={isMaintenanceModeEnabled && window.location.hash === "#/"}
+            when={isMaintenanceModeEnabled && hash === "#/"}
             message={() => false}
           />
           <Notifactions />
