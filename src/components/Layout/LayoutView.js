@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { withStyles, CssBaseline } from '@material-ui/core';
-import { HashRouter, Route, Switch, Prompt, useHistory, useLocation } from 'react-router-dom';
+import { HashRouter, Route, Switch, Prompt, Redirect } from 'react-router-dom';
 import aboutPageRoutes from '../../bento/aboutPagesRoutes';
 import Header from '../Header/HeaderView';
 import Footer from '../Footer/FooterView';
@@ -52,22 +52,16 @@ const Layout = ({ classes, isSidebarOpened }) => {
   const { LoginRoute, MixedRoute, PrivateRoute, AdminRoute } = AuthenticationMiddlewareGenerator(AUTH_MIDDLEWARE_CONFIG);
 
   const [isMaintenanceModeEnabled, setIsMaintenanceModeEnabled] = useState(false);
-  const history = useHistory();
-  const location = useLocation();
 
   useEffect(() => {
     axios.get(STATIC_CONTENT.siteWideSettings)
     .then(response => {
-      const maintenance = response.data.maintenanceModeEnabled;
-      setIsMaintenanceModeEnabled(maintenance);
-      if (maintenance && location.hash !== '/') {
-        history.replace('/');
-      }
+      setIsMaintenanceModeEnabled(response.data.maintenanceModeEnabled)
     })
     .catch(error => {
       console.error(error, 'Failed to gather settings')
     })
-  }, [location.hash]);
+  }, []);
 
   return (
     <>
@@ -75,7 +69,7 @@ const Layout = ({ classes, isSidebarOpened }) => {
       <HashRouter>
         <>
           <Prompt
-            when={isMaintenanceModeEnabled}
+            when={isMaintenanceModeEnabled && window.location.hash === "#/"}
             message={() => false}
           />
           <Notifactions />
@@ -92,7 +86,10 @@ const Layout = ({ classes, isSidebarOpened }) => {
             <Route component={ScrollToTop} />
 
             {isMaintenanceModeEnabled ? (
-              <Route component={Maintenance} />
+              <Switch>
+                <Route exact path="/" component={Maintenance} />
+                <Redirect to="/" />
+              </Switch>
             ) : (
               <Switch>
                 <MixedRoute exact path="/" component={Home} />
