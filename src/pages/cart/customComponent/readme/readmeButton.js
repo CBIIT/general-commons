@@ -9,7 +9,7 @@ import { readMeButtonStyles } from './readmeStyles';
 
 const readMeButtonView = (props) => {
     const { classes } = props;
-    const readMeURL = env.REACT_APP_STATIC_CONTENT_URL+ 'fileCentricCartPageREADME.md';
+    const readMeURL = env.REACT_APP_STATIC_CONTENT_URL+ 'cart/fileCentricCartPageREADME.md';
 
     const [displayReadMe, setDisplayReadMe] = useState(false);
     const [content, setContent] = useState(undefined);
