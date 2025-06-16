@@ -1034,10 +1034,10 @@ type QueryType {
 
     studies (
         # id filter
-        phs_accessions: [String]
+        phs_accessions: [String] = []
         # property filters
-        study_names: [String]
-        study_acronyms: [String]
+        study_names: [String] = []
+        study_acronyms: [String] = []
         # formatting
         first: Int = 10,
         offset: Int = 0
