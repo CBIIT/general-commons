@@ -45,6 +45,10 @@ export const STATIC_CONTENT = {
   logo: {
     CRDC_LOGO_SVG: `${env.REACT_APP_STATIC_CONTENT_URL}logo/crdc-logo.svg`,
   },
+  cart: {
+    README_MD: `${env.REACT_APP_STATIC_CONTENT_URL}cart/fileCentricCartPageREADME.md`,
+    README_PDF: `${env.REACT_APP_STATIC_CONTENT_URL}cart/GC-SELECTED-FILES-CART-README.pdf`,
+  },
   siteWideSettings: `${env.REACT_APP_STATIC_CONTENT_URL}siteWideSettings.json`,
 };
 
