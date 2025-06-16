@@ -13,7 +13,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import ReactMarkdown from 'react-markdown';
 //import { marked } from 'marked';
 //import html2pdf from 'html2pdf.js';
-import env from '../../../../../utils/env';
+import { STATIC_CONTENT } from '../../../../../assets/staticContent';
 // import PdfTemplate from './ReadMePdf';
 import styles from './readmeDialogStyle';
 import CustomTheme from './readmeDialogTheme';
@@ -109,8 +109,8 @@ const ReadMeDialogComponent = ({
     return (<></>);
   }
 
-  const downloadFileName = "GC-SELECTED-FILES-CART-README.pdf"; 
-  const README_PDF_URL = env.REACT_APP_STATIC_CONTENT_URL + "cart/" + downloadFileName;
+  const README_PDF_URL = STATIC_CONTENT.cart.README_PDF;
+  const downloadFileName = README_PDF_URL.substring(README_PDF_URL.lastIndexOf('/') + 1);
 
   return (
     <CustomTheme>
