@@ -181,19 +181,6 @@ Parameters:
 | file_ids               | [String] | False    | Filters the results by file_id of the associated File        |
 | first                  | Int      | False    | Controls the results pagination size                         |
 | offset                 | Int      | False    | Controls the results pagination offset                       |
-### Non-DICOMMR Images Query
-Description: Returns a list of non-DICOMMR image data records  
-Query Name: ```non_dicommr_images```  
-Data Type: ```NonDICOMMRimages```  
-Parameters:
-
-| Name                   | Type     | Required | Description                                                  |
-|------------------------|----------|----------|--------------------------------------------------------------|
-| non_dicommr_images_ids | [String] | False    | Filters the results by non_dicommr_images_id                 |    
-| phs_accession          | String   | True     | Filters the results by phs_accession of the associated Study |
-| file_ids               | [String] | False    | Filters the results by file_id of the associated File        |
-| first                  | Int      | False    | Controls the results pagination size                         |
-| offset                 | Int      | False    | Controls the results pagination offset                       |
 ### Non-DICOM Pathology Images Query
 Description: Returns a list of non-DICOM pathology images data records  
 Query Name: ```non_dicom_pathology_images```  
