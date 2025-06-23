@@ -1,34 +1,7 @@
 queries:
-  - name: numberOfStudies
-    index:
-      - files
-    filter:
-      type: aggregation
-      selectedField: studies
-    result:
-      type: int
-      method: count_bucket_keys
   - name: numberOfSubjects
     index:
       - subjects
-    filter:
-      type: aggregation
-      selectedField: _id
-    result:
-      type: int
-      method: count_bucket_keys
-  - name: numberOfSamples
-    index:
-      - samples
-    filter:
-      type: aggregation
-      selectedField: _id
-    result:
-      type: int
-      method: count_bucket_keys
-  - name: numberOfFiles
-    index:
-      - files
     filter:
       type: aggregation
       selectedField: _id
@@ -41,24 +14,6 @@ queries:
     filter:
       type: aggregation
       selectedField: primary_site
-    result:
-      type: int
-      method: count_bucket_keys
-  - name: numberOfImages
-    index:
-      - image
-    filter:
-      type: aggregation
-      selectedField: study_link_id
-    result:
-      type: int
-      method: count_bucket_keys
-  - name: numberOfProteomics
-    index:
-      - proteomics
-    filter:
-      type: aggregation
-      selectedField: aliquot_id
     result:
       type: int
       method: count_bucket_keys

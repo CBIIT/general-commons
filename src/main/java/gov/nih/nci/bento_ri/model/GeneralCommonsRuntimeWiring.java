@@ -133,6 +133,61 @@ public class GeneralCommonsRuntimeWiring {
                             Map<String, Object> args = env.getArguments();
                             return memgraphDataFetcher.pdxDataFetcher(args);
                         })
+                        // NumberOf query data fetchers
+                        .dataFetcher("numberOfPrograms", env -> {
+                            return memgraphDataFetcher.getNumberOfPrograms();
+                        })
+                        .dataFetcher("numberOfStudies", env -> {
+                            return memgraphDataFetcher.getNumberOfStudies();
+                        })
+                        .dataFetcher("numberOfParticipants", env -> {
+                            return memgraphDataFetcher.getNumberOfParticipants();
+                        })
+                        .dataFetcher("numberOfSamples", env -> {
+                            return memgraphDataFetcher.getNumberOfSamples();
+                        })
+                        .dataFetcher("numberOfFiles", env -> {
+                            return memgraphDataFetcher.getNumberOfFiles();
+                        })
+                        .dataFetcher("numberOfDiagnoses", env -> {
+                            return memgraphDataFetcher.getNumberOfDiagnoses();
+                        })
+                        .dataFetcher("numberOfTreatments", env -> {
+                            return memgraphDataFetcher.getNumberOfTreatments();
+                        })
+                        .dataFetcher("numberOfImages", env -> {
+                            return memgraphDataFetcher.getNumberOfImages();
+                        })
+                        .dataFetcher("numberOfGenomicInfo", env -> {
+                            return memgraphDataFetcher.getNumberOfGenomicInfo();
+                        })
+                        .dataFetcher("numberOfProteomics", env -> {
+                            return memgraphDataFetcher.getNumberOfProteomics();
+                        })
+                        .dataFetcher("numberOfPDX", env -> {
+                            return memgraphDataFetcher.getNumberOfPDX();
+                        })
+                        .dataFetcher("numberOfMultiplexMicroscopies", env -> {
+                            return memgraphDataFetcher.getNumberOfMultiplexMicroscopies();
+                        })
+                        .dataFetcher("numberOfNonDICOMCTimages", env -> {
+                            return memgraphDataFetcher.getNumberOfNonDICOMCTimages();
+                        })
+                        .dataFetcher("numberOfNonDICOMMRimages", env -> {
+                            return memgraphDataFetcher.getNumberOfNonDICOMMRimages();
+                        })
+                        .dataFetcher("numberOfNonDICOMPETimages", env -> {
+                            return memgraphDataFetcher.getNumberOfNonDICOMPETimages();
+                        })
+                        .dataFetcher("numberOfNonDICOMpathologyImages", env -> {
+                            return memgraphDataFetcher.getNumberOfNonDICOMpathologyImages();
+                        })
+                        .dataFetcher("numberOfNonDICOMradiologyAllModalities", env -> {
+                            return memgraphDataFetcher.getNumberOfNonDICOMradiologyAllModalities();
+                        })
+                        .dataFetcher("numberOfVersions", env -> {
+                            return memgraphDataFetcher.getNumberOfVersions();
+                        })
                 )
                 .build();
     }

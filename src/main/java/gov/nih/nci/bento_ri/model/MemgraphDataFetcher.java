@@ -134,6 +134,80 @@ public class MemgraphDataFetcher implements AutoCloseable{
     public List<Map<String, Object>> pdxDataFetcher(Map<String, Object> params){
         return listQuery(PDXQuery.PDX_QUERY, params);
     }
+    
+    // NumberOf query data fetchers
+    public Long getNumberOfPrograms(){
+        return countQuery(NumberOfQueries.getNumberOfProgramsQuery());
+    }
+    
+    public Long getNumberOfStudies(){
+        return countQuery(NumberOfQueries.getNumberOfStudiesQuery());
+    }
+    
+    public Long getNumberOfParticipants(){
+        return countQuery(NumberOfQueries.getNumberOfParticipantsQuery());
+    }
+    
+    public Long getNumberOfSamples(){
+        return countQuery(NumberOfQueries.getNumberOfSamplesQuery());
+    }
+    
+    public Long getNumberOfFiles(){
+        return countQuery(NumberOfQueries.getNumberOfFilesQuery());
+    }
+    
+    public Long getNumberOfDiagnoses(){
+        return countQuery(NumberOfQueries.getNumberOfDiagnosesQuery());
+    }
+    
+    public Long getNumberOfTreatments(){
+        return countQuery(NumberOfQueries.getNumberOfTreatmentsQuery());
+    }
+    
+    public Long getNumberOfImages(){
+        return countQuery(NumberOfQueries.getNumberOfImagesQuery());
+    }
+    
+    public Long getNumberOfGenomicInfo(){
+        return countQuery(NumberOfQueries.getNumberOfGenomicInfoQuery());
+    }
+    
+    public Long getNumberOfProteomics(){
+        return countQuery(NumberOfQueries.getNumberOfProteomicsQuery());
+    }
+    
+    public Long getNumberOfPDX(){
+        return countQuery(NumberOfQueries.getNumberOfPDXQuery());
+    }
+    
+    public Long getNumberOfMultiplexMicroscopies(){
+        return countQuery(NumberOfQueries.getNumberOfMultiplexMicroscopiesQuery());
+    }
+    
+    public Long getNumberOfNonDICOMCTimages(){
+        return countQuery(NumberOfQueries.getNumberOfNonDICOMCTimagesQuery());
+    }
+    
+    public Long getNumberOfNonDICOMMRimages(){
+        return countQuery(NumberOfQueries.getNumberOfNonDICOMMRimagesQuery());
+    }
+    
+    public Long getNumberOfNonDICOMPETimages(){
+        return countQuery(NumberOfQueries.getNumberOfNonDICOMPETimagesQuery());
+    }
+    
+    public Long getNumberOfNonDICOMpathologyImages(){
+        return countQuery(NumberOfQueries.getNumberOfNonDICOMpathologyImagesQuery());
+    }
+    
+    public Long getNumberOfNonDICOMradiologyAllModalities(){
+        return countQuery(NumberOfQueries.getNumberOfNonDICOMradiologyAllModalitiesQuery());
+    }
+    
+    public Long getNumberOfVersions(){
+        return countQuery(NumberOfQueries.getNumberOfVersionsQuery());
+    }
+    
 
     private Map<String, Object> mapQuery(String query, Map<String, Object> params){
         try (Session session = driver.session()) {
@@ -197,6 +271,12 @@ public class MemgraphDataFetcher implements AutoCloseable{
         return daysInMonth[month];
     }
 
+    private Long countQuery(String query){
+        try (Session session = driver.session()) {
+            Result result = session.run(query);
+            return result.single().get("count").asLong();
+        }
+    }
 
 }
 

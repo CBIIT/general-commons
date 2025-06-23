@@ -1,6 +1,3 @@
-
-
-
 type SubjectOverview {
     subject_id: String
     study_acronym: [String]
@@ -788,6 +785,19 @@ type QueryType {
     numberOfDiseaseSites: Int
     numberOfImages: Int
     numberOfProteomics: Int
+    numberOfPrograms: Int
+    numberOfParticipants: Int
+    numberOfDiagnoses: Int
+    numberOfTreatments: Int
+    numberOfGenomicInfo: Int
+    numberOfPDX: Int
+    numberOfMultiplexMicroscopies: Int
+    numberOfNonDICOMCTimages: Int
+    numberOfNonDICOMMRimages: Int
+    numberOfNonDICOMPETimages: Int
+    numberOfNonDICOMpathologyImages: Int
+    numberOfNonDICOMradiologyAllModalities: Int
+    numberOfVersions: Int
 
     idsLists: IdsLists
 
