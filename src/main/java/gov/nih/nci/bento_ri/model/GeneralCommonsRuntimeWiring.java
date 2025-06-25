@@ -26,8 +26,8 @@ public class GeneralCommonsRuntimeWiring {
         YamlQueryFactory yamlQueryFactory = new YamlQueryFactory(esService);
         this.runtimeWiring = RuntimeWiring.newRuntimeWiring()
                 .type(newTypeWiring("QueryType")
-                        .dataFetcher("schemaVersion", env -> "3.0.0")
-                        .dataFetcher("schemaModelVersion", env -> "8.0.0")
+                        .dataFetcher("schemaVersion", env -> "3.1.0")
+                        .dataFetcher("schemaModelVersion", env -> "8.0.1")
                         .dataFetchers(yamlQueryFactory.createYamlQueries(Const.ES_ACCESS_TYPE.PRIVATE))
                         .dataFetcher("searchSubjects", env -> {
                             Map<String, Object> args = env.getArguments();
@@ -133,60 +133,78 @@ public class GeneralCommonsRuntimeWiring {
                             Map<String, Object> args = env.getArguments();
                             return memgraphDataFetcher.pdxDataFetcher(args);
                         })
-                        // NumberOf query data fetchers
-                        .dataFetcher("numberOfPrograms", env -> {
-                            return memgraphDataFetcher.getNumberOfPrograms();
+                        // Memgraph node count queries
+                        .dataFetcher("programsCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfPrograms(args);
                         })
-                        .dataFetcher("numberOfStudies", env -> {
-                            return memgraphDataFetcher.getNumberOfStudies();
+                        .dataFetcher("studiesCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfStudies(args);
                         })
-                        .dataFetcher("numberOfParticipants", env -> {
-                            return memgraphDataFetcher.getNumberOfParticipants();
+                        .dataFetcher("participantsCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfParticipants(args);
                         })
-                        .dataFetcher("numberOfSamples", env -> {
-                            return memgraphDataFetcher.getNumberOfSamples();
+                        .dataFetcher("samplesCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfSamples(args);
                         })
-                        .dataFetcher("numberOfFiles", env -> {
-                            return memgraphDataFetcher.getNumberOfFiles();
+                        .dataFetcher("filesCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfFiles(args);
                         })
-                        .dataFetcher("numberOfDiagnoses", env -> {
-                            return memgraphDataFetcher.getNumberOfDiagnoses();
+                        .dataFetcher("diagnosesCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfDiagnoses(args);
                         })
-                        .dataFetcher("numberOfTreatments", env -> {
-                            return memgraphDataFetcher.getNumberOfTreatments();
+                        .dataFetcher("treatmentsCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfTreatments(args);
                         })
-                        .dataFetcher("numberOfImages", env -> {
-                            return memgraphDataFetcher.getNumberOfImages();
+                        .dataFetcher("imagesCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfImages(args);
                         })
-                        .dataFetcher("numberOfGenomicInfo", env -> {
-                            return memgraphDataFetcher.getNumberOfGenomicInfo();
+                        .dataFetcher("genomicInfoCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfGenomicInfo(args);
                         })
-                        .dataFetcher("numberOfProteomics", env -> {
-                            return memgraphDataFetcher.getNumberOfProteomics();
+                        .dataFetcher("proteomicsCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfProteomics(args);
                         })
-                        .dataFetcher("numberOfPDX", env -> {
-                            return memgraphDataFetcher.getNumberOfPDX();
+                        .dataFetcher("pdxCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfPDX(args);
                         })
-                        .dataFetcher("numberOfMultiplexMicroscopies", env -> {
-                            return memgraphDataFetcher.getNumberOfMultiplexMicroscopies();
+                        .dataFetcher("multiplexMicroscopiesCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfMultiplexMicroscopies(args);
                         })
-                        .dataFetcher("numberOfNonDICOMCTimages", env -> {
-                            return memgraphDataFetcher.getNumberOfNonDICOMCTimages();
+                        .dataFetcher("nonDICOMCTimagesCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfNonDICOMCTimages(args);
                         })
-                        .dataFetcher("numberOfNonDICOMMRimages", env -> {
-                            return memgraphDataFetcher.getNumberOfNonDICOMMRimages();
+                        .dataFetcher("nonDICOMMRimagesCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfNonDICOMMRimages(args);
                         })
-                        .dataFetcher("numberOfNonDICOMPETimages", env -> {
-                            return memgraphDataFetcher.getNumberOfNonDICOMPETimages();
+                        .dataFetcher("nonDICOMPETimagesCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfNonDICOMPETimages(args);
                         })
-                        .dataFetcher("numberOfNonDICOMpathologyImages", env -> {
-                            return memgraphDataFetcher.getNumberOfNonDICOMpathologyImages();
+                        .dataFetcher("nonDICOMpathologyImagesCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfNonDICOMpathologyImages(args);
                         })
-                        .dataFetcher("numberOfNonDICOMradiologyAllModalities", env -> {
-                            return memgraphDataFetcher.getNumberOfNonDICOMradiologyAllModalities();
+                        .dataFetcher("nonDICOMradiologyAllModalitiesCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfNonDICOMradiologyAllModalities(args);
                         })
-                        .dataFetcher("numberOfVersions", env -> {
-                            return memgraphDataFetcher.getNumberOfVersions();
+                        .dataFetcher("versionsCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfVersions(args);
                         })
                 )
                 .build();

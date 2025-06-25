@@ -785,19 +785,6 @@ type QueryType {
     numberOfDiseaseSites: Int
     numberOfImages: Int
     numberOfProteomics: Int
-    numberOfPrograms: Int
-    numberOfParticipants: Int
-    numberOfDiagnoses: Int
-    numberOfTreatments: Int
-    numberOfGenomicInfo: Int
-    numberOfPDX: Int
-    numberOfMultiplexMicroscopies: Int
-    numberOfNonDICOMCTimages: Int
-    numberOfNonDICOMMRimages: Int
-    numberOfNonDICOMPETimages: Int
-    numberOfNonDICOMpathologyImages: Int
-    numberOfNonDICOMradiologyAllModalities: Int
-    numberOfVersions: Int
 
     idsLists: IdsLists
 
@@ -1223,4 +1210,24 @@ type QueryType {
     ): [PDX]
 
     version: Version
+
+    # Memgraph node count queries
+    programsCount: Int
+    studiesCount: Int
+    participantsCount(phs_accession: String!): Int
+    samplesCount(phs_accession: String!): Int
+    filesCount(phs_accession: String!): Int
+    diagnosesCount(phs_accession: String!): Int
+    treatmentsCount(phs_accession: String!): Int
+    imagesCount(phs_accession: String!): Int
+    genomicInfoCount(phs_accession: String!): Int
+    proteomicsCount(phs_accession: String!): Int
+    pdxCount(phs_accession: String!): Int
+    multiplexMicroscopiesCount(phs_accession: String!): Int
+    nonDICOMCTimagesCount(phs_accession: String!): Int
+    nonDICOMMRimagesCount(phs_accession: String!): Int
+    nonDICOMPETimagesCount(phs_accession: String!): Int
+    nonDICOMpathologyImagesCount(phs_accession: String!): Int
+    nonDICOMradiologyAllModalitiesCount(phs_accession: String!): Int
+    versionsCount: Int
 }

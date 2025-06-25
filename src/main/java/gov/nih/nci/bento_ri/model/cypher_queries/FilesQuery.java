@@ -2,7 +2,7 @@ package gov.nih.nci.bento_ri.model.cypher_queries;
 
 public class FilesQuery {
     public static final String FILES_QUERY = """
-        MATCH (f:file)-->(s:study {phs_accession: $phs_accession})
+        MATCH (f:file)-[:of_study]->(s:study {phs_accession: $phs_accession})
         WITH DISTINCT f, s
         WHERE
             ($file_ids = [] OR f.file_id IN $file_ids) AND
@@ -22,5 +22,10 @@ public class FilesQuery {
         WITH apoc_replacement_poc.merge(output, f {.*}) AS output
         RETURN output
         ORDER BY output.file_id ASC
+    """;
+
+    public static final String FILES_COUNT_QUERY = """
+        MATCH (f:file)-[:of_study]->(s:study {phs_accession: $phs_accession})
+        RETURN COUNT(DISTINCT f) AS count
     """;
 }

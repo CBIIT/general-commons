@@ -10,4 +10,9 @@ public class StudiesQuery {
         RETURN s{.*} AS output
         ORDER BY output.phs_accession ASC
     """;
+
+    public static final String STUDIES_COUNT_QUERY = """
+        MATCH (s:study)
+        RETURN COUNT(DISTINCT s) AS count
+    """;    
 }
