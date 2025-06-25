@@ -5,8 +5,8 @@ import {
   DialogTitle,
 
 } from '@material-ui/core';
-import * as text from './MaintenanceText.json';
-import DialogThemeProvider from './MaintenanceThemeConfig';
+import * as text from './ScheduledMaintenanceText.json';
+import DialogThemeProvider from './ScheduledMaintenanceThemeConfig';
 
 const MaintenanceWindow = () => {
   const title = text.title;

@@ -28,8 +28,8 @@ import SysInfoView from '../../pages/sysInfo/view';
 import ProfileController from '../../pages/profile/profileController';
 import editUserController from '../../pages/admin/userDetails/editUserController';
 import viewUserController from '../../pages/admin/userDetails/viewUserController';
-import ScheduledMaintenanceWindow from '../ScheduledMaintenanceOverlay/MaintenanceWindow';
-import OverlayWindow from '../OverlayWindow/OverlayWindow';
+import ScheduledMaintenanceWindow from '../ScheduledMaintenanceOverlay/ScheduledMaintenanceOverlay';
+import PrivacyNotice from '../PrivacyNoticeOverlay/PrivacyNoticeOverlay';
 import AUTH_MIDDLEWARE_CONFIG from '../Auth/authMiddlewareConfig';
 import CarView from '../../pages/cart/cartController';
 import AuthSessionTimeoutController from '../SessionTimeout/SessionTimeoutController';
@@ -81,11 +81,13 @@ const Layout = ({ classes, isSidebarOpened }) => {
             aria-label="GC announcement banner"
           />
           <Header />
-          {maintenanceMode.enabled ? (
-            !maintenanceMode.isInPermanentMode && <ScheduledMaintenanceWindow />
-          ) : (
-            <OverlayWindow />
-          )}
+          {
+            maintenanceMode.enabled && !maintenanceMode.isInPermanentMode ? (
+              <ScheduledMaintenanceWindow />
+            ) : (
+              <PrivacyNotice /> //Privacy Notice still appears in Permanent Maintenance
+            )
+          }
           {/* Reminder: Ajay need to replace the ICDC with env variable and
           change build npm to read env variable */}
           <div className={classes.content}>
