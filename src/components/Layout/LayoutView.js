@@ -6,7 +6,7 @@ import Header from '../Header/HeaderView';
 import Footer from '../Footer/FooterView';
 import { STATIC_CONTENT } from '../../assets/staticContent';
 import Error from '../../pages/error/Error';
-import Maintenance from '../../pages/maintenance/Maintenance';
+import PermanentMaintenance from '../../pages/permanentMaintenance/PermanentMaintenance';
 import CaseDetail from '../../pages/caseDetail/caseDetailController';
 import table from '../../pages/table/tableView';
 import Home from '../../pages/landing/landingController';
@@ -28,6 +28,7 @@ import SysInfoView from '../../pages/sysInfo/view';
 import ProfileController from '../../pages/profile/profileController';
 import editUserController from '../../pages/admin/userDetails/editUserController';
 import viewUserController from '../../pages/admin/userDetails/viewUserController';
+import ScheduledMaintenanceWindow from '../ScheduledMaintenanceOverlay/MaintenanceWindow';
 import OverlayWindow from '../OverlayWindow/OverlayWindow';
 import AUTH_MIDDLEWARE_CONFIG from '../Auth/authMiddlewareConfig';
 import CarView from '../../pages/cart/cartController';
@@ -51,13 +52,13 @@ const Layout = ({ classes, isSidebarOpened }) => {
   // Access control imports
   const { LoginRoute, MixedRoute, PrivateRoute, AdminRoute } = AuthenticationMiddlewareGenerator(AUTH_MIDDLEWARE_CONFIG);
 
-  const [isMaintenanceModeEnabled, setIsMaintenanceModeEnabled] = useState(false);
+  const [maintenanceMode, setMaintenanceMode] = useState({ enabled: false, isInPermanentMode: false });
   const { hash } = useLocation();
 
   useEffect(() => {
     axios.get(STATIC_CONTENT.siteWideSettings)
     .then(response => {
-      setIsMaintenanceModeEnabled(response.data.maintenanceModeEnabled)
+      setMaintenanceMode({ enabled: response.data.maintenanceMode.enabled, isInPermanentMode: response.data.maintenanceMode.isInPermanentMode });
     })
     .catch(error => {
       console.error(error, 'Failed to gather settings')
@@ -70,7 +71,7 @@ const Layout = ({ classes, isSidebarOpened }) => {
       <HashRouter>
         <>
           <Prompt
-            when={isMaintenanceModeEnabled && hash === "#/"}
+            when={maintenanceMode.enabled && hash === "#/"}
             message={() => false}
           />
           <Notifactions />
@@ -80,15 +81,19 @@ const Layout = ({ classes, isSidebarOpened }) => {
             aria-label="GC announcement banner"
           />
           <Header />
-          <OverlayWindow />
+          {maintenanceMode.enabled ? (
+            !maintenanceMode.isInPermanentMode && <ScheduledMaintenanceWindow />
+          ) : (
+            <OverlayWindow />
+          )}
           {/* Reminder: Ajay need to replace the ICDC with env variable and
           change build npm to read env variable */}
           <div className={classes.content}>
             <Route component={ScrollToTop} />
 
-            {isMaintenanceModeEnabled ? (
+            {maintenanceMode.enabled ? (
               <Switch>
-                <Route exact path="/" component={Maintenance} />
+                <Route exact path="/" component={maintenanceMode.isInPermanentMode ? PermanentMaintenance : Home} />
                 <Redirect to="/" />
               </Switch>
             ) : (
