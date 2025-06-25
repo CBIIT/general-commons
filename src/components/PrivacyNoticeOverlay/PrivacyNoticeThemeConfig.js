@@ -5,8 +5,6 @@ import themes, { overrides } from '../../themes';
 export default ({
   children,
 }) => {
-  const style = [];
-
   const overridesObj = themes.light.overrides;
 
   const MuiDialog = {
@@ -130,9 +128,8 @@ export default ({
   overridesObj.MuiBackdrop = MuiBackdrop;
   overridesObj.MuiDialogActions = MuiDialogActions;
 
-  style.push(overridesObj);
-  const computedTheme = createTheme({ ...themes.light, ...overrides, ...style });
-
+  const computedTheme = createTheme(Object.assign({}, themes.light, overrides, overridesObj));
+  
   return (
     <ThemeProvider theme={computedTheme}>
       {children}
