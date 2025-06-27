@@ -610,20 +610,20 @@ type QueryType {
     # Memgraph node count queries
     programsCount: Int
     studiesCount: Int
-    participantsCount: Int
-    samplesCount: Int
-    filesCount: Int
-    diagnosesCount: Int
-    treatmentsCount: Int
-    imagesCount: Int
-    genomicInfoCount: Int
-    proteomicsCount: Int
-    pdxCount: Int
-    multiplexMicroscopiesCount: Int
-    nonDICOMCTimagesCount: Int
-    nonDICOMMRimagesCount: Int
-    nonDICOMPETimagesCount: Int
-    nonDICOMpathologyImagesCount: Int
-    nonDICOMradiologyAllModalitiesCount: Int
+    participantsCount(phs_accession: String!): Int
+    samplesCount(phs_accession: String!): Int
+    filesCount(phs_accession: String!): Int
+    diagnosesCount(phs_accession: String!): Int
+    treatmentsCount(phs_accession: String!): Int
+    imagesCount(phs_accession: String!): Int
+    genomicInfoCount(phs_accession: String!): Int
+    proteomicsCount(phs_accession: String!): Int
+    pdxCount(phs_accession: String!): Int
+    multiplexMicroscopiesCount(phs_accession: String!): Int
+    nonDICOMCTimagesCount(phs_accession: String!): Int
+    nonDICOMMRimagesCount(phs_accession: String!): Int
+    nonDICOMPETimagesCount(phs_accession: String!): Int
+    nonDICOMpathologyImagesCount(phs_accession: String!): Int
+    nonDICOMradiologyAllModalitiesCount(phs_accession: String!): Int
     versionsCount: Int
 }
