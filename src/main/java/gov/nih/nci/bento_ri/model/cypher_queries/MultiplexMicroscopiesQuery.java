@@ -2,7 +2,7 @@ package gov.nih.nci.bento_ri.model.cypher_queries;
 
 public class MultiplexMicroscopiesQuery {
     public static final String MULTIPLEX_MICROSCOPIES_QUERY = """
-        MATCH (x:multiplex_microscopy)-->(:image)-->(:file)-->(s:study {phs_accession: $phs_accession})
+        MATCH (x:multiplex_microscopy)-[:of_image]->(:image)-[:of_file]->(:file)-[:of_study]->(s:study {phs_accession: $phs_accession})
         WHERE
             $multiplex_microscopy_ids = [] OR x.MultiplexMicroscopy_id IN $multiplex_microscopy_ids
         WITH x, {phs_accession: s.phs_accession} AS output
@@ -16,5 +16,10 @@ public class MultiplexMicroscopiesQuery {
         WITH apoc_replacement_poc.merge(output, x {.*}) AS output
         RETURN output
         ORDER BY output.multiplex_microscopy_id ASC
+    """;
+
+    public static final String MULTIPLEX_MICROSCOPIES_COUNT_QUERY = """
+        MATCH (x:multiplex_microscopy)-[:of_image]->(:image)-[:of_file]->(:file)-[:of_study]->(s:study {phs_accession: $phs_accession})
+        RETURN COUNT(DISTINCT x) AS count
     """;
 }

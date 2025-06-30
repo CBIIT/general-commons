@@ -2,7 +2,7 @@ package gov.nih.nci.bento_ri.model.cypher_queries;
 
 public class NonDICOMMRimagesQuery {
     public static final String NON_DICOMMR_IMAGES_QUERY = """
-        MATCH (x:NonDICOMMRimages)-->(:image)-->(:file)-->(s:study {phs_accession: $phs_accession})
+        MATCH (x:NonDICOMMRimages)-[:of_image]->(:image)-[:of_file]->(:file)-[:of_study]->(s:study {phs_accession: $phs_accession})
         WHERE
             $non_dicommr_images_ids = [] OR x.NonDICOMMRimages_id IN $non_dicommr_images_ids
         WITH x, {phs_accession: s.phs_accession} AS output
@@ -16,5 +16,10 @@ public class NonDICOMMRimagesQuery {
         WITH apoc_replacement_poc.merge(output, x {.*}) AS output
         RETURN output
         ORDER BY output.non_dicommr_images_id ASC
+    """;
+
+    public static final String NON_DICOMMR_IMAGES_COUNT_QUERY = """
+        MATCH (x:NonDICOMMRimages)-[:of_image]->(:image)-[:of_file]->(:file)-[:of_study]->(s:study {phs_accession: $phs_accession})
+        RETURN COUNT(DISTINCT x) AS count
     """;
 }

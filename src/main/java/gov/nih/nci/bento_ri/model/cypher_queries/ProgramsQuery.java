@@ -8,4 +8,9 @@ public class ProgramsQuery {
         RETURN p{.*} AS output
         ORDER BY output.program_name ASC
     """;
+    
+    public static final String PROGRAMS_COUNT_QUERY = """
+        MATCH (p:program)
+        RETURN COUNT(DISTINCT p) AS count
+    """;
 }

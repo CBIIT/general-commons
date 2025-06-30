@@ -134,6 +134,80 @@ public class MemgraphDataFetcher implements AutoCloseable{
     public List<Map<String, Object>> pdxDataFetcher(Map<String, Object> params){
         return listQuery(PDXQuery.PDX_QUERY, params);
     }
+    
+    // NumberOf query data fetchers
+    public Long getNumberOfPrograms(Map<String, Object> params){
+        return countQuery(ProgramsQuery.PROGRAMS_COUNT_QUERY, params);
+    }
+    
+    public Long getNumberOfStudies(Map<String, Object> params){
+        return countQuery(StudiesQuery.STUDIES_COUNT_QUERY, params);
+    }
+    
+    public Long getNumberOfParticipants(Map<String, Object> params){
+        return countQuery(ParticipantsQuery.PARTICIPANTS_COUNT_QUERY, params);
+    }
+    
+    public Long getNumberOfSamples(Map<String, Object> params){
+        return countQuery(SamplesQuery.SAMPLES_COUNT_QUERY, params);
+    }
+    
+    public Long getNumberOfFiles(Map<String, Object> params){
+        return countQuery(FilesQuery.FILES_COUNT_QUERY, params);
+    }
+    
+    public Long getNumberOfDiagnoses(Map<String, Object> params){
+        return countQuery(DiagnosesQuery.DIAGNOSES_COUNT_QUERY, params);
+    }
+    
+    public Long getNumberOfTreatments(Map<String, Object> params){
+        return countQuery(TreatmentsQuery.TREATMENTS_COUNT_QUERY, params);
+    }
+    
+    public Long getNumberOfImages(Map<String, Object> params){
+        return countQuery(ImagesQuery.IMAGES_COUNT_QUERY, params);
+    }
+    
+    public Long getNumberOfGenomicInfo(Map<String, Object> params){
+        return countQuery(GenomicInfoQuery.GENOMIC_INFO_COUNT_QUERY, params);
+    }
+    
+    public Long getNumberOfProteomics(Map<String, Object> params){
+        return countQuery(ProteomicsQuery.PROTEOMICS_COUNT_QUERY, params);
+    }
+    
+    public Long getNumberOfPDX(Map<String, Object> params){
+        return countQuery(PDXQuery.PDX_COUNT_QUERY, params);
+    }
+    
+    public Long getNumberOfMultiplexMicroscopies(Map<String, Object> params){
+        return countQuery(MultiplexMicroscopiesQuery.MULTIPLEX_MICROSCOPIES_COUNT_QUERY, params);
+    }
+    
+    public Long getNumberOfNonDICOMCTimages(Map<String, Object> params){
+        return countQuery(NonDICOMCTimagesQuery.NON_DICOMCT_IMAGES_COUNT_QUERY, params);
+    }
+    
+    public Long getNumberOfNonDICOMMRimages(Map<String, Object> params){
+        return countQuery(NonDICOMMRimagesQuery.NON_DICOMMR_IMAGES_COUNT_QUERY, params);
+    }
+    
+    public Long getNumberOfNonDICOMPETimages(Map<String, Object> params){
+        return countQuery(NonDICOMPETimagesQuery.NON_DICOMPET_IMAGES_COUNT_QUERY, params);
+    }
+    
+    public Long getNumberOfNonDICOMpathologyImages(Map<String, Object> params){
+        return countQuery(NonDICOMpathologyImagesQuery.NON_DICOM_PATHOLOGY_IMAGES_COUNT_QUERY, params);
+    }
+    
+    public Long getNumberOfNonDICOMradiologyAllModalities(Map<String, Object> params){
+        return countQuery(NonDICOMradiologyAllModalitiesQuery.NON_DICOM_RADIOLOGY_ALL_MODALITIES_COUNT_QUERY, params);
+    }
+    
+    public Long getNumberOfVersions(Map<String, Object> params){
+        return countQuery(VersionQuery.VERSION_COUNT_QUERY, params);
+    }
+    
 
     private Map<String, Object> mapQuery(String query, Map<String, Object> params){
         try (Session session = driver.session()) {
@@ -197,6 +271,15 @@ public class MemgraphDataFetcher implements AutoCloseable{
         return daysInMonth[month];
     }
 
+    private Long countQuery(String query, Map<String, Object> params){
+        if (params == null){
+            params = new HashMap<>();
+        }
+        try (Session session = driver.session()) {
+            Result result = session.run(query, params);
+            return result.single().get("count").asLong();
+        }
+    }
 
 }
 

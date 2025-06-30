@@ -2,6 +2,10 @@
 # subset of types and queries designed for requests from General Commons users. The others can be accessed but are
 # designed for interfacing with the site's frontend.
 
+# Schema Version: 3.1.0
+# Based on Data Model Version: 8.0.1
+
+# Node types
 type Program {
     # id property
     program_name: String
@@ -423,10 +427,10 @@ type QueryType {
 
     studies (
         # id filter
-        phs_accessions: [String]
+        phs_accessions: [String] = []
         # property filters
-        study_names: [String]
-        study_acronyms: [String]
+        study_names: [String] = []
+        study_acronyms: [String] = []
         # formatting
         first: Int = 10,
         offset: Int = 0
@@ -602,6 +606,24 @@ type QueryType {
     ): [PDX]
 
     version: Version
-    schemaVersion: String
-    schemaModelVersion: String
+
+    # Memgraph node count queries
+    programsCount: Int
+    studiesCount: Int
+    participantsCount(phs_accession: String!): Int
+    samplesCount(phs_accession: String!): Int
+    filesCount(phs_accession: String!): Int
+    diagnosesCount(phs_accession: String!): Int
+    treatmentsCount(phs_accession: String!): Int
+    imagesCount(phs_accession: String!): Int
+    genomicInfoCount(phs_accession: String!): Int
+    proteomicsCount(phs_accession: String!): Int
+    pdxCount(phs_accession: String!): Int
+    multiplexMicroscopiesCount(phs_accession: String!): Int
+    nonDICOMCTimagesCount(phs_accession: String!): Int
+    nonDICOMMRimagesCount(phs_accession: String!): Int
+    nonDICOMPETimagesCount(phs_accession: String!): Int
+    nonDICOMpathologyImagesCount(phs_accession: String!): Int
+    nonDICOMradiologyAllModalitiesCount(phs_accession: String!): Int
+    versionsCount: Int
 }

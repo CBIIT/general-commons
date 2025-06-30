@@ -2,7 +2,7 @@ package gov.nih.nci.bento_ri.model.cypher_queries;
 
 public class TreatmentsQuery {
     public static final String TREATMENTS_QUERY = """
-        MATCH (t:treatment)-->(:participant)-->(s:study {phs_accession: $phs_accession})
+        MATCH (t:treatment)-[:of_participant]->(:participant)-[:of_study]->(s:study {phs_accession: $phs_accession})
         WHERE
             $treatment_ids = [] OR t.treatment_id IN $treatment_ids
         WITH DISTINCT t, {
@@ -16,5 +16,10 @@ public class TreatmentsQuery {
         }) AS output
         RETURN apoc_replacement_poc.merge(output, t {.*}) AS output
         ORDER BY output.treatment_id ASC
+    """;
+
+    public static final String TREATMENTS_COUNT_QUERY = """
+        MATCH (t:treatment)-[:of_participant]->(:participant)-[:of_study]->(s:study {phs_accession: $phs_accession})
+        RETURN COUNT(DISTINCT t) AS count
     """;
 }
