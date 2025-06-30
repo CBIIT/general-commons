@@ -15,7 +15,7 @@ public class NonDICOMCTimagesQuery {
         }) AS output
         WITH apoc_replacement_poc.merge(output, x {.*}) AS output
         RETURN output
-        ORDER BY output.multiplex_microscopy_id ASC
+        ORDER BY output.non_dicomct_images_id ASC
     """;
 
     public static final String NON_DICOMCT_IMAGES_COUNT_QUERY = """
