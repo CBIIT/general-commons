@@ -1,11 +1,10 @@
 import React from 'react';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { MuiThemeProvider, createTheme } from '@material-ui/core/styles';
 import themes, { overrides } from '../../../themes';
 
 export default ({
   children,
 }) => {
-  const style = [];
 
   const overridesObj = themes.light.overrides;
   const tableBorder = '#88B4DA 1px solid';
@@ -31,8 +30,7 @@ export default ({
   overridesObj.MUIDataTableFooter.root.borderBottom = tableBorder;
   overridesObj.MUIDataTableFooter.root.borderTop = tableBorder;
 
-  style.push(overridesObj);
-  const computedTheme = createMuiTheme({ ...themes.light, ...overrides, ...style });
+  const computedTheme = createTheme(Object.assign({}, themes.light, overrides, overridesObj));
 
   return (
     <MuiThemeProvider theme={computedTheme}>

@@ -6,7 +6,7 @@ import LeftBg from '../../assets/error/leftBg.png';
 import rightBg from '../../assets/error/rightBg.png';
 import usePageTitle from '../../components/Analytics/usePageTitle';
 
-const Maintenance = ({ classes }) => {
+const PermanentMaintenance = ({ classes }) => {
   usePageTitle("Under Maintenance");
 
   return (
@@ -105,4 +105,4 @@ const styles = (theme) => ({
   },
 });
 
-export default withStyles(styles, { withTheme: true })(Maintenance);
+export default withStyles(styles, { withTheme: true })(PermanentMaintenance);
