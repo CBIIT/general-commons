@@ -1023,7 +1023,7 @@ type QueryType {
 
     # Memgraph Queries
     programs(
-        program_names: [String],
+        program_names: [String] = [],
         # formatting
         first: Int = 10,
         offset: Int = 0
