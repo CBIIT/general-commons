@@ -71,7 +71,7 @@ const Layout = ({ classes, isSidebarOpened }) => {
       <HashRouter>
         <>
           <Prompt
-            when={maintenanceMode.enabled && hash === "#/"}
+            when={!!(maintenanceMode.enabled && hash === "#/")}
             message={() => false}
           />
           <Notifactions />
