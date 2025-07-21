@@ -150,7 +150,7 @@ const ReadMeDialogComponent = ({
               {title}
             </span>
           </div>
-          <div item="true" xs={1} className={classes.closeBtn}>
+          <div item xs={1} className={classes.closeBtn}>
             <Button
               className={classes.downloadBtn}
               href={README_PDF_URL}
