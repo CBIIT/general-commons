@@ -802,9 +802,11 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             String[][] highlights = (String[][]) category.get(GS_HIGHLIGHT_FIELDS);
             Map<String, Object> query = getGlobalSearchQuery(input, category);
 
-            // Get count
+            // Get count - use a clean query without highlights since _count endpoint doesn't support highlights
+            Map<String, Object> countQuery = new HashMap<>(query);
+            countQuery.remove("highlight"); // Remove any existing highlights
             Request countRequest = new Request("GET", (String) category.get(GS_COUNT_ENDPOINT));
-            countRequest.setJsonEntity(gson.toJson(query));
+            countRequest.setJsonEntity(gson.toJson(countQuery));
             JsonObject countResult = esService.send(countRequest);
             int oldCount = (int)result.getOrDefault(countResultFieldName, 0);
             result.put(countResultFieldName, countResult.get("count").getAsInt() + oldCount);
