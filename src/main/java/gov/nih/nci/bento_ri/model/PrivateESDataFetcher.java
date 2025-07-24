@@ -814,7 +814,13 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             // Get results
             Request request = new Request("GET", (String)category.get(GS_END_POINT));
             String sortFieldName = (String)category.get(GS_SORT_FIELD);
-            query.put("sort", Map.of(sortFieldName, "asc"));
+            
+            // Implement deterministic sorting with tie-breaker for consistent pagination
+            List<Map<String, Object>> sortClauses = new ArrayList<>();
+            sortClauses.add(Map.of(sortFieldName, "asc"));
+            sortClauses.add(Map.of("_id", "asc")); // Tie-breaker for deterministic ordering
+            query.put("sort", sortClauses);
+            
             query = addHighlight(query, category);
 
             List<Map<String, Object>> objects;
