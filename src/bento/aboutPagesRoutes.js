@@ -3,5 +3,4 @@ export default [
   '/resources',
   '/graphql',
   '/GeneralCommons',
-  '/support',
 ];
