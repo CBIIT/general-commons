@@ -1,0 +1,8 @@
+
+.idea
+config
+logs
+target
+ignore.*
+/src/main/resources/application.local.properties
+/.vscode

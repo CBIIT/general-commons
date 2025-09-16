@@ -1,0 +1,2313 @@
+# Indices settings
+Indices:
+  # Subjects index
+  - index_name: subjects
+    type: neo4j
+    # type mapping for each property of the index
+    mapping:
+      # Filter properties
+      accesses:
+        type: keyword
+      acl:
+        type: keyword
+      experimental_strategies:
+        type: keyword
+      file_types:
+        type: keyword
+      sex:
+        type: keyword
+      image_modality:
+        type: keyword
+      organ_or_tissue:
+        type: keyword
+      tissue_fixative:
+        type: keyword
+      imaging_assay_type:
+        type: keyword
+      instrument_models:
+        type: keyword
+      is_tumor:
+        type: keyword
+      library_layouts:
+        type: keyword
+      library_selections:
+        type: keyword
+      library_source_materials:
+        type: keyword
+      library_source_molecules:
+        type: keyword
+      library_strategies:
+        type: keyword
+      number_of_study_participants:
+        type: integer
+      number_of_study_samples:
+        type: integer
+      phs_accession:
+        type: keyword
+      platforms:
+        type: keyword
+      primary_diagnoses:
+        type: keyword
+      reference_genome_assemblies:
+        type: keyword
+      sample_types:
+        type: keyword
+      site:
+        type: keyword
+      studies:
+        type: keyword
+      study_data_types:
+        type: keyword
+      aliquot_ids:
+        type: keyword
+      analytical_fractions:
+        type: keyword
+      instrument_makes:
+        type: keyword
+      proteomic_instrument_models:
+        type: keyword
+      proteomic_design_descriptions:
+        type: keyword
+      # Sort properties
+      is_tumor_sort:
+        type: keyword
+      sample_types_sort:
+        type: keyword
+      experimental_strategies_sort:
+        type: keyword
+      file_types_sort:
+        type: keyword
+      primary_diagnoses_sort:
+        type: keyword
+      site_sort:
+        type: keyword
+      library_layouts_sort:
+        type: keyword
+      library_selections_sort:
+        type: keyword
+      library_source_materials_sort:
+        type: keyword
+      library_source_molecules_sort:
+        type: keyword
+      library_strategies_sort:
+        type: keyword
+      instrument_models_sort:
+        type: keyword
+      platforms_sort:
+        type: keyword
+      reference_genome_assemblies_sort:
+        type: keyword
+      imaging_assay_type_sort:
+        type: keyword
+      organ_or_tissue_sort:
+        type: keyword
+      tissue_fixative_sort:
+        type: keyword
+      image_modality_sort:
+        type: keyword
+      # Global Search properties
+      site_gs:
+        type: search_as_you_type
+      study_gs:
+        type: search_as_you_type
+      subject_id_gs:
+        type: search_as_you_type
+      sex_gs:
+        type: search_as_you_type
+      # Overview properties
+      participant_id:
+        type: keyword
+      race:
+        type: keyword
+      ethnicity:
+        type: keyword
+      dbGaP_subject_id:
+        type: keyword
+      files:
+        type: keyword
+      samples:
+        type: keyword
+      subject_ids:
+        type: keyword
+      subject_ids_filter:
+        type: keyword
+    # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
+    cypher_queries:
+      - query: |
+          WITH 'Not specified in data' AS na
+          MATCH (s:study)<--(:file)-->(p:participant)
+          WITH s, na,
+            {
+              accesses: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(s.study_access, na))),
+              acl: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(CASE WHEN s.acl = '[]' THEN na ELSE apoc_replacement_poc.text_replace(s.acl,'\\[|\\]|\\"|\'','') END, na))),
+              phs_accession: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(s.phs_accession, na))),
+              studies: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(s.study_name, na))),
+              study_data_types: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(s.study_data_types, na))),
+              number_of_study_participants: count(distinct p),
+              study_gs: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(s.study_name, na)))
+            } AS opensearch_data
+          OPTIONAL MATCH (s)<--(:file)-->(:participant)<--(samp:sample)
+          WITH s, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              number_of_study_samples: count(distinct samp)
+            }) AS opensearch_data
+          MATCH (s)<--(:file)-->(p:participant)
+          WITH DISTINCT p, na, opensearch_data
+          SKIP $skip LIMIT $limit
+          WITH p, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              participant_id: COALESCE(p.participant_id, na),
+              sex: COALESCE(p.sex, na),
+              ethnicity: COALESCE(p.ethnicity, na),
+              race: COALESCE(p.race, na),
+              subject_ids: p.participant_id,
+              subject_ids_filter: COLLECT(DISTINCT p.participant_id),
+              dbGaP_subject_id: COALESCE(p.dbGaP_subject_id, na)
+            }) AS opensearch_data
+          WITH p, na, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              sex_gs: opensearch_data.sex,
+              subject_id_gs: opensearch_data.subject_ids
+            }) AS opensearch_data
+          OPTIONAL MATCH (p)<--(samp:sample)
+          WITH p, na, opensearch_data,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(samp.sample_tumor_status, na))) AS is_tumor,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(samp.sample_id, na))) AS samples,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc_replacement_poc.text_split(samp.sample_type, ':'))), na))) AS sample_types
+          WITH p, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              is_tumor: is_tumor,
+              samples: samples,
+              sample_types: sample_types,
+              is_tumor_sort: apoc_replacement_poc.text_join(is_tumor, ''),
+              sample_types_sort: apoc_replacement_poc.text_join(sample_types, '')
+            }) AS opensearch_data
+          OPTIONAL MATCH (p)<--(f:file)
+          WITH p, na, opensearch_data, 
+              apoc_replacement_poc.sort(apoc_replacement_poc.to_set(apoc_replacement_poc.flatten(COLLECT(apoc_replacement_poc.text_split(
+                CASE WHEN f.experimental_strategy_and_data_subtypes = '[]' THEN na ELSE 
+                apoc_replacement_poc.text_replace(f.experimental_strategy_and_data_subtypes,'\\[|\\]|\\"',
+                '') END, '[;,]\\s{0,1}'))))) AS experimental_strategies,
+              apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(f.file_type, na))) AS file_types,
+              apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(f.file_id, na))) AS files
+          WITH p, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              experimental_strategies: experimental_strategies,
+              file_types: file_types,
+              files: files,
+              experimental_strategies_sort: apoc_replacement_poc.text_join(experimental_strategies, ''),
+              file_types_sort: apoc_replacement_poc.text_join(file_types, '')
+            }) AS opensearch_data
+          OPTIONAL MATCH (p)<--(:file)<--(pr:proteomic)
+          WITH p, na, opensearch_data, 
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.aliquot_id, na))) AS aliquot_ids,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.analytical_fractions, na))) AS analytical_fractions,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.instrument_make, na))) AS instrument_makes,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.proteomic_instrument_model, na))) AS proteomic_instrument_models,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.proteomic_design_description, na))) AS proteomic_design_descriptions
+          WITH p, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              aliquot_ids: aliquot_ids,
+              analytical_fractions: analytical_fractions,
+              instrument_makes: instrument_makes,
+              proteomic_instrument_models: proteomic_instrument_models,
+              proteomic_design_descriptions: proteomic_design_descriptions
+            }) AS opensearch_data
+          OPTIONAL MATCH (p)<--(diag:diagnosis)
+          WITH p, na, opensearch_data,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na))) AS primary_site,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc_replacement_poc.text_split(diag.primary_diagnosis, ':'))), na))) AS primary_diagnosis
+          WITH p, na, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              primary_diagnoses: primary_diagnosis,
+              site: primary_site,
+              site_gs: primary_site,
+              primary_diagnoses_sort: apoc_replacement_poc.text_join(primary_diagnosis, ''),
+              site_sort: apoc_replacement_poc.text_join(primary_site, '')
+            }) AS opensearch_data
+          OPTIONAL MATCH (p)<--(f:file)
+          OPTIONAL MATCH (f)<--(g:genomic_info)
+          WITH p, na, opensearch_data,
+              apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))) AS library_layouts,
+              apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))) AS library_selections,
+              apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_source_material, na))) AS library_source_materials, 
+              apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_source_molecule, na))) AS library_source_molecules, 
+              apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))) AS library_strategies,
+              apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))) AS instrument_models,
+              apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.platform, na))) AS platforms,
+              apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.reference_genome_assembly, na))) AS reference_genome_assemblies
+          WITH p, na, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              library_layouts: library_layouts,
+              library_selections: library_selections,
+              library_source_materials: library_source_materials, 
+              library_source_molecules: library_source_molecules,
+              library_strategies: library_strategies,
+              instrument_models: instrument_models,
+              platforms: platforms,
+              reference_genome_assemblies: reference_genome_assemblies,
+              library_layouts_sort: apoc_replacement_poc.text_join(library_layouts, ''),
+              library_selections_sort: apoc_replacement_poc.text_join(library_selections, ''),
+              library_source_materials_sort: apoc_replacement_poc.text_join(library_source_materials, ''), 
+              library_source_molecules_sort: apoc_replacement_poc.text_join(library_source_molecules, ''), 
+              library_strategies_sort: apoc_replacement_poc.text_join(library_strategies, ''),
+              instrument_models_sort: apoc_replacement_poc.text_join(instrument_models, ''),
+              platforms_sort: apoc_replacement_poc.text_join(platforms, ''),
+              reference_genome_assemblies_sort: apoc_replacement_poc.text_join(reference_genome_assemblies, '')
+            }) AS opensearch_data
+          OPTIONAL MATCH (p)<--(:file)<--(i:image)
+          WITH p, na, opensearch_data, 
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na))) AS image_modality,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(i.organ_or_tissue, na))) AS organ_or_tissue
+          WITH p, na, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              image_modality: image_modality,
+              organ_or_tissue: organ_or_tissue,
+              image_modality_sort: apoc_replacement_poc.text_join(image_modality, ''),
+              organ_or_tissue_sort: apoc_replacement_poc.text_join(organ_or_tissue, '')
+            }) AS opensearch_data
+          OPTIONAL MATCH (p)<--(:file)<--(:image)<--(mm:MultiplexMicroscopy)
+          WITH p, na, opensearch_data, 
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(mm.tissue_fixative, na))) AS tissue_fixative,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(mm.imaging_assay_type, na))) AS imaging_assay_type
+          WITH p, na, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              imaging_assay_type: imaging_assay_type,
+              tissue_fixative: tissue_fixative,
+              imaging_assay_type_sort: apoc_replacement_poc.text_join(imaging_assay_type, ''),
+              tissue_fixative_sort: apoc_replacement_poc.text_join(tissue_fixative, '')
+            }) AS opensearch_data
+          RETURN opensearch_data
+          ORDER BY opensearch_data.subject_ids
+        page_size: 50000
+  # Samples index
+  - index_name: samples
+    type: neo4j
+    mapping:
+      # Filter properties
+      accesses:
+        type: keyword
+      acl:
+        type: keyword
+      experimental_strategies:
+        type: keyword
+      file_types:
+        type: keyword
+      sex:
+        type: keyword
+      image_modality:
+        type: keyword
+      organ_or_tissue:
+        type: keyword
+      tissue_fixative:
+        type: keyword
+      imaging_assay_type:
+        type: keyword
+      instrument_models:
+        type: keyword
+      is_tumor:
+        type: keyword
+      library_layouts:
+        type: keyword
+      library_selections:
+        type: keyword
+      library_source_materials:
+        type: keyword
+      library_source_molecules:
+        type: keyword
+      library_strategies:
+        type: keyword
+      number_of_study_participants:
+        type: integer
+      number_of_study_samples:
+        type: integer
+      phs_accession:
+        type: keyword
+      platforms:
+        type: keyword
+      primary_diagnoses:
+        type: keyword
+      reference_genome_assemblies:
+        type: keyword
+      sample_types:
+        type: keyword
+      site:
+        type: keyword
+      studies:
+        type: keyword
+      study_data_types:
+        type: keyword
+      aliquot_ids:
+        type: keyword
+      analytical_fractions:
+        type: keyword
+      instrument_makes:
+        type: keyword
+      proteomic_instrument_models:
+        type: keyword
+      proteomic_design_descriptions:
+        type: keyword
+      # Sort properties
+      experimental_strategies_sort:
+        type: keyword
+      file_types_sort:
+        type: keyword
+      library_layouts_sort:
+        type: keyword
+      library_selections_sort:
+        type: keyword
+      library_source_materials_sort:
+        type: keyword
+      library_source_molecules_sort:
+        type: keyword
+      library_strategies_sort:
+        type: keyword
+      instrument_models_sort:
+        type: keyword
+      platforms_sort:
+        type: keyword
+      reference_genome_assemblies_sort:
+        type: keyword
+      primary_diagnoses_sort:
+        type: keyword
+      site_sort:
+        type: keyword
+      imaging_assay_type_sort:
+        type: keyword
+      organ_or_tissue_sort:
+        type: keyword
+      image_modality_sort:
+        type: keyword
+      tissue_fixative_sort:
+        type: keyword
+      # Global search properties
+      sample_id_gs:
+        type: search_as_you_type
+      is_tumor_gs:
+        type: search_as_you_type
+      analyte_type_gs:
+        type: search_as_you_type
+      # Overview properties
+      analyte_type:
+        type: keyword
+      files:
+        type: keyword
+      sample_id:
+        type: keyword
+      sample_ids:
+        type: keyword
+      subject_ids:
+        type: keyword
+      sample_type:
+        type: keyword
+      sample_tumor_status:
+        type: keyword
+      sample_anatomic_site:
+        type: keyword
+      sample_age_at_collection:
+        type: keyword
+      derived_from_specimen:
+        type: keyword
+      biosample_accession:
+        type: keyword
+      subject_ids_filter:
+        type: keyword
+    # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
+    cypher_queries:
+      - query: |
+          WITH 'Not specified in data' AS na
+          MATCH (s:study)<--(:file)-->(p:participant)
+          WITH s, na,
+            {
+              accesses: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(s.study_access, na))),
+              acl: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(CASE WHEN s.acl = '[]' THEN na ELSE apoc_replacement_poc.text_replace(s.acl,'\\[|\\]|\\"|\'','') END, na))),
+              phs_accession: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(s.phs_accession, na))),
+              studies: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(s.study_name, na))),
+              study_data_types: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(s.study_data_types, na))),
+              number_of_study_participants: count(distinct p),
+              study_gs: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(s.study_name, na)))
+            } AS opensearch_data
+          OPTIONAL MATCH (s)<--(:file)-->(:participant)<--(samp:sample)
+          WITH s, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              number_of_study_samples: count(distinct samp)
+            }) AS opensearch_data
+          MATCH (s)<--(:file)-->(:participant)<--(samp:sample)
+          WITH DISTINCT samp, na, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              is_tumor: samp.sample_tumor_status,
+              analyte_type: TRIM(LAST(apoc_replacement_poc.text_split(samp.sample_type, ':'))),
+              sample_types: TRIM(LAST(apoc_replacement_poc.text_split(samp.sample_type, ':'))),
+              sample_type: TRIM(LAST(apoc_replacement_poc.text_split(samp.sample_type, ':'))),
+              sample_id: samp.sample_id,
+              sample_ids: samp.sample_id,
+              sample_tumor_status: samp.sample_tumor_status,
+              sample_anatomic_site: TRIM(LAST(apoc_replacement_poc.text_split(samp.sample_anatomic_site, ':'))),
+              sample_age_at_collection: samp.sample_age_at_collection,
+              derived_from_specimen: samp.derived_from_specimen,
+              biosample_accession: samp.biosample_accession
+            }) AS opensearch_data
+          SKIP $skip LIMIT $limit
+          WITH samp, na, 
+          apoc_replacement_poc.merge(opensearch_data, {
+              is_tumor_gs: opensearch_data.is_tumor,
+              analyte_type_gs: opensearch_data.analyte_type,
+              sample_id_gs: opensearch_data.sample_id
+            }) AS opensearch_data
+          OPTIONAL MATCH (samp)-->(p:participant)
+          WITH samp, na, opensearch_data,
+            COALESCE(p.sex, na) AS sex,
+            COALESCE(p.participant_id, na) AS subject_ids,
+            COLLECT(DISTINCT p.participant_id) AS subject_ids_filter
+          WITH samp, na, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              sex: sex,
+              subject_ids: subject_ids,
+              subject_ids_filter: subject_ids_filter
+            }) AS opensearch_data
+          OPTIONAL MATCH (samp)-->(:participant)<--(f:file)
+          WITH samp, na, opensearch_data,
+            apoc_replacement_poc.sort(apoc_replacement_poc.to_set(apoc_replacement_poc.flatten(COLLECT(apoc_replacement_poc.text_split(
+              CASE WHEN f.experimental_strategy_and_data_subtypes = '[]' THEN na ELSE 
+              apoc_replacement_poc.text_replace(f.experimental_strategy_and_data_subtypes,'\\[|\\]|\\"',
+              '') END, '[;,]\\s{0,1}'))))) AS experimental_strategies,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(f.file_type, na))) AS file_types,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(f.file_id, na))) AS files
+          WITH samp, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              experimental_strategies: experimental_strategies,
+              file_types: file_types,
+              files: files,
+              experimental_strategies_sort: apoc_replacement_poc.text_join(experimental_strategies, ''),
+              file_types_sort: apoc_replacement_poc.text_join(file_types, '')
+            }) AS opensearch_data
+          OPTIONAL MATCH (samp)-->(:participant)<--(:file)<--(g:genomic_info)
+          WITH samp, na, opensearch_data,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))) AS library_layouts, 
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))) AS library_selections, 
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_source_material, na))) AS library_source_materials,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_source_molecule, na))) AS library_source_molecules, 
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))) AS library_strategies,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))) AS instrument_models,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.platform, na))) AS platforms,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.reference_genome_assembly, na))) AS reference_genome_assemblies
+          WITH samp, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              library_layouts: library_layouts, 
+              library_selections: library_selections, 
+              library_source_materials: library_source_materials, 
+              library_source_molecules: library_source_molecules, 
+              library_strategies: library_strategies,
+              instrument_models: instrument_models,
+              platforms: platforms,
+              reference_genome_assemblies: reference_genome_assemblies,
+              library_layouts_sort: apoc_replacement_poc.text_join(library_layouts, ''),
+              library_selections_sort: apoc_replacement_poc.text_join(library_selections, ''),
+              library_source_materials_sort: apoc_replacement_poc.text_join(library_source_materials, ''), 
+              library_source_molecules_sort: apoc_replacement_poc.text_join(library_source_molecules, ''),
+              library_strategies_sort: apoc_replacement_poc.text_join(library_strategies,''),
+              instrument_models_sort: apoc_replacement_poc.text_join(reference_genome_assemblies,''),
+              platforms_sort: apoc_replacement_poc.text_join(platforms,''),
+              reference_genome_assemblies_sort: apoc_replacement_poc.text_join(reference_genome_assemblies, '')
+            }) AS opensearch_data
+          OPTIONAL MATCH (samp)-->(:participant)<--(diag:diagnosis)
+          WITH samp, na, opensearch_data, 
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc_replacement_poc.text_split(diag.primary_diagnosis, ':'))), na))) AS primary_diagnoses,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na))) AS site
+          WITH samp, na, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              primary_diagnoses: primary_diagnoses,
+              site: site,
+              primary_diagnoses_sort: apoc_replacement_poc.text_join(primary_diagnoses, ''),
+              site_sort: apoc_replacement_poc.text_join(site, '')
+            }) AS opensearch_data
+          OPTIONAL MATCH (samp)-->(:participant)<--(:file)<--(i:image)
+          WITH samp, na, opensearch_data,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(i.image_modality, na))) AS image_modality,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(i.organ_or_tissue, na))) AS organ_or_tissue,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(i.tissue_fixative, na))) AS tissue_fixative,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(i.imaging_assay_type, na))) AS imaging_assay_type
+          WITH samp, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              image_modality: image_modality,
+              organ_or_tissue: organ_or_tissue,
+              image_modality_sort: apoc_replacement_poc.text_join(image_modality, ''),
+              organ_or_tissue_sort: apoc_replacement_poc.text_join(organ_or_tissue, '')
+            }) AS opensearch_data
+          OPTIONAL MATCH (samp)-->(:participant)<--(:file)<--(:image)<--(mm:MultiplexMicroscopy)
+          WITH samp, na, opensearch_data,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(mm.tissue_fixative, na))) AS tissue_fixative,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(mm.imaging_assay_type, na))) AS imaging_assay_type
+          WITH samp, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              tissue_fixative: tissue_fixative,
+              imaging_assay_type: imaging_assay_type,
+              imaging_assay_type_sort: apoc_replacement_poc.text_join(imaging_assay_type, ''),
+              tissue_fixative_sort: apoc_replacement_poc.text_join(tissue_fixative, '')
+            }) AS opensearch_data
+          OPTIONAL MATCH (samp)-->(:participant)<--(:file)<--(pr:proteomic)
+          WITH samp, na, opensearch_data, 
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.aliquot_id, na))) AS aliquot_ids,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.analytical_fractions, na))) AS analytical_fractions,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.instrument_make, na))) AS instrument_makes,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.proteomic_instrument_model, na))) AS proteomic_instrument_models,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.proteomic_design_description, na))) AS proteomic_design_descriptions
+          WITH samp, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              aliquot_ids: aliquot_ids,
+              analytical_fractions: analytical_fractions,
+              instrument_makes: instrument_makes,
+              proteomic_instrument_models: proteomic_instrument_models,
+              proteomic_design_descriptions: proteomic_design_descriptions
+            }) AS opensearch_data
+          RETURN opensearch_data
+          ORDER BY opensearch_data.sample_id
+        page_size: 50000
+  # Files index (split by experimental strategies)
+  - index_name: file_experimental_strategies
+    type: neo4j
+    mapping:
+      file_id:
+        type: keyword
+      # Filter properties
+      accesses:
+        type: keyword
+      acl:
+        type: keyword
+      experimental_strategies:
+        type: keyword
+      file_types:
+        type: keyword
+      sex:
+        type: keyword
+      image_modality:
+        type: keyword
+      organ_or_tissue:
+        type: keyword
+      tissue_fixative:
+        type: keyword
+      imaging_assay_type:
+        type: keyword
+      instrument_models:
+        type: keyword
+      is_tumor:
+        type: keyword
+      library_layouts:
+        type: keyword
+      library_selections:
+        type: keyword
+      library_source_materials:
+        type: keyword
+      library_source_molecules:
+        type: keyword
+      library_strategies:
+        type: keyword
+      number_of_study_participants:
+        type: integer
+      number_of_study_samples:
+        type: integer
+      phs_accession:
+        type: keyword
+      platforms:
+        type: keyword
+      primary_diagnoses:
+        type: keyword
+      reference_genome_assemblies:
+        type: keyword
+      sample_types:
+        type: keyword
+      site:
+        type: keyword
+      studies:
+        type: keyword
+      study_data_types:
+        type: keyword
+      aliquot_ids:
+        type: keyword
+      analytical_fractions:
+        type: keyword
+      instrument_makes:
+        type: keyword
+      proteomic_instrument_models:
+        type: keyword
+      proteomic_design_descriptions:
+        type: keyword
+      subject_ids:
+        type: keyword
+    cypher_queries:
+      - query: |
+          MATCH (s:study)<--(:file)-->(p:participant)
+          WITH s, p, 'Not specified in data' AS na
+          WITH s, na,
+            {
+              accesses: s.study_access,
+              acl: CASE WHEN s.acl = '[]' THEN na ELSE apoc_replacement_poc.text_replace(s.acl,'\\[|\\]|\\"|\'','') END,
+              phs_accession: s.phs_accession,
+              studies: s.study_name,
+              study_data_types: s.study_data_types,
+              number_of_study_participants: count(distinct p),
+              study_gs: s.study_name
+            } AS opensearch_data
+          OPTIONAL MATCH (s)<--(:file)-->(:participant)<--(samp:sample)
+          WITH s, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              number_of_study_samples: count(distinct samp)
+            }) AS opensearch_data
+          MATCH (s)<--(f:file)
+          WITH DISTINCT f, 'Not specified in data' AS na, opensearch_data
+          UNWIND 
+            apoc_replacement_poc.text_split(CASE WHEN f.experimental_strategy_and_data_subtypes = '[]' 
+            THEN na ELSE apoc_replacement_poc.text_replace(f.experimental_strategy_and_data_subtypes,
+            '\\[|\\]|\\"','') END, '[;,]\\s{0,1}')
+          AS experimental_strategies
+          WITH f, na, opensearch_data, experimental_strategies, coalesce(toUpper(f.file_type), na) AS file_type
+          SKIP $skip LIMIT $limit
+          WITH f, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              experimental_strategies: experimental_strategies,
+              file_types: file_type ,
+              files: f.file_id,
+              file_id: f.file_id,
+              file_name: f.file_name,
+              file_type: file_type,
+              file_size: f.file_size,
+              md5sum: f.md5sum
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)-->(p:participant)
+          WITH f, na, opensearch_data, 
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(p.sex, na))) AS sex,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(p.participant_id, na))) AS participant_id
+          WITH f, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              sex: sex,
+              subject_ids: participant_id
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)-->(:participant)<--(samp:sample)
+          WITH f, na, opensearch_data,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(samp.sample_tumor_status, na))) AS sample_tumor_status,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc_replacement_poc.text_split(samp.sample_type, ':'))), na))) AS sample_type,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(samp.sample_id, na))) AS sample_id
+          WITH f, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              is_tumor: sample_tumor_status,
+              analyte_type: sample_type,
+              sample_types: sample_type,
+              sample_ids: sample_id
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)<--(g:genomic_info)
+          WITH f, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              library_layouts: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))), 
+              library_selections: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))), 
+              library_source_materials: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_source_material, na))),
+              library_source_molecules: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_source_molecule, na))), 
+              library_strategies: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))),
+              instrument_models: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))),
+              platforms: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.platform, na))),
+              reference_genome_assemblies: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.reference_genome_assembly, na)))
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)-->(:participant)<--(diag:diagnosis)
+          WITH f, na, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              primary_diagnoses: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc_replacement_poc.text_split(diag.primary_diagnosis, ':'))), na))),
+              site: apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na)))
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)<--(i:image)
+          WITH f, na, opensearch_data, 
+            COALESCE(i.image_modality, na) AS image_modality,
+            COALESCE(i.organ_or_tissue, na) AS organ_or_tissue
+          WITH f, na, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              image_modality: image_modality,
+              organ_or_tissue: organ_or_tissue
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)<--(:image)<--(mm:MultiplexMicroscopy)
+          WITH f, na, opensearch_data, 
+            COALESCE(mm.tissue_fixative, na) AS tissue_fixative,
+            COALESCE(mm.imaging_assay_type, na) AS imaging_assay_type
+          WITH f, na, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              tissue_fixative: tissue_fixative,
+              imaging_assay_type: imaging_assay_type
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)<--(pr:proteomic)
+          WITH f, na, opensearch_data, 
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.aliquot_id, na))) AS aliquot_ids,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.analytical_fractions, na))) AS analytical_fractions,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.instrument_make, na))) AS instrument_makes,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.proteomic_instrument_model, na))) AS proteomic_instrument_models,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.proteomic_design_description, na))) AS proteomic_design_descriptions
+          WITH f, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              aliquot_ids: aliquot_ids,
+              analytical_fractions: analytical_fractions,
+              instrument_makes: instrument_makes,
+              proteomic_instrument_models: proteomic_instrument_models,
+              proteomic_design_descriptions: proteomic_design_descriptions
+            }) AS opensearch_data
+          RETURN opensearch_data
+          ORDER BY opensearch_data.files
+        page_size: 50000
+  # Files index
+  - index_name: files
+    type: neo4j
+    mapping:
+      # Filter properties
+      accesses:
+        type: keyword
+      acl:
+        type: keyword
+      experimental_strategies:
+        type: keyword
+      file_types:
+        type: keyword
+      sex:
+        type: keyword
+      races:
+        type: keyword
+      image_modality:
+        type: keyword
+      organ_or_tissue:
+        type: keyword
+      tissue_fixative:
+        type: keyword
+      imaging_assay_type:
+        type: keyword
+      instrument_models:
+        type: keyword
+      is_tumor:
+        type: keyword
+      library_layouts:
+        type: keyword
+      library_selections:
+        type: keyword
+      library_source_materials:
+        type: keyword
+      library_source_molecules:
+        type: keyword
+      library_strategies:
+        type: keyword
+      number_of_study_participants:
+        type: integer
+      number_of_study_samples:
+        type: integer
+      phs_accession:
+        type: keyword
+      platforms:
+        type: keyword
+      primary_diagnoses:
+        type: keyword
+      reference_genome_assemblies:
+        type: keyword
+      sample_types:
+        type: keyword
+      site:
+        type: keyword
+      studies:
+        type: keyword
+      study_data_types:
+        type: keyword
+      aliquot_ids:
+        type: keyword
+      analytical_fractions:
+        type: keyword
+      instrument_makes:
+        type: keyword
+      proteomic_instrument_models:
+        type: keyword
+      proteomic_design_descriptions:
+        type: keyword
+      # Overview properties
+      analyte_type:
+        type: keyword
+      file_id:
+        type: keyword
+      file_ids:
+        type: keyword
+      file_name:
+        type: keyword
+      file_names:
+        type: keyword
+      file_type:
+        type: keyword
+      file_size:
+        type: long
+      md5sum:
+        type: keyword
+      file_url_in_cds:
+        type: keyword
+      sample_id:
+        type: keyword
+      sample_ids:
+        type: keyword
+      subject_ids:
+        type: keyword
+      file_description:
+        type: keyword
+      experimental_strategy_and_data_subtypes:
+        type: keyword
+      drs_uri:
+        type: keyword
+      is_supplementary_file:
+        type: keyword
+      release_datetime:
+        type: keyword
+      # Sort properties
+      analyte_type_sort:
+        type: keyword
+      experimental_strategies_sort:
+        type: keyword
+      sex_sort:
+        type: keyword
+      races_sort:
+        type: keyword
+      is_tumor_sort:
+        type: keyword
+      sample_types_sort:
+        type: keyword
+      library_layouts_sort:
+        type: keyword
+      library_selections_sort:
+        type: keyword
+      library_source_materials_sort:
+        type: keyword
+      library_source_molecules_sort:
+        type: keyword
+      library_strategies_sort:
+        type: keyword
+      instrument_models_sort:
+        type: keyword
+      platforms_sort:
+        type: keyword
+      primary_diagnoses_sort:
+        type: keyword
+      site_sort:
+        type: keyword
+      # Global search properties
+      file_id_gs:
+        type: search_as_you_type
+      file_name_gs:
+        type: search_as_you_type
+      file_type_gs:
+        type: search_as_you_type
+      subject_id_gs:
+        type: search_as_you_type
+      sample_id_gs:
+        type: search_as_you_type
+      accesses_gs:
+        type: search_as_you_type
+      acl_gs:
+        type: search_as_you_type
+      experimental_strategies_gs:
+        type: search_as_you_type
+      instrument_models_gs:
+        type: search_as_you_type
+      library_layouts_gs:
+        type: search_as_you_type
+      library_selections_gs:
+        type: search_as_you_type
+      library_source_materials_gs:
+        type: search_as_you_type
+      library_source_molecules_gs:
+        type: search_as_you_type
+      library_strategies_gs:
+        type: search_as_you_type
+      platforms_gs:
+        type: search_as_you_type
+      reference_genome_assemblies_gs:
+        type: search_as_you_type
+      sites_gs:
+        type: search_as_you_type
+      subject_ids_filter:
+        type: keyword
+      is_supplementary_file_gs:
+        type: search_as_you_type
+      release_datetime_gs:
+        type: search_as_you_type
+      # associated file properties
+      associated_file:
+        type: keyword
+      associated_drs_uri:
+        type: keyword
+      associated_md5sum:
+        type: keyword
+      associated_is_supplementary_file:
+        type: keyword
+    # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
+    cypher_queries:
+      - query: |
+          MATCH (s:study)<--(:file)-->(p:participant)
+          WITH s, p, 'Not specified in data' AS na
+          WITH s, p, na, CASE WHEN s.acl = '[]' THEN na ELSE apoc_replacement_poc.text_replace(s.acl,'\\[|\\]|\\"|\'','') END AS acl
+          WITH s,
+            {
+              accesses: s.study_access,
+              accesses_gs: s.study_access,
+              acl: acl,
+              acl_gs: acl,
+              phs_accession: s.phs_accession,
+              studies: s.study_name,
+              study_data_types: s.study_data_types,
+              number_of_study_participants: count(distinct p),
+              study_gs: s.study_name
+            } AS opensearch_data
+          OPTIONAL MATCH (s)<--(:file)-->(:participant)<--(samp:sample)
+          WITH s, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              number_of_study_samples: count(distinct samp)
+            }) AS opensearch_data
+          MATCH (s)<--(f:file)
+          WITH DISTINCT f, 'Not specified in data' AS na, opensearch_data
+          SKIP $skip LIMIT $limit
+          WITH f, na, opensearch_data,
+            coalesce(toUpper(f.file_type), na) AS file_type, 
+            apoc_replacement_poc.text_split(CASE WHEN f.experimental_strategy_and_data_subtypes = '[]' 
+              THEN na ELSE apoc_replacement_poc.text_replace(f.experimental_strategy_and_data_subtypes,
+              '\\[|\\]|\\"','') END, '[;,]\\s{0,1}') AS experimental_strategy_and_data_subtypes
+          WITH f, na, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              experimental_strategies: experimental_strategy_and_data_subtypes,
+              experimental_strategies_sort: apoc_replacement_poc.text_join(experimental_strategy_and_data_subtypes, ''),
+              experimental_strategy_and_data_subtypes: f.experimental_strategy_and_data_subtypes,
+              file_description: f.file_description,
+              file_types: file_type ,
+              files: f.file_id,
+              file_id: f.file_id,
+              file_ids: f.file_id,
+              file_name: f.file_name,
+              file_names: f.file_name,
+              file_type: file_type,
+              file_size: f.file_size,
+              md5sum: f.md5sum,
+              experimental_strategies_gs: experimental_strategy_and_data_subtypes,
+              file_type_gs: f.file_type ,
+              file_id_gs: f.file_id,
+              file_name_gs: f.file_name,
+              file_url_in_cds: f.file_url_in_cds,
+              drs_uri: 'drs://nci-crdc.datacommons.io/' + f.file_id,
+              is_supplementary_file: COALESCE(f.is_supplementary_file, na),
+              is_supplementary_file_gs: COALESCE(f.is_supplementary_file, na),
+              release_datetime: f.release_datetime,
+              release_datetime_gs: f.release_datetime
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)-->(p:participant)
+          WITH f, na, opensearch_data,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(p.sex, na))) AS sex,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(p.race, na))) AS race,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(p.participant_id, na))) AS participant_id
+          WITH f, na, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              sex: sex,
+              sex_sort: apoc_replacement_poc.text_join(sex, ''),
+              races: race,
+              races_sort: apoc_replacement_poc.text_join(race, ''),
+              subject_ids: participant_id,
+              subject_id_gs: participant_id,
+              subject_ids_filter: participant_id
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)-->(:participant)<--(samp:sample)
+          WITH f, na, opensearch_data, 
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(samp.sample_tumor_status, na))) AS sample_tumor_status,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc_replacement_poc.text_split(samp.sample_type, ':'))), na))) AS sample_type,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(samp.sample_id, na))) AS sample_id
+          WITH f, na, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              is_tumor: sample_tumor_status,
+              is_tumor_sort: apoc_replacement_poc.text_join(sample_tumor_status, ''),
+              sample_types: sample_type,
+              sample_types_sort: apoc_replacement_poc.text_join(sample_type, ''),
+              analyte_type: sample_type,
+              analyte_type_sort: apoc_replacement_poc.text_join(sample_type, ''),
+              sample_id: sample_id,
+              sample_ids: sample_id,
+              sample_id_gs: sample_id
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)<--(g:genomic_info)
+          WITH f, na, opensearch_data, 
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_layout, na))) AS library_layout,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_selection, na))) AS library_selection,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_source_material, na))) AS library_source_materials,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_source_molecule, na))) AS library_source_molecules,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.library_strategy, na))) AS library_strategy,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.instrument_model, na))) AS instrument_model,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.platform, na))) AS platform,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(g.reference_genome_assembly, na))) AS reference_genome_assembly
+          WITH f, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              library_layouts: library_layout, 
+              library_selections: library_selection, 
+              library_source_materials: library_source_materials, 
+              library_source_molecules: library_source_molecules, 
+              library_strategies: library_strategy,
+              instrument_models: instrument_model,
+              platforms: platform,
+              reference_genome_assemblies: reference_genome_assembly,
+              library_layouts_gs: library_layout, 
+              library_selections_gs: library_selection, 
+              library_source_materials_gs: library_source_materials, 
+              library_source_molecules_gs: library_source_molecules,
+              library_strategies_gs: library_strategy,
+              instrument_models_gs: instrument_model,
+              platforms_gs: platform,
+              reference_genome_assemblies_gs: reference_genome_assembly,
+              library_layouts_sort: apoc_replacement_poc.text_join(library_layout, ''), 
+              library_selections_sort: apoc_replacement_poc.text_join(library_selection, ''), 
+              library_source_materials_sort: apoc_replacement_poc.text_join(library_source_materials, ''), 
+              library_source_molecules_sort: apoc_replacement_poc.text_join(library_source_molecules, ''), 
+              library_strategies_sort: apoc_replacement_poc.text_join(library_strategy, ''),
+              instrument_models_sort: apoc_replacement_poc.text_join(instrument_model, ''),
+              platforms_sort: apoc_replacement_poc.text_join(platform, ''),
+              reference_genome_assemblies_sort: apoc_replacement_poc.text_join(reference_genome_assembly, '')
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)-->(:participant)<--(diag:diagnosis)
+          WITH f, na, opensearch_data,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(TRIM(LAST(apoc_replacement_poc.text_split(diag.primary_diagnosis, ':'))), na))) AS primary_diagnosis,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(diag.primary_site, na))) AS primary_site
+          WITH f, na, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              primary_diagnoses: primary_diagnosis,
+              site: primary_site,
+              sites_gs: primary_site,
+              primary_diagnoses_sort: apoc_replacement_poc.text_join(primary_diagnosis, ''),
+              site_sort: apoc_replacement_poc.text_join(primary_site, '')
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)<--(i:image)
+          WITH f, na, opensearch_data, 
+            COALESCE(i.image_modality, na) AS image_modality,
+            COALESCE(i.organ_or_tissue, na) AS organ_or_tissue
+          WITH f, na, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              image_modality: image_modality,
+              organ_or_tissue: organ_or_tissue
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)<--(:image)<--(mm:MultiplexMicroscopy)
+          WITH f, na, opensearch_data, 
+            COALESCE(mm.tissue_fixative, na) AS tissue_fixative,
+            COALESCE(mm.imaging_assay_type, na) AS imaging_assay_type
+          WITH f, na, 
+            apoc_replacement_poc.merge(opensearch_data, {
+              tissue_fixative: tissue_fixative,
+              imaging_assay_type: imaging_assay_type
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)<--(pr:proteomic)
+          WITH f, na, opensearch_data, 
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.aliquot_id, na))) AS aliquot_ids,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.analytical_fractions, na))) AS analytical_fractions,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.instrument_make, na))) AS instrument_makes,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.proteomic_instrument_model, na))) AS proteomic_instrument_models,
+            apoc_replacement_poc.sort(COLLECT(DISTINCT COALESCE(pr.proteomic_design_description, na))) AS proteomic_design_descriptions
+          WITH f, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              aliquot_ids: aliquot_ids,
+              analytical_fractions: analytical_fractions,
+              instrument_makes: instrument_makes,
+              proteomic_instrument_models: proteomic_instrument_models,
+              proteomic_design_descriptions: proteomic_design_descriptions
+            }) AS opensearch_data
+          OPTIONAL MATCH (f)-->(af:file)
+          WITH f, na, opensearch_data,
+            COALESCE(af.file_name, na) AS associated_file,
+            CASE WHEN af.file_id IS NOT NULL THEN 'drs://nci-crdc.datacommons.io/' + af.file_id ELSE na END AS associated_drs_uri,
+            COALESCE(af.md5sum, na) AS associated_md5sum,
+            COALESCE(af.is_supplementary_file, na) AS associated_is_supplementary_file
+          WITH f, na,
+            apoc_replacement_poc.merge(opensearch_data, {
+              associated_file: associated_file,
+              associated_drs_uri: associated_drs_uri,
+              associated_md5sum: associated_md5sum,
+              associated_is_supplementary_file: associated_is_supplementary_file
+            }) AS opensearch_data
+          RETURN opensearch_data
+          ORDER BY opensearch_data.files
+        page_size: 40000
+  # Programs index
+  - index_name: programs
+    type: neo4j
+    # type mapping for each property of the index
+    mapping:
+      # program properties
+      program_name:
+        type: keyword
+      program_acronym:
+        type: keyword
+      program_short_description:
+        type: keyword
+      program_full_description:
+        type: keyword
+      program_external_url:
+        type: keyword
+      program_sort_order:
+        type: keyword
+      # global search
+      program_name_gs:
+        type: search_as_you_type
+      program_short_description_gs:
+        type: search_as_you_type
+      program_full_description_gs:
+        type: search_as_you_type
+      program_external_url_gs:
+        type: search_as_you_type
+      program_sort_order_gs:
+        type: search_as_you_type
+      type_gs:
+        type: search_as_you_type
+    # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
+    cypher_query: |
+      MATCH (p:program)
+      WITH p, 'program' as type_gs
+      SKIP $skip LIMIT $limit
+      RETURN
+        p.program_name AS program_name,
+        p.program_acronym AS program_acronym,
+        p.program_short_description AS program_short_description,
+        p.program_full_description AS program_full_description,
+        p.program_external_url AS program_external_url,
+        p.program_sort_order AS program_sort_order,
+        p.program_name AS program_name_gs,
+        p.program_short_description AS program_short_description_gs,
+        p.program_full_description AS program_full_description_gs,
+        p.program_external_url AS program_external_url_gs,
+        p.program_sort_order AS program_sort_order_gs,
+        type_gs
+  # Studies index
+  - index_name: studies
+    type: neo4j
+    # type mapping for each property of the index
+    mapping:
+      study_name:
+        type: keyword
+      study_code:
+        type: keyword
+      study_acronym:
+        type: keyword
+      study_description:
+        type: keyword
+      short_description:
+        type: keyword
+      study_external_url:
+        type: keyword
+      primary_investigator_name:
+        type: keyword
+      primary_investigator_email:
+        type: keyword
+      co_investigator_name:
+        type: keyword
+      co_investigator_email:
+        type: keyword
+      phs_accession:
+        type: keyword
+      bioproject_accession:
+        type: keyword
+      index_date:
+        type: keyword
+      cds_requestor:
+        type: keyword
+      funding_agency:
+        type: keyword
+      funding_source_program_name:
+        type: keyword
+      grant_id:
+        type: keyword
+      clinical_trial_system:
+        type: keyword
+      clinical_trial_identifier:
+        type: keyword
+      clinical_trial_arm:
+        type: keyword
+      organism_species:
+        type: keyword
+      adult_or_childhood_study:
+        type: keyword
+      data_types:
+        type: keyword
+      file_types:
+        type: keyword
+      data_access_level:
+        type: keyword
+      cds_primary_bucket:
+        type: keyword
+      cds_secondary_bucket:
+        type: keyword
+      cds_tertiary_bucket:
+        type: keyword
+      number_of_participants:
+        type: integer
+      number_of_samples:
+        type: integer
+      study_data_types:
+        type: keyword
+      file_types_and_format:
+        type: keyword
+      size_of_data_being_uploaded:
+        type: keyword
+      size_of_data_being_uploaded_unit:
+        type: keyword
+      size_of_data_being_uploaded_original:
+        type: keyword
+      size_of_data_being_uploaded_original_unit:
+        type: keyword
+      acl:
+        type: keyword
+      study_access:
+        type: keyword
+      study_version:
+        type: keyword
+      study_code_gs:
+        type: search_as_you_type
+      phs_accession_gs:
+        type: search_as_you_type
+      study_name_gs:
+        type: search_as_you_type
+      study_data_types_gs:
+        type: search_as_you_type
+    # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
+    cypher_query: |
+      MATCH (s:study)<--(:file)
+      WITH s, 'Not specified in data' AS na
+      WITH DISTINCT s, {
+        study_name: s.study_name,
+        study_code: s.study_name,
+        study_acronym: s.study_acronym,
+        study_description: s.study_description,
+        short_description: s.short_description,
+        study_external_url: s.study_external_url,
+        primary_investigator_name: s.primary_investigator_name,
+        primary_investigator_email: s.primary_investigator_email,
+        co_investigator_name: s.co_investigator_name,
+        co_investigator_email: s.co_investigator_email,
+        phs_accession: s.phs_accession,
+        bioproject_accession: s.bioproject_accession,
+        index_date: s.index_date,
+        cds_requestor: s.cds_requestor,
+        funding_agency: s.funding_agency,
+        funding_source_program_name: s.funding_source_program_name,
+        grant_id: s.grant_id,
+        clinical_trial_system: s.clinical_trial_system,
+        clinical_trial_identifier: s.clinical_trial_identifier,
+        clinical_trial_arm: s.clinical_trial_arm,
+        organism_species: s.organism_species,
+        adult_or_childhood_study: s.adult_or_childhood_study,
+        data_types: s.data_types,
+        file_types: s.file_types,
+        data_access_level: s.data_access_level,
+        cds_primary_bucket: s.cds_primary_bucket,
+        cds_secondary_bucket: s.cds_secondary_bucket,
+        cds_tertiary_bucket: s.cds_tertiary_bucket,
+        number_of_participants: s.number_of_participants,
+        number_of_samples: s.number_of_samples,
+        study_data_types: s.study_data_types,
+        file_types_and_format: CASE WHEN s.file_types_and_format = '[]' THEN na ELSE apoc_replacement_poc.text_replace(s.file_types_and_format,'\\[|\\]|\\"|\'','') END,
+        size_of_data_being_uploaded: s.size_of_data_being_uploaded,
+        size_of_data_being_uploaded_unit: s.size_of_data_being_uploaded_unit,
+        size_of_data_being_uploaded_original: s.size_of_data_being_uploaded_original,
+        size_of_data_being_uploaded_original_unit: s.size_of_data_being_uploaded_original_unit,
+        acl: CASE WHEN s.acl = '[]' THEN na ELSE apoc_replacement_poc.text_replace(s.acl,'\\[|\\]|\\"|\'','') END,
+        study_access: s.study_access,
+        study_version: CASE WHEN s.study_version = '[]' THEN na ELSE apoc_replacement_poc.text_replace(s.study_version,'\\[|\\]|\\"|\'','') END,
+        study_code_gs: s.study_name,
+        phs_accession_gs: s.phs_accession,
+        study_name_gs: s.study_name,
+        study_data_types_gs: s.data_types
+      } AS opensearch_data
+      SKIP $skip LIMIT $limit
+      OPTIONAL MATCH (s)<--(f:file)
+      OPTIONAL MATCH (f)-->(p:participant)
+      WITH s, 
+        apoc_replacement_poc.merge(opensearch_data, {
+          number_of_participants: COUNT(DISTINCT p)
+        }) AS opensearch_data
+      OPTIONAL MATCH (s)<--(f:file)
+      OPTIONAL MATCH (f)-->(p:participant)
+      OPTIONAL MATCH (p)<--(samp:sample)
+      WITH s, 
+        apoc_replacement_poc.merge(opensearch_data, {
+          number_of_samples: COUNT(DISTINCT samp)
+        }) AS opensearch_data
+      RETURN opensearch_data
+      ORDER BY opensearch_data.study_code
+  - index_name: diagnosis
+    type: neo4j
+    mapping:
+      diagnosis_id:
+        type: keyword
+      disease_type:
+        type: keyword
+      vital_status:
+        type: keyword
+      primary_diagnosis:
+        type: keyword
+      primary_site:
+        type: keyword
+      age_at_diagnosis:
+        type: keyword
+      tumor_grade:
+        type: keyword
+      tumor_stage_clinical_m:
+        type: keyword
+      tumor_stage_clinical_n:
+        type: keyword
+      tumor_stage_clinical_t:
+        type: keyword
+      morphology:
+        type: keyword
+      incidence_type:
+        type: keyword
+      progression_or_recurrence:
+        type: keyword
+      days_to_recurrence:
+        type: keyword
+      days_to_last_followup:
+        type: keyword
+      last_known_disease_status:
+        type: keyword
+      days_to_last_known_status:
+        type: keyword
+    cypher_query: |
+      MATCH (d:diagnosis)
+      WITH DISTINCT d, {
+        diagnosis_id: d.diagnosis_id,
+        disease_type: d.disease_type,
+        vital_status: d.vital_status,
+        primary_diagnosis: TRIM(LAST(apoc_replacement_poc.text_split(d.primary_diagnosis, ':'))),
+        primary_site: d.primary_site,
+        age_at_diagnosis: d.age_at_diagnosis,
+        tumor_grade: d.tumor_grade,
+        tumor_stage_clinical_m: d.tumor_stage_clinical_m,
+        tumor_stage_clinical_n: d.tumor_stage_clinical_n,
+        tumor_stage_clinical_t: d.tumor_stage_clinical_t,
+        morphology: d.morphology,
+        incidence_type: d.incidence_type,
+        progression_or_recurrence: d.progression_or_recurrence,
+        days_to_recurrence: d.days_to_recurrence,
+        days_to_last_followup: d.days_to_last_followup,
+        last_known_disease_status: d.last_known_disease_status,
+        days_to_last_known_status: d.days_to_last_known_status
+      } AS opensearch_data
+      SKIP $skip LIMIT $limit
+      RETURN opensearch_data
+  - index_name: genomic_info
+    type: neo4j
+    mapping:
+      library_id:
+        type: keyword
+      bases:
+        type: keyword
+      number_of_reads:
+        type: keyword
+      avg_read_length:
+        type: keyword
+      coverage:
+        type: keyword
+      reference_genome_assembly:
+        type: keyword
+      custom_assembly_fasta_file_for_alignment:
+        type: keyword
+      design_description:
+        type: keyword
+      library_strategy:
+        type: keyword
+      library_layout:
+        type: keyword
+      library_source_material:
+        type: keyword
+      library_source_molecule:
+        type: keyword
+      library_selection:
+        type: keyword
+      platform:
+        type: keyword
+      instrument_model:
+        type: keyword
+      sequence_alignment_software:
+        type: keyword
+    cypher_query: |
+      MATCH (g:genomic_info)
+      WITH DISTINCT g, {
+        library_id: g.library_id,
+        bases: g.bases,
+        number_of_reads: g.number_of_reads,
+        avg_read_length: g.avg_read_length,
+        coverage: g.coverage,
+        reference_genome_assembly: g.reference_genome_assembly,
+        custom_assembly_fasta_file_for_alignment: g.custom_assembly_fasta_file_for_alignment,
+        design_description: g.design_description,
+        library_strategy: g.library_strategy,
+        library_layout: g.library_layout,
+        library_source_material: g.library_source_material,
+        library_source_molecule: g.library_source_molecule,
+        library_selection: g.library_selection,
+        platform: g.platform,
+        instrument_model: g.instrument_model,
+        sequence_alignment_software: g.sequence_alignment_software
+      } AS opensearch_data
+      SKIP $skip LIMIT $limit
+      RETURN opensearch_data
+  - index_name: specimen
+    type: neo4j
+    mapping:
+      specimen_id:
+        type: keyword
+      participant:
+        type: keyword
+    cypher_query: |
+      MATCH (spec:specimen)
+      WITH DISTINCT spec, {
+        specimen_id: spec.specimen_id,
+        participant: spec.participant
+      } AS opensearch_data
+      SKIP $skip LIMIT $limit
+      RETURN opensearch_data
+  - index_name: treatment
+    type: neo4j
+    mapping:
+      treatment_id:
+        type: keyword
+      treatment_type:
+        type: keyword
+      treatment_outcome:
+        type: keyword
+      days_to_treatment:
+        type: keyword
+      therapeutic_agents:
+        type: keyword
+    cypher_query: |
+      MATCH (t:treatment)
+      WITH DISTINCT t, {
+        treatment_id: t.treatment_id,
+        treatment_type: t.treatment_type,
+        treatment_outcome: t.treatment_outcome,
+        days_to_treatment: t.days_to_treatment,
+        therapeutic_agents: t.therapeutic_agents
+      } AS opensearch_data
+      SKIP $skip LIMIT $limit
+      RETURN opensearch_data
+  - index_name: image
+    type: neo4j
+    mapping:
+      study_link_id:
+        type: keyword
+      de_identification_method_type:
+        type: keyword
+      de_identification_method_description:
+        type: keyword
+      de_identification_software:
+        type: keyword
+      license:
+        type: keyword
+      citation_or_DOI:
+        type: keyword
+      species:
+        type: keyword
+      image_modality:
+        type: keyword
+      imaging_equipment_manufacturer:
+        type: keyword
+      imaging_equipment_model:
+        type: keyword
+      imaging_sofware:
+        type: keyword
+      imaging_protocol:
+        type: keyword
+      organ_or_tissue:
+        type: keyword
+      performed_imaging_study_description:
+        type: keyword
+      performed_imaging_study_admittingDiagnosisCode:
+        type: keyword
+      performed_imaging_study_nonAcquisitionModalitiesInStudyCode:
+        type: keyword
+      performed_imaging_study_lossyImageCompressionIndicator:
+        type: keyword
+      performed_imaging_study_summary:
+        type: keyword
+      performed_imaging_study_primaryAnatomicSiteCode:
+        type: keyword
+      performed_imaging_study_acquisitionTypeCode:
+        type: keyword
+      performed_imaging_study_imageTypeCode:
+        type: keyword
+      performed_imaging_study_cardiacSynchronizationTechniqueCode:
+        type: keyword
+      performed_imaging_study_dataCollectionDiameter:
+        type: keyword
+      performed_imaging_study_respiratoryMotionTechniqueCode:
+        type: keyword
+      performed_imaging_study_bodyPositionCode:
+        type: keyword
+      performed_imaging_study_typeCode:
+        type: keyword
+      performed_imaging_study_algorithmCode:
+        type: keyword
+      performed_imaging_study_reconstructionFieldOfViewHeight:
+        type: keyword
+      performed_imaging_study_reconstructionFieldOfViewWidth:
+        type: keyword
+      performed_imaging_study_reconstructionDiameter:
+        type: keyword
+      performed_imaging_study_sliceThickness:
+        type: keyword
+      performed_imaging_study_reconstructionInterval:
+        type: keyword
+      longitudinal_temporal_event_type:
+        type: keyword
+      longitudinal_temporal_event_offset:
+        type: keyword
+      CTAquisitionProtocolElement_singleCollimationWidth:
+        type: keyword
+      CTAquisitionProtocolElement_totalCollimationWidth:
+        type: keyword
+      CTAquisitionProtocolElement_gantryDetectorTilt:
+        type: keyword
+      CTAquisitionProtocolElement_tableSpeed:
+        type: keyword
+      CTAquisitionProtocolElement_spiralPitchFactor:
+        type: keyword
+      CTAquisitionProtocolElement_ctdiVol:
+        type: keyword
+      CTAquisitionProtocolElement_ctdiPhantomTypeCode:
+        type: keyword
+      CTAquisitionProtocolElement_kVp:
+        type: keyword
+      CTAquisitionProtocolElement_exposureModulationType_Code:
+        type: keyword
+      CTImageReconstructionProtocolElement_convolutionKernel:
+        type: keyword
+      CTImageReconstructionProtocolElement_convolutionKernelGroupCode:
+        type: keyword
+      MRImageAcquisitionProtocolElement_echoPulseSequenceCategoryCode:
+        type: keyword
+      MRImageAcquisitionProtocolElement_diffusionBValue:
+        type: keyword
+      MRImageAcquisitionProtocolElement_diffusionDirectionalityCode:
+        type: keyword
+      MRImageAcquisitionProtocolElement_magneticFieldStrength:
+        type: keyword
+      MRImageAcquisitionProtocolElement_resonantNucleusCode:
+        type: keyword
+      MRImageAcquisitionProtocolElement_acquisitionContrastCode:
+        type: keyword
+      MRImageAcquisitionProtocolElement_inversionRecoveryIndicator:
+        type: keyword
+      MRImageAcquisitionProtocolElement_pulseSequenceName:
+        type: keyword
+      MRImageAcquisitionProtocolElement_multipleSpinEchoIndicator:
+        type: keyword
+      MRImageAcquisitionProtocolElement_phaseContrastIndicator:
+        type: keyword
+      MRImageAcquisitionProtocolElement_timeOfFlightContrastIndicator:
+        type: keyword
+      MRImageAcquisitionProtocolElement_arterialSpinLabelingContrastCode:
+        type: keyword
+      MRImageAcquisitionProtocolElement_steadyStatePulseSequenceCode:
+        type: keyword
+      MRImageAcquisitionProtocolElement_echoPlanarPulseSequenceIndicator:
+        type: keyword
+      MRImageAcquisitionProtocolElement_saturationRecoveryIndicator:
+        type: keyword
+      MRImageAcquisitionProtocolElement_spectrallySelectedSuppressionCode:
+        type: keyword
+      MRImageReconstructionProtocolElement_complexImageComponentCode:
+        type: keyword
+      PETImagingAcquisitionProtocolElement_gantryDetectorTilt:
+        type: keyword
+      Radiopharmaceutical_radionuclideCode:
+        type: keyword
+      acquisition_method_type:
+        type: keyword
+      tumor_tissue_type:
+        type: keyword
+      tissue_fixative:
+        type: keyword
+      embedding_medium:
+        type: keyword
+      staining_method:
+        type: keyword
+      objective:
+        type: keyword
+      nominal_magnification:
+        type: keyword
+      immersion:
+        type: keyword
+      lens_numerical_aperture:
+        type: keyword
+      working_distance:
+        type: keyword
+      imaging_assay_type:
+        type: keyword
+      pyramid:
+        type: keyword
+      physical_size_x:
+        type: keyword
+      physical_size_y:
+        type: keyword
+      physical_size_z:
+        type: keyword
+      size_c:
+        type: keyword
+      size_t:
+        type: keyword
+      size_x:
+        type: keyword
+      size_y:
+        type: keyword
+      size_z:
+        type: keyword
+      channel_metadata_filename:
+        type: keyword
+      channel_metadata_file_url_in_cds:
+        type: keyword
+      channel_id:
+        type: keyword
+      channel_name:
+        type: keyword
+      cycle_number:
+        type: keyword
+      sub_cycle_number:
+        type: keyword
+      target_name:
+        type: keyword
+      antibody_name:
+        type: keyword
+      rrid_identifier:
+        type: keyword
+      fluorophore:
+        type: keyword
+      clone:
+        type: keyword
+      lot:
+        type: keyword
+      vendor:
+        type: keyword
+      catalog_number:
+        type: keyword
+      excitation_wavelength:
+        type: keyword
+      emission_wavelength:
+        type: keyword
+      excitation_bandwidth:
+        type: keyword
+      emission_bandwidth:
+        type: keyword
+      metal_isotope_element:
+        type: keyword
+      oligo_barcode_upper_strand:
+        type: keyword
+      oligo_barcode_lower_strand:
+        type: keyword
+      diluation:
+        type: keyword
+      concentration:
+        type: keyword
+      passes_qc:
+        type: keyword
+      crdc_id:
+        type: keyword
+    cypher_query: |
+      MATCH (i:image)
+      WITH DISTINCT i, {
+        study_link_id: i.study_link_id,
+        de_identification_method_type: i.de_identification_method_type,
+        de_identification_method_description: i.de_identification_method_description,
+        de_identification_software: i.de_identification_software,
+        license: i.license,
+        citation_or_DOI: i.citation_or_DOI,
+        species: i.species,
+        image_modality: i.image_modality,
+        imaging_equipment_manufacturer: i.imaging_equipment_manufacturer,
+        imaging_equipment_model: i.imaging_equipment_model,
+        imaging_sofware: i.imaging_sofware,
+        imaging_protocol: i.imaging_protocol,
+        organ_or_tissue: i.organ_or_tissue,
+        performed_imaging_study_description: i.performed_imaging_study_description,
+        performed_imaging_study_admittingDiagnosisCode: i.performed_imaging_study_admittingDiagnosisCode,
+        performed_imaging_study_nonAcquisitionModalitiesInStudyCode: i.performed_imaging_study_nonAcquisitionModalitiesInStudyCode,
+        performed_imaging_study_lossyImageCompressionIndicator: i.performed_imaging_study_lossyImageCompressionIndicator,
+        performed_imaging_study_summary: i.performed_imaging_study_summary,
+        performed_imaging_study_primaryAnatomicSiteCode: i.performed_imaging_study_primaryAnatomicSiteCode,
+        performed_imaging_study_acquisitionTypeCode: i.performed_imaging_study_acquisitionTypeCode,
+        performed_imaging_study_imageTypeCode: i.performed_imaging_study_imageTypeCode,
+        performed_imaging_study_cardiacSynchronizationTechniqueCode: i.performed_imaging_study_cardiacSynchronizationTechniqueCode,
+        performed_imaging_study_dataCollectionDiameter: i.performed_imaging_study_dataCollectionDiameter,
+        performed_imaging_study_respiratoryMotionTechniqueCode: i.performed_imaging_study_respiratoryMotionTechniqueCode,
+        performed_imaging_study_bodyPositionCode: i.performed_imaging_study_bodyPositionCode,
+        performed_imaging_study_typeCode: i.performed_imaging_study_typeCode,
+        performed_imaging_study_algorithmCode: i.performed_imaging_study_algorithmCode,
+        performed_imaging_study_reconstructionFieldOfViewHeight: i.performed_imaging_study_reconstructionFieldOfViewHeight,
+        performed_imaging_study_reconstructionFieldOfViewWidth: i.performed_imaging_study_reconstructionFieldOfViewWidth,
+        performed_imaging_study_reconstructionDiameter: i.performed_imaging_study_reconstructionDiameter,
+        performed_imaging_study_sliceThickness: i.performed_imaging_study_sliceThickness,
+        performed_imaging_study_reconstructionInterval: i.performed_imaging_study_reconstructionInterval,
+        longitudinal_temporal_event_type: i.longitudinal_temporal_event_type,
+        longitudinal_temporal_event_offset: i.longitudinal_temporal_event_offset,
+        CTAquisitionProtocolElement_singleCollimationWidth: i.CTAquisitionProtocolElement_singleCollimationWidth,
+        CTAquisitionProtocolElement_totalCollimationWidth: i.CTAquisitionProtocolElement_totalCollimationWidth,
+        CTAquisitionProtocolElement_gantryDetectorTilt: i.CTAquisitionProtocolElement_gantryDetectorTilt,
+        CTAquisitionProtocolElement_tableSpeed: i.CTAquisitionProtocolElement_tableSpeed,
+        CTAquisitionProtocolElement_spiralPitchFactor: i.CTAquisitionProtocolElement_spiralPitchFactor,
+        CTAquisitionProtocolElement_ctdiVol: i.CTAquisitionProtocolElement_ctdiVol,
+        CTAquisitionProtocolElement_ctdiPhantomTypeCode: i.CTAquisitionProtocolElement_ctdiPhantomTypeCode,
+        CTAquisitionProtocolElement_kVp: i.CTAquisitionProtocolElement_kVp,
+        CTAquisitionProtocolElement_exposureModulationType_Code: i.CTAquisitionProtocolElement_exposureModulationType_Code,
+        CTImageReconstructionProtocolElement_convolutionKernel: i.CTImageReconstructionProtocolElement_convolutionKernel,
+        CTImageReconstructionProtocolElement_convolutionKernelGroupCode: i.CTImageReconstructionProtocolElement_convolutionKernelGroupCode,
+        MRImageAcquisitionProtocolElement_echoPulseSequenceCategoryCode: i.MRImageAcquisitionProtocolElement_echoPulseSequenceCategoryCode,
+        MRImageAcquisitionProtocolElement_diffusionBValue: i.MRImageAcquisitionProtocolElement_diffusionBValue,
+        MRImageAcquisitionProtocolElement_diffusionDirectionalityCode: i.MRImageAcquisitionProtocolElement_diffusionDirectionalityCode,
+        MRImageAcquisitionProtocolElement_magneticFieldStrength: i.MRImageAcquisitionProtocolElement_magneticFieldStrength,
+        MRImageAcquisitionProtocolElement_resonantNucleusCode: i.MRImageAcquisitionProtocolElement_resonantNucleusCode,
+        MRImageAcquisitionProtocolElement_acquisitionContrastCode: i.MRImageAcquisitionProtocolElement_acquisitionContrastCode,
+        MRImageAcquisitionProtocolElement_inversionRecoveryIndicator: i.MRImageAcquisitionProtocolElement_inversionRecoveryIndicator,
+        MRImageAcquisitionProtocolElement_pulseSequenceName: i.MRImageAcquisitionProtocolElement_pulseSequenceName,
+        MRImageAcquisitionProtocolElement_multipleSpinEchoIndicator: i.MRImageAcquisitionProtocolElement_multipleSpinEchoIndicator,
+        MRImageAcquisitionProtocolElement_phaseContrastIndicator: i.MRImageAcquisitionProtocolElement_phaseContrastIndicator,
+        MRImageAcquisitionProtocolElement_timeOfFlightContrastIndicator: i.MRImageAcquisitionProtocolElement_timeOfFlightContrastIndicator,
+        MRImageAcquisitionProtocolElement_arterialSpinLabelingContrastCode: i.MRImageAcquisitionProtocolElement_arterialSpinLabelingContrastCode,
+        MRImageAcquisitionProtocolElement_steadyStatePulseSequenceCode: i.MRImageAcquisitionProtocolElement_steadyStatePulseSequenceCode,
+        MRImageAcquisitionProtocolElement_echoPlanarPulseSequenceIndicator: i.MRImageAcquisitionProtocolElement_echoPlanarPulseSequenceIndicator,
+        MRImageAcquisitionProtocolElement_saturationRecoveryIndicator: i.MRImageAcquisitionProtocolElement_saturationRecoveryIndicator,
+        MRImageAcquisitionProtocolElement_spectrallySelectedSuppressionCode: i.MRImageAcquisitionProtocolElement_spectrallySelectedSuppressionCode,
+        MRImageReconstructionProtocolElement_complexImageComponentCode: i.MRImageReconstructionProtocolElement_complexImageComponentCode,
+        PETImagingAcquisitionProtocolElement_gantryDetectorTilt: i.PETImagingAcquisitionProtocolElement_gantryDetectorTilt,
+        Radiopharmaceutical_radionuclideCode: i.Radiopharmaceutical_radionuclideCode,
+        acquisition_method_type: i.acquisition_method_type,
+        tumor_tissue_type: i.tumor_tissue_type,
+        tissue_fixative: i.tissue_fixative,
+        embedding_medium: i.embedding_medium,
+        staining_method: i.staining_method,
+        objective: i.objective,
+        nominal_magnification: i.nominal_magnification,
+        immersion: i.immersion,
+        lens_numerical_aperture: i.lens_numerical_aperture,
+        working_distance: i.working_distance,
+        imaging_assay_type: i.imaging_assay_type,
+        pyramid: i.pyramid,
+        physical_size_x: i.physical_size_x,
+        physical_size_y: i.physical_size_y,
+        physical_size_z: i.physical_size_z,
+        size_c: i.size_c,
+        size_t: i.size_t,
+        size_x: i.size_x,
+        size_y: i.size_y,
+        size_z: i.size_z,
+        channel_metadata_filename: i.channel_metadata_filename,
+        channel_metadata_file_url_in_cds: i.channel_metadata_file_url_in_cds,
+        channel_id: i.channel_id,
+        channel_name: i.channel_name,
+        cycle_number: i.cycle_number,
+        sub_cycle_number: i.sub_cycle_number,
+        target_name: i.target_name,
+        antibody_name: i.antibody_name,
+        rrid_identifier: i.rrid_identifier,
+        fluorophore: i.fluorophore,
+        clone: i.clone,
+        lot: i.lot,
+        vendor: i.vendor,
+        catalog_number: i.catalog_number,
+        excitation_wavelength: i.excitation_wavelength,
+        emission_wavelength: i.emission_wavelength,
+        excitation_bandwidth: i.excitation_bandwidth,
+        emission_bandwidth: i.emission_bandwidth,
+        metal_isotope_element: i.metal_isotope_element,
+        oligo_barcode_upper_strand: i.oligo_barcode_upper_strand,
+        oligo_barcode_lower_strand: i.oligo_barcode_lower_strand,
+        diluation: i.diluation,
+        concentration: i.concentration,
+        passes_qc: i.passes_qc,
+        crdc_id: i.crdc_id
+      } AS opensearch_data
+      SKIP $skip LIMIT $limit
+      RETURN opensearch_data
+  - index_name: version
+    type: neo4j
+    mapping:
+      data_version_id:
+        type: keyword
+      data_version:
+        type: keyword
+      datetime:
+        type: keyword
+      model_version:
+        type: keyword
+      description:
+        type: keyword
+    cypher_query: |
+      MATCH (dv: version)
+      WITH {
+          data_version_id: dv.data_version_id,
+          data_version: dv.data_version,
+          datetime: dv.datetime,
+          model_version: dv.model_version,
+          description: dv.description
+        } AS opensearch_data
+      RETURN opensearch_data
+  # Subject IDs index
+  - index_name: subject_ids
+    type: neo4j
+    # type mapping for each property of the index
+    mapping:
+      phs_accession:
+        type: keyword
+      subject_id:
+        type: keyword
+      # subject_ids must be converted into lower case
+      subject_ids:
+        type: keyword
+    # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
+    cypher_query: |
+      MATCH (s:study)<--(:file)-->(p:participant)
+      WITH DISTINCT p, s
+      SKIP $skip LIMIT $limit
+      RETURN
+        s.phs_accession AS phs_accession,
+        p.participant_id AS subject_id,
+        toLower(p.participant_id) AS subject_ids
+  - index_name: program_detail
+    type: neo4j
+    # type mapping for each property of the index
+    mapping:
+      program:
+        type: keyword
+      program_name:
+        type: keyword
+      program_url:
+        type: keyword
+      program_short_description:
+        type: keyword
+      num_studies:
+        type: integer
+      num_participants:
+        type: integer
+      num_files:
+        type: integer
+      num_samples:
+        type: integer
+      num_disease_sites:
+        type: integer
+      study_participants:
+        type: nested
+        properties:
+          group:
+            type: keyword
+          subjects:
+            type: integer
+      studies:
+        type: nested
+        properties:
+          accession:
+            type: keyword
+          study_access:
+            type: keyword
+          study_version:
+            type: keyword
+          study_data_types:
+            type: keyword
+          study_name:
+            type: keyword
+          study_description:
+            type: keyword
+          short_description:
+            type: keyword
+          num_participants:
+            type: integer
+          num_samples:
+            type: integer
+          num_files:
+            type: integer
+    # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
+    cypher_query: |
+      MATCH (pr:program)
+      OPTIONAL MATCH (pr)<--(s:study)
+      WITH s
+      OPTIONAL MATCH (s)<--(p:participant)
+      WITH s, count(distinct p) as num_participants, 'Not specified in data' AS na
+      WITH s,
+          {
+              group: s.study_name,
+              subjects: num_participants
+          } AS study_participants,
+          {
+              accession: s.phs_accession,
+              study_access: s.study_access,
+              study_version: CASE WHEN s.study_version = '[]' THEN na ELSE apoc_replacement_poc.text_replace(s.study_version,'\\[|\\]|\\"|\'','') END,
+              study_data_types: s.study_data_types,
+              study_name: s.study_name,
+              study_description: s.study_description,
+              short_description: s.short_description,
+              num_participants: num_participants
+          } AS studies
+      OPTIONAL MATCH (s)<--(:participant)<--(samp:sample)
+      WITH s, study_participants,
+          apoc_replacement_poc.merge(studies, {
+              num_samples: count(distinct samp)
+          }) AS studies
+      OPTIONAL MATCH (s)<--(f:file)
+      WITH s, study_participants,
+          apoc_replacement_poc.merge(studies, {
+              num_files: count(distinct f)
+          }) AS studies
+      OPTIONAL MATCH (pr:program)<--(s)
+      WITH pr, {
+          program: pr.program_acronym,
+          program_name: pr.program_name,
+          program_url: pr.program_external_url,
+          program_short_description: pr.program_short_description,
+          num_studies: COUNT(DISTINCT s),
+          studies: collect(distinct studies),
+          study_participants: collect(distinct study_participants)
+      } as output
+      OPTIONAL MATCH (pr)<--(:study)<--(p:participant)
+      WITH pr,
+          apoc_replacement_poc.merge(output, {
+              num_participants: count(distinct p)
+          }) as output
+      OPTIONAL MATCH (pr)<--(:study)<--(:participant)<--(samp:sample)
+      WITH pr,
+          apoc_replacement_poc.merge(output, {
+              num_samples: count(distinct samp)
+          }) as output
+      OPTIONAL MATCH (pr)<--(:study)<--(f:file)
+      WITH pr,
+          apoc_replacement_poc.merge(output, {
+              num_files: count(distinct f)
+          }) as output
+      OPTIONAL MATCH (pr)<--(:study)<--(:participant)<--(diag:diagnosis)
+      WITH pr,
+          apoc_replacement_poc.merge(output, {
+              num_disease_sites: COUNT(DISTINCT diag.primary_site)
+          }) as output
+      RETURN 
+        output.program AS program,
+        output.program_name AS program_name,
+        output.program_url AS program_url,
+        output.program_short_description AS program_short_description,
+        output.num_studies AS num_studies,
+        output.num_participants AS num_participants,
+        output.num_files AS num_files,
+        output.num_samples AS num_samples,
+        output.num_disease_sites AS num_disease_sites,
+        output.study_participants AS study_participants,
+        output.studies AS studies
+  - index_name: program_list
+    type: neo4j
+    # type mapping for each property of the index
+    mapping:
+      acronym:
+        type: keyword
+      name:
+        type: keyword
+      website:
+        type: keyword
+      num_studies:
+        type: keyword
+    # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
+    cypher_query: |
+      MATCH (pr:program)
+      OPTIONAL MATCH (pr)<--(s:study)
+      RETURN DISTINCT
+        pr.program_acronym AS acronym,
+        pr.program_name AS name,
+        pr.program_external_url AS website,
+        COUNT(DISTINCT s) AS num_studies
+  - index_name: study_list
+    type: neo4j
+    mapping:
+      phs_accession:
+        type: keyword
+      study_name:
+        type: keyword
+      data_type:
+        type: keyword
+      study_access:
+        type: keyword
+      numberOfSubjects:
+        type: keyword
+      numberOfFiles:
+        type: keyword
+      study_version:
+        type: keyword
+    cypher_query: |
+      MATCH (s:study)
+      OPTIONAL MATCH (p:participant)-->(s)
+      WITH s, count(distinct p) AS num_participants
+      OPTIONAL MATCH (f:file)-->(s)
+      WITH s, num_participants, count(distinct f) as num_files, 'Not specified in data' AS na
+      RETURN 
+        s.phs_accession AS phs_accession,
+        s.study_name AS study_name,
+        s.study_data_types AS data_type,
+        s.study_access AS study_access,
+        num_participants AS numberOfSubjects,
+        num_files AS numberOfFiles,
+        CASE WHEN s.study_version = '[]' THEN na ELSE apoc_replacement_poc.text_replace(s.study_version,'\\[|\\]|\\"|\'','') END AS study_version
+  - index_name: study_detail
+    type: neo4j
+    mapping:
+      study_name:
+        type: keyword
+      phs_accession:
+        type: keyword
+      study_acronym:
+        type: keyword
+      study_description:
+        type: keyword
+      study_version:
+        type: keyword
+      study_access:
+        type: keyword
+      data_types:
+        type: keyword
+      study_external_url:
+        type: keyword
+      numberOfSubjects:
+        type: keyword
+      numberOfSamples:
+        type: keyword
+      numberOfDiseaseSites:
+        type: keyword
+      numberOfFiles:
+        type: keyword
+    cypher_query: |
+      MATCH (s:study)
+      WITH s, 'Not specified in data' AS na
+      WITH s, {
+          study_name: s.study_name,
+          phs_accession: s.phs_accession,
+          study_acronym: s.study_acronym,
+          study_description: s.study_description,
+          data_types: s.study_data_types,
+          study_external_url: s.study_external_url,
+          study_version: CASE WHEN s.study_version = '[]' THEN na ELSE apoc_replacement_poc.text_replace(s.study_version,'\\[|\\]|\\"|\'','') END,
+          study_access: s.data_access_level
+      } AS opensearch_data
+      OPTIONAL MATCH (s)<--(p:participant)
+      WITH s,
+          apoc_replacement_poc.merge(opensearch_data, {
+              numberOfSubjects: COUNT(DISTINCT p)
+          }) AS opensearch_data
+      OPTIONAL MATCH (s)<--(:participant)<--(samp:sample)
+      WITH s,
+          apoc_replacement_poc.merge(opensearch_data, {
+              numberOfSamples: COUNT(DISTINCT samp)
+          }) AS opensearch_data
+      OPTIONAL MATCH (s)<--(:participant)<--(diag:diagnosis)
+      WITH s,
+          apoc_replacement_poc.merge(opensearch_data, {
+              numberOfDiseaseSites: COUNT(DISTINCT diag.primary_site)
+          }) AS opensearch_data
+      OPTIONAL MATCH (s)<--(f:file)
+      WITH s,
+          apoc_replacement_poc.merge(opensearch_data, {
+              numberOfFiles: COUNT(DISTINCT f)
+          }) AS opensearch_data
+      RETURN opensearch_data
+  - index_name: subject_detail
+    type: neo4j
+    mapping:
+      subject_id:
+        type: keyword
+      study_acronym:
+        type: keyword
+      study_name:
+        type: keyword
+      sex:
+        type: keyword
+      site:
+        type: keyword
+      numberOfSamples:
+        type: keyword
+      numberOfDiseaseSites:
+        type: keyword
+      numberOfFiles:
+        type: keyword
+      files:
+        type: nested
+        properties:
+          file_id:
+            type: keyword
+          file_name:
+            type: keyword
+          file_type:
+            type: keyword
+          file_description:
+            type: keyword
+          file_size:
+            type: keyword
+          md5sum:
+            type: keyword
+          file_url_in_cds:
+            type: keyword
+          experimental_strategy_and_data_subtypes:
+            type: keyword
+      samples:
+        type: nested
+        properties:
+          sample_id:
+            type: keyword
+          sample_type:
+            type: keyword
+          sample_tumor_status:
+            type: keyword
+          sample_anatomic_site:
+            type: keyword
+          sample_age_at_collection:
+            type: integer
+          derived_from_specimen:
+            type: keyword
+          biosample_accession:
+            type: keyword
+    cypher_query: |
+      MATCH (p:participant)
+      WITH p
+      SKIP $skip LIMIT $limit
+      OPTIONAL MATCH (s:study)<--(p)
+      WITH p, {
+          subject_id: p.participant_id,
+          study_acronym: s.study_acronym,
+          study_name: s.study_name,
+          sex: p.sex
+      } AS opensearch_data
+      OPTIONAL MATCH (p)<--(samp:sample)
+      WITH p, samp, opensearch_data, COLLECT(DISTINCT {
+              sample_id: samp.sample_id,
+              sample_type: TRIM(LAST(apoc_replacement_poc.text_split(samp.sample_type, ':'))),
+              sample_tumor_status: samp.sample_tumor_status,
+              sample_anatomic_site: TRIM(LAST(apoc_replacement_poc.text_split(samp.sample_anatomic_site, ':'))),
+              sample_age_at_collection: samp.sample_age_at_collection,
+              derived_from_specimen: samp.derived_from_specimen,
+              biosample_accession: samp.biosample_accession
+            }) as samp_then
+      WITH p,
+          apoc_replacement_poc.merge(opensearch_data, {
+              site: COLLECT(DISTINCT TRIM(LAST(apoc_replacement_poc.text_split(samp.sample_anatomic_site, ':')))),
+              samples: CASE WHEN samp IS NOT NULL THEN samp_then ELSE NULL END
+          }) AS opensearch_data
+      OPTIONAL MATCH (p)<--(diag:diagnosis)
+      WITH p,
+          apoc_replacement_poc.merge(opensearch_data, {
+              numberOfDiseaseSites: COUNT(DISTINCT diag.primary_site)
+          }) AS opensearch_data
+      OPTIONAL MATCH (p)<--(:sample)<--(f:file)
+      WITH p, f, opensearch_data, COLLECT(DISTINCT {
+              file_id: f.file_id,
+              file_name: f.file_name,
+              file_type: f.file_type,
+              file_description: f.file_description,
+              file_size: f.file_size,
+              md5sum: f.md5sum,
+              file_url_in_cds: f.file_url_in_cds,
+              experimental_strategy_and_data_subtypes: f.experimental_strategy_and_data_subtypes
+            }) as f_then
+      WITH p,
+        apoc_replacement_poc.merge(opensearch_data, {
+            files: CASE WHEN f IS NOT NULL THEN f_then ELSE NULL END
+        }) AS opensearch_data
+      WITH p, 
+        apoc_replacement_poc.merge(opensearch_data, {
+            numberOfFiles: size(opensearch_data.files),
+            numberOfSamples: COUNT(DISTINCT opensearch_data.samples)
+        }) AS opensearch_data
+      RETURN opensearch_data
+  - index_name: subject_ids_list
+    type: neo4j
+    # type mapping for each property of the index
+    mapping:
+      subjectIds:
+        type: keyword
+    # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
+    cypher_query: |
+      MATCH (p:participant)-->(s:study)
+      RETURN
+      COLLECT(DISTINCT p.participant_id) AS subjectIds
+  # Proteomics Index
+  - index_name: proteomics
+    type: neo4j
+    # type mapping for each property of the index
+    mapping:
+      # Filter properties
+      aliquot_id:
+        type: keyword
+      analytical_fractions:
+        type: keyword
+      instrument_make:
+        type: keyword
+      proteomic_instrument_model:
+        type: keyword
+      proteomic_design_description:
+        type: keyword
+    # Cypher query will be used to retrieve data from Neo4j, and index into Elasticsearch
+    cypher_queries:
+      - query: |
+          MATCH (pr:proteomic)
+          WITH DISTINCT pr
+          SKIP $skip LIMIT $limit
+          WITH {
+            aliquot_id: pr.aliquot_id,
+            analytical_fractions: pr.analytical_fractions,
+            instrument_make: pr.instrument_make,
+            proteomic_instrument_model: pr.proteomic_instrument_model,
+            proteomic_design_description: pr.proteomic_design_description
+          } AS opensearch_data
+          RETURN opensearch_data
+          ORDER BY opensearch_data.aliquot_id
+        page_size: 50000
+  # About Page index
+  - index_name: about_page
+    type: about_file
+    # type mapping for each property of the index
+    mapping:
+      page:
+        type: search_as_you_type
+      title:
+        type: search_as_you_type
+      primaryContentImage:
+        type: text
+      content:
+        type: object
+  # Model nodes index
+  - index_name: model_nodes
+    type: model
+    subtype: node
+    # type mapping for each property of the index
+    mapping:
+      node:
+        type: search_as_you_type
+      node_kw:
+        type: keyword
+  # Model properties index
+  - index_name: model_properties
+    type: model
+    subtype: property
+    # type mapping for each property of the index
+    mapping:
+      node:
+        type: search_as_you_type
+      property:
+        type: search_as_you_type
+      property_kw:
+        type: keyword
+      property_description:
+        type: search_as_you_type
+      property_required:
+        type: search_as_you_type
+      property_type:
+        type: search_as_you_type
+  # Model values index
+  - index_name: model_values
+    type: model
+    subtype: value
+    # type mapping for each property of the index
+    mapping:
+      node:
+        type: search_as_you_type
+      property:
+        type: search_as_you_type
+      property_description:
+        type: search_as_you_type
+      property_required:
+        type: search_as_you_type
+      property_type:
+        type: search_as_you_type
+      value:
+        type: search_as_you_type
+      value_kw:
+        type: keyword
