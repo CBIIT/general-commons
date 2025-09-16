@@ -1,0 +1,165 @@
+import { withStyles } from '@material-ui/core';
+import { ArrowDropDown } from '@material-ui/icons'; 
+import clsx from 'clsx'; 
+import React, { useState, useEffect } from 'react';
+import jsonLink from '../../bento/releaseNotesData';
+import styles from './styles';
+import ReleaseNotes from './components/releaseNotes';
+import Stats from '../../components/Stats/AllStatsController';
+import { Typography } from '../../components/Wrappers/Wrappers';
+import usePageTitle from '../../components/Analytics/usePageTitle';
+
+const dataReleaseURL = jsonLink + 'DataReleaseNotes.json';
+const softwareReleaseURL = jsonLink + 'SoftwareReleaseNotes.json';
+
+const ReleaseVersions = (props) => {
+  usePageTitle("Release Notes");
+  const { classes } = props;
+  const [dataReleaseJsonData, setDataReleaseJsonData] = useState(null);
+  const [softwareReleaseJsonData, setSoftwareReleaseJsonData] = useState(null);
+  const [releaseNoteDetails, setReleaseNoteDetails] = useState(null);
+  const [releaseNoteType, setReleaseNoteType] = useState(null);
+  const [expandedSection, setExpandedSection] = useState(null);
+  const [expandedYear, setExpandedYear] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchDataReleaseData = async () => {
+      try {
+        const response = await fetch(dataReleaseURL);
+        const data = await response.json();
+        setDataReleaseJsonData(data);
+        setReleaseNoteDetails(data.VERSIONS[0]); // Set initial version details
+        setReleaseNoteType('data');
+      } catch (error) {
+        setError(error);
+        console.error('Error fetching Data Release JSON data:', error);
+      }
+    };
+
+    const fetchSoftwareReleaseData = async () => {
+      try {
+        const response = await fetch(softwareReleaseURL);
+        const data = await response.json();
+        setSoftwareReleaseJsonData(data);
+      } catch (error) {
+        setError(error);
+        console.error('Error fetching Software Release JSON data:', error);
+      }
+    };
+
+    fetchDataReleaseData();
+    fetchSoftwareReleaseData();
+  }, []); 
+
+  const handleReleaseNoteClick = (row, type) => {
+    setReleaseNoteDetails(row);
+    setReleaseNoteType(type);
+  };
+
+  const versionsByYear = dataReleaseJsonData ? dataReleaseJsonData.VERSIONS.reduce((acc, row) => {
+    const year = new Date(row.releaseDate).getFullYear();
+    if (!acc[year]) acc[year] = [];
+    acc[year].push(row);
+    return acc;
+  }, {}) : {};
+
+  const handleYearClick = (year) => {
+    setExpandedYear(prevYear => (prevYear === year ? null : year));
+  };
+
+  const renderRow = (type, row, idx = null, expansionRequirement = true) => {
+    return (
+      <div
+        key={row.id}
+        onClick={() => handleReleaseNoteClick(row, type)}
+        className={clsx(
+          releaseNoteDetails &&
+            releaseNoteDetails.id &&
+            releaseNoteDetails.id === row.id
+            ? classes[`${type}SelectedRow`]
+            : classes.unselectedRow,
+          expandedSection === type && expansionRequirement
+            ? classes.visibleRow
+            : classes.hiddenRow,
+          idx !== null ? (idx % 2 === 0 ? classes.evenRow : classes.oddRow) : "",
+        )}
+      >
+        <div className={classes.dataVersion}>
+          <span className={classes.version}>{"Version: " + row.versionNumber}</span>
+        </div>
+        <div className={classes[`${type}Date`]}>{"(" + row.releaseDate + ")"}</div>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <Stats />
+      <div className={classes.container}>
+        {dataReleaseJsonData && softwareReleaseJsonData && (
+          <>
+            <h1>{dataReleaseJsonData.HEADING}</h1>
+            <div className={classes.wrapper}>
+              <div className={classes.tableWrapper}>
+                <div className={classes.tableExternal}>
+                  <div className={classes.topBorder}/>
+                  <div className={classes.tableInside}>
+                    <div className={classes.tableHead} onClick={() => setExpandedSection(expandedSection === 'data' ? null : 'data')}>
+                      <span className={clsx(classes.releaseHeading, classes.dataHeading)}>  
+                        {"DATA RELEASE NOTES"} 
+                        <ArrowDropDown className={clsx(classes.releaseDropdown, expandedSection === 'data' ? classes.rightsideUp : classes.upsideDown)}/> 
+                      </span>
+                    </div>
+                    <div className={classes.dataRows}>
+                      {Object.keys(versionsByYear).sort((a, b) => b - a).map((year) => (
+                        <div key={year} className={expandedSection === 'data' ? classes.yearSection : ''}>
+                          <div className={clsx(classes.yearHeader, expandedSection === 'data' ? classes.visibleYear : classes.hiddenYear)} onClick={() => handleYearClick(year)}>
+                            <span>{year}</span>
+                            <ArrowDropDown className={clsx(classes.yearDropdown, expandedYear === year ? classes.rightsideUp : classes.upsideDown)} />
+                          </div>
+                          <div>
+                            {versionsByYear[year]
+                              .sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate))
+                              .map((row, idx) => (
+                                renderRow("data", row, idx, expandedYear === year)
+                              ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className={classes.softwareBorder}/>
+                  <div className={classes.tableOutside}>
+                    <div className={classes.tableHead} onClick={() => setExpandedSection(expandedSection === 'software' ? null : 'software')}>
+                        <span className={clsx(classes.releaseHeading, classes.softwareHeading)}>  
+                          {"SOFTWARE RELEASE NOTES"} 
+                          <ArrowDropDown className={clsx(classes.releaseDropdown, expandedSection === 'software' ? classes.rightsideUp : classes.upsideDown)}/> 
+                        </span>
+                      </div>
+                      <div className={classes.softwareRows}>
+                        {softwareReleaseJsonData.VERSIONS.map((row, idx) => (
+                          renderRow("software", row)
+                        ))}
+                      </div>
+                  </div>
+                </div>
+                <hr className={classes.horizontalLine} />
+              </div>
+              {releaseNoteDetails && <ReleaseNotes releaseNoteDetails={releaseNoteDetails} releaseNoteType={releaseNoteType}/>}
+            </div>
+          </>
+        )}
+        {
+          error && (
+            <Typography variant="h5" color="error" size="sm">
+              {`An error has occurred in loading release notes data: ${error}`}
+            </Typography>
+          )
+        }
+      </div>
+    </>
+  );
+};
+
+export default withStyles(styles)(ReleaseVersions);

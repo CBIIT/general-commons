@@ -1,0 +1,85 @@
+- page: '/bento'
+  title: "Bento"
+  primaryContentImage: <%= PURPOSE_CONTENT_IMAGE %>
+  content:
+    - paragraph: "Bento is an open source framework developed by the Frederick National Laboratory for Cancer Research to support data sharing. It provides a structure to enable groups to quickly stand up and then configure a data sharing environment for life science data - groups can use Bento to share data amongst themselves or with a larger community. Bento's reference implementation contains a data model that is compatible with the Cancer Research Data Commons' Harmonized model (CRDC-H) such that Bento instances can be connected into and inter-operate with the CRDC. Users can customize the data model for their own needs. Bento also contains a User Interface and an API for programmatic access."
+    - paragraph: "$$*CONTACT:*$$ bento-help@nih.gov"
+- page: "/resources"
+  primaryContentImage: <%= CDS_CONTENT_IMAGE %>
+  title: "Data Model"
+  content:
+    - paragraph: "The model works with various data types, offering robust yet flexible infrastructure while adhering to FAIR (Findability, Accessibility, Interoperability, and Reuse) data principles. CRDC Data Submission portal continues to evolve to meet the data needs for various NCI-funded programs."
+    - paragraph: "All code necessary to use the $$[Bento platform](https://bento-tools.org/#/ title: 'Visit the Bento platform')$$ on which the CRDC Data Submission portal is built is provided in the form of Docker containers. However, the Bento code is also available to the public for research and forking and pull requests. The General Commons (GC) model can be viewed under the CRDC Data Submissions:  $$[https://hub.datacommons.cancer.gov/model-navigator/GC/latest](https://hub.datacommons.cancer.gov/model-navigator/GC/latest title: 'Visit the GC-model on CRDC')$$."
+  secondaryZoomImageTitle: "The Core Data Model"
+  secondaryZoomImage: 'https://raw.githubusercontent.com/CBIIT/cds-model/main/docs/model-desc/cds-model.svg'
+- page: '/graphql'
+  title: "Query the GC Portal Using GraphQL"
+  imageLocation: "hidden"
+  content:
+    - paragraph: "Users can search through all the GC portal using GraphQL queries. There are several queries that users can utilize from the tutorial to $$[Query GC Database](<%= QUERY_GC_DATABASE_PDF %> title: 'Download the Query GC Database PDF')$$"
+  components: ["GraphqlClient"]
+- page: '/GeneralCommons'
+  title: "About The General Commons"
+  primaryContentImage: <%= CDS_CONTENT_IMAGE %>
+  actionTitle: 'ALSO AVAILABLE:'
+  actionButtonLabel: 'DATA MODEL'
+  actionLink: '/resources'
+  content:
+    - paragraph: "$$#About GC#$$"
+    - paragraph: "The General Commons (GC), formerly Cancer Data Service (CDS) is one of the Data Commons under the Cancer Research Data Commons (CRDC) data ecosystem. GC continues to evolve as a data-type agnostic data commons, to meet the data needs of various NCI-funded programs."
+    - paragraph: "The GC provides secure storage and data sharing capabilities, on the cloud, for studies that fall under the following categories:"
+    - listWithBullets: 
+      - "Studies with data that do not match the requirements of the existing CRDC Data Commons (Genomic Data Commons, Proteomic Data Commons, Imaging Data Commons etc.)"
+      - "Studies with data that do not fit current data type criteria and/or the required metadata for any CRDC data commons"
+    - paragraph: "The GC is home to a combination of open and controlled access (sensitive) data. The GC portal is accessible to all users for searching data across all studies which have submitted data to GC.  This requires no login and so allows any users to check if the GC has the data of their interest before going through the process of requesting access. To access sensitive data (controlled access data) in the GC, users must obtain authorization through the NCBI’s $$[dbGaP](https://www.ncbi.nlm.nih.gov/gap/ title: 'Visit the NCBI website')$$ system. Open access data is publicly accessible; it does not require any authorization."
+    - paragraph: "General Commons is a cloud repository and makes data available on the NCI’s Cloud resource, the Cancer Genomics Cloud by Velsera. The GC portal does not facilitate direct downloads of data from the cloud. However, programs/initiatives willing to fund the download costs for their users with approved dbGaP access to the data can reach out to the $$[CRDC helpdesk](NCICRDC@mail.nih.gov title: 'Email the CRDC helpdesk')$$ for further information."
+    - paragraph: ""
+    - paragraph: "$$#Accessing and Analyzing GC Data#$$"
+    - paragraph: ""
+    - listWithBullets:
+      - "The GC portal offers users a variety of ways to search the data. Users can create cohorts and download a data manifest which has associated metadata. Researchers can explore the data hosted in GC using the following different methods: Search by participant IDs: upload a list of known IDs to get the metadata associated with those participants"
+      - "Search using filters such as Study, Experimental Strategy, Tumor, Sex, and File Type etc."
+      - "Search using a programmatic approach by querying the entire GC schema using the GraphQL endpoint"
+    - paragraph: "Once a researcher has filtered down to a cohort of interest (files, samples, Participants etc.), that set can be added to the \"shopping cart,\" from which a manifest can be exported/downloaded. The exported/downloaded manifest will contain all the information needed to access. The actual data files for further analysis on the Cancer Genomics Cloud by $$[Velsera](https://www.cancergenomicscloud.org/ title: 'Visit the Velsera website')$$, which is one of the NCI's Cloud Resources."
+    - paragraph: "The GC portal also provides additional information and descriptions about the studies and programs that have deposited data in the GC. These are linked to the search page making it easy to find all the data from a specific study."
+    - paragraph: ""
+    - paragraph: "$$#About the NCI's Cloud Resources#$$"
+    - paragraph: "The NCI Cloud Resources are cloud platforms for analyzing data hosted in CRDC. Data hosted in GC is made accessible on the Cancer Genomics Cloud (CGC) by Velsera. This cloud-based platform eliminates the need for researchers to download and store extremely large data sets by allowing them work in a secure cloud environment that provides on-demand computational capacity.  The NCI Cloud Resources, including CGC, make it possible to use publicly available analytical tools applied to the selected data, or to bring custom analytical tools to their secure environments. The NCI Cloud Resources also make it` possible to upload private data for secure comparative analysis."
+    - paragraph: "Manifests generated on the GC portal can be exported and uploaded on to the CGC and the files accessed in CGC’s private workspaces. The Data can then be analyzed using more than 200 preinstalled, curated bioinformatics tools and workflows. Researchers can also extend the functionality of the platform by adding their own data and tools via an intuitive software development kit."
+    - paragraph: ""
+    - listWithBullets:
+      - "Read more about tools for data analysis on the $$[Velsera website](https://docs.cancergenomicscloud.org/docs/workflows-and-tools title: 'Visit the Velsera website')$$"
+      - "$$[Learn more about importing files from GC Portal to Velsera](<%= USER_GUIDE_PDF %> title: 'Download the User Guide PDF')$$"
+- page: '/cloudresources'
+  title: "NCI's Cloud Services"
+  primaryContentImage: <%= CRDC_CONTENT_IMAGE %>
+  content:
+    - paragraph: "The CRDC Cloud Resources($$[Velsera Cancer Genomics Cloud](https://www.cancergenomicscloud.org)$$  ,$$[ISB Cancer Genomics Cloud](https://isb-cgc.appspot.com/)$$ ), each providing analysis platforms when working with data."
+    - paragraph: "These cloud-based platforms eliminate the need for researchers to download and store extremely large data sets by allowing them to bring analysis tools to the data in the cloud. These cloud resources provide access to on-demand computational capacity to analyze data. They also allow users to run best practice tools and pipelines already implemented or to upload their own data or analysis methods to secure workspaces."
+    - paragraph: "All cloud resources provide support for data access through a web-based user interface in addition to programmatic access to analytic tools and workflows, and the capability of sharing results with collaborators. Each cloud resource is continually developing new functionality to improve the user experience and add new tools for researchers."
+    - paragraph: "CDS currently has a collaboration with $$[Velsera Cancer Genomics Cloud](https://www.cancergenomicscloud.org)$$(SBG), which is hosted on Amazon Web Services and has a rich user interface that allows researchers to find data of interest and combine it with their own private data. Data can be analyzed using more than 200 preinstalled, curated bioinformatics tools and workflows. Researchers can also extend the functionality of the platform by adding their own data and tools via an intuitive software development kit."
+- page: '/analysis'
+  title: "Accessing and Analyzing Data"
+  primaryContentImage: <%= CDS_CONTENT_IMAGE %>
+  content:
+    - paragraph: "The CDS Data Portal offers users a variety of ways to search data and download a data manifest to export information to one of NCI’s Cloud Resources where data can be analyzed."
+    - paragraph: "Researchers can filter the files available by a variety of methods on the Data page:"
+    - paragraph: ""
+    - listWithBullets: 
+      - "Search by participant IDs by uploading a list of known IDs to have the data associated with those participants returned"
+      - "Search using filters including Study, Experimental Strategy, Gender, Tumor, and File Type"
+      - "Search using a programmatic approach by querying the entire CDS schema using the GraphQL endpoint"
+    - paragraph: "Once a researcher has filtered down to a set of files of interest, that set can be saved to the portal “shopping cart,” from which an export manifest can be generated. That manifest contains all the information needed to import files to the $$[Velsera-CGC](https://www.cancergenomicscloud.org/)$$ to carry out analysis."
+    - paragraph: "The CDS Data Portal also hosts descriptions and additional information about the studies and programs that have deposited data in the CDS. These are linked to the search page making it easy to find all the data from a specific study."
+    - paragraph: ""
+    - paragraph: "$$#DATA ANALYSIS #$$"
+    - paragraph: "$$#Velsera-CGC for data analysis#$$"
+    - paragraph: "Velsera is one of the NCI funded Cloud Resources which is another component of CRDC. Velsera can be used as a primary resource for analyzing data"
+    - paragraph: "•  Read more about tools for data analysis on the $$[Velsera website](https://docs.cancergenomicscloud.org/docs/workflows-and-tools)$$."
+    - paragraph: "•  Learn more about importing files from CDS to Velsera ($$[SBG-CGC](https://docs.cancergenomicscloud.org/docs/import-cds-data)$$)"
+- page: /support
+  title: Support
+  primaryContentImage: <%= SUPPORT_CONTENT_IMAGE %>
+  content: 
+    - 
+      paragraph: "If you have any questions, please contact us at $$[CDSHelpDesk@mail.nih.gov](CDSHelpDesk@mail.nih.gov)$$."

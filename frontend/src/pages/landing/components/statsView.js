@@ -1,0 +1,156 @@
+import React from 'react';
+import classnames from 'classnames';
+import { Link } from 'react-router-dom';
+import {
+  withStyles,
+} from '@material-ui/core';
+
+const LandingStatsView = ({ classes, stats, statsData }) => (
+  <>
+    <div className={classnames({
+      [classes.statsSection]: stats.length < 5,
+      [classes.statsSectionCenter]: stats.length === 5,
+    })}
+    >
+      { stats.length > 0 && (
+      <div
+        className={classnames({
+          [classes.boxCut]: stats.length < 5,
+          [classes.box]: stats.length === 5,
+        })}
+      >
+
+        {
+        stats.map((stat, index) => (
+          <Link to={stat.callToActionLink} className={classes.statLink}>
+            <div className={classes.statsGroup}>
+              <div className={classes.statsText}>
+                <div className={classes.statTitle} id={`title_${index + 1}`}>
+                  {stat.statTitle}
+                </div>
+                <div className={classes.statCount} id={`count_${index + 1}`}>
+                  {statsData[stat.statAPI]}
+                </div>
+              </div>
+            </div>
+          </Link>
+        ))
+        }
+      </div>
+      ) }
+    </div>
+  </>
+);
+
+const styles = () => ({
+  statsSection: {
+    background: '#115D7E',
+    maxWidth: '906px',
+    textAlign: 'center',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    margin: '-26.5px auto auto auto',
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  statsSectionCenter: {
+    background: 'transparent',
+    maxWidth: '906px',
+    textAlign: 'center',
+    position: 'absolute',
+    overflow: 'auto',
+    left: 0,
+    right: 0,
+    margin: '-26.5px auto auto auto',
+    display: 'flex',
+    justifyContent: 'center',
+    '@media (min-width: 900px)': {
+      overflow: 'inherit',
+    },
+  },
+  statLink: {
+    textDecoration: 'none',
+  },
+  bannerTexture: {
+    color: '#4898B4',
+    fontFamily: 'Raleway',
+    fontSize: '19px',
+    fontWeight: '600',
+    lineHeight: '60px',
+    textAlign: 'center',
+    margin: '0 auto',
+    letterSpacing: '0.050pt',
+    textTransform: 'uppercase',
+    width: '869px',
+  },
+  boxCut: {
+    direction: 'ltr',
+    display: 'inline-flex',
+    borderBottom: '74px solid #115D7E',
+    borderLeft: '0px solid transparent',
+    height: '74px',
+  },
+  box: {
+    direction: 'ltr',
+    display: 'inline-flex',
+    borderBottom: '74px solid #115D7E',
+    height: '74px',
+    boxShadow: '-3px 5px 24px 1px rgba(27,28,28,0.15)',
+    // '@media (min-width: 900px)': {
+    //   display: 'inline-flex',
+    // },
+
+  },
+  statsText: {
+    height: '42px',
+    display: 'flex',
+    borderBottom: '3px solid white',
+    minWidth: '140px',
+    justifyContent: 'center',
+    '&:hover': {
+      borderBottom: '3px solid #88EDFF',
+
+    },
+  },
+  statTitle: {
+    display: 'inline-block',
+    float: 'left',
+    color: '#9ED7FF',
+    fontFamily: 'Nunito',
+    letterSpacing: 1,
+    fontWeight: 900,
+    fontSize: '15px',
+    marginRight: '8px',
+    marginTop: '16px',
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    lineHeight: '15.73px',
+  },
+  statCount: {
+    display: 'inline-block',
+    color: '#FFFFFF',
+    fontFamily: 'Oswald',
+    fontSize: '24px',
+    fontWeight: 600,
+    lineHeight: '34.32px',
+    letterSpacing: '0.15px',
+  },
+  floatLeft: {
+    float: 'left',
+    marginTop: '3px',
+    letterSpacing: '1px',
+  },
+  floatRight: {
+    float: 'right',
+    marginLeft: '6px',
+    marginTop: '3px',
+  },
+  statsGroup: {
+    // padding: '36px 48px 4px 48px',
+    // borderBottom: '2px solid',
+    margin: '8px 20px',
+  },
+});
+
+export default withStyles(styles, { withTheme: true })(LandingStatsView);
