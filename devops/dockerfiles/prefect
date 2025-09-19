@@ -1,0 +1,23 @@
+FROM prefecthq/prefect:3.4.18-python3.12 AS build
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y git cmake make gcc g++ libssl-dev && \
+    apt-get clean
+
+# Get mgconsole code
+RUN git clone --branch v1.4.0 https://github.com/memgraph/mgconsole.git
+
+# Build and install mgconsole
+RUN cd mgconsole && mkdir build
+
+RUN cd mgconsole/build \
+    && cmake -DCMAKE_BUILD_TYPE=Release ..
+
+RUN cd mgconsole/build \
+    && make \
+    && make install
+
+FROM prefecthq/prefect:3.4.18-python3.12
+
+COPY --from=build /usr/bin/mgconsole /usr/bin/
