@@ -105,4 +105,5 @@ jobs:
       run: |
         docker tag "$MGCONSOLE_IMAGE_NAME" "$REGISTRY_URL/$ECR_REPOSITORY:prefect-3-python3.12"
         echo "Pushing: $MGCONSOLE_IMAGE_NAME"
-        docker push $MGCONSOLE_IMAGE_NAME
+        #docker push $MGCONSOLE_IMAGE_NAME
+        docker push $REGISTRY_URL/$ECR_REPOSITORY:prefect-3-python3.12
