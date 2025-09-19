@@ -103,6 +103,6 @@ jobs:
         REGISTRY_URL: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.REGION }}.amazonaws.com
         MGCONSOLE_IMAGE_NAME: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY}}:${{ env.IMAGE_TAG }}
       run: |
-        docker tag $MGCONSOLE_IMAGE_NAME $REGISTRY_URL/$ECR_REPOSITORY:prefect-3-python3.12
+        docker tag "$MGCONSOLE_IMAGE_NAME" "$REGISTRY_URL/$ECR_REPOSITORY:prefect-3-python3.12"
         echo "Pushing: $MGCONSOLE_IMAGE_NAME"
         docker push $MGCONSOLE_IMAGE_NAME
