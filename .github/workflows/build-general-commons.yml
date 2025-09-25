@@ -58,7 +58,7 @@ jobs:
     if: github.event.inputs.build_be == 'true'
     environment: ${{ inputs.environment }}
     env:
-      ECR_BE: "crdc-gen-backend "
+      ECR_BE: "crdc-gen-backend"
       REGION: "us-east-1"
 #      CODE_BRANCH: "${{ github.event.inputs.code_branch }}"
       AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
