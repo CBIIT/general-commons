@@ -4,7 +4,8 @@ FROM node:18.20.5-alpine as fnl_base_image
 ENV PORT 4030
 ENV NODE_ENV production
 WORKDIR /usr/src/app
-COPY package*.json ./
+#COPY package*.json ./
+COPY interoperation/ package*.json ./
 #RUN npm ci --only=production
 RUN npm install
 COPY  --chown=node:node . .
