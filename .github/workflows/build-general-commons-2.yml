@@ -1,4 +1,4 @@
-name: Build General Commons service
+name: Build Image for General Commons service 
 permissions: 
   contents: write
   id-token: write
