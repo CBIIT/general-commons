@@ -57,6 +57,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
+      ECR_BE: "crdc-gen-backend"
+      ECR_FE: "crdc-gen-frontend"
+      ECR_INTEROPERATION: "crdc-gen-interoperation"
       REGION: "us-east-1"
 #      CODE_BRANCH: "${{ github.event.inputs.code_branch }}"
       AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
