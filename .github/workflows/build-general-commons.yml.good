@@ -48,7 +48,6 @@ on:
         description: "Trigger deploy after build"
         required: true
         default: false
-      memgraph_image:
 run-name: "Build Docker Images and Deploy General Commons"
 
 jobs:
@@ -223,27 +222,6 @@ jobs:
         run: |
           echo "Pushing: $INTEROP_IMAGE_NAME"
           docker push $INTEROP_IMAGE_NAME
-
-      - name: Deploy to dev
-        uses: actions/github-script@v7
-        if: ${{ inputs.deploy }}
-        with:
-          github-token: ${{ secrets.REPO_PAT }}
-          script: |
-            await github.rest.actions.createWorkflowDispatch({
-                owner: 'CBIIT',
-                repo: 'general-deployments',
-                workflow_id: 'manual-deploy.yml',
-                ref: 'main',
-                inputs: {
-                  environment: '${{ inputs.environment }}',
-                  frontend_image: '${{ env.IMAGE_TAG }}',
-                  backend_image: '${{ env.IMAGE_TAG }}',
-                  interoperation_image: '${{ env.IMAGE_TAG }}',
-                  memgraph_image: '${{ inputs.memgraph_image }}',
-                  cdk_command: 'deploy'
-                }
-            })
 
 #  send-slack-notification:
 #    name: send slack notification
