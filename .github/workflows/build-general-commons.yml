@@ -63,8 +63,8 @@ jobs:
       ECR_INTEROPERATION: "crdc-gen-interoperation"
       REGION: "us-east-1"
 #      CODE_BRANCH: "${{ github.event.inputs.code_branch }}"
-      AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_BUILD_ROLE_TO_ASSUME: ${{ secrets.AWS_BUILD_ROLE_TO_ASSUME }}
+      AWS_ECR_ACCOUNT_ID: ${{ secrets.AWS_ECR_ACCOUNT_ID }}
       #SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
     steps:
@@ -103,10 +103,10 @@ jobs:
         env:
           ECR_BE: "crdc-gen-backend"
           REGION: "us-east-1"
-          AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-          REGISTRY_URL: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-          BE_IMAGE_NAME: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_BE }}:${{ env.IMAGE_TAG }}
+          AWS_BUILD_ROLE_TO_ASSUME: ${{ secrets.AWS_BUILD_ROLE_TO_ASSUME }}
+          AWS_ECR_ACCOUNT_ID: ${{ secrets.AWS_ECR_ACCOUNT_ID }}
+          REGISTRY_URL: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          BE_IMAGE_NAME: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_BE }}:${{ env.IMAGE_TAG }}
         run: |
           docker build --no-cache -t $BE_IMAGE_NAME -f backend/Dockerfile .
 
@@ -114,8 +114,8 @@ jobs:
         id: trivy-scan-be
         if: github.event.inputs.trivy_scan_be == 'true'
         env:
-          REGISTRY_URL: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-          BE_IMAGE_NAME: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_BE }}:${{ env.IMAGE_TAG }}
+          REGISTRY_URL: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          BE_IMAGE_NAME: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_BE }}:${{ env.IMAGE_TAG }}
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: '${{ env.BE_IMAGE_NAME }}'
@@ -129,10 +129,10 @@ jobs:
         env:
           ECR_FE: "crdc-gen-frontend"
           REGION: "us-east-1"
-          AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-          REGISTRY_URL: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-          FE_IMAGE_NAME: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_FE }}:${{ env.IMAGE_TAG }}
+          AWS_BUILD_ROLE_TO_ASSUME: ${{ secrets.AWS_BUILD_ROLE_TO_ASSUME }}
+          AWS_ECR_ACCOUNT_ID: ${{ secrets.AWS_ECR_ACCOUNT_ID }}
+          REGISTRY_URL: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          FE_IMAGE_NAME: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_FE }}:${{ env.IMAGE_TAG }}
         run: |
           docker build --no-cache -t $FE_IMAGE_NAME -f frontend/Dockerfile .
 
@@ -140,8 +140,8 @@ jobs:
         id: trivy-scan-fe
         if: github.event.inputs.trivy_scan_fe == 'true'
         env:
-          REGISTRY_URL: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-          FE_IMAGE_NAME: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_FE }}:${{ env.IMAGE_TAG }}
+          REGISTRY_URL: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          FE_IMAGE_NAME: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_FE }}:${{ env.IMAGE_TAG }}
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: '${{ env.FE_IMAGE_NAME }}'
@@ -155,10 +155,10 @@ jobs:
         env:
           ECR_INTEROPERATION: "crdc-gen-interoperation"
           REGION: "us-east-1"
-          AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-          REGISTRY_URL: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-          INTEROP_IMAGE_NAME: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_INTEROPERATION }}:${{ env.IMAGE_TAG }}
+          AWS_BUILD_ROLE_TO_ASSUME: ${{ secrets.AWS_BUILD_ROLE_TO_ASSUME }}
+          AWS_ECR_ACCOUNT_ID: ${{ secrets.AWS_ECR_ACCOUNT_ID }}
+          REGISTRY_URL: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          INTEROP_IMAGE_NAME: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_INTEROPERATION }}:${{ env.IMAGE_TAG }}
         run: |
           docker build --no-cache -t $INTEROP_IMAGE_NAME -f interoperation/Dockerfile .
 
@@ -166,8 +166,8 @@ jobs:
         id: trivy-scan-interop
         if: github.event.inputs.trivy_scan_interoperation == 'true'
         env:
-          REGISTRY_URL: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-          INTEROP_IMAGE_NAME: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_INTEROPERATION }}:${{ env.IMAGE_TAG }}
+          REGISTRY_URL: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          INTEROP_IMAGE_NAME: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_INTEROPERATION }}:${{ env.IMAGE_TAG }}
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: '${{ env.INTEROP_IMAGE_NAME }}'
@@ -190,7 +190,7 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         env:
-          REGISTRY_URL: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          REGISTRY_URL: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
         run:  |
           aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $REGISTRY_URL
 
@@ -198,8 +198,8 @@ jobs:
         if: success()
         env:
           ECR_BE: "crdc-gen-backend"
-          REGISTRY_URL: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.REGION }}.amazonaws.com
-          BE_IMAGE_NAME: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_BE }}:${{ env.IMAGE_TAG }}
+          REGISTRY_URL: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ env.REGION }}.amazonaws.com
+          BE_IMAGE_NAME: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_BE }}:${{ env.IMAGE_TAG }}
         run: |
           echo "Pushing: $BE_IMAGE_NAME"
           docker push $BE_IMAGE_NAME
@@ -208,8 +208,8 @@ jobs:
         if: success()
         env:
           ECR_FE: "crdc-gen-frontend"
-          REGISTRY_URL: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.REGION }}.amazonaws.com
-          FE_IMAGE_NAME: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_FE }}:${{ env.IMAGE_TAG }}
+          REGISTRY_URL: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ env.REGION }}.amazonaws.com
+          FE_IMAGE_NAME: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_FE }}:${{ env.IMAGE_TAG }}
         run: |
           echo "Pushing: $FE_IMAGE_NAME"
           docker push $FE_IMAGE_NAME
@@ -218,8 +218,8 @@ jobs:
         if: success()
         env:
           ECR_INTEROPERATION: "crdc-gen-interoperation"
-          REGISTRY_URL: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.REGION }}.amazonaws.com
-          INTEROP_IMAGE_NAME: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_INTEROPERATION }}:${{ env.IMAGE_TAG }}
+          REGISTRY_URL: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ env.REGION }}.amazonaws.com
+          INTEROP_IMAGE_NAME: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_INTEROPERATION }}:${{ env.IMAGE_TAG }}
         run: |
           echo "Pushing: $INTEROP_IMAGE_NAME"
           docker push $INTEROP_IMAGE_NAME
