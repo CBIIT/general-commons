@@ -2,7 +2,7 @@ package gov.nih.nci.bento_ri.model.cypher_queries;
 
 public class PDXQuery {
     public static final String PDX_QUERY = """
-        MATCH (p:pdx)-[:of_sample]->(:sample)-[:of_participant]->(:participant)-[:of_study]->(s:study {phs_accession: $phs_accession})
+        MATCH (p:pdx)-[:from_sample]->(:sample)-[:of_participant]->(:participant)-[:of_study]->(s:study {phs_accession: $phs_accession})
         WHERE
             $pdx_ids = [] OR p.pdx_id IN $pdx_ids
         WITH p, {phs_accession: s.phs_accession} AS output
@@ -19,7 +19,7 @@ public class PDXQuery {
     """;
 
     public static final String PDX_COUNT_QUERY = """
-        MATCH (p:pdx)-[:of_sample]->(:sample)-[:of_participant]->(:participant)-[:of_study]->(s:study {phs_accession: $phs_accession})
+        MATCH (p:pdx)-[:from_sample]->(:sample)-[:of_participant]->(:participant)-[:of_study]->(s:study {phs_accession: $phs_accession})
         RETURN COUNT(DISTINCT p) AS count
     """;
 }
