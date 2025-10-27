@@ -5,10 +5,10 @@ public class PDXQuery {
         MATCH (p:pdx)-[:from_sample]->(samp:sample)-[:of_participant]->(:participant)-[:of_study]->(s:study {phs_accession: $phs_accession})
         WHERE
             $pdx_ids = [] OR p.pdx_id IN $pdx_ids
-        with p, samp, s
+        WITH p, samp, s
         WHERE
             $sample_ids = [] OR samp.sample_id IN $sample_ids
-        with apoc_replacement_poc.merge({
+        WITH apoc_replacement_poc.merge({
             phs_accession: s.phs_accession,
             sample_id: samp.sample_id
         }, p {.*}) AS output
