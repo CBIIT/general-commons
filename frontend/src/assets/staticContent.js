@@ -11,7 +11,6 @@ export const STATIC_CONTENT = {
     PURPOSE_CONTENT_IMAGE: `${env.REACT_APP_STATIC_CONTENT_URL}about/purpose.png`,
     RESOURCES_CONTENT_IMAGE: `${env.REACT_APP_STATIC_CONTENT_URL}about/resources.png`,
     SUBMIT_CONTENT_IMAGE: `${env.REACT_APP_STATIC_CONTENT_URL}about/submit.png`,
-    SUPPORT_CONTENT_IMAGE: `${env.REACT_APP_STATIC_CONTENT_URL}about/support.jpeg`,
   },
   icons: {
     svgs: {
