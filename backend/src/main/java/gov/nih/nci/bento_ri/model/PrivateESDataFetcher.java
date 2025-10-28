@@ -3,6 +3,7 @@ package gov.nih.nci.bento_ri.model;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import gov.nih.nci.bento.model.AbstractPrivateESDataFetcher;
 import gov.nih.nci.bento.model.search.mapper.TypeMapperImpl;
 import gov.nih.nci.bento.model.search.mapper.TypeMapperService;
@@ -801,9 +802,11 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             String[][] highlights = (String[][]) category.get(GS_HIGHLIGHT_FIELDS);
             Map<String, Object> query = getGlobalSearchQuery(input, category);
 
-            // Get count
+            // Get count - use a clean query without highlights since _count endpoint doesn't support highlights
+            Map<String, Object> countQuery = new HashMap<>(query);
+            countQuery.remove("highlight"); // Remove any existing highlights
             Request countRequest = new Request("GET", (String) category.get(GS_COUNT_ENDPOINT));
-            countRequest.setJsonEntity(gson.toJson(query));
+            countRequest.setJsonEntity(gson.toJson(countQuery));
             JsonObject countResult = esService.send(countRequest);
             int oldCount = (int)result.getOrDefault(countResultFieldName, 0);
             result.put(countResultFieldName, countResult.get("count").getAsInt() + oldCount);
@@ -811,19 +814,37 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             // Get results
             Request request = new Request("GET", (String)category.get(GS_END_POINT));
             String sortFieldName = (String)category.get(GS_SORT_FIELD);
-            query.put("sort", Map.of(sortFieldName, "asc"));
+            
+            // Implement deterministic sorting with tie-breaker for consistent pagination
+            List<Map<String, Object>> sortClauses = new ArrayList<>();
+            sortClauses.add(Map.of(sortFieldName, "asc"));
+            sortClauses.add(Map.of("_id", "asc")); // Tie-breaker for deterministic ordering
+            query.put("sort", sortClauses);
+            
             query = addHighlight(query, category);
 
+            List<Map<String, Object>> objects;
             if (combinedCategories.contains(resultFieldName)) {
+                // For combined categories, use scroll API to get all data
                 query.put("size", ESService.MAX_ES_SIZE);
                 query.put("from", 0);
+                request.setJsonEntity(gson.toJson(query));
+                JsonObject jsonObject = esService.send(request);
+                objects = esService.collectPage(jsonObject, properties, highlights, ESService.MAX_ES_SIZE, 0);
             } else {
-                query.put("size", size);
-                query.put("from", offset);
+                // For regular categories, check if scroll is needed
+                if (size + offset > ESService.MAX_ES_SIZE) {
+                    // Use scroll API for large pagination requests
+                    objects = collectPageWithScroll(request, query, properties, highlights, size, offset);
+                } else {
+                    // Use regular pagination for smaller requests
+                    query.put("size", size);
+                    query.put("from", offset);
+                    request.setJsonEntity(gson.toJson(query));
+                    JsonObject jsonObject = esService.send(request);
+                    objects = esService.collectPage(jsonObject, properties, highlights, size, 0);
+                }
             }
-            request.setJsonEntity(gson.toJson(query));
-            JsonObject jsonObject = esService.send(request);
-            List<Map<String, Object>> objects = esService.collectPage(jsonObject, properties, highlights, (int)query.get("size"), 0);
 
             for (var object: objects) {
                 object.put(GS_CATEGORY_TYPE, category.get(GS_CATEGORY_TYPE));
@@ -850,6 +871,148 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         }
 
         return result;
+    }
+
+    /**
+     * Collect a page of data using scroll API when regular pagination exceeds OpenSearch limits
+     * This method handles highlights unlike the ESService.collectPageWithScroll method
+     */
+    private List<Map<String, Object>> collectPageWithScroll(
+            Request request, Map<String, Object> query, String[][] properties, String[][] highlights, int pageSize, int offset) throws IOException {
+        
+        // Use maximum page size for scroll requests and paginate in memory
+        int maxScrollSize = Math.min(ESService.MAX_ES_SIZE, 5000); // Use 5000 as max for efficiency
+        
+        // Calculate how many results we need to fetch
+        int totalResultsNeeded = offset + pageSize;
+        
+        logger.info("Fetching {} results with scroll (offset: {}, pageSize: {}, maxScrollSize: {})", 
+                   totalResultsNeeded, offset, pageSize, maxScrollSize);
+        
+        // Initialize scroll context with maximum size
+        query.put("size", maxScrollSize);
+        request.setJsonEntity(gson.toJson(query));
+        request.addParameter("scroll", "30S");
+        JsonObject initialResponse = esService.send(request);
+        String scrollId = initialResponse.get("_scroll_id").getAsString();
+        
+        List<Map<String, Object>> allResults = new ArrayList<>();
+        int currentOffset = 0;
+        
+        try {
+            // Collect all results we need
+            while (currentOffset < totalResultsNeeded) {
+                JsonObject page;
+                if (currentOffset == 0) {
+                    // Use initial response
+                    page = initialResponse;
+                } else {
+                    // Continue scrolling
+                    Request scrollRequest = buildScrollRequest(ESService.SCROLL_ENDPOINT, scrollId);
+                    page = esService.send(scrollRequest);
+                    scrollId = page.get("_scroll_id").getAsString();
+                }
+                
+                JsonArray hits = page.getAsJsonObject("hits").getAsJsonArray("hits");
+                
+                if (hits.size() == 0) {
+                    logger.info("No more results available after {} total results", allResults.size());
+                    break;
+                }
+                
+                // Process all hits in this batch
+                for (int i = 0; i < hits.size(); i++) {
+                    Map<String, Object> result = new HashMap<>();
+                    
+                    // Extract properties
+                    for (String[] prop : properties) {
+                        String propName = prop[0];
+                        String dataField = prop[1];
+                        JsonElement element = hits.get(i).getAsJsonObject().get("_source").getAsJsonObject().get(dataField);
+                        result.put(propName, getValue(element));
+                    }
+                    
+                    // Extract highlights if available
+                    if (highlights != null) {
+                        JsonObject highlightObj = hits.get(i).getAsJsonObject().get("highlight").getAsJsonObject();
+                        for (String[] highlight : highlights) {
+                            String hlName = highlight[0];
+                            String hlField = highlight[1];
+                            JsonElement element = highlightObj.get(hlField);
+                            if (element != null) {
+                                result.put(hlName, ((List<String>)getValue(element)).get(0));
+                            }
+                        }
+                    }
+                    
+                    allResults.add(result);
+                    currentOffset++;
+                    
+                    // Stop if we have enough results
+                    if (currentOffset >= totalResultsNeeded) {
+                        break;
+                    }
+                }
+                
+                logger.info("Collected {} results so far", allResults.size());
+            }
+            
+        } finally {
+            // Clean up scroll context to prevent resource leaks
+            try {
+                Request clearScrollRequest = new Request("DELETE", ESService.SCROLL_ENDPOINT);
+                clearScrollRequest.setJsonEntity("{\"scroll_id\":\"" + scrollId + "\"}");
+                esService.send(clearScrollRequest);
+            } catch (Exception e) {
+                logger.warn("Failed to clean up scroll context for scroll_id: " + scrollId, e);
+            }
+        }
+        
+        // Paginate in memory
+        int startIndex = offset;
+        int endIndex = Math.min(startIndex + pageSize, allResults.size());
+        
+        logger.info("Returning results from index {} to {} (total collected: {})", startIndex, endIndex, allResults.size());
+        
+        if (startIndex >= allResults.size()) {
+            return new ArrayList<>();
+        }
+        
+        return allResults.subList(startIndex, endIndex);
+    }
+    
+    /**
+     * Helper method to extract value from JsonElement
+     */
+    private Object getValue(JsonElement element) {
+        if (element == null || element.isJsonNull()) {
+            return null;
+        } else if (element.isJsonArray()) {
+            List<String> list = new ArrayList<>();
+            for (JsonElement item : element.getAsJsonArray()) {
+                list.add(item.getAsString());
+            }
+            return list;
+        } else if (element.isJsonPrimitive()) {
+            JsonPrimitive primitive = element.getAsJsonPrimitive();
+            if (primitive.isString()) {
+                return primitive.getAsString();
+            } else if (primitive.isNumber()) {
+                return primitive.getAsNumber();
+            } else if (primitive.isBoolean()) {
+                return primitive.getAsBoolean();
+            }
+        }
+        return element.toString();
+    }
+
+    private Request buildScrollRequest(String endpoint, String scrollId) {
+        Request request = new Request("POST", endpoint);
+        Map<String, Object> scrollQuery = new HashMap<>();
+        scrollQuery.put("scroll", "30S");
+        scrollQuery.put("scroll_id", scrollId);
+        request.setJsonEntity(gson.toJson(scrollQuery));
+        return request;
     }
 
     private List paginate(List org, int pageSize, int offset) {
