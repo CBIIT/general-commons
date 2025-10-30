@@ -12,11 +12,20 @@ public class BentoApplication extends SpringBootServletInitializer {
 	private static final Logger logger = LogManager.getLogger(BentoApplication.class);
 
 	public static void main(String[] args) {
-		SpringApplication.run(BentoApplication.class, args);
+		logger.info("=== BentoApplication Starting ===");
+		logger.info("Starting Spring Boot application...");
+		try {
+			SpringApplication.run(BentoApplication.class, args);
+		} catch (Exception e) {
+			logger.error("Fatal error during application startup", e);
+			throw e;
+		}
 	}
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+		logger.info("=== BentoApplication.configure() called ===");
+		logger.info("Configuring SpringApplicationBuilder for servlet deployment...");
 		logger.info("Server started");
 
 		return application.sources(BentoApplication.class);

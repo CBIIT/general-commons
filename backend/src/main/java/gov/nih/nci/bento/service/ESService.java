@@ -33,20 +33,53 @@ public class ESService {
     public ESService(ConfigurationDAO config){
         if (config.isEsFilterEnabled()){
             this.gson = new GsonBuilder().serializeNulls().create();
-            logger.info("Initializing Elasticsearch client");
-            // Base on host name to use signed request (AWS) or not (local)
-            AbstractClient abstractClient = config.isEsSignRequests() ? new AWSClient(config) : new DefaultClient(config);
-            restHighLevelClient = abstractClient.getElasticClient();
-            client = abstractClient.getLowLevelElasticClient();
+            logger.info("Initializing OpenSearch/Elasticsearch client");
+            logger.info("OpenSearch configuration: host={}, port={}, scheme={}, signRequests={}", 
+                config.getEsHost(), config.getEsPort(), config.getEsScheme(), config.isEsSignRequests());
+            
+            try {
+                // Base on host name to use signed request (AWS) or not (local)
+                AbstractClient abstractClient = config.isEsSignRequests() ? new AWSClient(config) : new DefaultClient(config);
+                restHighLevelClient = abstractClient.getElasticClient();
+                client = abstractClient.getLowLevelElasticClient();
+                logger.info("OpenSearch client successfully initialized");
+            } catch (Exception e) {
+                logger.error("Failed to initialize OpenSearch client", e);
+                throw new RuntimeException("OpenSearch client initialization failed", e);
+            }
+        } else {
+            logger.warn("OpenSearch/Elasticsearch client NOT initialized because es.filter.enabled=false");
+            logger.warn("OpenSearch-dependent GraphQL queries (e.g., searchSubjects) will fail with NullPointerException");
+            this.client = null;
+            this.restHighLevelClient = null;
+            this.gson = null;
         }
     }
 
     @PreDestroy
     private void close() throws IOException {
-        client.close();
+        logger.info("ESService.close() called");
+        if (client != null) {
+            try {
+                client.close();
+                logger.info("OpenSearch client closed successfully");
+            } catch (Exception e) {
+                logger.error("Error closing OpenSearch client", e);
+            }
+        } else {
+            logger.debug("OpenSearch client was null, nothing to close");
+        }
     }
 
     public JsonObject send(Request request) throws IOException{
+        if (client == null) {
+            String msg = "Cannot invoke RestClient.performRequest() because the OpenSearch client is null. " +
+                    "This happens when es.filter.enabled=false or the client failed to initialize. " +
+                    "Check your configuration and application logs for initialization errors.";
+            logger.error(msg);
+            throw new IllegalStateException(msg);
+        }
+        
         Response response = client.performRequest(request);
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode != 200) {
@@ -58,6 +91,14 @@ public class ESService {
     }
 
     public <T> Map<String, T> elasticMultiSend(@NotNull List<MultipleRequests> requests) throws IOException {
+        if (restHighLevelClient == null) {
+            String msg = "Cannot invoke RestHighLevelClient.msearch() because the OpenSearch client is null. " +
+                    "This happens when es.filter.enabled=false or the client failed to initialize. " +
+                    "Check your configuration and application logs for initialization errors.";
+            logger.error(msg);
+            throw new IllegalStateException(msg);
+        }
+        
         try {
             MultiSearchRequest multiRequests = new MultiSearchRequest();
             requests.forEach(r->multiRequests.add(r.getRequest()));
@@ -66,8 +107,8 @@ public class ESService {
             return getMultiResponse(response.getResponses(), requests);
         }
         catch (IOException | OpenSearchException e) {
-            logger.error(e.toString());
-            throw new IOException(e.toString());
+            logger.error("Error in elasticMultiSend: {}", e.toString(), e);
+            throw new IOException(e.toString(), e);
         }
     }
 
