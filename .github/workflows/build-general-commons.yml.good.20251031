@@ -13,9 +13,21 @@ on:
 #      code_branch:
 #        description: Branch to build validation
 #        required: false
-      build:
-        description: build docker images
+      build_be:
+        description: build BE
         required: true
+        type: boolean
+        default: true
+      build_fe:
+        description: build FE
+        required: true
+        type: boolean
+        default: true
+      build_interoperation:
+        description: build interoperation
+        required: true
+        type: boolean
+        default: true
       trivy_scan_be:
         description: "Run Trivy Scan for BE"
         required: true
@@ -53,7 +65,7 @@ jobs:
 #      CODE_BRANCH: "${{ github.event.inputs.code_branch }}"
       AWS_BUILD_ROLE_TO_ASSUME: ${{ secrets.AWS_BUILD_ROLE_TO_ASSUME }}
       AWS_ECR_ACCOUNT_ID: ${{ secrets.AWS_ECR_ACCOUNT_ID }}
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      #SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
     steps:
 
@@ -87,7 +99,7 @@ jobs:
 
       - name: Build BE Docker Image
         id: build-be-image
-        #if: github.event.inputs.build_be == 'true'
+        if: github.event.inputs.build_be == 'true'
         env:
           ECR_BE: "crdc-gen-backend"
           REGION: "us-east-1"
@@ -113,7 +125,7 @@ jobs:
 
       - name: Build FE Docker Image
         id: build-fe-image
-        #if: github.event.inputs.build_fe == 'true'
+        if: github.event.inputs.build_fe == 'true'
         env:
           ECR_FE: "crdc-gen-frontend"
           REGION: "us-east-1"
@@ -139,7 +151,7 @@ jobs:
 
       - name: Build Interoperation Docker Image
         id: build-interop-image
-        #if: github.event.inputs.build_interoperation == 'true'
+        if: github.event.inputs.build_interoperation == 'true'
         env:
           ECR_INTEROPERATION: "crdc-gen-interoperation"
           REGION: "us-east-1"
@@ -233,11 +245,22 @@ jobs:
                 }
             })
 
-      - name: Slack Notification
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        uses: act10ns/slack@87c73aef9f8838eb6feae81589a6b1487a4a9e08     # v1.6.0
-        with:
-          status: ${{ job.status }}
-          steps: ${{ toJson(steps) }}
-        if: always()
+#  send-slack-notification:
+#    name: send slack notification
+#    runs-on: ubuntu-latest
+#    needs: [build-file-validation, build-essential-validation, build-metadata-validation, build-export-validation]
+    #if: ${{ (needs.build-file-validation.result == 'success' && github.event.inputs.build_file_validation == 'true') || (needs.build-essential-validation.result == 'success' && github.event.inputs.build_essential_validation == 'true') || (needs.build-metadata-validation.result == 'success' && github.event.inputs.build_metadata_validation == 'true') || (needs.build-export-validation.result == 'success' && github.event.inputs.build_export_validation == 'true') }} 
+#    environment: ${{ inputs.environment }}
+#    env:
+#      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+#    steps:
+
+#      - name: send slack notification
+#        env:
+#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+#        uses: act10ns/slack@87c73aef9f8838eb6feae81589a6b1487a4a9e08     # v1.6.0
+#        with:
+#          status: ${{ job.status }}
+#          steps: ${{ toJson(steps) }}
+#        if: always()
