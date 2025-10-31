@@ -4,5 +4,5 @@ config
 logs
 target
 ignore.*
-/src/main/resources/*.properties
+/src/main/resources/application.local.properties
 /.vscode
