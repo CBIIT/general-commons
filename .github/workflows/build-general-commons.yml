@@ -16,6 +16,8 @@ on:
       build:
         description: build docker images
         required: true
+        type: boolean
+        default: true
       trivy_scan_be:
         description: "Run Trivy Scan for BE"
         required: true
