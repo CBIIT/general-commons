@@ -301,7 +301,7 @@ const ProgramView = ({ classes, data, theme }) => {
                           />
                         </div>
                         <div className={classes.participantsCount} id="program_detail_participants_count">
-                          {programData[rightPanel.participants[0].dataField]}
+                          {Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(programData[rightPanel.participants[0].dataField] || 0)}
                         </div>
                       </div>
                     </div>
@@ -324,7 +324,7 @@ const ProgramView = ({ classes, data, theme }) => {
                           />
                         </div>
                         <div className={classes.fileCount} id="program_detail_file_count">
-                          {programData[rightPanel.files[0].dataField]}
+                          {Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(programData[rightPanel.files[0].dataField] || 0)}
                         </div>
                       </div>
                     </div>
