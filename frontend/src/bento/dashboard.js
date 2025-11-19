@@ -61,6 +61,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   // STUDY
   {
@@ -76,6 +77,7 @@ export const facetsConfig = [
     search: true,
     disableSearchModal: true,
     searchPlaceholder: "e.g. Study Name",
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: STUDY,
@@ -90,6 +92,7 @@ export const facetsConfig = [
     search: true,
     disableSearchModal: true,
     searchPlaceholder: "e.g. phs000000",
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: STUDY,
@@ -101,6 +104,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: STUDY,
@@ -112,6 +116,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: STUDY,
@@ -128,6 +133,7 @@ export const facetsConfig = [
     minLowerBound: 0,
     maxUpperBound: 25445,
     quantifier: "Study Participants",
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   //SAMPLES
   {
@@ -140,6 +146,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: SAMPLES,
@@ -151,6 +158,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: SAMPLES,
@@ -167,6 +175,7 @@ export const facetsConfig = [
     minLowerBound: 0,
     maxUpperBound: 40872,
     quantifier: "Study Samples",
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   // GENOMIC
   {
@@ -179,6 +188,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: GENOMIC,
@@ -190,6 +200,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: GENOMIC,
@@ -201,6 +212,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: GENOMIC,
@@ -212,6 +224,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: GENOMIC,
@@ -223,6 +236,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: GENOMIC,
@@ -234,6 +248,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: GENOMIC,
@@ -256,6 +271,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   // IMAGING
   {
@@ -268,6 +284,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: IMAGING,
@@ -279,6 +296,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: IMAGING,
@@ -290,6 +308,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: IMAGING,
@@ -301,6 +320,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   // DIAGNOSIS
   {
@@ -315,6 +335,7 @@ export const facetsConfig = [
     show: true,
     search: true,
     disableSearchModal: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
     //searchPlaceholder: "Customize Placeholder Text",
   },
   // FILES
@@ -331,6 +352,7 @@ export const facetsConfig = [
     search: true,
     disableSearchModal: true,
     searchPlaceholder: "e.g. BAM",
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: FILES,
@@ -342,6 +364,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   // PROTEOMIC
   {
@@ -354,6 +377,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: PROTEOMIC,
@@ -365,6 +389,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   // {
   //   section: PROTEOMIC,

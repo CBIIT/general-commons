@@ -17,8 +17,8 @@ const Tabs = (props) => {
   const getTabs = (tabs) => tabs.map((tab) => ({
     ...tab,
     name: tab.name,
-    count: `(${props.dashboardStats[tab.count]})`,
-    display: [tab.name, props.dashboardStats[tab.count]],
+    count: `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(props.dashboardStats[tab.count] || 0)})`,
+    display: [tab.name, `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(props.dashboardStats[tab.count] || 0)})`],
     clsName: `${tab.name}`.toLowerCase().replace(' ', '_'),
   }));
 
