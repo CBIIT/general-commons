@@ -26,20 +26,21 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     final String ORDER_BY = "order_by";
     final String SORT_DIRECTION = "sort_direction";
 
-    final String STUDIES_END_POINT = "/studies/_search";
-    final String STUDIES_COUNT_END_POINT = "/studies/_count";
+    final String STUDIES_END_POINT = "/study/_search";
+    final String STUDIES_COUNT_END_POINT = "/study/_count";
 
-    final String SUBJECTS_END_POINT = "/subjects/_search";
-    final String SUBJECTS_COUNT_END_POINT = "/subjects/_count";
+    final String SUBJECTS_END_POINT = "/dashboard_participant/_search";
+    final String SUBJECTS_COUNT_END_POINT = "/dashboard_participant/_count";
     final String SUBJECT_IDS_END_POINT = "/subject_ids/_search";
-    final String SAMPLES_END_POINT = "/samples/_search";
-    final String SAMPLES_COUNT_END_POINT = "/samples/_count";
-    final String FILES_END_POINT = "/files/_search";
-    final String STUDY_DATA_TYPES_END_POINT = "/study_data_types/_search";
-    final String FILES_EXPERIMENTAL_STRATEGY_END_POINT = "/file_experimental_strategies/_search";
-    final String FILES_COUNT_END_POINT = "/files/_count";
-    final String PROGRAMS_END_POINT = "/programs/_search";
-    final String PROGRAMS_COUNT_END_POINT = "/programs/_count";
+    final String SAMPLES_END_POINT = "/dashboard_sample/_search";
+    final String SAMPLES_COUNT_END_POINT = "/dashboard_sample/_count";
+    final String FILES_END_POINT = "/dashboard_file/_search";
+    final String FILES_COUNT_END_POINT = "/dashboard_file/_count";
+    final String STUDY_DATA_TYPES_END_POINT = "/dashboard_study_data_type/_search";
+    final String FILES_EXPERIMENTAL_STRATEGY_END_POINT = "/dashboard_file_experimental_strategy/_search";
+    
+    final String PROGRAMS_END_POINT = "/program/_search";
+    final String PROGRAMS_COUNT_END_POINT = "/program/_count";
     final String NODES_END_POINT = "/model_nodes/_search";
     final String NODES_COUNT_END_POINT = "/model_nodes/_count";
     final String PROPERTIES_END_POINT = "/model_properties/_search";
@@ -47,8 +48,6 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     final String VALUES_END_POINT = "/model_values/_search";
     final String VALUES_COUNT_END_POINT = "/model_values/_count";
     final String GS_ABOUT_END_POINT = "/about_page/_search";
-    final String GS_MODEL_END_POINT = "/data_model/_search";
-    final String VERSION_END_POINT = "/version/_search";
 
     final int GS_LIMIT = 10;
     final String GS_END_POINT = "endpoint";
