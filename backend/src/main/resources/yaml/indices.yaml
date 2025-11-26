@@ -13,6 +13,10 @@ indices:
         - dbGaP_subject_id # participant.dbGaP_subject_id - single value
         # Participant Samples
         - samples # sample.sample_id - sample_ids - array
+        - is_tumor # sample.sample_tumor_status - samples_sample_tumor_status_filter - array
+        - sample_types # sample.sample_type - samples_sample_type_filter - array
+        - is_tumor_sort # derived from is_tumor - single value
+        - sample_types_sort # derived from sample_types - single value
         # Study
         - studies # study.study_name - study_study_name_filter - array
         - phs_accession # study.phs_accession - study_phs_accession_filter - array
@@ -25,14 +29,6 @@ indices:
         - file_types # file.file_type - files_file_type_filter - array
         - experimental_strategies_sort # derived from experimental_strategies - single value
         - file_types_sort # derived from file_types - single value
-        # File Participants
-        - demographics_sex_filter # participant.sex - array
-        - subject_ids_filter # participant.participant_id - array
-        # File Samples
-        - is_tumor # sample.sample_tumor_status - samples_sample_tumor_status_filter - array
-        - sample_types # sample.sample_type - samples_sample_type_filter - array
-        - is_tumor_sort # derived from is_tumor - single value
-        - sample_types_sort # derived from sample_types - single value
         # File Diagnoses
         - primary_diagnoses # diagnosis.primary_diagnosis - diagnosis_primary_diagnosis_filter - array
         - diagnosis_primary_diagnosis_filter # diagnosis.primary_diagnosis - array
@@ -102,14 +98,40 @@ indices:
       # Participant Samples
       - name: "Participant Samples"
         # samples
+        # is_tumor
+        # sample_types
+        # is_tumor_sort
+        # sample_types_sort
         query: |
           MATCH (p:participant)
           WITH p
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (p)<-[:of_participant]-(samp:sample)
+          WITH p.study_participant_id AS study_participant_id,
+            COLLECT(DISTINCT samp.sample_id) AS samples,
+            COLLECT(DISTINCT samp.sample_tumor_status) AS is_tumor,
+            COLLECT(DISTINCT samp.sample_type) AS sample_types
+          CALL {
+            WITH is_tumor
+            UNWIND is_tumor AS tumor_status
+            WITH tumor_status
+            ORDER BY tumor_status
+            RETURN reduce(s = '', i IN collect(tumor_status) | s + i + '') AS is_tumor_sort
+          }
+          CALL {
+            WITH sample_types
+            UNWIND sample_types AS sample_type
+            WITH sample_type
+            ORDER BY sample_type
+            RETURN reduce(s = '', i IN collect(sample_type) | s + i + '') AS sample_types_sort
+          }
           RETURN DISTINCT
-            p.study_participant_id as study_participant_id,
-            COLLECT(DISTINCT samp.sample_id) as samples
+            study_participant_id,
+            samples,
+            is_tumor,
+            sample_types,
+            is_tumor_sort,
+            sample_types_sort
         page_size: 10000
       # Study
       - name: "Study"
@@ -124,31 +146,38 @@ indices:
           MATCH (s:study)
           WITH s 
           SKIP $skip LIMIT $limit 
-          OPTIONAL MATCH (s)<-[:of_study]-(p:participant)
-          WITH DISTINCT s, COLLECT(DISTINCT p) AS ps
-          WITH s, ps, SIZE(ps) AS number_of_study_participants, "Not specified in data" AS na
+          WITH s, "Not specified in data" AS na
           CALL {
-            WITH ps 
-            WITH CASE WHEN size(ps)=0 THEN [NULL] ELSE ps END AS ps
-            UNWIND ps AS p
-            OPTIONAL MATCH (p)<-[:of_participant]-(samp:sample)
-            RETURN DISTINCT COUNT(DISTINCT samp) AS number_of_study_samples
+            WITH s
+            OPTIONAL MATCH (s)<-[:of_study]-(p:participant)
+            WITH COLLECT(DISTINCT p) AS ps 
+            CALL {
+              WITH ps
+              WITH CASE WHEN size(ps)=0 THEN [NULL] ELSE ps END AS ps
+              UNWIND ps AS p 
+              OPTIONAL MATCH (p)<-[:of_participant]-(samp:sample)
+              RETURN COUNT(DISTINCT samp) AS number_of_study_samples
+            }
+            RETURN 
+              SIZE(ps) AS number_of_study_participants,
+              number_of_study_samples
           }
           WITH 
-            ps, s, na, number_of_study_participants, number_of_study_samples,
+            s, na, number_of_study_participants, number_of_study_samples,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types,
             split(replace(replace(replace(s.acl, '[', ''), ']', ''), '"', ''), ", ") AS acl,
             COLLECT(DISTINCT COALESCE(s.study_name, na)) AS studies,
             COLLECT(DISTINCT COALESCE(s.phs_accession, na)) AS phs_accession,
             COLLECT(DISTINCT COALESCE(s.study_access, na)) AS accesses
           WITH 
-            ps, s, na, number_of_study_participants, number_of_study_samples,
+            s, na, number_of_study_participants, number_of_study_samples,
             CASE WHEN size(study_data_types)=0 THEN [na] ELSE study_data_types END AS study_data_types,
             CASE WHEN size(acl)=0 THEN [na] ELSE acl END AS acl,
             CASE WHEN size(studies)=0 THEN [na] ELSE studies END AS studies,
             CASE WHEN size(phs_accession)=0 THEN [na] ELSE phs_accession END AS phs_accession,
             CASE WHEN size(accesses)=0 THEN [na] ELSE accesses END AS accesses
-          UNWIND ps AS p
+          OPTIONAL MATCH (s)<-[:of_study]-(p:participant)
+          WITH DISTINCT p, s, na, number_of_study_participants, number_of_study_samples, study_data_types, acl, studies, phs_accession, accesses
           RETURN DISTINCT
             p.study_participant_id AS study_participant_id,
             studies,
@@ -210,61 +239,6 @@ indices:
             files_is_supplementary_file_filter,
             experimental_strategies_sort,
             file_types_sort
-        page_size: 10000
-      # File Participants
-      - name: "File Participants"
-        # demographics_sex_filter
-        # subject_ids_filter
-        query: |
-          MATCH (p:participant)
-          WITH DISTINCT p
-          SKIP $skip LIMIT $limit
-          OPTIONAL MATCH (f:file)-[:of_participant]->(p)
-          WITH DISTINCT f, p.study_participant_id AS study_participant_id, "Not specified in data" AS na
-          OPTIONAL MATCH (f)-[:of_participant]->(fp:participant)
-          RETURN DISTINCT
-            study_participant_id,
-            COLLECT(DISTINCT fp.sex) AS demographics_sex_filter,
-            COLLECT(DISTINCT COALESCE(fp.participant_id, na)) AS subject_ids_filter
-        page_size: 10000
-      # File Samples
-      - name: "File Samples"
-        # is_tumor
-        # sample_types
-        # is_tumor_sort
-        # sample_types_sort
-        query: |
-          MATCH (p:participant)
-          WITH DISTINCT p
-          SKIP $skip LIMIT $limit
-          OPTIONAL MATCH (f:file)-[:of_participant]->(p)
-          WITH DISTINCT f, p.study_participant_id AS study_participant_id
-          OPTIONAL MATCH (f)-[:of_participant]->(p:participant)
-          WITH DISTINCT study_participant_id, p
-          OPTIONAL MATCH (p)<-[:of_participant]-(fsamp:sample)
-          WITH study_participant_id,
-            COLLECT(DISTINCT fsamp.sample_tumor_status) AS is_tumor,
-            COLLECT(DISTINCT fsamp.sample_type) AS sample_types
-          CALL {
-            WITH is_tumor
-            UNWIND is_tumor AS tumor_status
-            WITH tumor_status
-            ORDER BY tumor_status
-            RETURN reduce(s = '', i IN collect(tumor_status) | s + i + '') AS is_tumor_sort
-          }
-          CALL {
-            WITH sample_types
-            UNWIND sample_types AS sample_type
-            WITH sample_type
-            ORDER BY sample_type
-            RETURN reduce(s = '', i IN collect(sample_type) | s + i + '') AS sample_types_sort
-          }
-          RETURN DISTINCT
-            study_participant_id,
-            is_tumor,
-            sample_types,
-            is_tumor_sort,
-            sample_types_sort
         page_size: 10000
       # File Diagnoses
       - name: "File Diagnoses"
@@ -556,6 +530,7 @@ indices:
         - participant_ids # participant.participant_id - array
         - subject_ids # participant.participant_id - single value
         - subject_ids_filter # participant.participant_id - array
+        - sex # participant.sex - single value
         # Study
         - studies # study.study_name - array
         - phs_accession # study.phs_accession - array
@@ -568,9 +543,7 @@ indices:
         - file_types # file.file_type - array
         - experimental_strategies_sort # derived from experimental_strategies - single value
         - file_types_sort # derived from file_types - single value
-        # File Participants
-        - sex # participant.sex - single value
-        # File Samples
+        # Samples
         - is_tumor # sample.sample_tumor_status - single value
         - sample_types # sample.sample_type - array
         # File Diagnoses
@@ -625,6 +598,8 @@ indices:
       # sample_age_at_collection
       # derived_from_specimen
       # biosample_accession
+      # is_tumor
+      # sample_types
       query: |
         MATCH (samp:sample)
         WITH DISTINCT samp, "Not specified in data" AS na
@@ -638,7 +613,9 @@ indices:
           COALESCE(samp.sample_anatomic_site, na) as sample_anatomic_site,
           samp.sample_age_at_collection as sample_age_at_collection,
           samp.derived_from_specimen as derived_from_specimen,
-          samp.biosample_accession as biosample_accession
+          samp.biosample_accession as biosample_accession,
+          COALESCE(samp.sample_tumor_status, na) as is_tumor,
+          [COALESCE(samp.sample_type, na)] as sample_types
         SKIP $skip LIMIT $limit
       page_size: 10000
     update_queries:
@@ -647,6 +624,7 @@ indices:
         # participant_ids
         # subject_ids
         # subject_ids_filter
+        # sex
         query: |
           MATCH (samp:sample)
           WITH DISTINCT samp
@@ -655,14 +633,17 @@ indices:
           WITH DISTINCT samp, p, "Not specified in data" AS na
           WITH samp, na,
             COLLECT(DISTINCT p.participant_id) AS participant_ids,
-            COLLECT(DISTINCT COALESCE(p.participant_id, na)) AS subject_ids_filter
-          WITH samp, na, participant_ids, subject_ids_filter,
-            CASE WHEN size(participant_ids) > 0 THEN participant_ids[0] ELSE na END AS subject_ids
+            COLLECT(DISTINCT COALESCE(p.participant_id, na)) AS subject_ids_filter,
+            COLLECT(DISTINCT COALESCE(p.sex, na)) AS sex_values
+          WITH samp, na, participant_ids, subject_ids_filter, sex_values,
+            CASE WHEN size(participant_ids) > 0 THEN participant_ids[0] ELSE na END AS subject_ids,
+            CASE WHEN size(sex_values) > 0 THEN sex_values[0] ELSE na END AS sex
           RETURN DISTINCT
             samp.sample_id AS sample_id,
             participant_ids,
             subject_ids,
-            subject_ids_filter
+            subject_ids_filter,
+            sex
         page_size: 10000
       # Study
       - name: "Study"
@@ -677,33 +658,38 @@ indices:
           MATCH (s:study)
           WITH s 
           SKIP $skip LIMIT $limit 
-          OPTIONAL MATCH (s)<-[:of_study]-(p:participant)
-          WITH DISTINCT s, p
-          OPTIONAL MATCH (p)<-[:of_participant]-(samp:sample)
-          WITH DISTINCT s, COLLECT(DISTINCT samp) AS ss
-          WITH s, ss, SIZE(ss) AS number_of_study_samples, "Not specified in data" AS na
+          WITH s, "Not specified in data" AS na
           CALL {
-            WITH ss 
-            WITH CASE WHEN size(ss)=0 THEN [NULL] ELSE ss END AS ss
-            UNWIND ss AS samp
-            OPTIONAL MATCH (p:participant)<-[:of_participant]-(samp)
-            RETURN DISTINCT COUNT(DISTINCT p) AS number_of_study_participants
+            WITH s
+            OPTIONAL MATCH (s)<-[:of_study]-(p:participant)
+            WITH COLLECT(DISTINCT p) AS ps 
+            CALL {
+              WITH ps
+              WITH CASE WHEN size(ps)=0 THEN [NULL] ELSE ps END AS ps
+              UNWIND ps AS p 
+              OPTIONAL MATCH (p)<-[:of_participant]-(samp:sample)
+              RETURN COUNT(DISTINCT samp) AS number_of_study_samples
+            }
+            RETURN 
+              SIZE(ps) AS number_of_study_participants,
+              number_of_study_samples
           }
           WITH 
-            ss, s, na, number_of_study_participants, number_of_study_samples,
+            s, na, number_of_study_participants, number_of_study_samples,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types,
             split(replace(replace(replace(s.acl, '[', ''), ']', ''), '"', ''), ", ") AS acl,
             COLLECT(DISTINCT COALESCE(s.study_name, na)) AS studies,
             COLLECT(DISTINCT COALESCE(s.phs_accession, na)) AS phs_accession,
             COLLECT(DISTINCT COALESCE(s.study_access, na)) AS accesses
           WITH 
-            ss, s, na, number_of_study_participants, number_of_study_samples,
+            s, na, number_of_study_participants, number_of_study_samples,
             CASE WHEN size(study_data_types)=0 THEN [na] ELSE study_data_types END AS study_data_types,
             CASE WHEN size(acl)=0 THEN [na] ELSE acl END AS acl,
             CASE WHEN size(studies)=0 THEN [na] ELSE studies END AS studies,
             CASE WHEN size(phs_accession)=0 THEN [na] ELSE phs_accession END AS phs_accession,
             CASE WHEN size(accesses)=0 THEN [na] ELSE accesses END AS accesses
-          UNWIND ss AS samp
+          OPTIONAL MATCH (s)<-[:of_study]-(:file)-[:of_participant]->(:participant)<-[:of_participant]-(samp:sample)
+          WITH DISTINCT samp, s, na, number_of_study_participants, number_of_study_samples, study_data_types, acl, studies, phs_accession, accesses
           RETURN DISTINCT
             samp.sample_id AS sample_id,
             studies,
@@ -769,44 +755,8 @@ indices:
             experimental_strategies_sort,
             file_types_sort
         page_size: 10000
-      # File Participants
-      - name: "File Participants"
-        # sex
-        query: |
-          MATCH (samp:sample)
-          WITH DISTINCT samp
-          SKIP $skip LIMIT $limit
-          OPTIONAL MATCH (samp)<-[:of_participant]-(p:participant)
-          WITH DISTINCT samp.sample_id AS sample_id, p
-          OPTIONAL MATCH (p)<-[:of_participant]-(f:file)
-          WITH DISTINCT sample_id, f, "Not specified in data" AS na
-          OPTIONAL MATCH (f)-[:of_participant]->(fp:participant)
-          RETURN DISTINCT
-            sample_id,
-            COALESCE(fp.sex, na) AS sex
-        page_size: 50000
-      # File Samples
-      - name: "File Samples"
-        # is_tumor
-        # sample_types
-        query: |
-          MATCH (samp:sample)
-          WITH DISTINCT samp
-          SKIP $skip LIMIT $limit
-          OPTIONAL MATCH (samp)-[:of_participant]->(p:participant)
-          WITH DISTINCT samp.sample_id AS sample_id, p
-          OPTIONAL MATCH (p)<-[:of_participant]-(f:file)
-          WITH DISTINCT sample_id, f
-          OPTIONAL MATCH (f)-[:of_participant]->(p:participant)
-          WITH DISTINCT sample_id, p
-          OPTIONAL MATCH (p)<-[:of_participant]-(fsamp:sample)
-          RETURN DISTINCT
-            sample_id,
-            COLLECT(DISTINCT fsamp.sample_tumor_status) AS is_tumor,
-            COLLECT(DISTINCT fsamp.sample_type) AS sample_types
-        page_size: 5000
       # File Diagnoses
-      - name: "File Diagnoses"
+      - name: "Diagnoses"
         # primary_diagnoses
         # primary_diagnoses_sort
         # site
@@ -815,47 +765,23 @@ indices:
           MATCH (samp:sample)
           WITH DISTINCT samp
           SKIP $skip LIMIT $limit
-          OPTIONAL MATCH (samp)<-[:of_participant]-(p:participant)
-          WITH DISTINCT samp.sample_id AS sample_id, p
-          OPTIONAL MATCH (p)<-[:of_participant]-(f:file)
-          WITH DISTINCT sample_id, f
-          OPTIONAL MATCH (f)-[:of_participant]->(p:participant)
-          WITH DISTINCT sample_id, COLLECT(DISTINCT p) AS ps, "Not specified in data" AS na
+          WITH samp, "Not specified in data" AS na
+          OPTIONAL MATCH (samp)<-[:of_sample]-(diag:diagnosis)
+          WITH samp, na,
+              COLLECT(DISTINCT COALESCE(diag.primary_diagnosis, na)) AS primary_diagnosis,
+              COLLECT(DISTINCT COALESCE(diag.primary_site, na)) AS primary_site
           CALL {
-            WITH ps, na
-            WITH CASE WHEN size(ps)=0 THEN [NULL] ELSE ps END AS ps, na
-            UNWIND ps AS p
-            OPTIONAL MATCH (p)<-[:of_participant]-(pdiag:diagnosis)
+            WITH samp, na
+            OPTIONAL MATCH (samp)-[:of_participant]->(p:participant)
+            WITH p, na
+            OPTIONAL MATCH (p)<-[:of_participant]-(diag:diagnosis)
             RETURN 
-              COLLECT(DISTINCT pdiag.primary_diagnosis) AS p_primary_diagnosis,
-              COLLECT(DISTINCT COALESCE(pdiag.primary_site, na)) AS p_primary_site
+              COLLECT(DISTINCT COALESCE(diag.primary_diagnosis, na)) AS p_primary_diagnosis,
+              COLLECT(DISTINCT COALESCE(diag.primary_site, na)) AS p_primary_site
           }
-          CALL {
-            WITH ps, na
-            UNWIND ps AS p
-            OPTIONAL MATCH (p)<-[:of_participant]-(samp2:sample)
-            WITH samp2, na
-            OPTIONAL MATCH (samp2)<-[:of_sample]-(sdiag:diagnosis)
-            RETURN 
-              COLLECT(DISTINCT sdiag.primary_diagnosis) AS s_primary_diagnosis,
-              COLLECT(DISTINCT COALESCE(sdiag.primary_site, na)) AS s_primary_site
-          }
-          WITH sample_id, na, 
-            p_primary_diagnosis + s_primary_diagnosis AS primary_diagnoses,
-            p_primary_site + s_primary_site AS primary_sites
-          WITH sample_id, na, 
-            CASE WHEN size(primary_diagnoses)=0 THEN [NULL] ELSE primary_diagnoses END AS primary_diagnoses,
-            CASE WHEN size(primary_sites)=0 THEN [NULL] ELSE primary_sites END AS primary_sites
-          UNWIND primary_diagnoses AS primary_diagnosis
-          WITH DISTINCT
-            sample_id, na, primary_sites,
-            COLLECT(DISTINCT primary_diagnosis) AS primary_diagnoses
-          WITH sample_id, na, primary_sites,
-            CASE WHEN SIZE(primary_diagnoses) = 0 THEN [na] ELSE primary_diagnoses END AS primary_diagnoses
-          UNWIND primary_sites AS primary_site
-          WITH DISTINCT
-            sample_id, na, primary_diagnoses,
-            COLLECT(DISTINCT primary_site) AS site
+          WITH samp.sample_id AS sample_id, na, 
+            p_primary_diagnosis + primary_diagnosis AS primary_diagnoses,
+            p_primary_site + primary_site AS site
           WITH sample_id,
             CASE WHEN SIZE(site) = 0 THEN [na] ELSE site END AS site,
             primary_diagnoses
@@ -1166,6 +1092,8 @@ indices:
         - associated_md5sum # file.md5sum - single value
       long:
         - file_size # file.file_size - single value
+        - number_of_study_participants # calculated - single value
+        - number_of_study_samples # calculated - single value
     initial_query:
       # file_id
       # file_name
@@ -1181,7 +1109,7 @@ indices:
       # file_types
       # experimental_strategies_sort
       query: |
-        MATCH (:study)<-[:of_study]-(f:file)
+        MATCH (f:file)
         WITH DISTINCT f
         ORDER BY f.file_id
         SKIP $skip LIMIT $limit
@@ -1221,18 +1149,35 @@ indices:
         # phs_accession
         # studies
         # study_data_types
+        # number_of_study_participants
+        # number_of_study_samples
         query: |
           MATCH (s:study)
           WITH s 
           SKIP $skip LIMIT $limit 
           OPTIONAL MATCH (s)<-[:of_study]-(f:file)
           WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS na
+          CALL {
+            WITH s
+            OPTIONAL MATCH (s)<-[:of_study]-(p:participant)
+            WITH COLLECT(DISTINCT p) AS ps 
+            CALL {
+              WITH ps
+              WITH CASE WHEN size(ps)=0 THEN [NULL] ELSE ps END AS ps
+              UNWIND ps AS p 
+              OPTIONAL MATCH (p)<-[:of_participant]-(samp:sample)
+              RETURN COUNT(DISTINCT samp) AS number_of_study_samples
+            }
+            RETURN 
+              SIZE(ps) AS number_of_study_participants,
+              number_of_study_samples
+          }
           WITH 
-            fs, s, na,
+            fs, s, na, number_of_study_participants, number_of_study_samples,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types,
             CASE WHEN s.acl = '[]' THEN na ELSE replace(replace(replace(s.acl, '[', ''), ']', ''), '"', '') END AS acl
           WITH 
-            fs, s, na,
+            fs, s, na, number_of_study_participants, number_of_study_samples,
             CASE WHEN size(study_data_types)=0 THEN [na] ELSE study_data_types END AS study_data_types,
             acl
           UNWIND fs AS f 
@@ -1242,7 +1187,9 @@ indices:
             COLLECT(DISTINCT acl) AS acl,
             COLLECT(DISTINCT COALESCE(s.phs_accession, na)) AS phs_accession,
             COLLECT(DISTINCT COALESCE(s.study_name, na)) AS studies,
-            study_data_types
+            study_data_types,
+            number_of_study_participants,
+            number_of_study_samples
         page_size: 1
       # Participants
       - name: Participants
@@ -1661,11 +1608,7 @@ indices:
         # initial_query
         - file_id_experimental_strategy # calculated - single value
         - file_id # file.file_id - single value
-        - file_name # file.file_name - single value
-        - file_type # file.file_type - single value
         - experimental_strategies # file.experimental_strategy_and_data_subtypes - single value
-        - file_types # file.file_type - single value
-        - md5sum # file.md5sum - single value
         # Study
         - accesses # study.study_access - array
         - acl # study.acl - array
@@ -1677,7 +1620,6 @@ indices:
         - subject_ids # participant.participant_id - array
         # Samples
         - sample_id # sample.sample_id - array
-        - sample_ids # sample.sample_id - array
         - is_tumor # sample.sample_tumor_status - array
         - sample_types # sample.sample_type - array
         - analyte_type # sample.sample_type - array
@@ -1699,24 +1641,16 @@ indices:
         - tissue_fixative # MultiplexMicroscopy.tissue_fixative - array
         - imaging_assay_type # MultiplexMicroscopy.imaging_assay_type - array
         # Proteomic
-        - aliquot_ids # proteomic.aliquot_id - array
         - analytical_fractions # proteomic.analytical_fractions - array
         - instrument_makes # proteomic.instrument_make - array
-        - proteomic_instrument_models # proteomic.proteomic_instrument_model - array
         - proteomic_design_descriptions # proteomic.proteomic_design_description - array
       long:
-        - file_size # file.file_size - single value
         - number_of_study_participants # calculated - single value
         - number_of_study_samples # calculated - single value
     initial_query:
       # file_id_experimental_strategy
       # file_id
-      # file_name
-      # file_type
-      # file_size
-      # md5sum
       # experimental_strategies
-      # file_types
       query: |
         MATCH (:study)<-[:of_study]-(f:file)
         WITH DISTINCT f
@@ -1730,12 +1664,7 @@ indices:
         RETURN DISTINCT
           f.file_id + "_" + COALESCE(experimental_strategy, na) AS file_id_experimental_strategy,
           f.file_id AS file_id,
-          f.file_name AS file_name,
-          COALESCE(toUpper(f.file_type), na) AS file_type,
-          f.file_size AS file_size,
-          f.md5sum AS md5sum,
-          COALESCE(experimental_strategy, na) AS experimental_strategies,
-          [COALESCE(toUpper(f.file_type), na)] AS file_types
+          COALESCE(experimental_strategy, na) AS experimental_strategies
       page_size: 50000
     update_queries:
       # Studies
@@ -1753,10 +1682,22 @@ indices:
           SKIP $skip LIMIT $limit 
           OPTIONAL MATCH (s)<-[:of_study]-(f:file)
           WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS na
-          OPTIONAL MATCH (s)<-[:of_study]-(:file)-[:of_participant]->(p:participant)
-          WITH s, fs, na, COUNT(DISTINCT p) AS number_of_study_participants
-          OPTIONAL MATCH (s)<-[:of_study]-(:file)-[:of_participant]->(:participant)<-[:of_participant]-(samp:sample)
-          WITH s, fs, na, number_of_study_participants, COUNT(DISTINCT samp) AS number_of_study_samples,
+          CALL {
+            WITH s
+            OPTIONAL MATCH (s)<-[:of_study]-(p:participant)
+            WITH COLLECT(DISTINCT p) AS ps 
+            CALL {
+              WITH ps
+              WITH CASE WHEN size(ps)=0 THEN [NULL] ELSE ps END AS ps
+              UNWIND ps AS p 
+              OPTIONAL MATCH (p)<-[:of_participant]-(samp:sample)
+              RETURN COUNT(DISTINCT samp) AS number_of_study_samples
+            }
+            RETURN 
+              SIZE(ps) AS number_of_study_participants,
+              number_of_study_samples
+          }
+          WITH s, fs, na, number_of_study_participants, number_of_study_samples,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types,
             CASE WHEN s.acl = '[]' THEN na ELSE replace(replace(replace(s.acl, '[', ''), ']', ''), '"', '') END AS acl
           WITH s, fs, na, number_of_study_participants, number_of_study_samples,
@@ -1811,9 +1752,8 @@ indices:
         # sample_types
         # analyte_type
         # sample_id
-        # sample_ids
         query: |
-          MATCH (:study)<-[:of_study]-(f:file)
+          MATCH (f:file)
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           WITH f, "Not specified in data" AS na,
@@ -1833,17 +1773,16 @@ indices:
               COLLECT(DISTINCT COALESCE(TRIM(LAST(split(samp.sample_type, ':'))), na)) AS sample_type,
               COLLECT(DISTINCT COALESCE(samp.sample_id, na)) AS sample_id
           }
-          WITH f, experimental_strategy, na, sample_tumor_status, sample_type, sample_id,
+          WITH DISTINCT f, experimental_strategy, na,
             CASE WHEN size(sample_tumor_status) = 0 THEN [na] ELSE sample_tumor_status END AS is_tumor,
             CASE WHEN size(sample_type) = 0 THEN [na] ELSE sample_type END AS sample_types,
-            CASE WHEN size(sample_id) = 0 THEN [na] ELSE sample_id END AS sample_ids
+            CASE WHEN size(sample_id) = 0 THEN [na] ELSE sample_id END AS sample_id
           RETURN 
             f.file_id + "_" + COALESCE(experimental_strategy, na) AS file_id_experimental_strategy,
             is_tumor,
             sample_types,
             sample_types AS analyte_type,
-            sample_ids AS sample_id,
-            sample_ids
+            sample_id
         page_size: 25000
       # Diagnoses
       - name: Diagnoses
@@ -1997,10 +1936,8 @@ indices:
         page_size: 10000
       # Proteomic
       - name: Proteomic
-        # aliquot_ids
         # analytical_fractions
         # instrument_makes
-        # proteomic_instrument_models
         # proteomic_design_descriptions
         query: |
           MATCH (:study)<-[:of_study]-(f:file)
@@ -2014,32 +1951,28 @@ indices:
           OPTIONAL MATCH (f)<-[:of_file]-(pr:proteomic)
           WITH f, experimental_strategy, pr, na
           WITH f, experimental_strategy, na,
-            COLLECT(DISTINCT COALESCE(pr.aliquot_id, na)) AS aliquot_ids,
             COLLECT(DISTINCT COALESCE(pr.analytical_fractions, na)) AS analytical_fractions,
             COLLECT(DISTINCT COALESCE(pr.instrument_make, na)) AS instrument_makes,
-            COLLECT(DISTINCT COALESCE(pr.proteomic_instrument_model, na)) AS proteomic_instrument_models,
             COLLECT(DISTINCT COALESCE(pr.proteomic_design_description, na)) AS proteomic_design_descriptions
-          WITH f, experimental_strategy, na, aliquot_ids, analytical_fractions, instrument_makes, proteomic_instrument_models, proteomic_design_descriptions
+          WITH f, experimental_strategy, na, analytical_fractions, instrument_makes, proteomic_design_descriptions
           WITH f, experimental_strategy, na,
-            CASE WHEN size(aliquot_ids) = 0 THEN [na] ELSE aliquot_ids END AS aliquot_ids,
             CASE WHEN size(analytical_fractions) = 0 THEN [na] ELSE analytical_fractions END AS analytical_fractions,
             CASE WHEN size(instrument_makes) = 0 THEN [na] ELSE instrument_makes END AS instrument_makes,
-            CASE WHEN size(proteomic_instrument_models) = 0 THEN [na] ELSE proteomic_instrument_models END AS proteomic_instrument_models,
             CASE WHEN size(proteomic_design_descriptions) = 0 THEN [na] ELSE proteomic_design_descriptions END AS proteomic_design_descriptions
           RETURN DISTINCT 
             f.file_id + "_" + COALESCE(experimental_strategy, na) AS file_id_experimental_strategy,
-            aliquot_ids,
             analytical_fractions,
             instrument_makes,
-            proteomic_instrument_models,
             proteomic_design_descriptions
         page_size: 10000
   - index_name: "dashboard_study_data_type"
-    id_field: "phs_accession_study_data_type"
+    id_field: "file_id_study_data_type"
     mapping:
       keyword:
-        - phs_accession_study_data_type
+        - file_id_study_data_type
+        - file_id
         - study_study_data_type_filter
+        - study_data_types
         - study_study_name_filter
         - study_phs_accession_filter
         - files_experimental_strategy_filter
@@ -2062,43 +1995,74 @@ indices:
         - imaging_imaging_assay_type_filter
         - proteomic_analytical_fractions_filter
         - proteomic_instrument_makes_filter
+      long:
+        - number_of_study_participants # calculated - single value
+        - number_of_study_samples # calculated - single value
       boolean:
         - files_is_supplementary_file_filter
     initial_query:
-      # phs_accession_study_data_type
+      # file_id_study_data_type
+      # file_id
       # study_study_data_type_filter
+      # study_data_types
       query: |
-        MATCH (s:study)
-        WITH DISTINCT s
-        ORDER BY s.phs_accession
+        MATCH (f:file)
+        WITH DISTINCT f
         SKIP $skip LIMIT $limit
-        WITH s, "Not specified in data" AS na,
+        OPTIONAL MATCH (f)-[:of_study]->(s:study)
+        WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS na,
           split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
-        WITH s, na, 
+        WITH s, fs, na,
             CASE WHEN size(study_data_types)=0 THEN [NULL] ELSE study_data_types END AS study_data_types
         UNWIND study_data_types AS study_data_type
+        UNWIND fs AS f
         RETURN DISTINCT
-          s.phs_accession + "_" + COALESCE(study_data_type, na) AS phs_accession_study_data_type,
-          COALESCE(study_data_type, na) AS study_study_data_type_filter
+          f.file_id + "_" + COALESCE(study_data_type, na) AS file_id_study_data_type,
+          f.file_id AS file_id,
+          COALESCE(study_data_type, na) AS study_study_data_type_filter,
+          COALESCE(study_data_type, na) AS study_data_types
       page_size: 10000
     update_queries:
       # Studies
       - name: Studies
         # study_study_name_filter
         # study_phs_accession_filter
+        # number_of_study_participants
+        # number_of_study_samples
         query: |
-          MATCH (s:study)
-          WITH s 
-          SKIP $skip LIMIT $limit 
-          WITH s, "Not specified in data" AS na,
+          MATCH (f:file)
+          WITH DISTINCT f
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (f)-[:of_study]->(s:study)
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS na
+          CALL {
+            WITH s
+            OPTIONAL MATCH (s)<-[:of_study]-(p:participant)
+            WITH COLLECT(DISTINCT p) AS ps 
+            CALL {
+              WITH ps
+              WITH CASE WHEN size(ps)=0 THEN [NULL] ELSE ps END AS ps
+              UNWIND ps AS p 
+              OPTIONAL MATCH (p)<-[:of_participant]-(samp:sample)
+              RETURN COUNT(DISTINCT samp) AS number_of_study_samples
+            }
+            RETURN 
+              SIZE(ps) AS number_of_study_participants,
+              number_of_study_samples
+          }
+          WITH s, fs, na, number_of_study_participants, number_of_study_samples,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
-          WITH s, na,
+          WITH s, fs, na, number_of_study_participants, number_of_study_samples,
             CASE WHEN size(study_data_types)=0 THEN [NULL] ELSE study_data_types END AS study_data_types
           UNWIND study_data_types AS study_data_type
-          RETURN
-            s.phs_accession + "_" + COALESCE(study_data_type, na) AS phs_accession_study_data_type,
+          UNWIND fs AS f
+          RETURN DISTINCT
+            f.file_id + "_" + COALESCE(study_data_type, na) AS file_id_study_data_type,
             COLLECT(DISTINCT COALESCE(s.study_name, na)) AS study_study_name_filter,
-            COLLECT(DISTINCT COALESCE(s.phs_accession, na)) AS study_phs_accession_filter
+            COLLECT(DISTINCT COALESCE(s.phs_accession, na)) AS study_phs_accession_filter,
+            COALESCE(study_data_type, na) AS study_data_types,
+            number_of_study_participants,
+            number_of_study_samples
         page_size: 10000
       # Files
       - name: Files
@@ -2106,23 +2070,23 @@ indices:
         # files_file_type_filter
         # files_is_supplementary_file_filter
         query: |
-          MATCH (s:study)
-          WITH DISTINCT s
+          MATCH (f:file)
+          WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH s, "Not specified in data" AS na,
+          OPTIONAL MATCH (f)-[:of_study]->(s:study)
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS na,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
-          WITH s, na,
+          WITH s, fs, na,
             CASE WHEN size(study_data_types)=0 THEN [NULL] ELSE study_data_types END AS study_data_types
           UNWIND study_data_types AS study_data_type
-          OPTIONAL MATCH (s)<-[:of_study]-(f:file)
-          WITH s, study_data_type, f, na
-          WITH s, study_data_type, f, na,
+          UNWIND fs AS f
+          WITH f, study_data_type, na,
             split(replace(replace(replace(f.experimental_strategy_and_data_subtypes, '[', ''), ']', ''), '"', ''), ", ") AS experimental_strategies
-          WITH s, study_data_type, f, na,
+          WITH f, study_data_type, na,
             CASE WHEN size(experimental_strategies)=0 THEN [NULL] ELSE experimental_strategies END AS experimental_strategies
           UNWIND experimental_strategies AS experimental_strategy
-          RETURN 
-            s.phs_accession + "_" + COALESCE(study_data_type, na) AS phs_accession_study_data_type,
+          RETURN DISTINCT
+            f.file_id + "_" + COALESCE(study_data_type, na) AS file_id_study_data_type,
             COLLECT(DISTINCT COALESCE(experimental_strategy, na)) AS files_experimental_strategy_filter,
             COLLECT(DISTINCT COALESCE(f.file_type, na)) AS files_file_type_filter,
             COLLECT(DISTINCT COALESCE(f.is_supplementary_file, false)) AS files_is_supplementary_file_filter
@@ -2131,19 +2095,19 @@ indices:
       - name: Participants
         # demographics_sex_filter
         query: |
-          MATCH (s:study)
-          WITH DISTINCT s
+          MATCH (f:file)
+          WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH s, "Not specified in data" AS na,
+          OPTIONAL MATCH (f)-[:of_study]->(s:study)
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS na,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
-          WITH s, na,
+          WITH s, fs, na,
             CASE WHEN size(study_data_types)=0 THEN [NULL] ELSE study_data_types END AS study_data_types
           UNWIND study_data_types AS study_data_type
-          OPTIONAL MATCH (s)<-[:of_study]-(f:file)
-          WITH s, study_data_type, f, na
+          UNWIND fs AS f
           OPTIONAL MATCH (f)-[:of_participant]->(p:participant)
-          RETURN 
-            s.phs_accession + "_" + COALESCE(study_data_type, na) AS phs_accession_study_data_type,
+          RETURN DISTINCT
+            f.file_id + "_" + COALESCE(study_data_type, na) AS file_id_study_data_type,
             COLLECT(DISTINCT COALESCE(p.sex, na)) AS demographics_sex_filter
         page_size: 10000
       # Samples
@@ -2151,18 +2115,18 @@ indices:
         # samples_sample_tumor_status_filter
         # samples_sample_type_filter
         query: |
-          MATCH (s:study)
-          WITH DISTINCT s
+          MATCH (f:file)
+          WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH s, "Not specified in data" AS na,
+          OPTIONAL MATCH (f)-[:of_study]->(s:study)
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS na,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
-          WITH s, na,
+          WITH s, fs, na,
             CASE WHEN size(study_data_types)=0 THEN [NULL] ELSE study_data_types END AS study_data_types
           UNWIND study_data_types AS study_data_type
-          OPTIONAL MATCH (s)<-[:of_study]-(f:file)
-          WITH s, study_data_type, f, na
+          UNWIND fs AS f
           OPTIONAL MATCH (f)-[:of_participant]->(p:participant)
-          WITH s, study_data_type, COLLECT(DISTINCT p) AS ps, na
+          WITH f, study_data_type, COLLECT(DISTINCT p) AS ps, na
           CALL {
             WITH ps, na
             WITH CASE WHEN size(ps)=0 THEN [NULL] ELSE ps END AS ps, na
@@ -2172,8 +2136,8 @@ indices:
               COLLECT(DISTINCT COALESCE(samp.sample_tumor_status, na)) AS samples_sample_tumor_status_filter,
               COLLECT(DISTINCT COALESCE(samp.sample_type, na)) AS samples_sample_type_filter
           }
-          RETURN 
-            s.phs_accession + "_" + COALESCE(study_data_type, na) AS phs_accession_study_data_type,
+          RETURN DISTINCT
+            f.file_id + "_" + COALESCE(study_data_type, na) AS file_id_study_data_type,
             samples_sample_tumor_status_filter,
             samples_sample_type_filter
         page_size: 10000
@@ -2181,18 +2145,18 @@ indices:
       - name: Diagnoses
         # diagnosis_primary_diagnosis_filter
         query: |
-          MATCH (s:study)
-          WITH DISTINCT s
+          MATCH (f:file)
+          WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH s, "Not specified in data" AS na,
+          OPTIONAL MATCH (f)-[:of_study]->(s:study)
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS na,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
-          WITH s, na,
+          WITH s, fs, na,
             CASE WHEN size(study_data_types)=0 THEN [NULL] ELSE study_data_types END AS study_data_types
           UNWIND study_data_types AS study_data_type
-          OPTIONAL MATCH (s)<-[:of_study]-(f:file)
-          WITH s, study_data_type, f, na
+          UNWIND fs AS f
           OPTIONAL MATCH (f)-[:of_participant]->(p:participant)
-          WITH s, study_data_type, COLLECT(DISTINCT p) AS ps, na
+          WITH f, study_data_type, COLLECT(DISTINCT p) AS ps, na
           CALL {
             WITH ps, na
             WITH CASE WHEN size(ps)=0 THEN [NULL] ELSE ps END AS ps, na
@@ -2208,14 +2172,14 @@ indices:
             OPTIONAL MATCH (samp)<-[:of_sample]-(sdiag:diagnosis)
             RETURN COLLECT(DISTINCT sdiag.primary_diagnosis) AS s_primary_diagnosis
           }
-          WITH s, study_data_type, na, p_primary_diagnosis + s_primary_diagnosis AS primary_diagnoses
-          WITH s, study_data_type, na, CASE WHEN size(primary_diagnoses)=0 THEN [NULL] ELSE primary_diagnoses END AS primary_diagnoses
+          WITH f, study_data_type, na, p_primary_diagnosis + s_primary_diagnosis AS primary_diagnoses
+          WITH f, study_data_type, na, CASE WHEN size(primary_diagnoses)=0 THEN [NULL] ELSE primary_diagnoses END AS primary_diagnoses
           UNWIND primary_diagnoses AS primary_diagnosis
           WITH DISTINCT
-            s, study_data_type, na,
+            f, study_data_type, na,
             COLLECT(DISTINCT primary_diagnosis) AS diagnosis_primary_diagnosis_filter
           RETURN DISTINCT
-            s.phs_accession + "_" + COALESCE(study_data_type, na) AS phs_accession_study_data_type,
+            f.file_id + "_" + COALESCE(study_data_type, na) AS file_id_study_data_type,
             CASE WHEN SIZE(diagnosis_primary_diagnosis_filter) = 0 THEN [na] ELSE diagnosis_primary_diagnosis_filter END AS diagnosis_primary_diagnosis_filter
         page_size: 10000
       # Genomic Info
@@ -2229,19 +2193,19 @@ indices:
         # genomic_instrument_model_filter
         # genomic_reference_genome_assembly_filter
         query: |
-          MATCH (s:study)
-          WITH DISTINCT s
+          MATCH (f:file)
+          WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH s, "Not specified in data" AS na,
+          OPTIONAL MATCH (f)-[:of_study]->(s:study)
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS na,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
-          WITH s, na,
+          WITH s, fs, na,
             CASE WHEN size(study_data_types)=0 THEN [NULL] ELSE study_data_types END AS study_data_types
           UNWIND study_data_types AS study_data_type
-          OPTIONAL MATCH (s)<-[:of_study]-(f:file)
-          WITH s, study_data_type, f, na
+          UNWIND fs AS f
           OPTIONAL MATCH (f)<-[:of_file]-(g:genomic_info)
-          RETURN 
-            s.phs_accession + "_" + COALESCE(study_data_type, na) AS phs_accession_study_data_type,
+          RETURN DISTINCT
+            f.file_id + "_" + COALESCE(study_data_type, na) AS file_id_study_data_type,
             COLLECT(DISTINCT COALESCE(g.library_strategy, na)) AS genomic_library_strategy_filter,
             COLLECT(DISTINCT COALESCE(g.library_source_material, na)) AS genomic_library_source_material_filter,
             COLLECT(DISTINCT COALESCE(g.library_source_molecule, na)) AS genomic_library_source_molecule_filter,
@@ -2258,18 +2222,18 @@ indices:
         # imaging_tissue_fixative_filter
         # imaging_imaging_assay_type_filter
         query: |
-          MATCH (s:study)
-          WITH DISTINCT s
+          MATCH (f:file)
+          WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH s, "Not specified in data" AS na,
+          OPTIONAL MATCH (f)-[:of_study]->(s:study)
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS na,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
-          WITH s, na,
+          WITH s, fs, na,
             CASE WHEN size(study_data_types)=0 THEN [NULL] ELSE study_data_types END AS study_data_types
           UNWIND study_data_types AS study_data_type
-          OPTIONAL MATCH (s)<-[:of_study]-(f:file)
-          WITH s, study_data_type, f, na
+          UNWIND fs AS f
           OPTIONAL MATCH (f)<-[:of_file]-(i:image)
-          WITH DISTINCT s, study_data_type, COLLECT(DISTINCT i) AS images, na
+          WITH DISTINCT f, study_data_type, COLLECT(DISTINCT i) AS images, na
           CALL {
             WITH images, na
             WITH CASE WHEN size(images)=0 THEN [NULL] ELSE images END AS images, na
@@ -2282,7 +2246,7 @@ indices:
               COLLECT(DISTINCT COALESCE(mm.tissue_fixative, na)) AS imaging_tissue_fixative_filter
           }
           RETURN DISTINCT 
-            s.phs_accession + "_" + COALESCE(study_data_type, na) AS phs_accession_study_data_type,
+            f.file_id + "_" + COALESCE(study_data_type, na) AS file_id_study_data_type,
             imaging_tissue_or_organ_of_origin_filter,
             imaging_image_modality_filter,
             imaging_imaging_assay_type_filter,
@@ -2293,19 +2257,19 @@ indices:
         # proteomic_analytical_fractions
         # proteomic_instrument_makes_filter
         query: |
-          MATCH (s:study)
-          WITH DISTINCT s
+          MATCH (f:file)
+          WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH s, "Not specified in data" AS na,
+          OPTIONAL MATCH (f)-[:of_study]->(s:study)
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS na,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
-          WITH s, na,
+          WITH s, fs, na,
             CASE WHEN size(study_data_types)=0 THEN [NULL] ELSE study_data_types END AS study_data_types
           UNWIND study_data_types AS study_data_type
-          OPTIONAL MATCH (s)<-[:of_study]-(f:file)
-          WITH s, study_data_type, f, na
+          UNWIND fs AS f
           OPTIONAL MATCH (f)<-[:of_file]-(pr:proteomic)
           RETURN DISTINCT 
-            s.phs_accession + "_" + COALESCE(study_data_type, na) AS phs_accession_study_data_type,
+            f.file_id + "_" + COALESCE(study_data_type, na) AS file_id_study_data_type,
             COLLECT(DISTINCT COALESCE(pr.analytical_fractions, na)) AS proteomic_analytical_fractions_filter,
             COLLECT(DISTINCT COALESCE(pr.instrument_make, na)) AS proteomic_instrument_makes_filter
         page_size: 10000
@@ -2316,21 +2280,58 @@ indices:
         - study_participant_id
         - participant_id
         - phs_accession
+      long:
+        - number_of_study_participants # calculated - single value
+        - number_of_study_samples # calculated - single value
     initial_query:
       # subject_id (participant_id)
       # phs_accession
       query: |
-        MATCH (s:study)<-[:of_study]-(f:file)
-        WITH DISTINCT f, s.phs_accession as phs_accession
-        MATCH (f)-[:of_participant]->(p:participant)
-        WITH DISTINCT p, f, phs_accession, "Not specified in data" AS na
+        MATCH (p:participant)
+        OPTIONAL MATCH (p)-[:of_participant]->(s:study)
+        WITH DISTINCT p, s, "Not specified in data" AS na
         ORDER BY p.participant_id
         RETURN DISTINCT
           COALESCE(p.study_participant_id, na) as study_participant_id,
           COALESCE(p.participant_id, na) as participant_id,
-          COALESCE(phs_accession, na) as phs_accession
+          COALESCE(s.phs_accession, na) as phs_accession
         SKIP $skip LIMIT $limit
       page_size: 10000
+    update_queries:
+      # Studies
+      - name: Studies
+        # number_of_study_participants
+        # number_of_study_samples
+        query: |
+          MATCH (s:study)
+          WITH s 
+          SKIP $skip LIMIT $limit 
+          CALL {
+            WITH s
+            OPTIONAL MATCH (s)<-[:of_study]-(p:participant)
+            WITH COLLECT(DISTINCT p) AS ps 
+            CALL {
+              WITH ps
+              WITH CASE WHEN size(ps)=0 THEN [NULL] ELSE ps END AS ps
+              UNWIND ps AS p 
+              OPTIONAL MATCH (p)<-[:of_participant]-(samp:sample)
+              RETURN COUNT(DISTINCT samp) AS number_of_study_samples
+            }
+            RETURN 
+              SIZE(ps) AS number_of_study_participants,
+              number_of_study_samples
+          }
+          MATCH (s)<-[:of_study]-(f:file)
+          WITH DISTINCT f, s.phs_accession as phs_accession, number_of_study_participants, number_of_study_samples
+          MATCH (f)-[:of_participant]->(p:participant)
+          WITH DISTINCT p, phs_accession, number_of_study_participants, number_of_study_samples, "Not specified in data" AS na
+          RETURN DISTINCT
+            COALESCE(p.study_participant_id, na) as study_participant_id,
+            COALESCE(p.participant_id, na) as participant_id,
+            COALESCE(phs_accession, na) as phs_accession,
+            number_of_study_participants,
+            number_of_study_samples
+        page_size: 10000
   - index_name: "gs_study"
     id_field: "phs_accession"
     mapping:
