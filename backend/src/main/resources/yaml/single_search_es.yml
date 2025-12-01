@@ -85,7 +85,7 @@ queries:
       type: map
   - name: studyList
     index:
-      - study_list
+      - study
     filter:
       type: default
     result:
@@ -106,7 +106,7 @@ queries:
       type: object_array
   - name: studyDetail
     index:
-      - study_detail
+      - study
     filter:
       type: default
     result:

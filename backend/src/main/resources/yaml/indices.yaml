@@ -2726,6 +2726,7 @@ indices:
         - organism_species
         - adult_or_childhood_study
         - data_types
+        - data_type
         - file_types
         - data_access_level
         - cds_primary_bucket
@@ -2742,9 +2743,13 @@ indices:
         - study_version
       long:
         - number_of_participants
+        - numberOfSubjects
         - number_of_samples
+        - numberOfSamples
         - number_of_files
+        - numberOfFiles
         - number_of_disease_sites
+        - numberOfDiseaseSites
     initial_query:
       # study_name
       # study_code
@@ -2769,6 +2774,7 @@ indices:
       # organism_species
       # adult_or_childhood_study
       # data_types
+      # data_type
       # file_types
       # data_access_level
       # cds_primary_bucket
@@ -2787,6 +2793,7 @@ indices:
         MATCH (s:study)<--(:file)
         WITH DISTINCT s, "Not specified in data" AS na
         SKIP $skip LIMIT $limit
+        WITH s, na, CASE WHEN s.study_data_types IS NULL OR s.study_data_types = '[]' THEN na ELSE replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', '') END AS study_data_types
         RETURN DISTINCT
           s.study_name AS study_name,
           s.study_name AS study_code,
@@ -2810,101 +2817,73 @@ indices:
           s.clinical_trial_arm AS clinical_trial_arm,
           s.organism_species AS organism_species,
           s.adult_or_childhood_study AS adult_or_childhood_study,
-          s.data_types AS data_types,
+          study_data_types AS data_types,
+          study_data_types AS data_type,
           s.file_types AS file_types,
           s.data_access_level AS data_access_level,
           s.cds_primary_bucket AS cds_primary_bucket,
           s.cds_secondary_bucket AS cds_secondary_bucket,
           s.cds_tertiary_bucket AS cds_tertiary_bucket,
-          s.study_data_types AS study_data_types,
-          CASE WHEN s.file_types_and_format = '[]' THEN na ELSE replace(replace(replace(replace(s.file_types_and_format, '[', ''), ']', ''), '"', ''), '''', '') END AS file_types_and_format,
+          study_data_types AS study_data_types,
+          CASE WHEN s.file_types_and_format = '[]' THEN na ELSE replace(replace(replace(s.file_types_and_format, '[', ''), ']', ''), '"', '') END AS file_types_and_format,
           s.size_of_data_being_uploaded AS size_of_data_being_uploaded,
           s.size_of_data_being_uploaded_unit AS size_of_data_being_uploaded_unit,
           s.size_of_data_being_uploaded_original AS size_of_data_being_uploaded_original,
           s.size_of_data_being_uploaded_original_unit AS size_of_data_being_uploaded_original_unit,
-          CASE WHEN s.acl = '[]' THEN na ELSE replace(replace(replace(replace(s.acl, '[', ''), ']', ''), '"', ''), '''', '') END AS acl,
+          CASE WHEN s.acl = '[]' THEN na ELSE replace(replace(replace(s.acl, '[', ''), ']', ''), '"', '') END AS acl,
           s.study_access AS study_access,
-          CASE WHEN s.study_version = '[]' THEN na ELSE replace(replace(replace(replace(s.study_version, '[', ''), ']', ''), '"', ''), '''', '') END AS study_version
-      page_size: 10000
+          CASE WHEN s.study_version = '[]' THEN na ELSE replace(replace(replace(s.study_version, '[', ''), ']', ''), '"', '') END AS study_version
+      page_size: 1
     update_queries:
       # Number of participants
       - name: "Number of participants"
         # number_of_participants
+        # numberOfSubjects
         query: |
           MATCH (s:study)
           WITH DISTINCT s
           SKIP $skip LIMIT $limit
-          CALL {
-            WITH s
-            OPTIONAL MATCH (s)<-[:of_study]-(f:file)
-            OPTIONAL MATCH (f)-[:of_participant]->(p:participant)
-            RETURN SIZE(COLLECT(DISTINCT p)) AS number_of_participants
-          }
-          RETURN DISTINCT s.phs_accession AS phs_accession, number_of_participants
-        page_size: 10000
+          OPTIONAL MATCH (s)<-[*]-(p:participant)
+          WITH DISTINCT s, COUNT(DISTINCT p) AS number_of_participants
+          RETURN DISTINCT s.phs_accession AS phs_accession, number_of_participants, number_of_participants AS numberOfSubjects
+        page_size: 1
       # Number of samples
       - name: "Number of samples"
         # number_of_samples
+        # numberOfSamples
         query: |
           MATCH (s:study)
           WITH DISTINCT s
           SKIP $skip LIMIT $limit
-          CALL {
-            WITH s
-            OPTIONAL MATCH (s)<-[:of_study]-(f:file)
-            OPTIONAL MATCH (f)-[:of_participant]->(p:participant)
-            OPTIONAL MATCH (p)<-[:of_participant]-(samp:sample)
-            RETURN SIZE(COLLECT(DISTINCT samp)) AS number_of_samples
-          }
-          RETURN DISTINCT s.phs_accession AS phs_accession, number_of_samples
-        page_size: 10000
+          OPTIONAL MATCH (s)<-[*]-(samp:sample)
+          WITH DISTINCT s, COUNT(DISTINCT samp) AS number_of_samples
+          RETURN DISTINCT s.phs_accession AS phs_accession, number_of_samples, number_of_samples AS numberOfSamples
+        page_size: 1
       # Number of files
       - name: "Number of files"
         # number_of_files
+        # numberOfFiles
         query: |
           MATCH (s:study)
           WITH DISTINCT s
           SKIP $skip LIMIT $limit
-          CALL {
-            WITH s
-            OPTIONAL MATCH (s)<-[:of_study]-(f:file)
-            RETURN SIZE(COLLECT(DISTINCT f)) AS number_of_files
-          }
-          RETURN DISTINCT s.phs_accession AS phs_accession, number_of_files
-        page_size: 10000
+          OPTIONAL MATCH (s)<-[*]-(f:file)
+          WITH DISTINCT s, COUNT(DISTINCT f) AS number_of_files
+          RETURN DISTINCT s.phs_accession AS phs_accession, number_of_files, number_of_files AS numberOfFiles
+        page_size: 1
       # Number of disease sites
       - name: "Number of disease sites"
         # number_of_disease_sites
+        # numberOfDiseaseSites
         query: |
           MATCH (s:study)
           WITH DISTINCT s
           SKIP $skip LIMIT $limit
-          CALL {
-            WITH s
-            OPTIONAL MATCH (s)<-[:of_study]-(f:file)
-            OPTIONAL MATCH (f)-[:of_participant]->(:participant)<-[:of_participant]-(pdiag:diagnosis)
-            WHERE pdiag.primary_site IS NOT NULL
-            RETURN COLLECT(DISTINCT pdiag.primary_site) AS p_sites
-          }
-          CALL {
-            WITH s
-            OPTIONAL MATCH (s)<-[:of_study]-(f:file)
-            OPTIONAL MATCH (f)-[:of_participant]->(:participant)<-[:of_participant]-(samp:sample)
-            WITH DISTINCT samp
-            OPTIONAL MATCH (samp)<-[:of_sample]-(sdiag:diagnosis)
-            WHERE sdiag.primary_site IS NOT NULL
-            RETURN COLLECT(DISTINCT sdiag.primary_site) AS s_sites
-          }
-          CALL {
-            WITH p_sites, s_sites
-            WITH 
-              CASE WHEN p_sites IS NULL THEN [] ELSE p_sites END +
-              CASE WHEN s_sites IS NULL THEN [] ELSE s_sites END AS sites
-            UNWIND sites AS all_sites
-            RETURN SIZE(COLLECT(DISTINCT all_sites)) AS number_of_disease_sites
-          }
-          RETURN DISTINCT s.phs_accession AS phs_accession, number_of_disease_sites
-        page_size: 10000
+          OPTIONAL MATCH (s)<-[*]-(diag:diagnosis)
+          WHERE diag.primary_site IS NOT NULL
+          WITH DISTINCT s, COUNT(DISTINCT diag.primary_site) AS number_of_disease_sites
+          RETURN DISTINCT s.phs_accession AS phs_accession, number_of_disease_sites, number_of_disease_sites AS numberOfDiseaseSites
+        page_size: 1
   - index_name: about_page
     type: about_file
   - index_name: model_nodes
