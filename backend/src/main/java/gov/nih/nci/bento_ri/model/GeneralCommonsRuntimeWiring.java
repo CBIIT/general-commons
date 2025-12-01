@@ -206,6 +206,28 @@ public class GeneralCommonsRuntimeWiring {
                             Map<String, Object> args = env.getArguments();
                             return memgraphDataFetcher.getNumberOfVersions(args);
                         })
+                        // numberOf... queries (replacing YAML-based queries) - total counts, no arguments required
+                        .dataFetcher("numberOfStudies", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfStudies();
+                        })
+                        .dataFetcher("numberOfSubjects", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfParticipants();
+                        })
+                        .dataFetcher("numberOfSamples", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfSamples();
+                        })
+                        .dataFetcher("numberOfFiles", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfFiles();
+                        })
+                        .dataFetcher("numberOfDiseaseSites", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfDiseaseSites();
+                        })
+                        .dataFetcher("numberOfImages", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfImages();
+                        })
+                        .dataFetcher("numberOfProteomics", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfProteomics();
+                        })
                 )
                 .build();
     }

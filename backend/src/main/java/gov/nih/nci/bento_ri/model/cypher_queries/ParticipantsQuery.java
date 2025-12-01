@@ -15,4 +15,9 @@ public class ParticipantsQuery {
         MATCH (p:participant)-[:of_study]->(s:study {phs_accession: $phs_accession})
         RETURN COUNT(DISTINCT p) AS count
     """;
+
+    public static final String PARTICIPANTS_TOTAL_COUNT_QUERY = """
+        MATCH (p:participant)
+        RETURN COUNT(DISTINCT p) AS count
+    """;
 }

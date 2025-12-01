@@ -160,6 +160,10 @@ public class MemgraphDataFetcher implements AutoCloseable{
         return countQuery(DiagnosesQuery.DIAGNOSES_COUNT_QUERY, params);
     }
     
+    public Long getNumberOfDiseaseSites(Map<String, Object> params){
+        return countQuery(DiagnosesQuery.DIAGNOSES_DISEASE_SITES_COUNT_QUERY, params);
+    }
+    
     public Long getNumberOfTreatments(Map<String, Object> params){
         return countQuery(TreatmentsQuery.TREATMENTS_COUNT_QUERY, params);
     }
@@ -208,6 +212,34 @@ public class MemgraphDataFetcher implements AutoCloseable{
         return countQuery(VersionQuery.VERSION_COUNT_QUERY, params);
     }
     
+    // Total count queries (no arguments required)
+    public Long getTotalNumberOfStudies(){
+        return countQuery(StudiesQuery.STUDIES_TOTAL_COUNT_QUERY, new HashMap<>());
+    }
+    
+    public Long getTotalNumberOfParticipants(){
+        return countQuery(ParticipantsQuery.PARTICIPANTS_TOTAL_COUNT_QUERY, new HashMap<>());
+    }
+    
+    public Long getTotalNumberOfSamples(){
+        return countQuery(SamplesQuery.SAMPLES_TOTAL_COUNT_QUERY, new HashMap<>());
+    }
+    
+    public Long getTotalNumberOfFiles(){
+        return countQuery(FilesQuery.FILES_TOTAL_COUNT_QUERY, new HashMap<>());
+    }
+    
+    public Long getTotalNumberOfDiseaseSites(){
+        return countQuery(DiagnosesQuery.DIAGNOSES_DISEASE_SITES_COUNT_QUERY, new HashMap<>());
+    }
+    
+    public Long getTotalNumberOfImages(){
+        return countQuery(ImagesQuery.IMAGES_TOTAL_COUNT_QUERY, new HashMap<>());
+    }
+    
+    public Long getTotalNumberOfProteomics(){
+        return countQuery(ProteomicsQuery.PROTEOMICS_TOTAL_COUNT_QUERY, new HashMap<>());
+    }
 
     private Map<String, Object> mapQuery(String query, Map<String, Object> params){
         try (Session session = driver.session()) {

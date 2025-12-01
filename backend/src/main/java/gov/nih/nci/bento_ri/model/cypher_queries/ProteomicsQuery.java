@@ -22,4 +22,9 @@ public class ProteomicsQuery {
         MATCH (p:proteomic)-[:of_file]->(:file)-[:of_study]->(s:study {phs_accession: $phs_accession})
         RETURN COUNT(DISTINCT p) AS count
     """;
+
+    public static final String PROTEOMICS_TOTAL_COUNT_QUERY = """
+        MATCH (p:proteomic)
+        RETURN COUNT(DISTINCT p) AS count
+    """;
 }
