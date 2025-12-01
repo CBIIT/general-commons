@@ -71,14 +71,14 @@ queries:
       type: map
   - name: programList
     index:
-      - program_list
+      - program
     filter:
       type: default
     result:
       type: object_array
   - name: programDetail
     index:
-      - program_detail
+      - program
     filter:
       type: default
     result:
