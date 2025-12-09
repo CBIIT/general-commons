@@ -1011,6 +1011,96 @@ indices:
             COLLECT(DISTINCT COALESCE(pr.proteomic_instrument_model, na)) AS proteomic_instrument_models,
             COLLECT(DISTINCT COALESCE(pr.proteomic_design_description, na)) AS proteomic_design_descriptions
         page_size: 10000
+  - index_name: "samples_for_subject_id"
+    id_field: "sample_id"
+    mapping:
+      keyword:
+        # initial_query
+        - sample_id # sample.sample_id - single value
+        - sample_type # sample.sample_type - single value
+        - sample_description # sample.sample_description - single value
+        - sample_type_category # sample.sample_type_category - single value
+        - sample_tumor_status # sample.sample_tumor_status - single value
+        - sample_anatomic_site # sample.sample_anatomic_site - single value
+        - sample_age_at_collection # sample.sample_age_at_collection - single value
+        - derived_from_specimen # sample.derived_from_specimen - single value
+        - biosample_accession # sample.biosample_accession - single value
+        - crdc_id # sample.crdc_id - single value
+        - participant_id # participant.participant_id - single value
+        - subject_id # participant.participant_id - single value (for filtering)
+        # Files (nested objects with file_id and file_name)
+        - files.file_id # file.file_id - array
+        - files.file_name # file.file_name - array
+        # Relationship properties (from update queries)
+        - phs_accession # study.phs_accession - single value
+    initial_query:
+      # sample_id
+      # sample_type
+      # sample_description
+      # sample_type_category
+      # sample_tumor_status
+      # sample_anatomic_site
+      # sample_age_at_collection
+      # derived_from_specimen
+      # biosample_accession
+      # crdc_id
+      # participant_id
+      # subject_id
+      # files
+      query: |
+        MATCH (samp:sample)-[:of_participant]->(:participant)
+        WITH DISTINCT samp 
+        SKIP $skip LIMIT $limit
+        CALL {
+          WITH samp
+          OPTIONAL MATCH (samp)-[:of_participant]->(p:participant)
+          WITH DISTINCT p
+          RETURN COLLECT(DISTINCT p.participant_id) AS participant_ids
+        }
+        CALL {
+          WITH samp
+          OPTIONAL MATCH (samp)-[:of_participant]->(p:participant)
+          WITH DISTINCT p
+          OPTIONAL MATCH (p)<-[:of_participant]-(f:file)
+          WITH DISTINCT f
+          RETURN COLLECT({
+            file_id: f.file_id,
+            file_name: f.file_name
+          }) AS files
+        }
+        WITH 
+          samp,
+          CASE WHEN size(participant_ids) > 0 THEN participant_ids ELSE [] END AS participant_ids,
+          CASE WHEN size(files) > 0 THEN files ELSE [] END AS files
+        RETURN DISTINCT
+          samp.sample_id AS sample_id,
+          samp.sample_type AS sample_type,
+          samp.sample_description AS sample_description,
+          samp.sample_type_category AS sample_type_category,
+          samp.sample_tumor_status AS sample_tumor_status,
+          samp.sample_anatomic_site AS sample_anatomic_site,
+          samp.sample_age_at_collection AS sample_age_at_collection,
+          samp.derived_from_specimen AS derived_from_specimen,
+          samp.biosample_accession AS biosample_accession,
+          samp.crdc_id AS crdc_id,
+          participant_ids AS participant_id,
+          participant_ids AS subject_id,
+          files
+      page_size: 10000
+    update_queries:
+      # Study (for phs_accession)
+      - name: "Study"
+        # phs_accession
+        query: |
+          MATCH (samp:sample)-[:of_participant]->(:participant)
+          WITH DISTINCT samp
+          SKIP $skip LIMIT $limit
+          MATCH (samp)-[*]->(s:study)
+          WITH DISTINCT samp.sample_id AS sample_id, s.phs_accession AS phs_accession
+          RETURN DISTINCT
+            sample_id,
+            phs_accession
+        page_size: 10000
   - index_name: "dashboard_file"
     id_field: "file_id"
     mapping:
@@ -2300,38 +2390,28 @@ indices:
     update_queries:
       # Studies
       - name: Studies
+        # study_participant_id
+        # participant_id
+        # phs_accession
         # number_of_study_participants
         # number_of_study_samples
         query: |
           MATCH (s:study)
           WITH s 
           SKIP $skip LIMIT $limit 
-          CALL {
-            WITH s
-            OPTIONAL MATCH (s)<-[:of_study]-(p:participant)
-            WITH COLLECT(DISTINCT p) AS ps 
-            CALL {
-              WITH ps
-              WITH CASE WHEN size(ps)=0 THEN [NULL] ELSE ps END AS ps
-              UNWIND ps AS p 
-              OPTIONAL MATCH (p)<-[:of_participant]-(samp:sample)
-              RETURN COUNT(DISTINCT samp) AS number_of_study_samples
-            }
-            RETURN 
-              SIZE(ps) AS number_of_study_participants,
-              number_of_study_samples
-          }
-          MATCH (s)<-[:of_study]-(f:file)
-          WITH DISTINCT f, s.phs_accession as phs_accession, number_of_study_participants, number_of_study_samples
-          MATCH (f)-[:of_participant]->(p:participant)
-          WITH DISTINCT p, phs_accession, number_of_study_participants, number_of_study_samples, "Not specified in data" AS na
+          OPTIONAL MATCH (s)<-[*]-(p:participant)
+          WITH DISTINCT s, COUNT(DISTINCT p) AS number_of_study_participants
+          OPTIONAL MATCH (s)<-[*]-(samp:sample)
+          WITH DISTINCT s, number_of_study_participants, COUNT(DISTINCT samp) AS number_of_study_samples
+          MATCH (s)<-[*]-(p:participant)
+          WITH DISTINCT p, s, number_of_study_participants, number_of_study_samples, "Not specified in data" AS na
           RETURN DISTINCT
             COALESCE(p.study_participant_id, na) as study_participant_id,
             COALESCE(p.participant_id, na) as participant_id,
-            COALESCE(phs_accession, na) as phs_accession,
+            COALESCE(s.phs_accession, na) as phs_accession,
             number_of_study_participants,
             number_of_study_samples
-        page_size: 10000
+        page_size: 1
   - index_name: "gs_study"
     id_field: "phs_accession"
     mapping:

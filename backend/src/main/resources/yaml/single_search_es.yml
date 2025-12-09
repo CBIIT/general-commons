@@ -36,7 +36,7 @@ queries:
       type: map
   - name: samplesForSubjectId
     index:
-      - samples
+      - samples_for_subject_id
     filter:
       type: default
     result:
