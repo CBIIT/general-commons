@@ -1,11 +1,4 @@
 queries:
-  - name: idsLists
-    index:
-      - subject_ids_list
-    filter:
-      type: default
-    result:
-      type: map
   - name: programList
     index:
       - program

@@ -29,6 +29,9 @@ public class GeneralCommonsRuntimeWiring {
                         .dataFetcher("schemaVersion", env -> "3.1.0")
                         .dataFetcher("schemaModelVersion", env -> "8.0.1")
                         .dataFetchers(yamlQueryFactory.createYamlQueries(Const.ES_ACCESS_TYPE.PRIVATE))
+                        .dataFetcher("idsLists", env -> {
+                            return privateESDataFetcher.idsLists();
+                        })
                         .dataFetcher("searchSubjects", env -> {
                             Map<String, Object> args = env.getArguments();
                             return privateESDataFetcher.searchSubjects(args);

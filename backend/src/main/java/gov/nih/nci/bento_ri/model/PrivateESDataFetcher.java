@@ -49,6 +49,18 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     final String VALUES_COUNT_END_POINT = "/model_values/_count";
     final String GS_ABOUT_END_POINT = "/about_page/_search";
 
+    // GlobalSearch endpoints - use GS-prefixed indices
+    final String GS_STUDY_END_POINT = "/gs_study/_search";
+    final String GS_STUDY_COUNT_END_POINT = "/gs_study/_count";
+    final String GS_PARTICIPANT_END_POINT = "/gs_participant/_search";
+    final String GS_PARTICIPANT_COUNT_END_POINT = "/gs_participant/_count";
+    final String GS_SAMPLE_END_POINT = "/gs_sample/_search";
+    final String GS_SAMPLE_COUNT_END_POINT = "/gs_sample/_count";
+    final String GS_FILE_END_POINT = "/gs_file/_search";
+    final String GS_FILE_COUNT_END_POINT = "/gs_file/_count";
+    final String GS_PROGRAM_END_POINT = "/gs_program/_search";
+    final String GS_PROGRAM_COUNT_END_POINT = "/gs_program/_count";
+
     final int GS_LIMIT = 10;
     final String GS_END_POINT = "endpoint";
     final String GS_COUNT_ENDPOINT = "count_endpoint";
@@ -635,15 +647,16 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         int size = (int) params.get("first");
         int offset = (int) params.get("offset");
         List<Map<String, Object>> searchCategories = new ArrayList<>();
+        // gs_study index - fields: phs_accession_gs, study_name_gs, study_code_gs, study_data_types_gs
         searchCategories.add(Map.of(
-                GS_END_POINT, STUDIES_END_POINT,
-                GS_COUNT_ENDPOINT, STUDIES_COUNT_END_POINT,
+                GS_END_POINT, GS_STUDY_END_POINT,
+                GS_COUNT_ENDPOINT, GS_STUDY_COUNT_END_POINT,
                 GS_COUNT_RESULT_FIELD, "study_count",
                 GS_RESULT_FIELD, "studies",
                 GS_SEARCH_FIELD, List.of("phs_accession_gs", "study_name_gs", "study_code_gs", "study_data_types_gs"),
                 GS_SORT_FIELD, "phs_accession",
                 GS_COLLECT_FIELDS, new String[][]{
-                        new String[]{"phs_accession", "phs_accession_gs"},
+                        new String[]{"phs_accession", "phs_accession"},
                         new String[]{"study_code", "study_code_gs"},
                         new String[]{"study_name", "study_name_gs"},
                         new String[]{"study_data_types", "study_data_types_gs"}
@@ -651,80 +664,86 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 GS_CATEGORY_TYPE, "study"
 
         ));
+        // gs_participant index - fields: study_gs, subject_id_gs, site_gs, sex_gs, subject_ids_filter
         searchCategories.add(Map.of(
-                GS_END_POINT, SUBJECTS_END_POINT,
-                GS_COUNT_ENDPOINT, SUBJECTS_COUNT_END_POINT,
+                GS_END_POINT, GS_PARTICIPANT_END_POINT,
+                GS_COUNT_ENDPOINT, GS_PARTICIPANT_COUNT_END_POINT,
                 GS_COUNT_RESULT_FIELD, "subject_count",
                 GS_RESULT_FIELD, "subjects",
                 GS_SEARCH_FIELD, List.of("study_gs", "subject_id_gs", "site_gs", "sex_gs"),
-                GS_SORT_FIELD, "subject_ids",
+                GS_SORT_FIELD, "study_participant_id",
                 GS_COLLECT_FIELDS, new String[][]{
                         new String[]{"study", "study_gs"},
                         new String[]{"subject_id", "subject_id_gs"},
                         new String[]{"site", "site_gs"},
                         new String[]{"sex", "sex_gs"},
-                        new String[]{"subject_ids_filter", "subject_ids_filter"},
+                        new String[]{"study_participant_id", "study_participant_id"},
+                        new String[]{"subject_ids_filter", "subject_ids_filter"}
                 },
                 GS_CATEGORY_TYPE, "subject"
         ));
+        // gs_sample index - fields: sample_id_gs, is_tumor_gs, analyte_type_gs, subject_ids_filter
         searchCategories.add(Map.of(
-                GS_END_POINT, SAMPLES_END_POINT,
-                GS_COUNT_ENDPOINT, SAMPLES_COUNT_END_POINT,
+                GS_END_POINT, GS_SAMPLE_END_POINT,
+                GS_COUNT_ENDPOINT, GS_SAMPLE_COUNT_END_POINT,
                 GS_COUNT_RESULT_FIELD, "sample_count",
                 GS_RESULT_FIELD, "samples",
                 GS_SEARCH_FIELD, List.of("sample_id_gs", "is_tumor_gs", "analyte_type_gs"),
                 GS_SORT_FIELD, "sample_id",
                 GS_COLLECT_FIELDS, new String[][]{
-                        new String[]{"sample_id", "sample_id_gs"},
+                        new String[]{"sample_id", "sample_id"},
                         new String[]{"is_tumor", "is_tumor_gs"},
                         new String[]{"analyte_type", "analyte_type_gs"},
                         new String[]{"subject_ids_filter", "subject_ids_filter"}
                 },
                 GS_CATEGORY_TYPE, "sample"
         ));
+        // gs_file index - all GS_File fields from GraphQL schema
         searchCategories.add(Map.of(
-                GS_END_POINT, FILES_END_POINT,
-                GS_COUNT_ENDPOINT, FILES_COUNT_END_POINT,
+                GS_END_POINT, GS_FILE_END_POINT,
+                GS_COUNT_ENDPOINT, GS_FILE_COUNT_END_POINT,
                 GS_COUNT_RESULT_FIELD, "file_count",
                 GS_RESULT_FIELD, "files",
-                GS_SEARCH_FIELD, List.of("subject_id_gs","sample_id_gs","file_id_gs","file_name_gs",
-                        "file_type_gs","accesses_gs","acl_gs","experimental_strategies_gs","instrument_models_gs",
-                        "library_layouts_gs","library_selections_gs","library_source_materials_gs","library_source_molecules_gs","library_strategies_gs",
-                        "platforms_gs","reference_genome_assemblies_gs","sites_gs", "is_supplementary_file_gs"),
+                GS_SEARCH_FIELD, List.of("subject_id_gs", "sample_id_gs", "file_id_gs", "file_name_gs",
+                        "file_type_gs", "accesses_gs", "acl_gs", "experimental_strategies_gs", "instrument_models_gs",
+                        "library_layouts_gs", "library_selections_gs", "library_source_materials_gs",
+                        "library_source_molecules_gs", "library_strategies_gs", "platforms_gs",
+                        "reference_genome_assemblies_gs", "sites_gs", "is_supplementary_file_gs"),
                 GS_SORT_FIELD, "file_id",
                 GS_COLLECT_FIELDS, new String[][]{
                         new String[]{"subject_id", "subject_id_gs"},
                         new String[]{"sample_id", "sample_id_gs"},
-                        new String[]{"file_id", "file_id_gs"},
+                        new String[]{"file_id", "file_id"},
                         new String[]{"file_name", "file_name_gs"},
                         new String[]{"file_type", "file_type_gs"},
                         new String[]{"accesses", "accesses_gs"},
-                        new String[]{"acl","acl_gs"},
-                        new String[]{"experimental_strategies","experimental_strategies_gs"},
-                        new String[]{"instrument_models","instrument_models_gs"},
-                        new String[]{"library_layouts","library_layouts_gs"},
-                        new String[]{"library_selections","library_selections_gs"},
-                        new String[]{"library_source_materials","library_source_materials_gs"},
+                        new String[]{"acl", "acl_gs"},
+                        new String[]{"experimental_strategies", "experimental_strategies_gs"},
+                        new String[]{"instrument_models", "instrument_models_gs"},
+                        new String[]{"library_layouts", "library_layouts_gs"},
+                        new String[]{"library_selections", "library_selections_gs"},
+                        new String[]{"library_source_materials", "library_source_materials_gs"},
                         new String[]{"library_source_molecules", "library_source_molecules_gs"},
-                        new String[]{"library_strategies","library_strategies_gs"},
-                        new String[]{"platforms","platforms_gs"},
-                        new String[]{"reference_genome_assemblies","reference_genome_assemblies_gs"},
-                        new String[]{"sites","sites_gs"},
+                        new String[]{"library_strategies", "library_strategies_gs"},
+                        new String[]{"platforms", "platforms_gs"},
+                        new String[]{"reference_genome_assemblies", "reference_genome_assemblies_gs"},
+                        new String[]{"sites", "sites_gs"},
                         new String[]{"subject_ids_filter", "subject_ids_filter"},
                         new String[]{"is_supplementary_file", "is_supplementary_file_gs"}
                 },
                 GS_CATEGORY_TYPE, "file"
         ));
+        // gs_program index - fields: program_name_gs, program_short_description_gs, program_full_description_gs, program_external_url_gs, program_sort_order_gs, type_gs
         searchCategories.add(Map.of(
-                GS_END_POINT, PROGRAMS_END_POINT,
-                GS_COUNT_ENDPOINT, PROGRAMS_COUNT_END_POINT,
+                GS_END_POINT, GS_PROGRAM_END_POINT,
+                GS_COUNT_ENDPOINT, GS_PROGRAM_COUNT_END_POINT,
                 GS_COUNT_RESULT_FIELD, "program_count",
                 GS_RESULT_FIELD, "programs",
                 GS_SEARCH_FIELD, List.of("program_name_gs", "program_short_description_gs", "program_full_description_gs",
                         "program_external_url_gs", "program_sort_order_gs"),
-                GS_SORT_FIELD, "program_sort_order",
+                GS_SORT_FIELD, "program_name",
                 GS_COLLECT_FIELDS, new String[][]{
-                        new String[]{"program_name", "program_name_gs"},
+                        new String[]{"program_name", "program_name"},
                         new String[]{"program_short_description", "program_short_description_gs"},
                         new String[]{"program_full_description", "program_full_description_gs"},
                         new String[]{"program_external_url", "program_external_url_gs"},
@@ -1039,6 +1058,31 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         request.setJsonEntity(gson.toJson(query));
         JsonObject jsonObject = esService.send(request);
         return esService.collectTerms(jsonObject, collectField);
+    }
+
+    /**
+     * Get all subject IDs using aggregation on dashboard_participant_ids index.
+     * This is more efficient than storing all IDs in a single document.
+     */
+    Map<String, Object> idsLists() throws IOException {
+        final String PARTICIPANT_IDS_END_POINT = "/dashboard_participant_ids/_search";
+        final String FIELD_NAME = "participant_id";
+        
+        // Build a match_all query with aggregation
+        Map<String, Object> query = new HashMap<>();
+        query.put("size", 0);
+        query.put("query", Map.of("match_all", Map.of()));
+        query = esService.addAggregations(query, new String[]{FIELD_NAME});
+        
+        Request request = new Request("GET", PARTICIPANT_IDS_END_POINT);
+        request.setJsonEntity(gson.toJson(query));
+        JsonObject jsonObject = esService.send(request);
+        
+        List<String> subjectIds = esService.collectTerms(jsonObject, FIELD_NAME);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("subjectIds", subjectIds);
+        return result;
     }
 
 }
