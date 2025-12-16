@@ -22,6 +22,9 @@ type SampleOverview {
     is_tumor: String
     analyte_type: String
     files: [String]
+    study_name: String
+    sample_name: String
+    organization_name: String
 }
 
 type FileOverview {
@@ -57,6 +60,7 @@ type FileOverview {
     is_supplementary_file: String
     release_datetime: String
     supplementary_file_names: [String]
+    study_name: String
 }
 
 type FilesInList {
@@ -97,6 +101,7 @@ type FilesInList {
     associated_drs_uri: String
     associated_md5sum: String
     associated_is_supplementary_file: String
+    study_name: String
 }
 
 
@@ -136,6 +141,15 @@ type SearchResult {
     subjectCountByImagingAssayType: [GroupCount]
     subjectCountByOrganOrTissue: [GroupCount]
     subjectCountByIsSupplementaryFile: [GroupCount]
+    subjectCountByProtocolName: [GroupCount]
+    subjectCountByProtocolType: [GroupCount]
+    subjectCountByPublicationTitle: [GroupCount]
+    subjectCountByPublicationStatus: [GroupCount]
+    subjectCountByPubId: [GroupCount]
+    subjectCountByNanomaterialEntity: [GroupCount]
+    subjectCountByFunctionalizingEntity: [GroupCount]
+    subjectCountByCharacterizationType: [GroupCount]
+    subjectCountByCharacterizationName: [GroupCount]
 
     filterSubjectCountByStudy: [GroupCount]
     filterSubjectCountByExperimentalStrategy: [GroupCount]
@@ -168,6 +182,15 @@ type SearchResult {
     filterSubjectCountByImagingAssayType: [GroupCount]
     filterSubjectCountByOrganOrTissue: [GroupCount]
     filterSubjectCountByIsSupplementaryFile: [GroupCount]
+    filterSubjectCountByProtocolName: [GroupCount]
+    filterSubjectCountByProtocolType: [GroupCount]
+    filterSubjectCountByPublicationTitle: [GroupCount]
+    filterSubjectCountByPublicationStatus: [GroupCount]
+    filterSubjectCountByPubId: [GroupCount]
+    filterSubjectCountByNanomaterialEntity: [GroupCount]
+    filterSubjectCountByFunctionalizingEntity: [GroupCount]
+    filterSubjectCountByCharacterizationType: [GroupCount]
+    filterSubjectCountByCharacterizationName: [GroupCount]
 
     donutCountByExperimentalStrategy: [GroupCount]
     donutCountBySex: [GroupCount]
@@ -839,6 +862,19 @@ type QueryType {
         tissue_fixative: [String] = []
         imaging_assay_type: [String] = []
         is_supplementary_file: [String] = []
+        # Protocol filters
+        protocol_names: [String] = []
+        protocol_types: [String] = []
+        # Publication filters
+        publication_titles: [String] = []
+        publication_statuses: [String] = []
+        pub_ids: [String] = []
+        # Composition filters
+        nanomaterial_entities: [String] = []
+        functionalizing_entities: [String] = []
+        # Characterization filters
+        characterization_types: [String] = []
+        characterization_names: [String] = []
     ): SearchResult
 
     subjectOverview (
@@ -875,6 +911,19 @@ type QueryType {
         tissue_fixative: [String] = []
         imaging_assay_type: [String] = []
         is_supplementary_file: [String] = []
+        # Protocol filters
+        protocol_names: [String] = []
+        protocol_types: [String] = []
+        # Publication filters
+        publication_titles: [String] = []
+        publication_statuses: [String] = []
+        pub_ids: [String] = []
+        # Composition filters
+        nanomaterial_entities: [String] = []
+        functionalizing_entities: [String] = []
+        # Characterization filters
+        characterization_types: [String] = []
+        characterization_names: [String] = []
         # pagination and sorting
         order_by: String = ""
         sort_direction: String = "ASC"
@@ -917,6 +966,19 @@ type QueryType {
         tissue_fixative: [String] = []
         imaging_assay_type: [String] = []
         is_supplementary_file: [String] = []
+        # Protocol filters
+        protocol_names: [String] = []
+        protocol_types: [String] = []
+        # Publication filters
+        publication_titles: [String] = []
+        publication_statuses: [String] = []
+        pub_ids: [String] = []
+        # Composition filters
+        nanomaterial_entities: [String] = []
+        functionalizing_entities: [String] = []
+        # Characterization filters
+        characterization_types: [String] = []
+        characterization_names: [String] = []
         # pagination and sorting
         order_by: String = ""
         sort_direction: String = "ASC"
@@ -960,6 +1022,19 @@ type QueryType {
         tissue_fixative: [String] = []
         imaging_assay_type: [String] = []
         is_supplementary_file: [String] = []
+        # Protocol filters
+        protocol_names: [String] = []
+        protocol_types: [String] = []
+        # Publication filters
+        publication_titles: [String] = []
+        publication_statuses: [String] = []
+        pub_ids: [String] = []
+        # Composition filters
+        nanomaterial_entities: [String] = []
+        functionalizing_entities: [String] = []
+        # Characterization filters
+        characterization_types: [String] = []
+        characterization_names: [String] = []
         # pagination and sorting
         order_by: String = ""
         sort_direction: String = "ASC"
@@ -1003,6 +1078,19 @@ type QueryType {
         tissue_fixative: [String] = []
         imaging_assay_type: [String] = []
         is_supplementary_file: [String] = []
+        # Protocol filters
+        protocol_names: [String] = []
+        protocol_types: [String] = []
+        # Publication filters
+        publication_titles: [String] = []
+        publication_statuses: [String] = []
+        pub_ids: [String] = []
+        # Composition filters
+        nanomaterial_entities: [String] = []
+        functionalizing_entities: [String] = []
+        # Characterization filters
+        characterization_types: [String] = []
+        characterization_names: [String] = []
         # pagination and sorting
         order_by: String = ""
         sort_direction: String = "ASC"
