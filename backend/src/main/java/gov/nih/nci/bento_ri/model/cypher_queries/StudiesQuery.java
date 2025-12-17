@@ -14,5 +14,10 @@ public class StudiesQuery {
     public static final String STUDIES_COUNT_QUERY = """
         MATCH (s:study)
         RETURN COUNT(DISTINCT s) AS count
+    """;
+
+    public static final String STUDIES_TOTAL_COUNT_QUERY = """
+        MATCH (s:study)
+        RETURN COUNT(DISTINCT s) AS count
     """;    
 }

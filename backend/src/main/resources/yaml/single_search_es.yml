@@ -1,91 +1,21 @@
 queries:
-  - name: numberOfStudies
-    index:
-      - files
-    filter:
-      type: aggregation
-      selectedField: studies
-    result:
-      type: int
-      method: count_bucket_keys
-  - name: numberOfSubjects
-    index:
-      - subjects
-    filter:
-      type: aggregation
-      selectedField: _id
-    result:
-      type: int
-      method: count_bucket_keys
-  - name: numberOfSamples
-    index:
-      - samples
-    filter:
-      type: aggregation
-      selectedField: _id
-    result:
-      type: int
-      method: count_bucket_keys
-  - name: numberOfFiles
-    index:
-      - files
-    filter:
-      type: aggregation
-      selectedField: _id
-    result:
-      type: int
-      method: count_bucket_keys
-  - name: numberOfDiseaseSites
-    index:
-      - diagnosis
-    filter:
-      type: aggregation
-      selectedField: primary_site
-    result:
-      type: int
-      method: count_bucket_keys
-  - name: numberOfImages
-    index:
-      - image
-    filter:
-      type: aggregation
-      selectedField: study_link_id
-    result:
-      type: int
-      method: count_bucket_keys
-  - name: numberOfProteomics
-    index:
-      - proteomics
-    filter:
-      type: aggregation
-      selectedField: aliquot_id
-    result:
-      type: int
-      method: count_bucket_keys
-  - name: idsLists
-    index:
-      - subject_ids_list
-    filter:
-      type: default
-    result:
-      type: map
   - name: programList
     index:
-      - program_list
+      - program
     filter:
       type: default
     result:
       type: object_array
   - name: programDetail
     index:
-      - program_detail
+      - program
     filter:
       type: default
     result:
       type: map
   - name: studyList
     index:
-      - study_list
+      - study
     filter:
       type: default
     result:
@@ -99,14 +29,14 @@ queries:
       type: map
   - name: samplesForSubjectId
     index:
-      - samples
+      - samples_for_subject_id
     filter:
       type: default
     result:
       type: object_array
   - name: studyDetail
     index:
-      - study_detail
+      - study
     filter:
       type: default
     result:

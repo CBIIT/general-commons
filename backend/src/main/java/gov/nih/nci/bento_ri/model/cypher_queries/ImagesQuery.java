@@ -22,4 +22,9 @@ public class ImagesQuery {
         MATCH (i:image)-[:of_file]->(:file)-[:of_study]->(s:study {phs_accession: $phs_accession})
         RETURN COUNT(DISTINCT i) AS count
     """;
+
+    public static final String IMAGES_TOTAL_COUNT_QUERY = """
+        MATCH (i:image)
+        RETURN COUNT(DISTINCT i) AS count
+    """;
 }

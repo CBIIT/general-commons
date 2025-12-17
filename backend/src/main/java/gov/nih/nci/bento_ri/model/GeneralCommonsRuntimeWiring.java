@@ -29,6 +29,9 @@ public class GeneralCommonsRuntimeWiring {
                         .dataFetcher("schemaVersion", env -> "3.1.0")
                         .dataFetcher("schemaModelVersion", env -> "8.0.1")
                         .dataFetchers(yamlQueryFactory.createYamlQueries(Const.ES_ACCESS_TYPE.PRIVATE))
+                        .dataFetcher("idsLists", env -> {
+                            return privateESDataFetcher.idsLists();
+                        })
                         .dataFetcher("searchSubjects", env -> {
                             Map<String, Object> args = env.getArguments();
                             return privateESDataFetcher.searchSubjects(args);
@@ -205,6 +208,28 @@ public class GeneralCommonsRuntimeWiring {
                         .dataFetcher("versionsCount", env -> {
                             Map<String, Object> args = env.getArguments();
                             return memgraphDataFetcher.getNumberOfVersions(args);
+                        })
+                        // numberOf... queries (replacing YAML-based queries) - total counts, no arguments required
+                        .dataFetcher("numberOfStudies", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfStudies();
+                        })
+                        .dataFetcher("numberOfSubjects", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfParticipants();
+                        })
+                        .dataFetcher("numberOfSamples", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfSamples();
+                        })
+                        .dataFetcher("numberOfFiles", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfFiles();
+                        })
+                        .dataFetcher("numberOfDiseaseSites", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfDiseaseSites();
+                        })
+                        .dataFetcher("numberOfImages", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfImages();
+                        })
+                        .dataFetcher("numberOfProteomics", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfProteomics();
                         })
                 )
                 .build();
