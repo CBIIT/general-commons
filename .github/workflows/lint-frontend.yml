@@ -1,4 +1,4 @@
-name: ESLint
+name: ESLint Frontend
 
 on:
   workflow_dispatch:
@@ -28,12 +28,13 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "16.x"
+          node-version: "20.x"
           cache: "npm"
+          cache-dependency-path: "frontend/package-lock.json"
 
       - name: Install Dependencies
-        run: npm install --legacy-peer-deps
+        run: cd frontend && npm install --legacy-peer-deps
 
       - name: Run ESLint
-        run: npm run lint:ci
+        run: cd frontend && npm run lint:ci
 
