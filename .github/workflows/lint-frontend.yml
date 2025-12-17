@@ -33,8 +33,10 @@ jobs:
           cache-dependency-path: "frontend/package-lock.json"
 
       - name: Install Dependencies
-        run: cd frontend && npm install --legacy-peer-deps
+        run: npm install --legacy-peer-deps
+        working-directory: frontend
 
       - name: Run ESLint
-        run: cd frontend && npm run lint:ci
+        run: npm run lint:ci
+        working-directory: frontend
 
