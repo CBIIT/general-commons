@@ -1,0 +1,39 @@
+name: ESLint
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "*.*.*"
+      - "main"
+      - "master"
+    paths:
+      - "frontend/**"
+  pull_request:
+    branches: "*"
+    paths:
+      - "frontend/**"
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint Changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "16.x"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Run ESLint
+        run: npm run lint:ci
+
