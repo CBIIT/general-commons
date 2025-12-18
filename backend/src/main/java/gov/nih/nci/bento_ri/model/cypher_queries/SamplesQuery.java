@@ -21,5 +21,10 @@ public class SamplesQuery {
     public static final String SAMPLES_COUNT_QUERY = """
         MATCH (samp:sample)-[:of_participant]->(:participant)-[:of_study]->(s:study {phs_accession: $phs_accession})
         RETURN COUNT(DISTINCT samp) AS count
-    """;    
+    """;
+
+    public static final String SAMPLES_TOTAL_COUNT_QUERY = """
+        MATCH (samp:sample)
+        RETURN COUNT(DISTINCT samp) AS count
+    """;   
 }

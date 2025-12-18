@@ -22,4 +22,10 @@ public class DiagnosesQuery {
         MATCH (diag:diagnosis)-[:of_participant]->(:participant)-[:of_study]->(s:study {phs_accession: $phs_accession})
         RETURN COUNT(DISTINCT diag) AS count
     """;
+
+    public static final String DIAGNOSES_DISEASE_SITES_COUNT_QUERY = """
+        MATCH (diag:diagnosis)
+        WHERE diag.primary_site IS NOT NULL
+        RETURN COUNT(DISTINCT diag.primary_site) AS count
+    """;
 }
