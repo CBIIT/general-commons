@@ -265,6 +265,64 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 FILTER_COUNT_QUERY, "filterSubjectCountByIsSupplementaryFile",
                 AGG_ENDPOINT, FILES_END_POINT
         ));
+        // caNanoLab Protocol filters
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "protocol_names",
+                WIDGET_QUERY, "subjectCountByProtocolName",
+                FILTER_COUNT_QUERY, "filterSubjectCountByProtocolName",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "protocol_types",
+                WIDGET_QUERY, "subjectCountByProtocolType",
+                FILTER_COUNT_QUERY, "filterSubjectCountByProtocolType",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        // caNanoLab Publication filters
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "publication_titles",
+                WIDGET_QUERY, "subjectCountByPublicationTitle",
+                FILTER_COUNT_QUERY, "filterSubjectCountByPublicationTitle",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "publication_statuses",
+                WIDGET_QUERY, "subjectCountByPublicationStatus",
+                FILTER_COUNT_QUERY, "filterSubjectCountByPublicationStatus",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "pub_ids",
+                WIDGET_QUERY, "subjectCountByPubId",
+                FILTER_COUNT_QUERY, "filterSubjectCountByPubId",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        // caNanoLab Composition filters
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "nanomaterial_entities",
+                WIDGET_QUERY, "subjectCountByNanomaterialEntity",
+                FILTER_COUNT_QUERY, "filterSubjectCountByNanomaterialEntity",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "functionalizing_entities",
+                WIDGET_QUERY, "subjectCountByFunctionalizingEntity",
+                FILTER_COUNT_QUERY, "filterSubjectCountByFunctionalizingEntity",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        // caNanoLab Characterization filters
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "characterization_types",
+                WIDGET_QUERY, "subjectCountByCharacterizationType",
+                FILTER_COUNT_QUERY, "filterSubjectCountByCharacterizationType",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "characterization_names",
+                WIDGET_QUERY, "subjectCountByCharacterizationName",
+                FILTER_COUNT_QUERY, "filterSubjectCountByCharacterizationName",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
         // Donut Count Fields
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "experimental_strategies",
