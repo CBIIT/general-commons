@@ -175,6 +175,7 @@ query fileOverview(
         
   sample_id
   analyte_type
+  study_name
   is_tumor
 }
 }`;
