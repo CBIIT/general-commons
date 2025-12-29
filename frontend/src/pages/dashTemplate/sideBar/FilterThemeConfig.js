@@ -91,6 +91,12 @@ const theme = {
         '&.proteomicCheckedOdd': {
           backgroundColor: '#FFF5FF',
         },
+        '&.cancer_nanotechnologyCheckedEven': {
+          backgroundColor: '#F3ECE5',
+        },
+        '&.cancer_nanotechnologyCheckedOdd': {
+          backgroundColor: '#FFFCFA',
+        },
       },      
     },
     MuiSvgIcon: {
@@ -118,6 +124,9 @@ const theme = {
         },
         '&.proteomicCheckedIcon': {
           color: '#942A90',
+        },
+        '&.cancer_nanotechnologyCheckedIcon': {
+          color: '#A35719',
         },
       },
     },
@@ -167,6 +176,12 @@ const theme = {
         },
         '&.proteomicSubjects': {
           color: '#942A90',
+          fontSize: '12px',
+          fontFamily: 'Nunito',
+          marginRight: '0px',
+        },
+        '&.cancer_nanotechnologySubjects': {
+          color: '#A35719',
           fontSize: '12px',
           fontFamily: 'Nunito',
           marginRight: '0px',
