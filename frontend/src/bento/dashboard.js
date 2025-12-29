@@ -454,7 +454,7 @@ export const facetsConfig = [
   },
   {
     section: CANCER_NANOTECHNOLOGY,
-    label: "Nanomaterial Entities",
+    label: "Nanomaterial Entity",
     apiPath: "filterSubjectCountByNanomaterialEntity",
     apiForFiltering: "filterSubjectCountByNanomaterialEntity",
     datafield: "nanomaterial_entities",
@@ -465,7 +465,7 @@ export const facetsConfig = [
   },
   {
     section: CANCER_NANOTECHNOLOGY,
-    label: "Functionalizing Entities",
+    label: "Functionalizing Entity",
     apiPath: "filterSubjectCountByFunctionalizingEntity",
     apiForFiltering: "filterSubjectCountByFunctionalizingEntity",
     datafield: "functionalizing_entities",
