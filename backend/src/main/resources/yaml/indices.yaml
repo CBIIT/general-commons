@@ -595,6 +595,7 @@ indices:
         - sample_age_at_collection # sample.sample_age_at_collection - single value
         - derived_from_specimen # sample.derived_from_specimen - single value
         - biosample_accession # sample.biosample_accession - single value
+        - organization_name # sample.Organization_Name - single value
         # Sample Participants
         - participant_ids # participant.participant_id - array
         - subject_ids # participant.participant_id - single value
@@ -681,6 +682,7 @@ indices:
       # sample_age_at_collection
       # derived_from_specimen
       # biosample_accession
+      # organization_name
       # is_tumor
       # sample_types
       query: |
@@ -697,6 +699,7 @@ indices:
           samp.sample_age_at_collection as sample_age_at_collection,
           samp.derived_from_specimen as derived_from_specimen,
           samp.biosample_accession as biosample_accession,
+          COALESCE(samp.Organization_Name, na) as organization_name,
           COALESCE(samp.sample_tumor_status, na) as is_tumor,
           [COALESCE(samp.sample_type, na)] as sample_types
         SKIP $skip LIMIT $limit
