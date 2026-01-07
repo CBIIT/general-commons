@@ -52,6 +52,7 @@ query sampleOverview($sample_ids: [String], $offset: Int = 0, $first: Int = 1000
     sample_procurement_method
     platform
     files 
+    organization_name
 }
 }
 `;
@@ -125,6 +126,7 @@ query filesInList($file_ids: [String], $offset: Int = 0, $first: Int = 1000, $or
             
       sample_id
       analyte_type
+      study_name
       is_tumor
     }
 }`;
