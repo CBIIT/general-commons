@@ -1,5 +1,6 @@
 type SubjectOverview {
     subject_id: String
+    study_participant_id: String
     study_acronym: [String]
     phs_accession: [String]
     sex: String
@@ -1015,6 +1016,7 @@ type QueryType {
         sample_ids: [String] = [""]
         file_names: [String] = [""]
         file_ids: [String] = [""]
+        study_participant_ids: [String] = [""]
     ): [String]
 
     findSubjectIdsInList(subject_ids: [String] = []): [SubjectResult]

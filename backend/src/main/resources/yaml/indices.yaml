@@ -1107,6 +1107,7 @@ indices:
         - sex # participant.sex - array
         - races # participant.race - array
         - subject_ids # participant.participant_id - array
+        - study_participant_ids # participant.study_participant_id - array
         # Samples
         - sample_id # sample.sample_id - array
         - sample_ids # alias for sample_id - for GraphQL parameter compatibility
@@ -1264,6 +1265,7 @@ indices:
         # races
         # races_sort
         # subject_ids
+        # study_participant_ids
         query: |
           MATCH (f:file)
           WITH DISTINCT f
@@ -1273,11 +1275,13 @@ indices:
           WITH file_id, na,
             COLLECT(DISTINCT COALESCE(p.sex, na)) AS sex,
             COLLECT(DISTINCT COALESCE(p.race, na)) AS races,
-            COLLECT(DISTINCT COALESCE(p.participant_id, na)) AS participant_ids
+            COLLECT(DISTINCT COALESCE(p.participant_id, na)) AS participant_ids,
+            COLLECT(DISTINCT COALESCE(p.study_participant_id, na)) AS study_participant_ids
           WITH file_id, na,
             CASE WHEN size(sex) = 0 THEN [na] ELSE sex END AS sex,
             CASE WHEN size(races) = 0 THEN [na] ELSE races END AS races,
-            participant_ids
+            participant_ids,
+            study_participant_ids
           CALL {
             WITH sex
             UNWIND sex AS sex_value
@@ -1298,7 +1302,8 @@ indices:
             sex_sort,
             races,
             races_sort,
-            participant_ids AS subject_ids
+            participant_ids AS subject_ids,
+            study_participant_ids
         page_size: 10000
       # Samples
       - name: Samples
