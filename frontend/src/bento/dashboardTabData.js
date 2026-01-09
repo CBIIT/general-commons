@@ -1398,11 +1398,12 @@ export const tabContainers = [
         display: true,
         tooltipText: 'Name of the study to which the files belong.',
         role: cellTypes.DISPLAY,
+        cellType: cellTypes.CUSTOM_ELEM,
       },
       {
         dataField: 'phs_accession',
         header: 'Accession',
-        cellType: cellTypes.LINK,
+        cellType: cellTypes.CUSTOM_ELEM,
         linkAttr: {
           rootPath: '/study',
           pathParams: ['phs_accession'],
@@ -1496,6 +1497,7 @@ export const tabContainers = [
         display: false,
         tooltipText: 'Type of data contained in the file (e.g., genomic, imagining).',
         role: cellTypes.DISPLAY,
+        cellType: cellTypes.CUSTOM_ELEM,
       },
       {
         dataField: 'library_strategy',
@@ -1511,6 +1513,7 @@ export const tabContainers = [
         display: false,
         tooltipText: 'Supplemental files contain additional data and references supporting the study.',
         role: cellTypes.DISPLAY,
+        cellType: cellTypes.CUSTOM_ELEM,
       },
       {
         dataField: 'image_modality',
