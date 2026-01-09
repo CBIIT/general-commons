@@ -77,8 +77,8 @@ type FilesInList {
     phs_accession: [String]
     study_data_type: [String]
 
-    image_modality: String
-    organ_or_tissue: String
+    image_modality: [String]
+    organ_or_tissue: [String]
     license: String
 
     sample_id: [String]
