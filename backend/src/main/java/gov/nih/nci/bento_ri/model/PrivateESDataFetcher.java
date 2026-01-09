@@ -1248,6 +1248,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         List<Map<String, Object>> filesInListResult = overview(FILES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
 
         // Transform the specified properties in the "joinProperties" list from an arrays to a comma separated strings
+        /*
         try{
             ArrayList<String> joinProperties = new ArrayList<>(Arrays.asList(
                     "experimental_strategy", "library_layouts", "library_strategy", "subject_id", "sample_id",
@@ -1267,6 +1268,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             logger.error(e);
             throw new Exception(message);
         }
+        */
 
         /*result.put("associated_file", associatedFileValue);
         result.put("associated_drs_uri", associatedDrsUriValue);
