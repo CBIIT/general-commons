@@ -89,6 +89,16 @@ export const customStyles = {
     backgroundColor: '#F4E7F3',
     border: '1px solid #942A90',
   },
+  facetSectionCancerNanotechnology: {
+    color: 'black',
+    backgroundColor: '#FFFFFF',
+    border: '1px solid #898989',
+  },
+  facetSectionCancerNanotechnologyBackground: {
+    color: '#0E3151',
+    backgroundColor: '#F3ECE5',
+    border: '1px solid #A35719',
+  },
   operators: {
     fontSize: '10px',
   },

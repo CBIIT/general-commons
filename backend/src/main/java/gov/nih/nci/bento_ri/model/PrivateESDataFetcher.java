@@ -265,6 +265,64 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 FILTER_COUNT_QUERY, "filterSubjectCountByIsSupplementaryFile",
                 AGG_ENDPOINT, FILES_END_POINT
         ));
+        // caNanoLab Protocol filters
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "protocol_names",
+                WIDGET_QUERY, "subjectCountByProtocolName",
+                FILTER_COUNT_QUERY, "filterSubjectCountByProtocolName",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "protocol_types",
+                WIDGET_QUERY, "subjectCountByProtocolType",
+                FILTER_COUNT_QUERY, "filterSubjectCountByProtocolType",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        // caNanoLab Publication filters
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "publication_titles",
+                WIDGET_QUERY, "subjectCountByPublicationTitle",
+                FILTER_COUNT_QUERY, "filterSubjectCountByPublicationTitle",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "publication_statuses",
+                WIDGET_QUERY, "subjectCountByPublicationStatus",
+                FILTER_COUNT_QUERY, "filterSubjectCountByPublicationStatus",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "pub_ids",
+                WIDGET_QUERY, "subjectCountByPubId",
+                FILTER_COUNT_QUERY, "filterSubjectCountByPubId",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        // caNanoLab Composition filters
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "nanomaterial_entities",
+                WIDGET_QUERY, "subjectCountByNanomaterialEntity",
+                FILTER_COUNT_QUERY, "filterSubjectCountByNanomaterialEntity",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "functionalizing_entities",
+                WIDGET_QUERY, "subjectCountByFunctionalizingEntity",
+                FILTER_COUNT_QUERY, "filterSubjectCountByFunctionalizingEntity",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        // caNanoLab Characterization filters
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "characterization_types",
+                WIDGET_QUERY, "subjectCountByCharacterizationType",
+                FILTER_COUNT_QUERY, "filterSubjectCountByCharacterizationType",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "characterization_names",
+                WIDGET_QUERY, "subjectCountByCharacterizationName",
+                FILTER_COUNT_QUERY, "filterSubjectCountByCharacterizationName",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
         // Donut Count Fields
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "experimental_strategies",
@@ -414,7 +472,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
 
     List<Map<String, Object>> sampleOverview(Map<String, Object> params) throws IOException {
         final String[][] PROPERTIES = new String[][]{
-                new String[]{"study_acronym", "studies"},
+                new String[]{"study_acronym", "study_acronym"},
                 new String[]{"phs_accession", "phs_accession"},
                 new String[]{"subject_id", "subject_ids"},
                 new String[]{"sample_id", "sample_id"},
@@ -423,13 +481,16 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"files", "files"},
                 new String[]{"sample_type", "analyte_type"},
                 new String[]{"sample_tumor_status", "is_tumor"},
-                new String[]{"organ_or_tissue", "organ_or_tissue"}
+                new String[]{"organ_or_tissue", "organ_or_tissue"},
+                new String[]{"study_name", "study_name"},
+                new String[]{"sample_name", "sample_id"},
+                new String[]{"organization_name", "organization_name"}
         };
 
         String defaultSort = "sample_id"; // Default sort order
 
         Map<String, String> sortFieldMapping = Map.ofEntries(
-                Map.entry("study_acronym", "studies"),
+                Map.entry("study_acronym", "study_acronym_sort"),
                 Map.entry("phs_accession", "phs_accession"),
                 Map.entry("subject_id", "subject_ids"),
                 Map.entry("sample_id", "sample_id"),
@@ -440,7 +501,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("image_modality", "image_modality_sort"),
                 Map.entry("organ_or_tissue", "organ_or_tissue_sort"),
                 Map.entry("imaging_assay_type", "imaging_assay_type_sort"),
-                Map.entry("tissue_fixative", "tissue_fixative_sort")
+                Map.entry("tissue_fixative", "tissue_fixative_sort"),
+                Map.entry("study_name", "study_name_sort"),
+                Map.entry("sample_name", "sample_id"),
+                Map.entry("organization_name", "organization_name_sort")
         );
 
         return overview(SAMPLES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
@@ -473,7 +537,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             new String[]{"organ_or_tissue", "organ_or_tissue"},
             new String[]{"release_datetime", "release_datetime"},
             new String[]{"is_supplementary_file", "is_supplementary_file"},
-            new String[]{"supplementary_file_names", "supplementary_file_names"}
+            new String[]{"supplementary_file_names", "supplementary_file_names"},
+            new String[]{"study_name", "study_name"}
     };
 
         String defaultSort = "file_name"; // Default sort order
@@ -503,7 +568,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("imaging_assay_type", "imaging_assay_type_sort"),
                 Map.entry("tissue_fixative", "tissue_fixative_sort"),
                 Map.entry("is_supplementary_file", "is_supplementary_file"),
-                Map.entry("supplementary_file_names", "supplementary_file_names_sort")
+                Map.entry("supplementary_file_names", "supplementary_file_names_sort"),
+                Map.entry("study_name", "study_name_sort")
         );
 
         List<Map<String, Object>> fileOverview = overview(FILES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
@@ -1183,6 +1249,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         List<Map<String, Object>> filesInListResult = overview(FILES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
 
         // Transform the specified properties in the "joinProperties" list from an arrays to a comma separated strings
+        /*
         try{
             ArrayList<String> joinProperties = new ArrayList<>(Arrays.asList(
                     "experimental_strategy", "library_layouts", "library_strategy", "subject_id", "sample_id",
@@ -1202,6 +1269,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             logger.error(e);
             throw new Exception(message);
         }
+        */
 
         /*result.put("associated_file", associatedFileValue);
         result.put("associated_drs_uri", associatedDrsUriValue);
