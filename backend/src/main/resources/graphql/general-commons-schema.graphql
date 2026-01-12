@@ -1048,6 +1048,7 @@ type QueryType {
         subject_ids: [String] = []
         sample_ids: [String] = []
         file_ids: [String] = []
+        study_participant_ids: [String] = []
         # standard filters
         accesses: [String] = []
         acl: [String] = []
