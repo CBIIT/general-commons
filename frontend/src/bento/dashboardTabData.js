@@ -601,6 +601,7 @@ query subjectOverview(
       offset:$offset
   ){
       subject_id
+      study_participant_id
       study_acronym
       phs_accession
       sex
@@ -834,10 +835,10 @@ query sampleOverview(
 
 export const GET_ALL_FILEIDS_CASESTAB_FOR_SELECT_ALL = gql`
 query search (          
-  $subject_ids: [String],
+  $study_participant_ids: [String],
 ){
   fileIDsFromList (          
-      subject_ids: $subject_ids,
+      study_participant_ids: $study_participant_ids,
   ) 
 }
   `;
@@ -1116,7 +1117,7 @@ export const tabContainers = [
     api: GET_CASES_OVERVIEW_QUERY,
     paginationAPIField: 'subjectOverview',
     count: 'numberOfSubjects',
-    dataKey: 'subject_id',
+    dataKey: 'study_participant_id',
     defaultSortField: 'subject_id',
     defaultSortDirection: 'asc',
     buttonText: 'Add Selected Files',
@@ -1215,7 +1216,7 @@ export const tabContainers = [
     tableMsg: {
       noMatch: 'No Matching Records Found',
     },
-    addFilesRequestVariableKey: 'subject_ids',
+    addFilesRequestVariableKey: 'study_participant_ids',
     addFilesResponseKeys: ['fileIDsFromList'],
     addAllFilesResponseKeys: ['fileOverview', 'file_id'],
     addAllFileQuery: GET_ALL_FILEIDS_FROM_FILESTAB_FOR_ADD_ALL_CART,
