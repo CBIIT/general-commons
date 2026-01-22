@@ -1675,8 +1675,15 @@ indices:
           OPTIONAL MATCH (p)<-[:of_participant]-(samp:sample)
           WITH DISTINCT file_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_tumor_status, nsd) END) AS sample_tumor_status,
-            COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(TRIM(LAST(split(samp.sample_type, ':'))), nsd) END) AS sample_type,
+            COLLECT(DISTINCT samp.sample_type) AS raw_sample_types,
             COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_id, nsd) END) AS sample_id
+          CALL {
+            WITH raw_sample_types, nsd
+            UNWIND (CASE WHEN size(raw_sample_types) = 0 THEN [null] ELSE raw_sample_types END) AS raw_sample_type
+            WITH CASE WHEN raw_sample_type IS NULL THEN null ELSE COALESCE(TRIM(LAST(split(raw_sample_type, ':'))), nsd) END AS processed_sample_type
+            RETURN COLLECT(DISTINCT processed_sample_type) AS sample_type
+          }
+          WITH file_id, nsd, na, sample_tumor_status, sample_id, sample_type
           WITH file_id, nsd, na, 
             CASE WHEN size(sample_tumor_status) = 0 THEN [na] ELSE sample_tumor_status END AS is_tumor,
             CASE WHEN size(sample_type) = 0 THEN [na] ELSE sample_type END AS sample_types,
@@ -1694,16 +1701,11 @@ indices:
             UNWIND sample_types AS sample_type_value
             WITH sample_type_value
             ORDER BY sample_type_value
-            WITH collect(sample_type_value) AS sorted_sample_types
-            RETURN sorted_sample_types, reduce(s = '', i IN sorted_sample_types | s + i + '') AS sample_types_sort
-          }
-          CALL {
-            WITH sample_types
-            UNWIND sample_types AS analyte_type_value
-            WITH analyte_type_value
-            ORDER BY analyte_type_value
-            WITH collect(analyte_type_value) AS sorted_analyte_type
-            RETURN sorted_analyte_type, reduce(s = '', i IN sorted_analyte_type | s + i + '') AS analyte_type_sort
+            WITH collect(distinct sample_type_value) AS sorted_sample_types
+            RETURN sorted_sample_types, 
+                   sorted_sample_types AS sorted_analyte_type,
+                   reduce(s = '', i IN sorted_sample_types | s + i + '') AS sample_types_sort,
+                   reduce(s = '', i IN sorted_sample_types | s + i + '') AS analyte_type_sort
           }
           CALL {
             WITH sample_id
