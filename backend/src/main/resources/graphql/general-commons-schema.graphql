@@ -785,6 +785,86 @@ type PDX {
     sample_id: String
 }
 
+type Investigator {
+    # id property
+    investigator_id: String
+    # node properties
+    primary_investigator_name: String
+    primary_investigator_email: String
+    co_investigator_name: String
+    co_investigator_email: String
+    role_or_affiliation: String
+    title: String
+    first_name: String
+    middle_name: String
+    last_name: String
+    suffix: String
+    email: String
+    # relationship properties
+    phs_accession: String
+}
+
+type Characterization {
+    # id property
+    Characterization_ID: String
+    # node properties
+    Characterization_Assay_Type: String
+    Characterization_Name: String
+    crdc_id: String
+    # relationship properties
+    phs_accession: String
+    sample_id: String
+}
+
+type Publication {
+    # id property
+    DOI_or_Pub_ID: String
+    # node properties
+    Publication_Type: String
+    Publication_Status: String
+    Publication_Title: String
+    crdc_id: String
+    # relationship properties
+    phs_accession: String
+    sample_id: String
+}
+
+type Protocol {
+    # id property
+    protocol_pk_id: String
+    # node properties
+    protocol_name: String
+    protocol_type: String
+    doi: String
+    crdc_id: String
+    # relationship properties
+    phs_accession: String
+}
+
+type Composition {
+    # id property
+    Composition_ID: String
+    # node properties
+    Nanomaterial_Entity_Type: String
+    Functionalizing_Entity_Type: String
+    Functionalizing_Entity_Inherent_Function_Type: String
+    crdc_id: String
+    # relationship properties
+    phs_accession: String
+    sample_id: String
+}
+
+type ConsentGroup {
+    # id property
+    consent_group_id: String
+    # node properties
+    consent_group_name: String
+    consent_group_number: String
+    crdc_id: String
+    # relationship properties
+    phs_accession: String
+}
+
 type Version {
     data_version: String
     datetime: String
@@ -1300,6 +1380,69 @@ type QueryType {
         offset: Int = 0
     ): [PDX]
 
+    investigators(
+        # id filter
+        investigator_ids: [String] = [],
+        # relationship filters
+        phs_accession: String!,
+        # formatting
+        first: Int = 10,
+        offset: Int = 0
+    ): [Investigator]
+
+    characterizations(
+        # id filter
+        characterization_ids: [String] = [],
+        # relationship filters
+        phs_accession: String!,
+        sample_ids: [String] = [],
+        # formatting
+        first: Int = 10,
+        offset: Int = 0
+    ): [Characterization]
+
+    publications(
+        # id filter
+        publication_ids: [String] = [],
+        # relationship filters
+        phs_accession: String!,
+        sample_ids: [String] = [],
+        # formatting
+        first: Int = 10,
+        offset: Int = 0
+    ): [Publication]
+
+    protocols(
+        # id filter
+        protocol_ids: [String] = [],
+        # relationship filters
+        phs_accession: String!,
+        # formatting
+        first: Int = 10,
+        offset: Int = 0
+    ): [Protocol]
+
+    compositions(
+        # id filter
+        composition_ids: [String] = [],
+        # relationship filters
+        phs_accession: String!,
+        sample_ids: [String] = [],
+        # formatting
+        first: Int = 10,
+        offset: Int = 0
+    ): [Composition]
+
+    consent_groups(
+        # id filter
+        consent_group_ids: [String] = [],
+        # relationship filters
+        phs_accession: String!,
+        # formatting
+        first: Int = 10,
+        offset: Int = 0
+    ): [ConsentGroup]
+
     version: Version
 
     # Memgraph node count queries
@@ -1320,5 +1463,11 @@ type QueryType {
     nonDICOMPETimagesCount(phs_accession: String!): Int
     nonDICOMpathologyImagesCount(phs_accession: String!): Int
     nonDICOMradiologyAllModalitiesCount(phs_accession: String!): Int
+    investigatorsCount(phs_accession: String!): Int
+    characterizationsCount(phs_accession: String!): Int
+    publicationsCount(phs_accession: String!): Int
+    protocolsCount(phs_accession: String!): Int
+    compositionsCount(phs_accession: String!): Int
+    consentGroupsCount(phs_accession: String!): Int
     versionsCount: Int
 }
