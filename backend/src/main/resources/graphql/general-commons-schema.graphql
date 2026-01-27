@@ -409,6 +409,7 @@ type Study {
     # id property
     phs_accession: String
     # node properties
+    study_id: String
     study_name: String
     study_acronym: String
     study_description: String
@@ -514,6 +515,8 @@ type Sample {
     sample_age_at_collection: String
     derived_from_specimen: String
     biosample_accession: String
+    tumor_classification: String
+    Organization_Name: String
     crdc_id: String
     # relationship properties
     phs_accession: String
@@ -748,6 +751,7 @@ type NonDICOMradiologyAllModalities {
     performed_imaging_study_reconstructionDiameter: String
     performed_imaging_study_sliceThickness: String
     performed_imaging_study_reconstructionInterval: String
+    performed_imaging_study_typeCode: String
     crdc_id: String
     # relationship properties
     phs_accession: String
@@ -839,6 +843,8 @@ type Protocol {
     crdc_id: String
     # relationship properties
     phs_accession: String
+    file_id: String
+    sample_id: String
 }
 
 type Composition {
@@ -866,10 +872,14 @@ type ConsentGroup {
 }
 
 type Version {
+    # id property
+    data_version_id: String
+    # node properties
     data_version: String
     datetime: String
     model_version: String
     description: String
+    crdc_id: String
 }
 
 schema {
@@ -1417,6 +1427,8 @@ type QueryType {
         protocol_ids: [String] = [],
         # relationship filters
         phs_accession: String!,
+        file_ids: [String] = [],
+        sample_ids: [String] = [],
         # formatting
         first: Int = 10,
         offset: Int = 0
