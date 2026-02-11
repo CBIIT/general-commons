@@ -77,7 +77,7 @@ const Layout = ({ classes, isSidebarOpened }) => {
           <Notifactions />
           <AuthSessionTimeoutController />
           <TextBanner
-            heading="CRDC’s Cancer Data Service (CDS) is now the General Commons (GC): Hosting and sharing NCI data of multiple data types that are not a match for other Data Commons."
+            heading="Cancer Nanotechnology data (caNanoLab) has now been integrated into the CRDC’s General Commons. Please refer to the ‘caNanoLab User Guide’ to learn more about the integration and how to search and access caNanoLab data on the GC portal."
             aria-label="GC announcement banner"
           />
           <Header />
