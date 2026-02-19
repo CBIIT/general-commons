@@ -78,7 +78,7 @@ indices:
         - nanomaterial_entities # Composition.Nanomaterial_Entity_Type - nanomaterial_entities_filter - array
         - functionalizing_entities # Composition.Functionalizing_Entity_Type - functionalizing_entities_filter - array
         # caNanoLab Characterization
-        - characterization_types # Characterization.Characterization_Assay_Type - characterization_types_filter - array
+        - characterization_types # Characterization.Characterization_Type - characterization_types_filter - array
         - characterization_names # Characterization.Characterization_Name - characterization_names_filter - array
       long:
         - number_of_study_participants # study_num_of_study_participants - single value
@@ -617,7 +617,7 @@ indices:
           WITH p, "Not specified in data" AS nsd, "Not applicable" AS na
           OPTIONAL MATCH (p)<-[*]-(char:Characterization)
           WITH p, nsd, na,
-            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Assay_Type, nsd) END) AS characterization_types_raw,
+            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Type, nsd) END) AS characterization_types_raw,
             COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Name, nsd) END) AS characterization_names_raw
           RETURN DISTINCT
             p.study_participant_id AS study_participant_id,
@@ -712,7 +712,7 @@ indices:
         - nanomaterial_entities # Composition.Nanomaterial_Entity_Type - nanomaterial_entities_filter - array
         - functionalizing_entities # Composition.Functionalizing_Entity_Type - functionalizing_entities_filter - array
         # caNanoLab Characterization
-        - characterization_types # Characterization.Characterization_Assay_Type - characterization_types_filter - array
+        - characterization_types # Characterization.Characterization_Type - characterization_types_filter - array
         - characterization_names # Characterization.Characterization_Name - characterization_names_filter - array
       long:
         - number_of_study_participants # calculated - single value
@@ -1266,7 +1266,7 @@ indices:
           WITH samp, "Not specified in data" AS nsd, "Not applicable" AS na
           OPTIONAL MATCH (samp)<-[*]-(char:Characterization)
           WITH samp, nsd, na,
-            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Assay_Type, nsd) END) AS characterization_types_raw,
+            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Type, nsd) END) AS characterization_types_raw,
             COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Name, nsd) END) AS characterization_names_raw
           RETURN DISTINCT
             samp.sample_id AS sample_id,
@@ -1459,7 +1459,7 @@ indices:
         - nanomaterial_entities # Composition.Nanomaterial_Entity_Type - nanomaterial_entities_filter - array
         - functionalizing_entities # Composition.Functionalizing_Entity_Type - functionalizing_entities_filter - array
         # caNanoLab Characterization
-        - characterization_types # Characterization.Characterization_Assay_Type - characterization_types_filter - array
+        - characterization_types # Characterization.Characterization_Type - characterization_types_filter - array
         - characterization_names # Characterization.Characterization_Name - characterization_names_filter - array
       long:
         - file_size # file.file_size - single value
@@ -2092,7 +2092,7 @@ indices:
           WITH f, "Not specified in data" AS nsd, "Not applicable" AS na
           OPTIONAL MATCH (f)<-[*]-(char:Characterization)
           WITH f, nsd, na,
-            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Assay_Type, nsd) END) AS characterization_types_raw,
+            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Type, nsd) END) AS characterization_types_raw,
             COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Name, nsd) END) AS characterization_names_raw
           RETURN DISTINCT
             f.file_id AS file_id,
@@ -2155,7 +2155,7 @@ indices:
         - nanomaterial_entities # Composition.Nanomaterial_Entity_Type - nanomaterial_entities_filter - array
         - functionalizing_entities # Composition.Functionalizing_Entity_Type - functionalizing_entities_filter - array
         # caNanoLab Characterization
-        - characterization_types # Characterization.Characterization_Assay_Type - characterization_types_filter - array
+        - characterization_types # Characterization.Characterization_Type - characterization_types_filter - array
         - characterization_names # Characterization.Characterization_Name - characterization_names_filter - array
       long:
         - number_of_study_participants # calculated - single value
@@ -2514,7 +2514,7 @@ indices:
           UNWIND experimental_strategies AS experimental_strategy
           OPTIONAL MATCH (f)<-[*]-(char:Characterization)
           WITH f, experimental_strategy, nsd, na,
-            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Assay_Type, nsd) END) AS characterization_types_raw,
+            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Type, nsd) END) AS characterization_types_raw,
             COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Name, nsd) END) AS characterization_names_raw
           RETURN DISTINCT
             f.file_id + "_" + COALESCE(experimental_strategy, nsd) AS file_id_experimental_strategy,
@@ -2562,7 +2562,7 @@ indices:
         - nanomaterial_entities # Composition.Nanomaterial_Entity_Type - nanomaterial_entities_filter - array
         - functionalizing_entities # Composition.Functionalizing_Entity_Type - functionalizing_entities_filter - array
         # caNanoLab Characterization
-        - characterization_types # Characterization.Characterization_Assay_Type - characterization_types_filter - array
+        - characterization_types # Characterization.Characterization_Type - characterization_types_filter - array
         - characterization_names # Characterization.Characterization_Name - characterization_names_filter - array
       long:
         - number_of_study_participants # calculated - single value
@@ -2944,7 +2944,7 @@ indices:
           UNWIND fs AS f
           OPTIONAL MATCH (f)<-[*]-(char:Characterization)
           WITH f, study_data_type, nsd, na,
-            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Assay_Type, nsd) END) AS characterization_types_raw,
+            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Type, nsd) END) AS characterization_types_raw,
             COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Name, nsd) END) AS characterization_names_raw
           RETURN DISTINCT
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
