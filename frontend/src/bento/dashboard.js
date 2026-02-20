@@ -450,7 +450,7 @@ export const facetsConfig = [
     field: "group",
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
-    show: true,
+    show: false,
   },
   {
     section: CANCER_NANOTECHNOLOGY,
