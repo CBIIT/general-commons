@@ -821,7 +821,7 @@ indices:
             CASE WHEN study_acronym IS NULL OR size(study_acronym)=0 THEN [nsd] ELSE study_acronym END AS study_acronym,
             CASE WHEN phs_accession IS NULL OR size(phs_accession)=0 THEN [nsd] ELSE phs_accession END AS phs_accession,
             CASE WHEN accesses IS NULL OR size(accesses)=0 THEN [nsd] ELSE accesses END AS accesses
-          OPTIONAL MATCH (s)<-[:of_study]-(:file)-[:of_participant]->(:participant)<-[:of_participant]-(samp:sample)
+          OPTIONAL MATCH (s)<-[*]-(samp:sample)
           WITH DISTINCT samp, s, nsd, na, number_of_study_participants, number_of_study_samples, study_data_types, acl, studies, study_name, study_acronym, phs_accession, accesses
           CALL {
             WITH study_name, nsd
@@ -875,10 +875,8 @@ indices:
           MATCH (samp:sample)
           WITH DISTINCT samp
           SKIP $skip LIMIT $limit
-          OPTIONAL MATCH (samp)-[:of_participant]->(p:participant)
-          WITH DISTINCT samp.sample_id AS sample_id, p
-          OPTIONAL MATCH (p)<-[:of_participant]-(f:file)
-          WITH sample_id, COLLECT(DISTINCT f) AS fs, COLLECT(DISTINCT f.file_id) AS files, "Not specified in data" AS nsd, "Not applicable" AS na
+          OPTIONAL MATCH (samp)<-[*]-(f:file)
+          WITH samp.sample_id AS sample_id, COLLECT(DISTINCT f) AS fs, COLLECT(DISTINCT f.file_id) AS files, "Not specified in data" AS nsd, "Not applicable" AS na
           CALL {
             WITH files
             UNWIND files AS file
@@ -995,10 +993,8 @@ indices:
           MATCH (samp:sample)
           WITH DISTINCT samp
           SKIP $skip LIMIT $limit
-          OPTIONAL MATCH (samp)<-[:of_participant]-(p:participant)
-          WITH DISTINCT samp.sample_id AS sample_id, p
-          OPTIONAL MATCH (p)<-[:of_participant]-(f:file)
-          WITH DISTINCT sample_id, f, "Not specified in data" AS nsd, "Not applicable" AS na
+          OPTIONAL MATCH (samp)<-[*]-(f:file)
+          WITH DISTINCT samp.sample_id AS sample_id, f, "Not specified in data" AS nsd, "Not applicable" AS na
           OPTIONAL MATCH (f)<-[:of_file]-(g:genomic_info)
           WITH sample_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_strategy, nsd) END) AS library_strategies,
@@ -1106,10 +1102,8 @@ indices:
           MATCH (samp:sample)
           WITH DISTINCT samp
           SKIP $skip LIMIT $limit
-          OPTIONAL MATCH (samp)-[:of_participant]->(p:participant)
-          WITH DISTINCT samp.sample_id AS sample_id, p
-          OPTIONAL MATCH (p)<-[:of_participant]-(f:file)
-          WITH DISTINCT sample_id, f, "Not specified in data" AS nsd, "Not applicable" AS na
+          OPTIONAL MATCH (samp)<-[*]-(f:file)
+          WITH DISTINCT samp.sample_id AS sample_id, f, "Not specified in data" AS nsd, "Not applicable" AS na
           OPTIONAL MATCH (f)<-[:of_file]-(i:image)
           OPTIONAL MATCH (i)<-[:of_image]-(mm:MultiplexMicroscopy)
           WITH DISTINCT sample_id, nsd, na,
@@ -1179,10 +1173,8 @@ indices:
           MATCH (samp:sample)
           WITH DISTINCT samp
           SKIP $skip LIMIT $limit
-          OPTIONAL MATCH (p:participant)<-[:of_participant]-(samp)
-          WITH DISTINCT samp.sample_id AS sample_id, p
-          OPTIONAL MATCH (p)<-[:of_participant]-(f:file)
-          WITH DISTINCT sample_id, f, "Not specified in data" AS nsd, "Not applicable" AS na
+          OPTIONAL MATCH (samp)<-[*]-(f:file)
+          WITH DISTINCT samp.sample_id AS sample_id, f, "Not specified in data" AS nsd, "Not applicable" AS na
           OPTIONAL MATCH (f)<-[:of_file]-(pr:proteomic)
           WITH sample_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN pr IS NULL THEN null ELSE COALESCE(pr.analytical_fractions, nsd) END) AS analytical_fractions_raw,
