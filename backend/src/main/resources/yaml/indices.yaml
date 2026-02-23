@@ -70,6 +70,8 @@ indices:
         # caNanoLab Protocol
         - protocol_names # Protocol.protocol_name - protocol_names_filter - array
         - protocol_types # Protocol.protocol_type - protocol_types_filter - array
+        - doi_urls # Protocol.doi_url - doi_url_filter - array
+        - dois # Protocol.doi -doi_filter - array
         # caNanoLab Publication
         - publication_titles # Publication.Publication_Title - publication_titles_filter - array
         - publication_statuses # Publication.Publication_Status - publication_statuses_filter - array
@@ -553,6 +555,8 @@ indices:
       - name: "caNanoLab Protocol"
         # protocol_names
         # protocol_types
+        # doi_urls
+        # dois
         query: |
           MATCH (p:participant)
           WITH DISTINCT p
@@ -561,11 +565,15 @@ indices:
           OPTIONAL MATCH (p)<-[*]-(proto:Protocol)
           WITH p, nsd, na,
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_name, nsd) END) AS protocol_names_raw,
-            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_type, nsd) END) AS protocol_types_raw
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_type, nsd) END) AS protocol_types_raw,
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi_url, nsd) END) AS doi_urls_raw,
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi, nsd) END) AS dois_raw
           RETURN DISTINCT
             p.study_participant_id AS study_participant_id,
             CASE WHEN size(protocol_names_raw)=0 THEN [na] ELSE protocol_names_raw END AS protocol_names,
-            CASE WHEN size(protocol_types_raw)=0 THEN [na] ELSE protocol_types_raw END AS protocol_types
+            CASE WHEN size(protocol_types_raw)=0 THEN [na] ELSE protocol_types_raw END AS protocol_types,
+            CASE WHEN size(doi_urls_raw)=0 THEN [na] ELSE doi_urls_raw END AS doi_urls,
+            CASE WHEN size(dois_raw)=0 THEN [na] ELSE dois_raw END AS dois
         page_size: 10000
       # caNanoLab Publication
       - name: "caNanoLab Publication"
@@ -704,6 +712,8 @@ indices:
         # caNanoLab Protocol
         - protocol_names # Protocol.protocol_name - protocol_names_filter - array
         - protocol_types # Protocol.protocol_type - protocol_types_filter - array
+        - doi_urls # Protocol.doi_url - doi_urls_filter - array
+        - dois # Protocol.doi - dois_filter - array
         # caNanoLab Publication
         - publication_titles # Publication.Publication_Title - publication_titles_filter - array
         - publication_statuses # Publication.Publication_Status - publication_statuses_filter - array
@@ -1194,6 +1204,8 @@ indices:
       - name: "caNanoLab Protocol"
         # protocol_names
         # protocol_types
+        # doi_urls
+        # dois
         query: |
           MATCH (samp:sample)
           WITH DISTINCT samp
@@ -1202,11 +1214,15 @@ indices:
           OPTIONAL MATCH (samp)<-[*]-(proto:Protocol)
           WITH samp, nsd, na,
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_name, nsd) END) AS protocol_names_raw,
-            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_type, nsd) END) AS protocol_types_raw
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_type, nsd) END) AS protocol_types_raw,
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi_url, nsd) END) AS doi_urls_raw,
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi, nsd) END) AS dois_raw
           RETURN DISTINCT
             samp.sample_id AS sample_id,
             CASE WHEN size(protocol_names_raw)=0 THEN [na] ELSE protocol_names_raw END AS protocol_names,
-            CASE WHEN size(protocol_types_raw)=0 THEN [na] ELSE protocol_types_raw END AS protocol_types
+            CASE WHEN size(protocol_types_raw)=0 THEN [na] ELSE protocol_types_raw END AS protocol_types,
+            CASE WHEN size(doi_urls_raw)=0 THEN [na] ELSE doi_urls_raw END AS doi_urls,
+            CASE WHEN size(dois_raw)=0 THEN [na] ELSE dois_raw END AS dois
         page_size: 10000
       # caNanoLab Publication
       - name: "caNanoLab Publication"
@@ -1443,6 +1459,8 @@ indices:
         # caNanoLab Protocol
         - protocol_names # Protocol.protocol_name - protocol_names_filter - array
         - protocol_types # Protocol.protocol_type - protocol_types_filter - array
+        - doi_urls # Protocol.doi_url - doi_urls_filter - array
+        - dois # Protocol.doi - dois_filter - array
         # caNanoLab Publication
         - publication_titles # Publication.Publication_Title - publication_titles_filter - array
         - publication_statuses # Publication.Publication_Status - publication_statuses_filter - array
@@ -2020,6 +2038,8 @@ indices:
       - name: "caNanoLab Protocol"
         # protocol_names
         # protocol_types
+        # doi_urls
+        # dois
         query: |
           MATCH (f:file)
           WITH DISTINCT f
@@ -2028,11 +2048,15 @@ indices:
           OPTIONAL MATCH (f)<-[*]-(proto:Protocol)
           WITH f, nsd, na,
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_name, nsd) END) AS protocol_names_raw,
-            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_type, nsd) END) AS protocol_types_raw
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_type, nsd) END) AS protocol_types_raw,
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi_url, nsd) END) AS doi_urls_raw,
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi, nsd) END) AS dois_raw
           RETURN DISTINCT
             f.file_id AS file_id,
             CASE WHEN size(protocol_names_raw)=0 THEN [na] ELSE protocol_names_raw END AS protocol_names,
-            CASE WHEN size(protocol_types_raw)=0 THEN [na] ELSE protocol_types_raw END AS protocol_types
+            CASE WHEN size(protocol_types_raw)=0 THEN [na] ELSE protocol_types_raw END AS protocol_types,
+            CASE WHEN size(doi_urls_raw)=0 THEN [na] ELSE doi_urls_raw END AS doi_urls,
+            CASE WHEN size(dois_raw)=0 THEN [na] ELSE dois_raw END AS dois
         page_size: 10000
       # caNanoLab Publication
       - name: "caNanoLab Publication"
@@ -2044,7 +2068,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           WITH f, "Not specified in data" AS nsd, "Not applicable" AS na
-          OPTIONAL MATCH (f)<-[*]-(pub:Publication)
+          OPTIONAL MATCH (f)-->(samp:sample)<-[*]-(pub:Publication)
           WITH f, nsd, na,
             COLLECT(DISTINCT CASE WHEN pub IS NULL THEN null ELSE COALESCE(pub.Publication_Title, nsd) END) AS publication_titles_raw,
             COLLECT(DISTINCT CASE WHEN pub IS NULL THEN null ELSE COALESCE(pub.Publication_Status, nsd) END) AS publication_statuses_raw,
@@ -2064,7 +2088,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           WITH f, "Not specified in data" AS nsd, "Not applicable" AS na
-          OPTIONAL MATCH (f)<-[*]-(comp:Composition)
+          OPTIONAL MATCH (f)-->(samp:sample)<-[*]-(comp:Composition)
           WITH f, nsd, na,
             COLLECT(DISTINCT CASE WHEN comp IS NULL THEN null ELSE COALESCE(comp.Nanomaterial_Entity_Type, nsd) END) AS nanomaterial_entities_raw,
             COLLECT(DISTINCT CASE WHEN comp IS NULL THEN null ELSE COALESCE(comp.Functionalizing_Entity_Type, nsd) END) AS functionalizing_entities_raw
@@ -2082,7 +2106,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           WITH f, "Not specified in data" AS nsd, "Not applicable" AS na
-          OPTIONAL MATCH (f)<-[*]-(char:Characterization)
+          OPTIONAL MATCH (f)-->(samp:sample)<-[*]-(char:Characterization)
           WITH f, nsd, na,
             COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Type, nsd) END) AS characterization_types_raw,
             COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Name, nsd) END) AS characterization_names_raw
@@ -2139,6 +2163,8 @@ indices:
         # caNanoLab Protocol
         - protocol_names # Protocol.protocol_name - protocol_names_filter - array
         - protocol_types # Protocol.protocol_type - protocol_types_filter - array
+        - doi_urls # Protocol.doi_url - doi_urls_filter - array
+        - dois # Protocol.doi - dois_filter - array
         # caNanoLab Publication
         - publication_titles # Publication.Publication_Title - publication_titles_filter - array
         - publication_statuses # Publication.Publication_Status - publication_statuses_filter - array
@@ -2426,6 +2452,8 @@ indices:
       - name: "caNanoLab Protocol"
         # protocol_names
         # protocol_types
+        # doi_urls
+        # dois
         query: |
           MATCH (f:file)
           WITH DISTINCT f
@@ -2438,11 +2466,15 @@ indices:
           OPTIONAL MATCH (f)<-[*]-(proto:Protocol)
           WITH f, experimental_strategy, nsd, na,
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_name, nsd) END) AS protocol_names_raw,
-            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_type, nsd) END) AS protocol_types_raw
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_type, nsd) END) AS protocol_types_raw,
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi_url, nsd) END) AS doi_urls_raw,
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi, nsd) END) AS dois_raw
           RETURN DISTINCT
             f.file_id + "_" + COALESCE(experimental_strategy, nsd) AS file_id_experimental_strategy,
             CASE WHEN size(protocol_names_raw)=0 THEN [na] ELSE protocol_names_raw END AS protocol_names,
-            CASE WHEN size(protocol_types_raw)=0 THEN [na] ELSE protocol_types_raw END AS protocol_types
+            CASE WHEN size(protocol_types_raw)=0 THEN [na] ELSE protocol_types_raw END AS protocol_types,
+            CASE WHEN size(doi_urls_raw)=0 THEN [na] ELSE doi_urls_raw END AS doi_urls,
+            CASE WHEN size(dois_raw)=0 THEN [na] ELSE dois_raw END AS dois
         page_size: 10000
       # caNanoLab Publication
       - name: "caNanoLab Publication"
@@ -2458,7 +2490,7 @@ indices:
           WITH f, nsd, na,
             CASE WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
           UNWIND experimental_strategies AS experimental_strategy
-          OPTIONAL MATCH (f)<-[*]-(pub:Publication)
+          OPTIONAL MATCH (f)-->(samp:sample)<-[*]-(pub:Publication)
           WITH f, experimental_strategy, nsd, na,
             COLLECT(DISTINCT CASE WHEN pub IS NULL THEN null ELSE COALESCE(pub.Publication_Title, nsd) END) AS publication_titles_raw,
             COLLECT(DISTINCT CASE WHEN pub IS NULL THEN null ELSE COALESCE(pub.Publication_Status, nsd) END) AS publication_statuses_raw,
@@ -2482,7 +2514,7 @@ indices:
           WITH f, nsd, na,
             CASE WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
           UNWIND experimental_strategies AS experimental_strategy
-          OPTIONAL MATCH (f)<-[*]-(comp:Composition)
+          OPTIONAL MATCH (f)-->(samp:sample)<-[*]-(comp:Composition)
           WITH f, experimental_strategy, nsd, na,
             COLLECT(DISTINCT CASE WHEN comp IS NULL THEN null ELSE COALESCE(comp.Nanomaterial_Entity_Type, nsd) END) AS nanomaterial_entities_raw,
             COLLECT(DISTINCT CASE WHEN comp IS NULL THEN null ELSE COALESCE(comp.Functionalizing_Entity_Type, nsd) END) AS functionalizing_entities_raw
@@ -2504,7 +2536,7 @@ indices:
           WITH f, nsd, na,
             CASE WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
           UNWIND experimental_strategies AS experimental_strategy
-          OPTIONAL MATCH (f)<-[*]-(char:Characterization)
+          OPTIONAL MATCH (f)-->(samp:sample)<-[*]-(char:Characterization)
           WITH f, experimental_strategy, nsd, na,
             COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Type, nsd) END) AS characterization_types_raw,
             COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Name, nsd) END) AS characterization_names_raw
@@ -2546,6 +2578,8 @@ indices:
         # caNanoLab Protocol
         - protocol_names # Protocol.protocol_name - protocol_names_filter - array
         - protocol_types # Protocol.protocol_type - protocol_types_filter - array
+        - doi_urls # Protocol.doi_url - doi_urls_filter - array
+        - dois # Protocol.doi - dois_filter - array
         # caNanoLab Publication
         - publication_titles # Publication.Publication_Title - publication_titles_filter - array
         - publication_statuses # Publication.Publication_Status - publication_statuses_filter - array
@@ -2848,6 +2882,8 @@ indices:
       - name: "caNanoLab Protocol"
         # protocol_names
         # protocol_types
+        # doi_urls
+        # dois
         query: |
           MATCH (f:file)
           WITH DISTINCT f
@@ -2862,11 +2898,15 @@ indices:
           OPTIONAL MATCH (f)<-[*]-(proto:Protocol)
           WITH f, study_data_type, nsd, na,
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_name, nsd) END) AS protocol_names_raw,
-            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_type, nsd) END) AS protocol_types_raw
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_type, nsd) END) AS protocol_types_raw,
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi_url, nsd) END) AS doi_urls_raw,
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi, nsd) END) AS dois_raw
           RETURN DISTINCT
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
             CASE WHEN size(protocol_names_raw)=0 THEN [na] ELSE protocol_names_raw END AS protocol_names,
-            CASE WHEN size(protocol_types_raw)=0 THEN [na] ELSE protocol_types_raw END AS protocol_types
+            CASE WHEN size(protocol_types_raw)=0 THEN [na] ELSE protocol_types_raw END AS protocol_types,
+            CASE WHEN size(doi_urls_raw)=0 THEN [na] ELSE doi_urls_raw END AS doi_urls,
+            CASE WHEN size(dois_raw)=0 THEN [na] ELSE dois_raw END AS dois
         page_size: 10000
       # caNanoLab Publication
       - name: "caNanoLab Publication"
@@ -2884,7 +2924,7 @@ indices:
             CASE WHEN study_data_types IS NULL OR size(study_data_types)=0 THEN [nsd] ELSE study_data_types END AS study_data_types
           UNWIND study_data_types AS study_data_type
           UNWIND fs AS f
-          OPTIONAL MATCH (f)<-[*]-(pub:Publication)
+          OPTIONAL MATCH (f)-->(samp:sample)<-[*]-(pub:Publication)
           WITH f, study_data_type, nsd, na,
             COLLECT(DISTINCT CASE WHEN pub IS NULL THEN null ELSE COALESCE(pub.Publication_Title, nsd) END) AS publication_titles_raw,
             COLLECT(DISTINCT CASE WHEN pub IS NULL THEN null ELSE COALESCE(pub.Publication_Status, nsd) END) AS publication_statuses_raw,
@@ -2910,7 +2950,7 @@ indices:
             CASE WHEN study_data_types IS NULL OR size(study_data_types)=0 THEN [nsd] ELSE study_data_types END AS study_data_types
           UNWIND study_data_types AS study_data_type
           UNWIND fs AS f
-          OPTIONAL MATCH (f)<-[*]-(comp:Composition)
+          OPTIONAL MATCH (f)-->(samp:sample)<-[*]-(comp:Composition)
           WITH f, study_data_type, nsd, na,
             COLLECT(DISTINCT CASE WHEN comp IS NULL THEN null ELSE COALESCE(comp.Nanomaterial_Entity_Type, nsd) END) AS nanomaterial_entities_raw,
             COLLECT(DISTINCT CASE WHEN comp IS NULL THEN null ELSE COALESCE(comp.Functionalizing_Entity_Type, nsd) END) AS functionalizing_entities_raw
@@ -2934,7 +2974,7 @@ indices:
             CASE WHEN study_data_types IS NULL OR size(study_data_types)=0 THEN [nsd] ELSE study_data_types END AS study_data_types
           UNWIND study_data_types AS study_data_type
           UNWIND fs AS f
-          OPTIONAL MATCH (f)<-[*]-(char:Characterization)
+          OPTIONAL MATCH (f)-->(samp:sample)<-[*]-(char:Characterization)
           WITH f, study_data_type, nsd, na,
             COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Type, nsd) END) AS characterization_types_raw,
             COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Name, nsd) END) AS characterization_names_raw

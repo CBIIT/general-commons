@@ -278,6 +278,18 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 FILTER_COUNT_QUERY, "filterSubjectCountByProtocolType",
                 AGG_ENDPOINT, FILES_END_POINT
         ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "dois",
+                WIDGET_QUERY, "subjectCountByDoi",
+                FILTER_COUNT_QUERY, "filterSubjectCountByDoi",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "doi_urls",
+                WIDGET_QUERY, "subjectCountByDoiUrl",
+                FILTER_COUNT_QUERY, "filterSubjectCountByDoiUrl",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
         // caNanoLab Publication filters
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "publication_titles",
@@ -302,26 +314,26 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 AGG_NAME, "nanomaterial_entities",
                 WIDGET_QUERY, "subjectCountByNanomaterialEntity",
                 FILTER_COUNT_QUERY, "filterSubjectCountByNanomaterialEntity",
-                AGG_ENDPOINT, FILES_END_POINT
+                AGG_ENDPOINT, SAMPLES_END_POINT
         ));
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "functionalizing_entities",
                 WIDGET_QUERY, "subjectCountByFunctionalizingEntity",
                 FILTER_COUNT_QUERY, "filterSubjectCountByFunctionalizingEntity",
-                AGG_ENDPOINT, FILES_END_POINT
+                AGG_ENDPOINT, SAMPLES_END_POINT
         ));
         // caNanoLab Characterization filters
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "characterization_types",
                 WIDGET_QUERY, "subjectCountByCharacterizationType",
                 FILTER_COUNT_QUERY, "filterSubjectCountByCharacterizationType",
-                AGG_ENDPOINT, FILES_END_POINT
+                AGG_ENDPOINT, SAMPLES_END_POINT
         ));
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "characterization_names",
                 WIDGET_QUERY, "subjectCountByCharacterizationName",
                 FILTER_COUNT_QUERY, "filterSubjectCountByCharacterizationName",
-                AGG_ENDPOINT, FILES_END_POINT
+                AGG_ENDPOINT, SAMPLES_END_POINT
         ));
         // Donut Count Fields
         TERM_AGGS.add(Map.of(

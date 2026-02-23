@@ -313,6 +313,14 @@ query searchSubjects(
             group
             subjects
         }
+        subjectCountByDoi{
+            group
+            subjects
+        }
+        subjectCountByDoiUrl{
+            group
+            subjects
+        }    
         subjectCountByPublicationTitle{
             group
             subjects
@@ -468,6 +476,14 @@ query searchSubjects(
             subjects
         }
         filterSubjectCountByProtocolType{
+            group
+            subjects
+        }
+        filterSubjectCountByDoi{
+            group
+            subjects
+        }
+        filterSubjectCountByDoiUrl{
             group
             subjects
         }
