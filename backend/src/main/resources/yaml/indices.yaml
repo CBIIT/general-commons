@@ -607,8 +607,8 @@ indices:
           WITH p, "Not specified in data" AS nsd, "Not applicable" AS na
           OPTIONAL MATCH (p)<-[*]-(comp:Composition)
           WITH p, nsd, na,
-            COLLECT(DISTINCT CASE WHEN comp IS NULL THEN null ELSE COALESCE(comp.Nanomaterial_Entity_Type, nsd) END) AS nanomaterial_entities_raw,
-            COLLECT(DISTINCT CASE WHEN comp IS NULL THEN null ELSE COALESCE(comp.Functionalizing_Entity_Type, nsd) END) AS functionalizing_entities_raw
+            COLLECT(DISTINCT CASE WHEN comp IS NULL OR comp.Nanomaterial_Entity_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(comp.Nanomaterial_Entity_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS nanomaterial_entities_raw,
+            COLLECT(DISTINCT CASE WHEN comp IS NULL OR comp.Functionalizing_Entity_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(comp.Functionalizing_Entity_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS functionalizing_entities_raw
           RETURN DISTINCT
             p.study_participant_id AS study_participant_id,
             CASE WHEN size(nanomaterial_entities_raw)=0 THEN [na] ELSE nanomaterial_entities_raw END AS nanomaterial_entities,
@@ -625,8 +625,8 @@ indices:
           WITH p, "Not specified in data" AS nsd, "Not applicable" AS na
           OPTIONAL MATCH (p)<-[*]-(char:Characterization)
           WITH p, nsd, na,
-            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Type, nsd) END) AS characterization_types_raw,
-            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Name, nsd) END) AS characterization_names_raw
+            COLLECT(DISTINCT CASE WHEN char IS NULL OR char.Characterization_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(char.Characterization_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS characterization_types_raw,
+            COLLECT(DISTINCT CASE WHEN char IS NULL OR char.Characterization_Name = "[]" THEN null ELSE COALESCE(replace(replace(replace(char.Characterization_Name, '[', ''), ']', ''), '"', ''), nsd) END) AS characterization_names_raw
           RETURN DISTINCT
             p.study_participant_id AS study_participant_id,
             CASE WHEN size(characterization_types_raw)=0 THEN [na] ELSE characterization_types_raw END AS characterization_types,
@@ -1256,8 +1256,8 @@ indices:
           WITH samp, "Not specified in data" AS nsd, "Not applicable" AS na
           OPTIONAL MATCH (samp)<-[*]-(comp:Composition)
           WITH samp, nsd, na,
-            COLLECT(DISTINCT CASE WHEN comp IS NULL THEN null ELSE COALESCE(comp.Nanomaterial_Entity_Type, nsd) END) AS nanomaterial_entities_raw,
-            COLLECT(DISTINCT CASE WHEN comp IS NULL THEN null ELSE COALESCE(comp.Functionalizing_Entity_Type, nsd) END) AS functionalizing_entities_raw
+            COLLECT(DISTINCT CASE WHEN comp IS NULL OR comp.Nanomaterial_Entity_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(comp.Nanomaterial_Entity_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS nanomaterial_entities_raw,
+            COLLECT(DISTINCT CASE WHEN comp IS NULL OR comp.Functionalizing_Entity_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(comp.Functionalizing_Entity_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS functionalizing_entities_raw
           RETURN DISTINCT
             samp.sample_id AS sample_id,
             CASE WHEN size(nanomaterial_entities_raw)=0 THEN [na] ELSE nanomaterial_entities_raw END AS nanomaterial_entities,
@@ -1274,8 +1274,8 @@ indices:
           WITH samp, "Not specified in data" AS nsd, "Not applicable" AS na
           OPTIONAL MATCH (samp)<-[*]-(char:Characterization)
           WITH samp, nsd, na,
-            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Type, nsd) END) AS characterization_types_raw,
-            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Name, nsd) END) AS characterization_names_raw
+            COLLECT(DISTINCT CASE WHEN char IS NULL OR char.Characterization_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(char.Characterization_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS characterization_types_raw,
+            COLLECT(DISTINCT CASE WHEN char IS NULL OR char.Characterization_Name = "[]" THEN null ELSE COALESCE(replace(replace(replace(char.Characterization_Name, '[', ''), ']', ''), '"', ''), nsd) END) AS characterization_names_raw
           RETURN DISTINCT
             samp.sample_id AS sample_id,
             CASE WHEN size(characterization_types_raw)=0 THEN [na] ELSE characterization_types_raw END AS characterization_types,
@@ -2090,8 +2090,8 @@ indices:
           WITH f, "Not specified in data" AS nsd, "Not applicable" AS na
           OPTIONAL MATCH (f)-->(samp:sample)<-[*]-(comp:Composition)
           WITH f, nsd, na,
-            COLLECT(DISTINCT CASE WHEN comp IS NULL THEN null ELSE COALESCE(comp.Nanomaterial_Entity_Type, nsd) END) AS nanomaterial_entities_raw,
-            COLLECT(DISTINCT CASE WHEN comp IS NULL THEN null ELSE COALESCE(comp.Functionalizing_Entity_Type, nsd) END) AS functionalizing_entities_raw
+            COLLECT(DISTINCT CASE WHEN comp IS NULL OR comp.Nanomaterial_Entity_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(comp.Nanomaterial_Entity_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS nanomaterial_entities_raw,
+            COLLECT(DISTINCT CASE WHEN comp IS NULL OR comp.Functionalizing_Entity_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(comp.Functionalizing_Entity_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS functionalizing_entities_raw
           RETURN DISTINCT
             f.file_id AS file_id,
             CASE WHEN size(nanomaterial_entities_raw)=0 THEN [na] ELSE nanomaterial_entities_raw END AS nanomaterial_entities,
@@ -2108,8 +2108,8 @@ indices:
           WITH f, "Not specified in data" AS nsd, "Not applicable" AS na
           OPTIONAL MATCH (f)-->(samp:sample)<-[*]-(char:Characterization)
           WITH f, nsd, na,
-            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Type, nsd) END) AS characterization_types_raw,
-            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Name, nsd) END) AS characterization_names_raw
+            COLLECT(DISTINCT CASE WHEN char IS NULL OR char.Characterization_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(char.Characterization_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS characterization_types_raw,
+            COLLECT(DISTINCT CASE WHEN char IS NULL OR char.Characterization_Name = "[]" THEN null ELSE COALESCE(replace(replace(replace(char.Characterization_Name, '[', ''), ']', ''), '"', ''), nsd) END) AS characterization_names_raw
           RETURN DISTINCT
             f.file_id AS file_id,
             CASE WHEN size(characterization_types_raw)=0 THEN [na] ELSE characterization_types_raw END AS characterization_types,
@@ -2516,8 +2516,8 @@ indices:
           UNWIND experimental_strategies AS experimental_strategy
           OPTIONAL MATCH (f)-->(samp:sample)<-[*]-(comp:Composition)
           WITH f, experimental_strategy, nsd, na,
-            COLLECT(DISTINCT CASE WHEN comp IS NULL THEN null ELSE COALESCE(comp.Nanomaterial_Entity_Type, nsd) END) AS nanomaterial_entities_raw,
-            COLLECT(DISTINCT CASE WHEN comp IS NULL THEN null ELSE COALESCE(comp.Functionalizing_Entity_Type, nsd) END) AS functionalizing_entities_raw
+            COLLECT(DISTINCT CASE WHEN comp IS NULL OR comp.Nanomaterial_Entity_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(comp.Nanomaterial_Entity_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS nanomaterial_entities_raw,
+            COLLECT(DISTINCT CASE WHEN comp IS NULL OR comp.Functionalizing_Entity_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(comp.Functionalizing_Entity_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS functionalizing_entities_raw
           RETURN DISTINCT
             f.file_id + "_" + COALESCE(experimental_strategy, nsd) AS file_id_experimental_strategy,
             CASE WHEN size(nanomaterial_entities_raw)=0 THEN [na] ELSE nanomaterial_entities_raw END AS nanomaterial_entities,
@@ -2538,8 +2538,8 @@ indices:
           UNWIND experimental_strategies AS experimental_strategy
           OPTIONAL MATCH (f)-->(samp:sample)<-[*]-(char:Characterization)
           WITH f, experimental_strategy, nsd, na,
-            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Type, nsd) END) AS characterization_types_raw,
-            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Name, nsd) END) AS characterization_names_raw
+            COLLECT(DISTINCT CASE WHEN char IS NULL OR char.Characterization_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(char.Characterization_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS characterization_types_raw,
+            COLLECT(DISTINCT CASE WHEN char IS NULL OR char.Characterization_Name = "[]" THEN null ELSE COALESCE(replace(replace(replace(char.Characterization_Name, '[', ''), ']', ''), '"', ''), nsd) END) AS characterization_names_raw
           RETURN DISTINCT
             f.file_id + "_" + COALESCE(experimental_strategy, nsd) AS file_id_experimental_strategy,
             CASE WHEN size(characterization_types_raw)=0 THEN [na] ELSE characterization_types_raw END AS characterization_types,
@@ -2952,8 +2952,8 @@ indices:
           UNWIND fs AS f
           OPTIONAL MATCH (f)-->(samp:sample)<-[*]-(comp:Composition)
           WITH f, study_data_type, nsd, na,
-            COLLECT(DISTINCT CASE WHEN comp IS NULL THEN null ELSE COALESCE(comp.Nanomaterial_Entity_Type, nsd) END) AS nanomaterial_entities_raw,
-            COLLECT(DISTINCT CASE WHEN comp IS NULL THEN null ELSE COALESCE(comp.Functionalizing_Entity_Type, nsd) END) AS functionalizing_entities_raw
+            COLLECT(DISTINCT CASE WHEN comp IS NULL OR comp.Nanomaterial_Entity_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(comp.Nanomaterial_Entity_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS nanomaterial_entities_raw,
+            COLLECT(DISTINCT CASE WHEN comp IS NULL OR comp.Functionalizing_Entity_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(comp.Functionalizing_Entity_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS functionalizing_entities_raw
           RETURN DISTINCT
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
             CASE WHEN size(nanomaterial_entities_raw)=0 THEN [na] ELSE nanomaterial_entities_raw END AS nanomaterial_entities,
@@ -2976,8 +2976,8 @@ indices:
           UNWIND fs AS f
           OPTIONAL MATCH (f)-->(samp:sample)<-[*]-(char:Characterization)
           WITH f, study_data_type, nsd, na,
-            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Type, nsd) END) AS characterization_types_raw,
-            COLLECT(DISTINCT CASE WHEN char IS NULL THEN null ELSE COALESCE(char.Characterization_Name, nsd) END) AS characterization_names_raw
+            COLLECT(DISTINCT CASE WHEN char IS NULL OR char.Characterization_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(char.Characterization_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS characterization_types_raw,
+            COLLECT(DISTINCT CASE WHEN char IS NULL OR char.Characterization_Name = "[]" THEN null ELSE COALESCE(replace(replace(replace(char.Characterization_Name, '[', ''), ']', ''), '"', ''), nsd) END) AS characterization_names_raw
           RETURN DISTINCT
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
             CASE WHEN size(characterization_types_raw)=0 THEN [na] ELSE characterization_types_raw END AS characterization_types,
