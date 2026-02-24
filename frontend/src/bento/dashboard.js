@@ -443,17 +443,6 @@ export const facetsConfig = [
   },
   {
     section: CANCER_NANOTECHNOLOGY,
-    label: "DOI URL",
-    apiPath: "filterSubjectCountByDoiUrl",
-    apiForFiltering: "filterSubjectCountByDoiUrl",
-    datafield: "doi_urls",
-    field: "group",
-    type: InputTypes.CHECKBOX,
-    sort_type: sortType.ALPHABET,
-    show: true,
-  },
-  {
-    section: CANCER_NANOTECHNOLOGY,
     label: "Publication Title",
     apiPath: "filterSubjectCountByPublicationTitle",
     apiForFiltering: "filterSubjectCountByPublicationTitle",
