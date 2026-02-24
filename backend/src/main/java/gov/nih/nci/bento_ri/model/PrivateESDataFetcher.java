@@ -314,26 +314,26 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 AGG_NAME, "nanomaterial_entities",
                 WIDGET_QUERY, "subjectCountByNanomaterialEntity",
                 FILTER_COUNT_QUERY, "filterSubjectCountByNanomaterialEntity",
-                AGG_ENDPOINT, SAMPLES_END_POINT
+                AGG_ENDPOINT, FILES_END_POINT
         ));
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "functionalizing_entities",
                 WIDGET_QUERY, "subjectCountByFunctionalizingEntity",
                 FILTER_COUNT_QUERY, "filterSubjectCountByFunctionalizingEntity",
-                AGG_ENDPOINT, SAMPLES_END_POINT
+                AGG_ENDPOINT, FILES_END_POINT
         ));
         // caNanoLab Characterization filters
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "characterization_types",
                 WIDGET_QUERY, "subjectCountByCharacterizationType",
                 FILTER_COUNT_QUERY, "filterSubjectCountByCharacterizationType",
-                AGG_ENDPOINT, SAMPLES_END_POINT
+                AGG_ENDPOINT, FILES_END_POINT
         ));
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "characterization_names",
                 WIDGET_QUERY, "subjectCountByCharacterizationName",
                 FILTER_COUNT_QUERY, "filterSubjectCountByCharacterizationName",
-                AGG_ENDPOINT, SAMPLES_END_POINT
+                AGG_ENDPOINT, FILES_END_POINT
         ));
         // Donut Count Fields
         TERM_AGGS.add(Map.of(
