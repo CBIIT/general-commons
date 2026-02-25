@@ -495,7 +495,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"sample_tumor_status", "is_tumor"},
                 new String[]{"organ_or_tissue", "organ_or_tissue"},
                 new String[]{"study_name", "study_name"},
-                new String[]{"sample_name", "sample_id"},
+                new String[]{"sample_name", "sample_name"},
                 new String[]{"organization_name", "organization_name"}
         };
 
@@ -515,7 +515,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("imaging_assay_type", "imaging_assay_type_sort"),
                 Map.entry("tissue_fixative", "tissue_fixative_sort"),
                 Map.entry("study_name", "study_name_sort"),
-                Map.entry("sample_name", "sample_id"),
+                Map.entry("sample_name", "sample_name"),
                 Map.entry("organization_name", "organization_name_sort")
         );
 

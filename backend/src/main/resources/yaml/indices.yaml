@@ -638,6 +638,7 @@ indices:
       keyword:
         # initial_query
         - sample_id # sample.sample_id - single value
+        - sample_name # sample.sample_name - single value
         - sample_type # sample.sample_type - single value
         - sample_tumor_status # sample.sample_tumor_status - single value
         - analyte_type # sample.sample_type - single value
@@ -743,12 +744,14 @@ indices:
       # organization_name
       # is_tumor
       # sample_types
+      # sample_name
       query: |
         MATCH (samp:sample)
         WITH DISTINCT samp, "Not specified in data" AS nsd
         ORDER BY samp.sample_id
         RETURN DISTINCT
           samp.sample_id as sample_id,
+          coalesce(samp.sample_name, coalesce(samp.sample_id, nsd)) as sample_name,
           samp.sample_type as sample_type,
           samp.sample_tumor_status as sample_tumor_status,
           COALESCE(samp.sample_type, nsd) as analyte_type,
