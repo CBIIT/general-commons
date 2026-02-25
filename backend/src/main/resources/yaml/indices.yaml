@@ -304,7 +304,7 @@ indices:
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f:file)-->(p)
           WITH DISTINCT f, p.study_participant_id AS study_participant_id, "Not specified in data" AS nsd, "Not applicable" AS na
-          OPTIONAL MATCH (f)<-[*]-(diag:diagnosis)
+          OPTIONAL MATCH (f)-->(p:participant)<--(diag:diagnosis)
           WITH DISTINCT study_participant_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(diag.primary_diagnosis, nsd) END) AS primary_diagnoses,
             COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(diag.primary_site, nsd) END) AS site
@@ -1745,7 +1745,7 @@ indices:
           MATCH (f:file)
           WITH DISTINCT f, "Not specified in data" AS nsd, "Not applicable" AS na
           SKIP $skip LIMIT $limit
-          OPTIONAL MATCH (f)-[*]->(diag:diagnosis)
+          OPTIONAL MATCH (f)-->(p:participant)<--(diag:diagnosis)
           WITH f.file_id AS file_id, nsd, na, 
           COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(TRIM(LAST(split(diag.primary_diagnosis, ':'))), nsd) END) AS primary_diagnoses,
           COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(diag.primary_site, nsd) END) AS primary_sites
@@ -2319,7 +2319,7 @@ indices:
           WITH f, nsd, na,
             CASE WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
           UNWIND experimental_strategies AS experimental_strategy
-          OPTIONAL MATCH (f)<-[*]-(diag:diagnosis)
+          OPTIONAL MATCH (f)-->(p:participant)<--(diag:diagnosis)
           WITH f, experimental_strategy, nsd, na,
             COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(TRIM(LAST(split(diag.primary_diagnosis, ':'))), nsd) END) AS primary_diagnoses,
             COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(diag.primary_site, nsd) END) AS site
@@ -2553,28 +2553,33 @@ indices:
         - file_id
         - study_study_data_type_filter
         - study_data_types
-        - study_study_name_filter
-        - study_phs_accession_filter
-        - files_experimental_strategy_filter
-        - files_file_type_filter
-        - demographics_sex_filter
-        - samples_sample_tumor_status_filter
-        - samples_sample_type_filter
-        - diagnosis_primary_diagnosis_filter
-        - genomic_library_strategy_filter
-        - genomic_library_source_material_filter
-        - genomic_library_source_molecule_filter
-        - genomic_library_layout_filter
-        - genomic_library_selection_filter
-        - genomic_platform_filter
-        - genomic_instrument_model_filter
-        - genomic_reference_genome_assembly_filter
-        - imaging_image_modality_filter
-        - imaging_tissue_or_organ_of_origin_filter
-        - imaging_tissue_fixative_filter
-        - imaging_imaging_assay_type_filter
-        - proteomic_analytical_fractions_filter
-        - proteomic_instrument_makes_filter
+        - studies # study.study_name - study_study_name_filter - array
+        - phs_accession # study.phs_accession - study_phs_accession_filter - array
+        - experimental_strategies # file.experimental_strategy_and_data_subtypes - files_experimental_strategy_filter - array
+        - file_types # file.file_type - files_file_type_filter - array
+        - sex # participant.sex - demographics_sex_filter - single value
+        - is_tumor # sample.sample_tumor_status - samples_sample_tumor_status_filter - array
+        - sample_types # sample.sample_type - samples_sample_type_filter - array
+        # File Diagnoses
+        - primary_diagnoses # diagnosis.primary_diagnosis - diagnosis_primary_diagnosis_filter - array
+        #- diagnosis_primary_diagnosis_filter # diagnosis.primary_diagnosis - array
+        # File Genomic Info
+        - library_strategies # genomic_info.library_strategy - genomic_library_strategy_filter - array
+        - library_source_materials # genomic_info.library_source_material - genomic_library_source_material_filter - array
+        - library_source_molecules # genomic_info.library_source_molecule - genomic_library_source_molecule_filter - array
+        - library_layouts # genomic_info.library_layout - genomic_library_layout_filter - array
+        - library_selections # genomic_info.library_selection - genomic_library_selection_filter - array
+        - platforms # genomic_info.platform - genomic_platform_filter - array
+        - instrument_models # genomic_info.instrument_model - genomic_instrument_model_filter - array
+        - reference_genome_assemblies # genomic_info.reference_genome_assembly - genomic_reference_genome_assembly_filter - array
+        # File Imaging
+        - image_modality # image.image_modality - imaging_image_modality_filter - array
+        - organ_or_tissue # image.organ_or_tissue - imaging_tissue_or_organ_of_origin_filter - array 
+        - tissue_fixative # MultiplexMicroscopy.tissue_fixative - imaging_tissue_fixative_filter - array
+        - imaging_assay_type # MultiplexMicroscopy.imaging_assay_type - imaging_imaging_assay_type_filter - array
+        # File Proteomic
+        - analytical_fractions # proteomic.analytical_fractions - proteomic_analytical_fractions_filter - array
+        - instrument_makes # proteomic.instrument_make - proteomic_instrument_makes_filter - array
         # caNanoLab Protocol
         - protocol_names # Protocol.protocol_name - protocol_names_filter - array
         - protocol_types # Protocol.protocol_type - protocol_types_filter - array
@@ -2621,8 +2626,8 @@ indices:
     update_queries:
       # Studies
       - name: Studies
-        # study_study_name_filter
-        # study_phs_accession_filter
+        # studies
+        # phs_accession
         # number_of_study_participants
         # number_of_study_samples
         query: |
@@ -2646,16 +2651,16 @@ indices:
           UNWIND fs AS f
           RETURN DISTINCT
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
-            COLLECT(DISTINCT CASE WHEN s IS NULL THEN null ELSE COALESCE(s.study_name, nsd) END) AS study_study_name_filter,
-            COLLECT(DISTINCT CASE WHEN s IS NULL THEN null ELSE COALESCE(s.phs_accession, nsd) END) AS study_phs_accession_filter,
+            COLLECT(DISTINCT CASE WHEN s IS NULL THEN null ELSE COALESCE(s.study_name, nsd) END) AS studies,
+            COLLECT(DISTINCT CASE WHEN s IS NULL THEN null ELSE COALESCE(s.phs_accession, nsd) END) AS phs_accession,
             COALESCE(study_data_type, nsd) AS study_data_types,
             number_of_study_participants,
             number_of_study_samples
         page_size: 10000
       # Files
       - name: Files
-        # files_experimental_strategy_filter
-        # files_file_type_filter
+        # experimental_strategies
+        # file_types
         # files_is_supplementary_file_filter
         query: |
           MATCH (f:file)
@@ -2675,24 +2680,24 @@ indices:
           UNWIND experimental_strategies AS experimental_strategy
           WITH f, study_data_type, nsd, na, experimental_strategy
           WITH f, study_data_type, nsd, na,
-            COLLECT(DISTINCT CASE WHEN experimental_strategy IS NULL THEN null ELSE COALESCE(experimental_strategy, nsd) END) AS files_experimental_strategy_filter,
-            COLLECT(DISTINCT CASE WHEN f IS NULL THEN null ELSE COALESCE(f.file_type, nsd) END) AS files_file_type_filter,
+            COLLECT(DISTINCT CASE WHEN experimental_strategy IS NULL THEN null ELSE COALESCE(experimental_strategy, nsd) END) AS experimental_strategies,
+            COLLECT(DISTINCT CASE WHEN f IS NULL THEN null ELSE COALESCE(f.file_type, nsd) END) AS file_types,
             COLLECT(DISTINCT COALESCE(f.is_supplementary_file, false)) AS files_is_supplementary_file_filter
-          WITH f, study_data_type, nsd, na, files_experimental_strategy_filter, files_file_type_filter, files_is_supplementary_file_filter
+          WITH f, study_data_type, nsd, na, experimental_strategies, file_types, files_is_supplementary_file_filter
           WITH f, study_data_type, nsd, na,
-            CASE WHEN size(files_experimental_strategy_filter) = 0 THEN [na] ELSE files_experimental_strategy_filter END AS files_experimental_strategy_filter,
-            CASE WHEN size(files_file_type_filter) = 0 THEN [na] ELSE files_file_type_filter END AS files_file_type_filter,
+            CASE WHEN size(experimental_strategies) = 0 THEN [na] ELSE experimental_strategies END AS experimental_strategies,
+            CASE WHEN size(file_types) = 0 THEN [na] ELSE file_types END AS file_types,
             files_is_supplementary_file_filter
           RETURN DISTINCT
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
-            files_experimental_strategy_filter,
-            files_file_type_filter,
+            experimental_strategies,
+            file_types,
             files_is_supplementary_file_filter,
             files_is_supplementary_file_filter AS is_supplementary_file
         page_size: 10000
       # Participants
       - name: Participants
-        # demographics_sex_filter
+        # sex
         query: |
           MATCH (f:file)
           WITH DISTINCT f
@@ -2706,17 +2711,17 @@ indices:
           UNWIND fs AS f
           OPTIONAL MATCH (f)-[:of_participant]->(p:participant)
           WITH f, study_data_type, nsd, na,
-            COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.sex, nsd) END) AS demographics_sex_filter
+            COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.sex, nsd) END) AS sex
           WITH f, study_data_type, nsd, na,
-            CASE WHEN size(demographics_sex_filter) = 0 THEN [na] ELSE demographics_sex_filter END AS demographics_sex_filter
+            CASE WHEN size(sex) = 0 THEN [na] ELSE sex END AS sex
           RETURN DISTINCT
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
-            demographics_sex_filter
+            sex
         page_size: 10000
       # Samples
       - name: Samples
-        # samples_sample_tumor_status_filter
-        # samples_sample_type_filter
+        # is_tumor
+        # sample_types
         query: |
           MATCH (f:file)
           WITH DISTINCT f
@@ -2731,19 +2736,19 @@ indices:
           OPTIONAL MATCH (f)-[:of_participant]->(p:participant)
           OPTIONAL MATCH (p)<-[:of_participant]-(samp:sample)
           WITH f, study_data_type, nsd, na,
-            COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_tumor_status, nsd) END) AS samples_sample_tumor_status_filter,
-            COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_type, nsd) END) AS samples_sample_type_filter
+            COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_tumor_status, nsd) END) AS is_tumor,
+            COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_type, nsd) END) AS sample_types
           WITH f, study_data_type, nsd, na,
-            CASE WHEN size(samples_sample_tumor_status_filter) = 0 THEN [na] ELSE samples_sample_tumor_status_filter END AS samples_sample_tumor_status_filter,
-            CASE WHEN size(samples_sample_type_filter) = 0 THEN [na] ELSE samples_sample_type_filter END AS samples_sample_type_filter
+            CASE WHEN size(is_tumor) = 0 THEN [na] ELSE is_tumor END AS is_tumor,
+            CASE WHEN size(sample_types) = 0 THEN [na] ELSE sample_types END AS sample_types
           RETURN DISTINCT
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
-            samples_sample_tumor_status_filter,
-            samples_sample_type_filter
+            is_tumor,
+            sample_types
         page_size: 10000
       # Diagnoses
       - name: Diagnoses
-        # diagnosis_primary_diagnosis_filter
+        # primary_diagnoses
         query: |
           MATCH (f:file)
           WITH DISTINCT f
@@ -2755,25 +2760,25 @@ indices:
             CASE WHEN study_data_types IS NULL OR size(study_data_types)=0 THEN [nsd] ELSE study_data_types END AS study_data_types
           UNWIND study_data_types AS study_data_type
           UNWIND fs AS f
-          OPTIONAL MATCH (f)<-[*]-(diag:diagnosis)
+          OPTIONAL MATCH (f)-->(p:participant)<--(diag:diagnosis)
           WITH f, study_data_type, nsd, na,
-            COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(diag.primary_diagnosis, nsd) END) AS diagnosis_primary_diagnosis_filter
+            COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(diag.primary_diagnosis, nsd) END) AS primary_diagnoses
           WITH f, study_data_type, nsd, na,
-            CASE WHEN diagnosis_primary_diagnosis_filter IS NULL OR size(diagnosis_primary_diagnosis_filter)=0 THEN [na] ELSE diagnosis_primary_diagnosis_filter END AS diagnosis_primary_diagnosis_filter
+            CASE WHEN primary_diagnoses IS NULL OR size(primary_diagnoses)=0 THEN [na] ELSE primary_diagnoses END AS primary_diagnoses
           RETURN DISTINCT
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
-            diagnosis_primary_diagnosis_filter
+            primary_diagnoses
         page_size: 10000
       # Genomic Info
       - name: Genomic Info
-        # genomic_library_strategy_filter
-        # genomic_library_source_material_filter
-        # genomic_library_source_molecule_filter
-        # genomic_library_layout_filter
-        # genomic_library_selection_filter
-        # genomic_platform_filter
-        # genomic_instrument_model_filter
-        # genomic_reference_genome_assembly_filter
+        # library_strategies 
+        # library_source_materials
+        # library_source_molecules
+        # library_layouts
+        # library_selections
+        # platforms
+        # instrument_models
+        # reference_genome_assemblies
         query: |
           MATCH (f:file)
           WITH DISTINCT f
@@ -2787,40 +2792,40 @@ indices:
           UNWIND fs AS f
           OPTIONAL MATCH (f)<-[:of_file]-(g:genomic_info)
           WITH f, study_data_type, nsd, na,
-            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_strategy, nsd) END) AS genomic_library_strategy_filter,
-            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_source_material, nsd) END) AS genomic_library_source_material_filter,
-            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_source_molecule, nsd) END) AS genomic_library_source_molecule_filter,
-            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_layout, nsd) END) AS genomic_library_layout_filter,
-            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_selection, nsd) END) AS genomic_library_selection_filter,
-            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.platform, nsd) END) AS genomic_platform_filter,
-            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.instrument_model, nsd) END) AS genomic_instrument_model_filter,
-            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.reference_genome_assembly, nsd) END) AS genomic_reference_genome_assembly_filter
+            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_strategy, nsd) END) AS library_strategies,
+            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_source_material, nsd) END) AS library_source_materials,
+            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_source_molecule, nsd) END) AS library_source_molecules,
+            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_layout, nsd) END) AS library_layouts,
+            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_selection, nsd) END) AS library_selections,
+            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.platform, nsd) END) AS platforms,
+            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.instrument_model, nsd) END) AS instrument_models,
+            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.reference_genome_assembly, nsd) END) AS reference_genome_assemblies
           WITH f, study_data_type, nsd, na,
-            CASE WHEN size(genomic_library_strategy_filter) = 0 THEN [na] ELSE genomic_library_strategy_filter END AS genomic_library_strategy_filter,
-            CASE WHEN size(genomic_library_source_material_filter) = 0 THEN [na] ELSE genomic_library_source_material_filter END AS genomic_library_source_material_filter,
-            CASE WHEN size(genomic_library_source_molecule_filter) = 0 THEN [na] ELSE genomic_library_source_molecule_filter END AS genomic_library_source_molecule_filter,
-            CASE WHEN size(genomic_library_layout_filter) = 0 THEN [na] ELSE genomic_library_layout_filter END AS genomic_library_layout_filter,
-            CASE WHEN size(genomic_library_selection_filter) = 0 THEN [na] ELSE genomic_library_selection_filter END AS genomic_library_selection_filter,
-            CASE WHEN size(genomic_platform_filter) = 0 THEN [na] ELSE genomic_platform_filter END AS genomic_platform_filter,
-            CASE WHEN size(genomic_instrument_model_filter) = 0 THEN [na] ELSE genomic_instrument_model_filter END AS genomic_instrument_model_filter,
-            CASE WHEN size(genomic_reference_genome_assembly_filter) = 0 THEN [na] ELSE genomic_reference_genome_assembly_filter END AS genomic_reference_genome_assembly_filter
+            CASE WHEN size(library_strategies) = 0 THEN [na] ELSE library_strategies END AS library_strategies,
+            CASE WHEN size(library_source_materials) = 0 THEN [na] ELSE library_source_materials END AS library_source_materials,
+            CASE WHEN size(library_source_molecules) = 0 THEN [na] ELSE library_source_molecules END AS library_source_molecules,
+            CASE WHEN size(library_layouts) = 0 THEN [na] ELSE library_layouts END AS library_layouts,
+            CASE WHEN size(library_selections) = 0 THEN [na] ELSE library_selections END AS library_selections,
+            CASE WHEN size(platforms) = 0 THEN [na] ELSE platforms END AS platforms,
+            CASE WHEN size(instrument_models) = 0 THEN [na] ELSE instrument_models END AS instrument_models,
+            CASE WHEN size(reference_genome_assemblies) = 0 THEN [na] ELSE reference_genome_assemblies END AS reference_genome_assemblies
           RETURN DISTINCT
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
-            genomic_library_strategy_filter,
-            genomic_library_source_material_filter,
-            genomic_library_source_molecule_filter,
-            genomic_library_layout_filter,
-            genomic_library_selection_filter,
-            genomic_platform_filter,
-            genomic_instrument_model_filter,
-            genomic_reference_genome_assembly_filter
+            library_strategies,
+            library_source_materials,
+            library_source_molecules,
+            library_layouts,
+            library_selections,
+            platforms,
+            instrument_models,
+            reference_genome_assemblies
         page_size: 10000
       # Imaging
       - name: Imaging
-        # imaging_image_modality_filter
-        # imaging_tissue_or_organ_of_origin_filter
-        # imaging_tissue_fixative_filter
-        # imaging_imaging_assay_type_filter
+        # image_modality
+        # organ_or_tissue
+        # tissue_fixative
+        # imaging_assay_type
         query: |
           MATCH (f:file)
           WITH DISTINCT f
@@ -2835,26 +2840,26 @@ indices:
           OPTIONAL MATCH (f)<-[:of_file]-(i:image)
           OPTIONAL MATCH (i)<-[:of_image]-(mm:MultiplexMicroscopy)
           WITH DISTINCT f, study_data_type, nsd, na,
-            COLLECT(DISTINCT CASE WHEN i IS NULL THEN null ELSE COALESCE(i.organ_or_tissue, nsd) END) AS imaging_tissue_or_organ_of_origin_filter,
-            COLLECT(DISTINCT CASE WHEN i IS NULL THEN null ELSE COALESCE(i.image_modality, nsd) END) AS imaging_image_modality_filter,
-            COLLECT(DISTINCT CASE WHEN mm IS NULL THEN null ELSE COALESCE(mm.imaging_assay_type, nsd) END) AS imaging_imaging_assay_type_filter,
-            COLLECT(DISTINCT CASE WHEN mm IS NULL THEN null ELSE COALESCE(mm.tissue_fixative, nsd) END) AS imaging_tissue_fixative_filter
+            COLLECT(DISTINCT CASE WHEN i IS NULL THEN null ELSE COALESCE(i.organ_or_tissue, nsd) END) AS organ_or_tissue,
+            COLLECT(DISTINCT CASE WHEN i IS NULL THEN null ELSE COALESCE(i.image_modality, nsd) END) AS image_modality,
+            COLLECT(DISTINCT CASE WHEN mm IS NULL THEN null ELSE COALESCE(mm.imaging_assay_type, nsd) END) AS imaging_assay_type,
+            COLLECT(DISTINCT CASE WHEN mm IS NULL THEN null ELSE COALESCE(mm.tissue_fixative, nsd) END) AS tissue_fixative
           WITH f, study_data_type, nsd, na,
-            CASE WHEN size(imaging_tissue_or_organ_of_origin_filter) = 0 THEN [na] ELSE imaging_tissue_or_organ_of_origin_filter END AS imaging_tissue_or_organ_of_origin_filter,
-            CASE WHEN size(imaging_image_modality_filter) = 0 THEN [na] ELSE imaging_image_modality_filter END AS imaging_image_modality_filter,
-            CASE WHEN size(imaging_imaging_assay_type_filter) = 0 THEN [na] ELSE imaging_imaging_assay_type_filter END AS imaging_imaging_assay_type_filter,
-            CASE WHEN size(imaging_tissue_fixative_filter) = 0 THEN [na] ELSE imaging_tissue_fixative_filter END AS imaging_tissue_fixative_filter
+            CASE WHEN size(organ_or_tissue) = 0 THEN [na] ELSE organ_or_tissue END AS organ_or_tissue,
+            CASE WHEN size(image_modality) = 0 THEN [na] ELSE image_modality END AS image_modality,
+            CASE WHEN size(imaging_assay_type) = 0 THEN [na] ELSE imaging_assay_type END AS imaging_assay_type,
+            CASE WHEN size(tissue_fixative) = 0 THEN [na] ELSE tissue_fixative END AS tissue_fixative
           RETURN DISTINCT 
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
-            imaging_tissue_or_organ_of_origin_filter,
-            imaging_image_modality_filter,
-            imaging_imaging_assay_type_filter,
-            imaging_tissue_fixative_filter 
+            organ_or_tissue,
+            image_modality,
+            imaging_assay_type,
+            tissue_fixative 
         page_size: 10000
       # Proteomic
       - name: Proteomic
-        # proteomic_analytical_fractions
-        # proteomic_instrument_makes_filter
+        # analytical_fractions
+        # instrument_makes
         query: |
           MATCH (f:file)
           WITH DISTINCT f
@@ -2868,15 +2873,15 @@ indices:
           UNWIND fs AS f
           OPTIONAL MATCH (f)<-[:of_file]-(pr:proteomic)
           WITH f, study_data_type, nsd, na,
-            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN null ELSE COALESCE(pr.analytical_fractions, nsd) END) AS proteomic_analytical_fractions_filter,
-            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN null ELSE COALESCE(pr.instrument_make, nsd) END) AS proteomic_instrument_makes_filter
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN null ELSE COALESCE(pr.analytical_fractions, nsd) END) AS analytical_fractions,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN null ELSE COALESCE(pr.instrument_make, nsd) END) AS instrument_makes
           WITH f, study_data_type, nsd, na,
-            CASE WHEN size(proteomic_analytical_fractions_filter) = 0 THEN [na] ELSE proteomic_analytical_fractions_filter END AS proteomic_analytical_fractions_filter,
-            CASE WHEN size(proteomic_instrument_makes_filter) = 0 THEN [na] ELSE proteomic_instrument_makes_filter END AS proteomic_instrument_makes_filter
+            CASE WHEN size(analytical_fractions) = 0 THEN [na] ELSE analytical_fractions END AS analytical_fractions,
+            CASE WHEN size(instrument_makes) = 0 THEN [na] ELSE instrument_makes END AS instrument_makes
           RETURN DISTINCT 
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
-            proteomic_analytical_fractions_filter,
-            proteomic_instrument_makes_filter
+            analytical_fractions,
+            instrument_makes
         page_size: 10000
       # caNanoLab Protocol
       - name: "caNanoLab Protocol"
@@ -3333,7 +3338,7 @@ indices:
           MATCH (f:file)
           WITH DISTINCT f, "Not specified in data" AS nsd, "Not applicable" AS na
           SKIP $skip LIMIT $limit
-          OPTIONAL MATCH (f)-[*]->(diag:diagnosis)
+          OPTIONAL MATCH (f)-->(p:participant)<--(diag:diagnosis)
           WITH f.file_id AS file_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(diag.primary_site, nsd) END) AS sites
           RETURN DISTINCT
