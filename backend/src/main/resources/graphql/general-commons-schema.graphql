@@ -64,6 +64,14 @@ type FileOverview {
     study_name: [String]
 }
 
+type ProtocolOverview{
+    protocol_name: String
+    protocol_type: String
+    doi: String
+    doi_url: String
+    file_name: String
+}
+
 type FilesInList {
     file_name: String
     file_type: String
