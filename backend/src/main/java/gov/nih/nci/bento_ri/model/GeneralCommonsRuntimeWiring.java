@@ -40,6 +40,10 @@ public class GeneralCommonsRuntimeWiring {
                             Map<String, Object> args = env.getArguments();
                             return privateESDataFetcher.subjectOverview(args);
                         })
+                        .dataFetcher("protocolOverview", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return privateESDataFetcher.protocolOverview(args);
+                        })
                         .dataFetcher("sampleOverview", env -> {
                             Map<String, Object> args = env.getArguments();
                             return privateESDataFetcher.sampleOverview(args);

@@ -3876,3 +3876,54 @@ indices:
         - property_required
         - property_type
         - value
+  # Protocol table index
+  - index_name: "dashboard_protocol"
+    id_field: "protocol_pk_id"
+    mapping:
+      keyword:
+      - protocol_pk_id # Protocol.protocol_pk_id - single value
+      - protocol_name # Protocol.protocol_name - single value
+      - protocol_type # Protocol.protocol_type - single value
+      - doi # Protocol.doi - single value
+      - doi_url # Protocol.doi_url - single value
+      - file_names # file.file_names - file_names - array
+      - file_names_sort # derived from file_names - single value
+    initial_query:
+      query: |
+        MATCH (proto:Protocol)
+        WITH DISTINCT proto, "Not specified in data" AS nsd
+        ORDER BY proto.protocol_pk_id
+        RETURN DISTINCT
+          proto.protocol_pk_id AS protocol_pk_id,
+          COALESCE(proto.protocol_name, nsd) AS protocol_name,
+          COALESCE(proto.protocol_type, nsd) AS protocol_type,
+          COALESCE(proto.doi, nsd) AS doi,
+          COALESCE(proto.doi_url, nsd) AS doi_url
+        SKIP $skip LIMIT $limit
+      page_size: 10000
+    update_queries:
+      # Protocol Files
+      - name: "Protocol Files"
+        # file_names
+        # file_names_sort
+        query: |
+          MATCH (proto:Protocol)
+          WITH DISTINCT proto, "Not specified in data" AS nsd, "Not applicable" AS na
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (f)<-[*]-(proto:Protocol)
+          WITH proto.protocol_pk_id AS protocol_pk_id, f, nsd, na,
+            COLLECT(DISTINCT COALESCE(f.file_name, nsd)) AS file_names
+          CALL {
+            WITH file_names, na
+            WITH CASE WHEN file_names IS NULL OR size(file_names)=0 THEN [na] ELSE file_names END AS file_names
+            UNWIND file_names AS file_name
+            WITH file_name
+            ORDER BY file_name
+            WITH collect(file_name) AS sorted_file_names
+            RETURN sorted_file_names, reduce(s = '', i IN sorted_file_names | s + i + '') AS file_names_sort
+          }
+          RETURN DISTINCT
+            protocol_pk_id,
+            file_names,
+            file_names_sort
+        page_size: 10000
