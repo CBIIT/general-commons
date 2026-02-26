@@ -747,7 +747,7 @@ indices:
       # sample_name
       query: |
         MATCH (samp:sample)
-        WITH DISTINCT samp, "Not specified in data" AS nsd
+        WITH DISTINCT samp, "Not specified in data" AS nsd, "Not applicable" AS na
         ORDER BY samp.sample_id
         RETURN DISTINCT
           samp.sample_id as sample_id,
@@ -954,7 +954,7 @@ indices:
           WITH DISTINCT samp
           SKIP $skip LIMIT $limit
           WITH samp, "Not specified in data" AS nsd, "Not applicable" AS na
-          OPTIONAL MATCH (samp)<--(diag:diagnosis)
+          OPTIONAL MATCH (samp)-->(p:participant)<--(diag:diagnosis)
           WITH samp.sample_id AS sample_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(diag.primary_diagnosis, nsd) END) AS primary_diagnoses,
             COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(diag.primary_site, nsd) END) AS site
@@ -983,7 +983,7 @@ indices:
             primary_diagnoses_sort,
             site,
             site_sort
-        page_size: 25000
+        page_size: 20000
       # File Genomic Info 
       - name: "File Genomic Info"
         # library_strategies
@@ -1460,6 +1460,7 @@ indices:
         - associated_drs_uri # calculated - single value
         - associated_md5sum # file.md5sum - single value
         # caNanoLab Protocol
+        - protocol_pk_ids # Protocol.protocol_pk_id - protocol_pk_ids_filter - array
         - protocol_names # Protocol.protocol_name - protocol_names_filter - array
         - protocol_types # Protocol.protocol_type - protocol_types_filter - array
         - doi_urls # Protocol.doi_url - doi_urls_filter - array
@@ -2043,6 +2044,7 @@ indices:
         # protocol_types
         # doi_urls
         # dois
+        # protocol_pk_ids
         query: |
           MATCH (f:file)
           WITH DISTINCT f
@@ -2053,13 +2055,15 @@ indices:
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_name, nsd) END) AS protocol_names_raw,
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_type, nsd) END) AS protocol_types_raw,
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi_url, nsd) END) AS doi_urls_raw,
-            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi, nsd) END) AS dois_raw
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi, nsd) END) AS dois_raw,
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(protocol_pk_id, nsd) END) AS protocol_pk_ids_raw
           RETURN DISTINCT
             f.file_id AS file_id,
             CASE WHEN size(protocol_names_raw)=0 THEN [na] ELSE protocol_names_raw END AS protocol_names,
             CASE WHEN size(protocol_types_raw)=0 THEN [na] ELSE protocol_types_raw END AS protocol_types,
             CASE WHEN size(doi_urls_raw)=0 THEN [na] ELSE doi_urls_raw END AS doi_urls,
-            CASE WHEN size(dois_raw)=0 THEN [na] ELSE dois_raw END AS dois
+            CASE WHEN size(dois_raw)=0 THEN [na] ELSE dois_raw END AS dois,
+            CASE WHEN size(protocol_pk_ids_raw)=0 THEN [na] ELSE protocol_pk_ids_raw END AS protocol_pk_ids
         page_size: 10000
       # caNanoLab Publication
       - name: "caNanoLab Publication"

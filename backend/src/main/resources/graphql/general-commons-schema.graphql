@@ -1208,6 +1208,7 @@ type QueryType {
         file_names: [String] = [""]
         file_ids: [String] = [""]
         study_participant_ids: [String] = [""]
+        protocol_pk_ids: [String] = [""]
     ): [String]
 
     findSubjectIdsInList(subject_ids: [String] = []): [SubjectResult]
