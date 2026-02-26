@@ -65,11 +65,12 @@ type FileOverview {
 }
 
 type ProtocolOverview{
+    protocol_pk_id: String
     protocol_name: String
     protocol_type: String
     doi: String
     doi_url: String
-    file_name: String
+    file_names: [String]
 }
 
 type FilesInList {
@@ -1033,6 +1034,22 @@ type QueryType {
         first: Int = 10
         offset: Int = 0
     ): [SubjectOverview]
+
+    protocolOverview (
+        # id filters
+        protocol_pk_ids: [String] = []
+        # standard filters
+        protocol_names: [String] = []
+        protocol_types: [String] = []
+        dois: [String] = []
+        doi_urls: [String] = []
+        file_names: [String] = []
+        # pagination and sorting
+        order_by: String = ""
+        sort_direction: String = "ASC"
+        first: Int = 10
+        offset: Int = 0
+    ): [ProtocolOverview]
 
     sampleOverview (
         # id filters
