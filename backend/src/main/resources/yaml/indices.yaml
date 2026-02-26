@@ -109,7 +109,7 @@ indices:
           COALESCE(p.participant_id, nsd) as subject_ids,
           COALESCE(p.dbGaP_subject_id, nsd) as dbGaP_subject_id
         SKIP $skip LIMIT $limit
-      page_size: 10000
+      page_size: 5000
     update_queries:
       # Participant Samples
       - name: "Participant Samples"
@@ -159,7 +159,7 @@ indices:
             sorted_sample_types AS sample_types,
             is_tumor_sort,
             sample_types_sort
-        page_size: 10000
+        page_size: 5000
       # Study
       - name: "Study"
         # studies
@@ -291,7 +291,7 @@ indices:
             files_is_supplementary_file_filter AS is_supplementary_file,
             experimental_strategies_sort,
             file_types_sort
-        page_size: 10000
+        page_size: 5000
       # File Diagnoses
       - name: "File Diagnoses"
         # primary_diagnoses
@@ -335,7 +335,7 @@ indices:
             primary_diagnoses_sort,
             sorted_site AS site,
             site_sort
-        page_size: 10000
+        page_size: 5000
       # File Genomic Info 
       - name: "File Genomic Info"
         # library_strategies
@@ -452,7 +452,7 @@ indices:
             platforms_sort,
             instrument_models_sort,
             reference_genome_assemblies_sort
-        page_size: 10000
+        page_size: 5000
       # File Imaging
       - name: "File Imaging"
         # image_modality
@@ -522,7 +522,7 @@ indices:
             organ_or_tissue_sort,
             tissue_fixative_sort,
             imaging_assay_type_sort
-        page_size: 10000
+        page_size: 5000
       # File Proteomic
       - name: "File Proteomic"
         # analytical_fractions
@@ -550,7 +550,7 @@ indices:
             CASE WHEN size(aliquot_ids_raw)=0 THEN [na] ELSE aliquot_ids_raw END AS aliquot_ids,
             CASE WHEN size(proteomic_instrument_models_raw)=0 THEN [na] ELSE proteomic_instrument_models_raw END AS proteomic_instrument_models,
             CASE WHEN size(proteomic_design_descriptions_raw)=0 THEN [na] ELSE proteomic_design_descriptions_raw END AS proteomic_design_descriptions
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Protocol
       - name: "caNanoLab Protocol"
         # protocol_names
@@ -574,7 +574,7 @@ indices:
             CASE WHEN size(protocol_types_raw)=0 THEN [na] ELSE protocol_types_raw END AS protocol_types,
             CASE WHEN size(doi_urls_raw)=0 THEN [na] ELSE doi_urls_raw END AS doi_urls,
             CASE WHEN size(dois_raw)=0 THEN [na] ELSE dois_raw END AS dois
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Publication
       - name: "caNanoLab Publication"
         # publication_titles
@@ -595,7 +595,7 @@ indices:
             CASE WHEN size(publication_titles_raw)=0 THEN [na] ELSE publication_titles_raw END AS publication_titles,
             CASE WHEN size(publication_statuses_raw)=0 THEN [na] ELSE publication_statuses_raw END AS publication_statuses,
             CASE WHEN size(pub_ids_raw)=0 THEN [na] ELSE pub_ids_raw END AS pub_ids
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Composition
       - name: "caNanoLab Composition"
         # nanomaterial_entities
@@ -613,7 +613,7 @@ indices:
             p.study_participant_id AS study_participant_id,
             CASE WHEN size(nanomaterial_entities_raw)=0 THEN [na] ELSE nanomaterial_entities_raw END AS nanomaterial_entities,
             CASE WHEN size(functionalizing_entities_raw)=0 THEN [na] ELSE functionalizing_entities_raw END AS functionalizing_entities
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Characterization
       - name: "caNanoLab Characterization"
         # characterization_types
@@ -631,7 +631,7 @@ indices:
             p.study_participant_id AS study_participant_id,
             CASE WHEN size(characterization_types_raw)=0 THEN [na] ELSE characterization_types_raw END AS characterization_types,
             CASE WHEN size(characterization_names_raw)=0 THEN [na] ELSE characterization_names_raw END AS characterization_names
-        page_size: 10000
+        page_size: 5000
   - index_name: "dashboard_sample"
     id_field: "sample_id"
     mapping:
@@ -765,7 +765,7 @@ indices:
           COALESCE(samp.sample_tumor_status, nsd) as is_tumor,
           [COALESCE(samp.sample_type, nsd)] as sample_types
         SKIP $skip LIMIT $limit
-      page_size: 10000
+      page_size: 5000
     update_queries:
       # Sample Participants
       - name: "Sample Participants"
@@ -792,7 +792,7 @@ indices:
             subject_ids,
             subject_ids_filter,
             sex
-        page_size: 10000
+        page_size: 5000
       # Study
       - name: "Study"
         # studies
@@ -942,7 +942,7 @@ indices:
             files_is_supplementary_file_filter AS is_supplementary_file,
             experimental_strategies_sort,
             file_types_sort
-        page_size: 10000
+        page_size: 5000
       # File Diagnoses
       - name: "Diagnoses"
         # primary_diagnoses
@@ -1100,7 +1100,7 @@ indices:
             platforms_sort,
             instrument_models_sort,
             reference_genome_assemblies_sort
-        page_size: 10000
+        page_size: 5000
       # File Imaging
       - name: "File Imaging"
         # image_modality
@@ -1174,7 +1174,7 @@ indices:
             organ_or_tissue_sort,
             tissue_fixative_sort,
             imaging_assay_type_sort
-        page_size: 10000
+        page_size: 5000
       # File Proteomic
       - name: "File Proteomic"
         # analytical_fractions
@@ -1202,7 +1202,7 @@ indices:
             CASE WHEN size(aliquot_ids_raw)=0 THEN [na] ELSE aliquot_ids_raw END AS aliquot_ids,
             CASE WHEN size(proteomic_instrument_models_raw)=0 THEN [na] ELSE proteomic_instrument_models_raw END AS proteomic_instrument_models,
             CASE WHEN size(proteomic_design_descriptions_raw)=0 THEN [na] ELSE proteomic_design_descriptions_raw END AS proteomic_design_descriptions
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Protocol
       - name: "caNanoLab Protocol"
         # protocol_names
@@ -1226,7 +1226,7 @@ indices:
             CASE WHEN size(protocol_types_raw)=0 THEN [na] ELSE protocol_types_raw END AS protocol_types,
             CASE WHEN size(doi_urls_raw)=0 THEN [na] ELSE doi_urls_raw END AS doi_urls,
             CASE WHEN size(dois_raw)=0 THEN [na] ELSE dois_raw END AS dois
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Publication
       - name: "caNanoLab Publication"
         # publication_titles
@@ -1247,7 +1247,7 @@ indices:
             CASE WHEN size(publication_titles_raw)=0 THEN [na] ELSE publication_titles_raw END AS publication_titles,
             CASE WHEN size(publication_statuses_raw)=0 THEN [na] ELSE publication_statuses_raw END AS publication_statuses,
             CASE WHEN size(pub_ids_raw)=0 THEN [na] ELSE pub_ids_raw END AS pub_ids
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Composition
       - name: "caNanoLab Composition"
         # nanomaterial_entities
@@ -1265,7 +1265,7 @@ indices:
             samp.sample_id AS sample_id,
             CASE WHEN size(nanomaterial_entities_raw)=0 THEN [na] ELSE nanomaterial_entities_raw END AS nanomaterial_entities,
             CASE WHEN size(functionalizing_entities_raw)=0 THEN [na] ELSE functionalizing_entities_raw END AS functionalizing_entities
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Characterization
       - name: "caNanoLab Characterization"
         # characterization_types
@@ -1283,7 +1283,7 @@ indices:
             samp.sample_id AS sample_id,
             CASE WHEN size(characterization_types_raw)=0 THEN [na] ELSE characterization_types_raw END AS characterization_types,
             CASE WHEN size(characterization_names_raw)=0 THEN [na] ELSE characterization_names_raw END AS characterization_names
-        page_size: 10000
+        page_size: 5000
   - index_name: "samples_for_subject_id"
     id_field: "sample_id"
     mapping:
@@ -1359,7 +1359,7 @@ indices:
           participant_ids AS participant_id,
           participant_ids AS subject_id,
           files
-      page_size: 10000
+      page_size: 5000
     update_queries:
       # Study (for phs_accession)
       - name: "Study"
@@ -1373,7 +1373,7 @@ indices:
           RETURN DISTINCT
             sample_id,
             phs_accession
-        page_size: 10000
+        page_size: 5000
   - index_name: "dashboard_file"
     id_field: "file_id"
     mapping:
@@ -1526,7 +1526,7 @@ indices:
           sorted_experimental_strategies AS experimental_strategies,
           [file_type] AS file_types,
           experimental_strategies_sort
-      page_size: 40000
+      page_size: 20000
     update_queries:
       # Studies
       - name: Studies
@@ -1669,7 +1669,7 @@ indices:
             races_sort,
             sorted_subject_ids AS subject_ids,
             study_participant_ids
-        page_size: 10000
+        page_size: 5000
       # Samples
       - name: Samples
         # is_tumor
@@ -1777,7 +1777,7 @@ indices:
             primary_diagnoses_sort,
             sorted_site AS site,
             site_sort
-        page_size: 10000
+        page_size: 5000
       # Genomic Info
       - name: Genomic Info
         # library_strategies
@@ -1899,7 +1899,7 @@ indices:
             sorted_instrument_models AS instrument_models,
             instrument_models_sort,
             sorted_reference_genome_assemblies AS reference_genome_assemblies
-        page_size: 10000
+        page_size: 5000
       # Imaging
       - name: Imaging
         # image_modality
@@ -1968,7 +1968,7 @@ indices:
             sorted_tissue_fixative AS tissue_fixative,
             tissue_fixative_sort,
             license
-        page_size: 10000
+        page_size: 5000
       # Proteomic
       - name: Proteomic
         # analytical_fractions
@@ -1993,7 +1993,7 @@ indices:
             analytical_fractions,
             instrument_makes,
             proteomic_design_descriptions
-        page_size: 10000
+        page_size: 5000
       # Associated Files
       - name: Associated Files
         # associated_file
@@ -2010,7 +2010,7 @@ indices:
             CASE WHEN af IS NULL THEN na ELSE COALESCE(af.file_name, nsd) END AS associated_file,
             CASE WHEN af IS NULL THEN na WHEN af.file_id IS NOT NULL THEN 'drs://nci-crdc.datacommons.io/' + af.file_id ELSE nsd END AS associated_drs_uri,
             CASE WHEN af IS NULL THEN na ELSE COALESCE(af.md5sum, nsd) END AS associated_md5sum
-        page_size: 10000
+        page_size: 5000
       # Supplementary File Names
       - name: Supplementary File Names
         # supplementary_file_names
@@ -2036,7 +2036,7 @@ indices:
             file_id,
             sorted_supplementary_file_names AS supplementary_file_names,
             supplementary_file_names_sort
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Protocol
       - name: "caNanoLab Protocol"
         # protocol_names
@@ -2060,7 +2060,7 @@ indices:
             CASE WHEN size(protocol_types_raw)=0 THEN [na] ELSE protocol_types_raw END AS protocol_types,
             CASE WHEN size(doi_urls_raw)=0 THEN [na] ELSE doi_urls_raw END AS doi_urls,
             CASE WHEN size(dois_raw)=0 THEN [na] ELSE dois_raw END AS dois
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Publication
       - name: "caNanoLab Publication"
         # publication_titles
@@ -2081,7 +2081,7 @@ indices:
             CASE WHEN size(publication_titles_raw)=0 THEN [na] ELSE publication_titles_raw END AS publication_titles,
             CASE WHEN size(publication_statuses_raw)=0 THEN [na] ELSE publication_statuses_raw END AS publication_statuses,
             CASE WHEN size(pub_ids_raw)=0 THEN [na] ELSE pub_ids_raw END AS pub_ids
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Composition
       - name: "caNanoLab Composition"
         # nanomaterial_entities
@@ -2099,7 +2099,7 @@ indices:
             f.file_id AS file_id,
             CASE WHEN size(nanomaterial_entities_raw)=0 THEN [na] ELSE nanomaterial_entities_raw END AS nanomaterial_entities,
             CASE WHEN size(functionalizing_entities_raw)=0 THEN [na] ELSE functionalizing_entities_raw END AS functionalizing_entities
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Characterization
       - name: "caNanoLab Characterization"
         # characterization_types
@@ -2117,7 +2117,7 @@ indices:
             f.file_id AS file_id,
             CASE WHEN size(characterization_types_raw)=0 THEN [na] ELSE characterization_types_raw END AS characterization_types,
             CASE WHEN size(characterization_names_raw)=0 THEN [na] ELSE characterization_names_raw END AS characterization_names
-        page_size: 10000
+        page_size: 5000
   - index_name: "dashboard_file_experimental_strategy"
     id_field: "file_id_experimental_strategy"
     mapping:
@@ -2275,7 +2275,7 @@ indices:
             f.file_id + "_" + COALESCE(experimental_strategy, nsd) AS file_id_experimental_strategy,
             sex,
             subject_ids
-        page_size: 10000
+        page_size: 5000
       # Samples
       - name: Samples
         # is_tumor
@@ -2333,7 +2333,7 @@ indices:
             f.file_id + "_" + COALESCE(experimental_strategy, nsd) AS file_id_experimental_strategy,
             primary_diagnoses,
             site
-        page_size: 10000
+        page_size: 5000
       # Genomic Info
       - name: Genomic Info
         # library_strategies
@@ -2385,7 +2385,7 @@ indices:
             platforms,
             instrument_models,
             reference_genome_assemblies
-        page_size: 10000
+        page_size: 5000
       # Imaging
       - name: Imaging
         # image_modality
@@ -2419,7 +2419,7 @@ indices:
             organ_or_tissue,
             imaging_assay_type,
             tissue_fixative 
-        page_size: 10000
+        page_size: 5000
       # Proteomic
       - name: Proteomic
         # analytical_fractions
@@ -2450,7 +2450,7 @@ indices:
             analytical_fractions,
             instrument_makes,
             proteomic_design_descriptions
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Protocol
       - name: "caNanoLab Protocol"
         # protocol_names
@@ -2478,7 +2478,7 @@ indices:
             CASE WHEN size(protocol_types_raw)=0 THEN [na] ELSE protocol_types_raw END AS protocol_types,
             CASE WHEN size(doi_urls_raw)=0 THEN [na] ELSE doi_urls_raw END AS doi_urls,
             CASE WHEN size(dois_raw)=0 THEN [na] ELSE dois_raw END AS dois
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Publication
       - name: "caNanoLab Publication"
         # publication_titles
@@ -2503,7 +2503,7 @@ indices:
             CASE WHEN size(publication_titles_raw)=0 THEN [na] ELSE publication_titles_raw END AS publication_titles,
             CASE WHEN size(publication_statuses_raw)=0 THEN [na] ELSE publication_statuses_raw END AS publication_statuses,
             CASE WHEN size(pub_ids_raw)=0 THEN [na] ELSE pub_ids_raw END AS pub_ids
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Composition
       - name: "caNanoLab Composition"
         # nanomaterial_entities
@@ -2525,7 +2525,7 @@ indices:
             f.file_id + "_" + COALESCE(experimental_strategy, nsd) AS file_id_experimental_strategy,
             CASE WHEN size(nanomaterial_entities_raw)=0 THEN [na] ELSE nanomaterial_entities_raw END AS nanomaterial_entities,
             CASE WHEN size(functionalizing_entities_raw)=0 THEN [na] ELSE functionalizing_entities_raw END AS functionalizing_entities
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Characterization
       - name: "caNanoLab Characterization"
         # characterization_types
@@ -2547,7 +2547,7 @@ indices:
             f.file_id + "_" + COALESCE(experimental_strategy, nsd) AS file_id_experimental_strategy,
             CASE WHEN size(characterization_types_raw)=0 THEN [na] ELSE characterization_types_raw END AS characterization_types,
             CASE WHEN size(characterization_names_raw)=0 THEN [na] ELSE characterization_names_raw END AS characterization_names
-        page_size: 10000
+        page_size: 5000
   - index_name: "dashboard_study_data_type"
     id_field: "file_id_study_data_type"
     mapping:
@@ -2625,7 +2625,7 @@ indices:
           f.file_id AS file_id,
           COALESCE(study_data_type, nsd) AS study_study_data_type_filter,
           COALESCE(study_data_type, nsd) AS study_data_types
-      page_size: 10000
+      page_size: 5000
     update_queries:
       # Studies
       - name: Studies
@@ -2659,7 +2659,7 @@ indices:
             COALESCE(study_data_type, nsd) AS study_data_types,
             number_of_study_participants,
             number_of_study_samples
-        page_size: 10000
+        page_size: 5000
       # Files
       - name: Files
         # experimental_strategies
@@ -2697,7 +2697,7 @@ indices:
             file_types,
             files_is_supplementary_file_filter,
             files_is_supplementary_file_filter AS is_supplementary_file
-        page_size: 10000
+        page_size: 5000
       # Participants
       - name: Participants
         # sex
@@ -2720,7 +2720,7 @@ indices:
           RETURN DISTINCT
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
             sex
-        page_size: 10000
+        page_size: 5000
       # Samples
       - name: Samples
         # is_tumor
@@ -2748,7 +2748,7 @@ indices:
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
             is_tumor,
             sample_types
-        page_size: 10000
+        page_size: 5000
       # Diagnoses
       - name: Diagnoses
         # primary_diagnoses
@@ -2771,7 +2771,7 @@ indices:
           RETURN DISTINCT
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
             primary_diagnoses
-        page_size: 10000
+        page_size: 5000
       # Genomic Info
       - name: Genomic Info
         # library_strategies 
@@ -2822,7 +2822,7 @@ indices:
             platforms,
             instrument_models,
             reference_genome_assemblies
-        page_size: 10000
+        page_size: 5000
       # Imaging
       - name: Imaging
         # image_modality
@@ -2858,7 +2858,7 @@ indices:
             image_modality,
             imaging_assay_type,
             tissue_fixative 
-        page_size: 10000
+        page_size: 5000
       # Proteomic
       - name: Proteomic
         # analytical_fractions
@@ -2885,7 +2885,7 @@ indices:
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
             analytical_fractions,
             instrument_makes
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Protocol
       - name: "caNanoLab Protocol"
         # protocol_names
@@ -2915,7 +2915,7 @@ indices:
             CASE WHEN size(protocol_types_raw)=0 THEN [na] ELSE protocol_types_raw END AS protocol_types,
             CASE WHEN size(doi_urls_raw)=0 THEN [na] ELSE doi_urls_raw END AS doi_urls,
             CASE WHEN size(dois_raw)=0 THEN [na] ELSE dois_raw END AS dois
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Publication
       - name: "caNanoLab Publication"
         # publication_titles
@@ -2942,7 +2942,7 @@ indices:
             CASE WHEN size(publication_titles_raw)=0 THEN [na] ELSE publication_titles_raw END AS publication_titles,
             CASE WHEN size(publication_statuses_raw)=0 THEN [na] ELSE publication_statuses_raw END AS publication_statuses,
             CASE WHEN size(pub_ids_raw)=0 THEN [na] ELSE pub_ids_raw END AS pub_ids
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Composition
       - name: "caNanoLab Composition"
         # nanomaterial_entities
@@ -2966,7 +2966,7 @@ indices:
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
             CASE WHEN size(nanomaterial_entities_raw)=0 THEN [na] ELSE nanomaterial_entities_raw END AS nanomaterial_entities,
             CASE WHEN size(functionalizing_entities_raw)=0 THEN [na] ELSE functionalizing_entities_raw END AS functionalizing_entities
-        page_size: 10000
+        page_size: 5000
       # caNanoLab Characterization
       - name: "caNanoLab Characterization"
         # characterization_types
@@ -2990,7 +2990,7 @@ indices:
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
             CASE WHEN size(characterization_types_raw)=0 THEN [na] ELSE characterization_types_raw END AS characterization_types,
             CASE WHEN size(characterization_names_raw)=0 THEN [na] ELSE characterization_names_raw END AS characterization_names
-        page_size: 10000
+        page_size: 5000
   - index_name: "dashboard_participant_ids"
     id_field: "study_participant_id"
     mapping:
@@ -3014,7 +3014,7 @@ indices:
           COALESCE(p.participant_id, nsd) as participant_id,
           CASE WHEN s IS NULL THEN na ELSE COALESCE(s.phs_accession, nsd) END as phs_accession
         SKIP $skip LIMIT $limit
-      page_size: 10000
+      page_size: 5000
     update_queries:
       # Studies
       - name: Studies
@@ -3071,7 +3071,7 @@ indices:
             ELSE replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', '') 
           END as study_data_types_gs
         SKIP $skip LIMIT $limit
-      page_size: 10000
+      page_size: 5000
   - index_name: "gs_participant"
     id_field: "study_participant_id"
     mapping:
@@ -3096,7 +3096,7 @@ indices:
           COALESCE(p.participant_id, nsd) as subject_id_gs,
           [COALESCE(p.participant_id, nsd)] as subject_ids_filter
         SKIP $skip LIMIT $limit
-      page_size: 10000
+      page_size: 5000
     update_queries:
       # Study
       - name: "Study"
@@ -3118,7 +3118,7 @@ indices:
           RETURN DISTINCT
             study_participant_id,
             study_gs
-        page_size: 10000
+        page_size: 5000
       # Site
       - name: "Site"
         # site_gs
@@ -3132,7 +3132,7 @@ indices:
           RETURN DISTINCT
             study_participant_id,
             site_gs
-        page_size: 10000
+        page_size: 5000
       # Sex
       - name: "Sex"
         # sex_gs
@@ -3144,7 +3144,7 @@ indices:
           RETURN DISTINCT
             study_participant_id,
             sex_gs
-        page_size: 10000
+        page_size: 5000
   - index_name: "gs_sample"
     id_field: "sample_id"
     mapping:
@@ -3170,7 +3170,7 @@ indices:
           COALESCE(samp.sample_tumor_status, nsd) as is_tumor_gs,
           COALESCE(samp.sample_type, nsd) as analyte_type_gs
         SKIP $skip LIMIT $limit
-      page_size: 10000
+      page_size: 5000
     update_queries:
       # Subject IDs Filter
       - name: "Subject IDs Filter"
@@ -3186,7 +3186,7 @@ indices:
           RETURN DISTINCT
             sample_id,
             CASE WHEN size(participant_ids) = 0 THEN [na] ELSE participant_ids END AS subject_ids_filter
-        page_size: 10000
+        page_size: 5000
   - index_name: "gs_file"
     id_field: "file_id"
     mapping:
@@ -3381,7 +3381,7 @@ indices:
           COALESCE(toString(p.program_sort_order), nsd) as program_sort_order_gs,
           'program' as type_gs
         SKIP $skip LIMIT $limit
-      page_size: 10000
+      page_size: 5000
   - index_name: "program"
     id_field: "program_name"
     mapping:
@@ -3445,7 +3445,7 @@ indices:
           program_external_url AS program_url,
           program_external_url AS website,
           program_name AS program_sort_order
-      page_size: 10000
+      page_size: 5000
     update_queries:
       # Program Statistics
       - name: "Program Statistics"
@@ -3497,7 +3497,7 @@ indices:
           RETURN DISTINCT
             pr.program_name AS program_name,
             study_participants
-        page_size: 10000
+        page_size: 5000
       # Studies
       - name: "Studies"
         # studies
@@ -3762,7 +3762,7 @@ indices:
           CASE WHEN s IS NULL THEN na ELSE COALESCE(s.study_acronym, nsd) END AS study_acronym,
           CASE WHEN s IS NULL THEN na ELSE COALESCE(s.study_name, nsd) END AS study_name,
           COALESCE(p.sex, nsd) AS sex
-      page_size: 10000
+      page_size: 5000
     update_queries:
       # Samples
       - name: "Samples"
@@ -3790,7 +3790,7 @@ indices:
             CASE WHEN numberOfSamples = 0 THEN [] ELSE samples END AS samples,
             numberOfSamples,
             CASE WHEN size(site) = 0 THEN [na] ELSE site END AS site
-        page_size: 10000
+        page_size: 5000
       # Files
       - name: "Files"
         # files
@@ -3815,7 +3815,7 @@ indices:
             p.participant_id AS subject_id,
             CASE WHEN numberOfFiles = 0 THEN [] ELSE files END AS files,
             numberOfFiles
-        page_size: 10000
+        page_size: 5000
       # Disease Sites
       - name: "Disease Sites"
         # numberOfDiseaseSites
@@ -3828,7 +3828,7 @@ indices:
           RETURN DISTINCT
             p.participant_id AS subject_id,
             numberOfDiseaseSites
-        page_size: 10000
+        page_size: 5000
   # About Page index
   - index_name: about_page
     type: about_file
