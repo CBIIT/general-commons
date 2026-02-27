@@ -1737,7 +1737,7 @@ indices:
             analyte_type_sort,
             sorted_sample_id AS sample_id,
             sorted_sample_id AS sample_ids
-        page_size: 5000
+        page_size: 2500
       # Diagnoses
       - name: Diagnoses
         # primary_diagnoses
