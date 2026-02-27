@@ -1684,9 +1684,9 @@ indices:
           MATCH (f:file)
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH "Not specified in data" AS nsd, "Not applicable" AS na
-          OPTIONAL MATCH (samp:sample)<--(f)
-          WITH DISTINCT f.file_id AS file_id, nsd, na,
+          OPTIONAL MATCH (f)-->(samp:sample)
+          WITH DISTINCT f.file_id AS file_id, samp, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH file_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_tumor_status, nsd) END) AS sample_tumor_status,
             COLLECT(DISTINCT samp.sample_type) AS raw_sample_types,
             COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_id, nsd) END) AS sample_id
@@ -1737,7 +1737,7 @@ indices:
             analyte_type_sort,
             sorted_sample_id AS sample_id,
             sorted_sample_id AS sample_ids
-        page_size: 2500
+        page_size: 25000
       # Diagnoses
       - name: Diagnoses
         # primary_diagnoses
@@ -2294,8 +2294,7 @@ indices:
           WITH f, nsd, na,
             CASE WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
           UNWIND experimental_strategies AS experimental_strategy
-          OPTIONAL MATCH (f)-[:of_participant]->(p:participant)
-          OPTIONAL MATCH (p)<-[:of_participant]-(samp:sample)
+          OPTIONAL MATCH (f)-->(samp:sample)
           WITH DISTINCT f, experimental_strategy, nsd, na,
             COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_tumor_status, nsd) END) AS sample_tumor_status,
             COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(TRIM(LAST(split(samp.sample_type, ':'))), nsd) END) AS sample_type,
