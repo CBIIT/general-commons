@@ -1664,7 +1664,7 @@ export const tabContainers = [
       },
       {
         dataField: 'file_names',
-        header: 'File Names',
+        header: 'File Name',
         display: true,
         tooltipText: 'Name of file associated with the study.',
         role: cellTypes.DISPLAY,
