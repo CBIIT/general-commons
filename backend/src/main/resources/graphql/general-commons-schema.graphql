@@ -121,7 +121,6 @@ type SearchResult {
     numberOfSamples: Int
     numberOfFiles: Int
     numberOfDiseaseSites: Int
-    numberOfProtocols: Int
 
     subjectCountByStudy: [GroupCount]
     subjectCountByExperimentalStrategy: [GroupCount]
