@@ -41,6 +41,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     final String FILES_EXPERIMENTAL_STRATEGY_END_POINT = "/dashboard_file_experimental_strategy/_search";
 
     final String PROTOCOLS_END_POINT = "/dashboard_protocol/_search";
+    final String PROTOCOLS_COUNT_END_POINT = "/dashboard_protocol/_count";
 
     final String PROGRAMS_END_POINT = "/program/_search";
     final String PROGRAMS_COUNT_END_POINT = "/program/_count";
@@ -392,6 +393,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         JsonObject subjectCountResult = esService.send(subjectCountRequest);
         int numberOfSubjects = subjectCountResult.get("count").getAsInt();
 
+        Request protocolCountRequest = new Request("GET", PROTOCOLS_COUNT_END_POINT);
+        protocolCountRequest.setJsonEntity(gson.toJson(query));
+        JsonObject protocolCountResult = esService.send(protocolCountRequest);
+        int numberOfProtocols = protocolCountResult.get("count").getAsInt();
 
         // Get aggregations
         Map<String, Object> aggQuery = esService.addAggregations(query, TERM_AGG_NAMES);
@@ -406,6 +411,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         data.put("numberOfSamples", numberOfSamples);
         data.put("numberOfFiles", numberOfFiles);
         data.put("numberOfDiseaseSites", aggs.get("site").size());
+        data.put("numberOfProtocols", numberOfProtocols);
 
         // widgets data and facet filter counts
         for (var agg: TERM_AGGS) {

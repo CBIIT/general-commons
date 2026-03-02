@@ -121,6 +121,7 @@ type SearchResult {
     numberOfSamples: Int
     numberOfFiles: Int
     numberOfDiseaseSites: Int
+    numberOfProtocols: Int
 
     subjectCountByStudy: [GroupCount]
     subjectCountByExperimentalStrategy: [GroupCount]
@@ -912,7 +913,6 @@ type QueryType {
     numberOfDiseaseSites: Int
     numberOfImages: Int
     numberOfProteomics: Int
-
     idsLists: IdsLists
 
     programDetail(
