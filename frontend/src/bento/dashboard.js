@@ -190,7 +190,7 @@ export const facetsConfig = [
     field: "group",
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
-    show: true,
+    show: false,
     customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   // GENOMIC
