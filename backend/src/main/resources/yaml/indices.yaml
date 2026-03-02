@@ -1410,7 +1410,6 @@ indices:
         - is_tumor # sample.sample_tumor_status - array
         - sample_types # sample.sample_type - array
         - analyte_type # sample.sample_type - array
-        - organization_name # sample.organization_name - array
         # Diagnoses
         - primary_diagnoses # diagnosis.primary_diagnosis - array
         - site # diagnosis.primary_site - array
@@ -1681,7 +1680,6 @@ indices:
         # analyte_type
         # analyte_type_sort
         # sample_id
-        # organiazation_name
         query: |
           MATCH (f:file)
           WITH DISTINCT f
@@ -1691,20 +1689,18 @@ indices:
           WITH file_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_tumor_status, nsd) END) AS sample_tumor_status,
             COLLECT(DISTINCT samp.sample_type) AS raw_sample_types,
-            COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_id, nsd) END) AS sample_id,
-            COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.Organization_Name, nsd) END) as organization_name
+            COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_id, nsd) END) AS sample_id
           CALL {
             WITH raw_sample_types, nsd
             UNWIND (CASE WHEN size(raw_sample_types) = 0 THEN [null] ELSE raw_sample_types END) AS raw_sample_type
             WITH CASE WHEN raw_sample_type IS NULL THEN null ELSE COALESCE(TRIM(LAST(split(raw_sample_type, ':'))), nsd) END AS processed_sample_type
             RETURN COLLECT(DISTINCT processed_sample_type) AS sample_type
           }
-          WITH file_id, nsd, na, sample_tumor_status, sample_id, sample_type, organization_name
+          WITH file_id, nsd, na, sample_tumor_status, sample_id, sample_type
           WITH file_id, nsd, na, 
             CASE WHEN size(sample_tumor_status) = 0 THEN [na] ELSE sample_tumor_status END AS is_tumor,
             CASE WHEN size(sample_type) = 0 THEN [na] ELSE sample_type END AS sample_types,
-            CASE WHEN size(sample_id) = 0 THEN [na] ELSE sample_id END AS sample_id,
-            CASE WHEN size(organization_name) = 0 THEN [na] ELSE organization_name END AS organization_name
+            CASE WHEN size(sample_id) = 0 THEN [na] ELSE sample_id END AS sample_id
           CALL {
             WITH is_tumor
             UNWIND is_tumor AS tumor_status
@@ -1740,8 +1736,7 @@ indices:
             sorted_analyte_type AS analyte_type,
             analyte_type_sort,
             sorted_sample_id AS sample_id,
-            sorted_sample_id AS sample_ids,
-            organization_name
+            sorted_sample_id AS sample_ids
         page_size: 25000
       # Diagnoses
       - name: Diagnoses
