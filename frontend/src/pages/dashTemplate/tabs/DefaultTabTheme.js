@@ -49,6 +49,13 @@ export const customTheme = {
             color: '#A35719',
           }
         },
+        '&.protocols': {
+          background: '#FFFCFA',
+          color: '#0E6292',
+          '& span.protocols_count': {
+            color: '#0E6292',
+          }
+        },
         '&.MuiTypography-body1': {
           color: 'red',
         },
@@ -66,6 +73,12 @@ export const customTheme = {
         fontWeight: '500',
       },
       '& span.files_count': {
+        marginLeft: '12px',
+        fontSize: '17px',
+        color: '#686868',
+        fontWeight: '500',
+      },
+      '& span.protocols_count': {
         marginLeft: '12px',
         fontSize: '17px',
         color: '#686868',
