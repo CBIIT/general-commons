@@ -155,6 +155,8 @@ type SearchResult {
     subjectCountByProtocolType: [GroupCount]
     subjectCountByDoi: [GroupCount]
     subjectCountByDoiUrl: [GroupCount]
+    subjectCountByOrganizationName: [GroupCount]
+    filterSubjectCountByOrganizationName: [GroupCount]
     subjectCountByPublicationTitle: [GroupCount]
     subjectCountByPublicationStatus: [GroupCount]
     subjectCountByPubId: [GroupCount]

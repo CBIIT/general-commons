@@ -292,6 +292,13 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 FILTER_COUNT_QUERY, "filterSubjectCountByDoiUrl",
                 AGG_ENDPOINT, FILES_END_POINT
         ));
+        // caNanoLab Organiation filters
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "organization_name",
+                WIDGET_QUERY, "subjectCountByOrganizationName",
+                FILTER_COUNT_QUERY, "filterSubjectCountByOrganizationName",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
         // caNanoLab Publication filters
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "publication_titles",
