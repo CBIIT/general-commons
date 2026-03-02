@@ -61,10 +61,11 @@ export const CustomCellView = (props) => {
           {label.map((item, idx) => {
             return (
               <Link
+                key={idx}
                 href={`#${rootPath}/`.concat(item)}
                 className={cellTypes.LINK}
               >
-                <Typography key={idx}>
+                <Typography>
                   {item}
                   {idx !== label.length - 1 && ", "}
                 </Typography>
