@@ -30,6 +30,7 @@ export const tabIndexMap = {
   'participants': 0,
   'samples': 1,
   'files': 2,
+  'protocols': 3,
 };
 
 // --------------- Tabs Header Data configuration --------------
@@ -1672,7 +1673,6 @@ export const tabContainers = [
       },
     ],
     id: 'protocol_tab',
-    tableID: 'protocol_tab_table',
     selectableRows: true,
     downloadFileName: 'GC_protocol_Download',
     tableMsg: {
