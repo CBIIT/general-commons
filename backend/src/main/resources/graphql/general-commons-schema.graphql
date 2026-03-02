@@ -64,6 +64,15 @@ type FileOverview {
     study_name: [String]
 }
 
+type ProtocolOverview{
+    protocol_pk_id: String
+    protocol_name: String
+    protocol_type: String
+    doi: String
+    doi_url: String
+    file_names: [String]
+}
+
 type FilesInList {
     file_name: String
     file_type: String
@@ -112,6 +121,7 @@ type SearchResult {
     numberOfSamples: Int
     numberOfFiles: Int
     numberOfDiseaseSites: Int
+    numberOfProtocols: Int
 
     subjectCountByStudy: [GroupCount]
     subjectCountByExperimentalStrategy: [GroupCount]
@@ -903,7 +913,6 @@ type QueryType {
     numberOfDiseaseSites: Int
     numberOfImages: Int
     numberOfProteomics: Int
-
     idsLists: IdsLists
 
     programDetail(
@@ -1025,6 +1034,22 @@ type QueryType {
         first: Int = 10
         offset: Int = 0
     ): [SubjectOverview]
+
+    protocolOverview (
+        # id filters
+        protocol_pk_id: [String] = []
+        # standard filters
+        protocol_name: [String] = []
+        protocol_type: [String] = []
+        doi: [String] = []
+        doi_url: [String] = []
+        file_names: [String] = []
+        # pagination and sorting
+        order_by: String = ""
+        sort_direction: String = "ASC"
+        first: Int = 10
+        offset: Int = 0
+    ): [ProtocolOverview]
 
     sampleOverview (
         # id filters
@@ -1200,6 +1225,7 @@ type QueryType {
         file_names: [String] = [""]
         file_ids: [String] = [""]
         study_participant_ids: [String] = [""]
+        protocol_pk_ids: [String] = [""]
     ): [String]
 
     findSubjectIdsInList(subject_ids: [String] = []): [SubjectResult]

@@ -39,7 +39,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     final String FILES_COUNT_END_POINT = "/dashboard_file/_count";
     final String STUDY_DATA_TYPES_END_POINT = "/dashboard_study_data_type/_search";
     final String FILES_EXPERIMENTAL_STRATEGY_END_POINT = "/dashboard_file_experimental_strategy/_search";
-    
+
+    final String PROTOCOLS_END_POINT = "/dashboard_protocol/_search";
+    final String PROTOCOLS_COUNT_END_POINT = "/dashboard_protocol/_count";
+
     final String PROGRAMS_END_POINT = "/program/_search";
     final String PROGRAMS_COUNT_END_POINT = "/program/_count";
     final String NODES_END_POINT = "/model_nodes/_search";
@@ -390,6 +393,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         JsonObject subjectCountResult = esService.send(subjectCountRequest);
         int numberOfSubjects = subjectCountResult.get("count").getAsInt();
 
+        Request protocolCountRequest = new Request("GET", PROTOCOLS_COUNT_END_POINT);
+        protocolCountRequest.setJsonEntity(gson.toJson(query));
+        JsonObject protocolCountResult = esService.send(protocolCountRequest);
+        int numberOfProtocols = protocolCountResult.get("count").getAsInt();
 
         // Get aggregations
         Map<String, Object> aggQuery = esService.addAggregations(query, TERM_AGG_NAMES);
@@ -404,6 +411,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         data.put("numberOfSamples", numberOfSamples);
         data.put("numberOfFiles", numberOfFiles);
         data.put("numberOfDiseaseSites", aggs.get("site").size());
+        data.put("numberOfProtocols", numberOfProtocols);
 
         // widgets data and facet filter counts
         for (var agg: TERM_AGGS) {
@@ -480,6 +488,30 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         );
 
         return overview(SUBJECTS_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
+    }
+    
+    List<Map<String, Object>> protocolOverview(Map<String, Object> params) throws IOException {
+        final String[][] PROPERTIES = new String[][]{
+                new String[]{"protocol_pk_id", "protocol_pk_id"},
+                new String[]{"protocol_name", "protocol_name"},
+                new String[]{"protocol_type", "protocol_type"},
+                new String[]{"doi", "doi"},
+                new String[]{"doi_url", "doi_url"},
+                new String[]{"file_names", "file_names"}
+        };
+
+        String defaultSort = "protocol_pk_id"; // Default sort order
+
+        Map<String, String> sortFieldMapping = Map.ofEntries(
+                Map.entry("protocol_pk_id", "protocol_pk_id"),
+                Map.entry("protocol_name", "protocol_name"),
+                Map.entry("protocol_type", "protocol_type"),
+                Map.entry("doi", "doi"),
+                Map.entry("doi_url", "doi_url"),
+                Map.entry("file_names", "file_names_sort")
+        );
+
+        return overview(PROTOCOLS_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
     }
 
     List<Map<String, Object>> sampleOverview(Map<String, Object> params) throws IOException {
