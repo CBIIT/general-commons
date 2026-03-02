@@ -1037,12 +1037,12 @@ type QueryType {
 
     protocolOverview (
         # id filters
-        protocol_pk_ids: [String] = []
+        protocol_pk_id: [String] = []
         # standard filters
-        protocol_names: [String] = []
-        protocol_types: [String] = []
-        dois: [String] = []
-        doi_urls: [String] = []
+        protocol_name: [String] = []
+        protocol_type: [String] = []
+        doi: [String] = []
+        doi_url: [String] = []
         file_names: [String] = []
         # pagination and sorting
         order_by: String = ""
