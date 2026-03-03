@@ -30,6 +30,7 @@ export const tabIndexMap = {
   'participants': 0,
   'samples': 1,
   'files': 2,
+  'protocols': 3,
 };
 
 // --------------- Tabs Header Data configuration --------------
@@ -51,6 +52,12 @@ export const tabs = [
     title: 'Files',
     dataField: 'dataFile',
     count: 'numberOfFiles',
+  },
+  {
+    id: 'protocol_tab',
+    title: 'Protocols',
+    dataField: 'dataProtocol',
+    count: 'numberOfProtocols',
   },
 ];
 
@@ -164,6 +171,7 @@ query searchSubjects(
         numberOfSubjects
         numberOfSamples
         numberOfFiles
+        numberOfProtocols
         numberOfDiseaseSites
         donutCountByExperimentalStrategy{
             group
@@ -847,6 +855,42 @@ query sampleOverview(
 
 `;
 
+export const GET_PROTOCOLS_OVERVIEW_QUERY = gql`
+query protocolOverview(
+  $protocol_pk_id: [String],
+  $protocol_name: [String],
+  $protocol_type: [String],
+  $doi: [String],
+  $doi_url: [String],
+  $file_names: [String],
+  $order_by: String,
+  $sort_direction: String,
+  $first: Int,
+  $offset: Int
+){
+  protocolOverview(
+      protocol_pk_id: $protocol_pk_id,
+      protocol_name: $protocol_name,
+      protocol_type: $protocol_type,
+      doi: $doi,
+      doi_url: $doi_url,
+      file_names: $file_names,
+      order_by: $order_by,
+      sort_direction: $sort_direction,
+      first: $first,
+      offset: $offset
+  ){
+      protocol_pk_id
+      protocol_name
+      protocol_type
+      doi
+      doi_url
+      file_names
+  }
+}
+
+`;
+
 // --------------- GraphQL query - select all check box --------------
 
 export const GET_ALL_FILEIDS_CASESTAB_FOR_SELECT_ALL = gql`
@@ -875,6 +919,16 @@ query search (
 ){
   fileIDsFromList (          
       file_names: $file_names
+  ) 
+}
+  `;
+
+export const GET_ALL_FILEIDS_PROTOCOLSTAB_FOR_SELECT_ALL = gql`
+query search (          
+  $protocol_pk_ids: [String],
+){
+  fileIDsFromList (          
+      protocol_pk_ids: $protocol_pk_ids,
   ) 
 }
   `;
@@ -1553,6 +1607,82 @@ export const tabContainers = [
     addAllFilesResponseKeys: ['fileOverview', 'file_id'],
     addAllFileQuery: GET_ALL_FILEIDS_FROM_FILESTAB_FOR_ADD_ALL_CART,
     //addSelectedFilesQuery: GET_ALL_FILEIDS_FILESTAB_FOR_SELECT_ALL,
+  },
+  {
+    name: 'Protocols',
+    dataField: 'dataProtocol',
+    api: GET_PROTOCOLS_OVERVIEW_QUERY,
+    paginationAPIField: 'protocolOverview',
+    defaultSortField: 'protocol_name',
+    defaultSortDirection: 'asc',
+    count: 'numberOfProtocols',
+    dataKey: 'protocol_pk_id',
+    tableID: 'protocol_tab_table',
+    tooltipConfig: {
+      title: 'This tab provides information about protocols associated with caNano data. Review protocol details and their connections to DOIs.',
+      arrow: true,
+      placement: "top",
+    },
+    extendedViewConfig: {
+      pagination: true,
+      manageViewColumns: {
+        title: 'View Columns',
+      },
+      download: {
+        downloadCsv: 'Download Table Content As CSV',
+        downloadFileName: 'GC_protocol_Download',
+      },
+    },
+    columns: [
+      {
+        cellType: cellTypes.CHECKBOX,
+        display: true,
+        role: cellTypes.CHECKBOX,
+      },
+      {
+        dataField: 'protocol_name',
+        header: 'Protocol Name',
+        display: true,
+        tooltipText: 'Name assigned to protocol associated with the study.',
+      },
+      {
+        dataField: 'protocol_type',
+        header: 'Protocol Type',
+        display: true,
+        tooltipText: 'Type of protocol associated with the study.',
+        role: cellTypes.DISPLAY,
+      },
+      {
+        dataField: 'doi',
+        header: 'DOI',
+        display: true,
+        tooltipText: 'Unique digital object identifier associated with the study.',
+        role: cellTypes.DISPLAY,
+        cellType: cellTypes.CUSTOM_ELEM,
+        externalLinkAttr: {
+          urlField: 'doi_url',
+        },
+      },
+      {
+        dataField: 'file_names',
+        header: 'File Name',
+        display: true,
+        tooltipText: 'Name of file associated with the study.',
+        role: cellTypes.DISPLAY,
+        cellType: cellTypes.CUSTOM_ELEM,
+      },
+    ],
+    id: 'protocol_tab',
+    selectableRows: true,
+    downloadFileName: 'GC_protocol_Download',
+    tableMsg: {
+      noMatch: 'No Matching Records Found',
+    },
+    addFilesRequestVariableKey: 'protocol_pk_ids',
+    addFilesResponseKeys: ['fileIDsFromList'],
+    addAllFilesResponseKeys: ['fileOverview', 'file_id'],
+    addAllFileQuery: GET_ALL_FILEIDS_FROM_FILESTAB_FOR_ADD_ALL_CART,
+    addSelectedFilesQuery: GET_ALL_FILEIDS_PROTOCOLSTAB_FOR_SELECT_ALL,
   },
 ];
 

@@ -83,6 +83,12 @@ export const HeaderSubLinks = {
           className: 'navMobileSubItem',
         },
         {
+          name: 'caNanotechnology User Guide',
+          link: STATIC_CONTENT.about.CANCER_NANOTECHNOLOGY_USER_GUIDE_PDF,
+          id: 'about-cancer-nanotechnology-user-guide',
+          className: 'navMobileSubItem',
+        },
+        {
           name: 'Query GC Database',
           link: STATIC_CONTENT.about.QUERY_GC_DATABASE_PDF,
           id: 'about-query-gc-database',

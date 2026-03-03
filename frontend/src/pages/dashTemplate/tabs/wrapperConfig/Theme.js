@@ -51,6 +51,9 @@ export const customTheme = {
       '&.add_selected_button_Files': {
         backgroundColor: '#0b4e75',
       },
+      '&.add_selected_button_Protocols': {
+        backgroundColor: '#0b4e75',
+      },
       '&.Mui-disabled': {
         color: '#fff',
         '&.add_selected_button_Participants': {
@@ -62,6 +65,10 @@ export const customTheme = {
           opacity: '0.3',
         },
         '&.add_selected_button_Files': {
+          backgroundColor: '#0b4e75',
+          opacity: '0.3',
+        },
+        '&.add_selected_button_Protocols': {
           backgroundColor: '#0b4e75',
           opacity: '0.3',
         },
