@@ -3899,6 +3899,7 @@ indices:
       - phs_accession # study.phs_accession - array
       - studies # study.study_name - array
       - study_data_types # study.study_data_types - array
+      - accesses # study.study_access - array
       # Participants
       - sex # participant.sex - array
       - subject_ids # participant.participant_id - array
@@ -4035,7 +4036,8 @@ indices:
             study_data_types,
             acl,
             number_of_study_participants,
-            number_of_study_samples
+            number_of_study_samples,
+            accesses
         page_size: 1
       # Files
       - name: "Files"
