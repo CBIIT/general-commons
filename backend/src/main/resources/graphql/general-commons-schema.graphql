@@ -1077,8 +1077,8 @@ type QueryType {
         # Protocol filters
         protocol_names: [String] = []
         protocol_types: [String] = []
-        doi_urls = []
-        dois = []
+        doi_urls: [String] = []
+        dois: [String] = []
         # Publication filters
         publication_titles: [String] = []
         publication_statuses: [String] = []
