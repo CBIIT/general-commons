@@ -4018,7 +4018,7 @@ indices:
             CASE WHEN study_acronym IS NULL OR size(study_acronym)=0 THEN [nsd] ELSE study_acronym END AS study_acronym,
             CASE WHEN phs_accession IS NULL OR size(phs_accession)=0 THEN [nsd] ELSE phs_accession END AS phs_accession,
             CASE WHEN accesses IS NULL OR size(accesses)=0 THEN [nsd] ELSE accesses END AS accesses
-          OPTIONAL MATCH (s)<-[*]-(samp:sample)<--(:file)<--(proto:Protocol)
+          OPTIONAL MATCH (s)<--(proto:Protocol)
           WITH DISTINCT proto, s, nsd, na, number_of_study_participants, number_of_study_samples, study_data_types, acl, studies, study_name, study_acronym, phs_accession, accesses
           CALL {
             WITH phs_accession, nsd
