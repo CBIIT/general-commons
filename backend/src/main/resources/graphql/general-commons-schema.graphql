@@ -1038,12 +1038,57 @@ type QueryType {
     protocolOverview (
         # id filters
         protocol_pk_id: [String] = []
-        # standard filters
         protocol_name: [String] = []
         protocol_type: [String] = []
         doi: [String] = []
         doi_url: [String] = []
+        # standard filters
+        acl: [String] = []
+        accesses: [String] = []
+        experimental_strategies: [String] = []
+        file_types: [String] = []
         file_names: [String] = []
+        sex: [String] = []
+        image_modality: [String] = []
+        instrument_models: [String] = []
+        is_tumor: [String] = []
+        library_layouts: [String] = []
+        library_selections: [String] = []
+        library_source_materials: [String] = []
+        library_source_molecules: [String] = []
+        library_strategies: [String] = []
+        number_of_study_participants: [Float] = []
+        number_of_study_samples: [Float] = []
+        phs_accession: [String] = []
+        platforms: [String] = []
+        primary_diagnoses: [String] = []
+        reference_genome_assemblies: [String] = []
+        sample_types: [String] = []
+        site: [String] = []
+        studies: [String] = []
+        study_data_types: [String] = []
+        analytical_fractions: [String] = []
+        instrument_makes: [String] = []
+        proteomic_design_descriptions: [String] = []
+        organ_or_tissue: [String] = []
+        tissue_fixative: [String] = []
+        imaging_assay_type: [String] = []
+        is_supplementary_file: [String] = []
+        # Protocol filters
+        protocol_names: [String] = []
+        protocol_types: [String] = []
+        doi_urls: [String] = []
+        dois: [String] = []
+        # Publication filters
+        publication_titles: [String] = []
+        publication_statuses: [String] = []
+        pub_ids: [String] = []
+        # Composition filters
+        nanomaterial_entities: [String] = []
+        functionalizing_entities: [String] = []
+        # Characterization filters
+        characterization_types: [String] = []
+        characterization_names: [String] = []
         # pagination and sorting
         order_by: String = ""
         sort_direction: String = "ASC"

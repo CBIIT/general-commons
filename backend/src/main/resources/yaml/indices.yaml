@@ -3883,14 +3883,86 @@ indices:
     id_field: "protocol_pk_id"
     mapping:
       keyword:
+      # initial_query
       - protocol_pk_id # Protocol.protocol_pk_id - single value
       - protocol_name # Protocol.protocol_name - single value
       - protocol_type # Protocol.protocol_type - single value
       - doi # Protocol.doi - single value
       - doi_url # Protocol.doi_url - single value
+      # Protocols
+      - protocol_types # Protocol.protocol_type - protocol_types_filter - array
+      - protocol_names # Protocol.protocol_name - protocol_names_filter - array
+      - doi_urls # Protocol.doi_url - doi_urls_filter - array
+      - dois # Protocol.doi - dois_filter - array
+      # Study
+      - acl # study.acl - array
+      - phs_accession # study.phs_accession - array
+      - studies # study.study_name - array
+      - study_data_types # study.study_data_types - array
+      - accesses # study.study_access - array
+      # Participants
+      - sex # participant.sex - array
+      - subject_ids # participant.participant_id - array
+      # Samples
+      - sample_id # sample.sample_id - array
+      - is_tumor # sample.sample_tumor_status - array
+      - sample_types # sample.sample_type - array
+      - analyte_type # sample.sample_type - array
+      # Files
+      - files # file.file_id - array
+      - experimental_strategies # file.experimental_strategy_and_data_subtypes - array
+      - file_types # file.file_type - array
+      - file_types_sort # derived from file_types - single value
       - file_names # file.file_names - file_names - array
       - file_names_sort # derived from file_names - single value
+      # Diagnoses
+      - primary_diagnoses # diagnosis.primary_diagnosis - array
+      - site # diagnosis.primary_site - array
+      # File Genomic Info
+      - library_strategies # genomic_info.library_strategy - array
+      - library_source_materials # genomic_info.library_source_material - array
+      - library_source_molecules # genomic_info.library_source_molecule - array
+      - library_layouts # genomic_info.library_layout - array
+      - library_selections # genomic_info.library_selection - array
+      - platforms # genomic_info.platform - array
+      - instrument_models # genomic_info.instrument_model - array
+      - reference_genome_assemblies # genomic_info.reference_genome_assembly - array
+      # File Imaging
+      - image_modality # image.image_modality - array
+      - organ_or_tissue # image.organ_or_tissue - array
+      - tissue_fixative # MultiplexMicroscopy.tissue_fixative - array
+      - imaging_assay_type # MultiplexMicroscopy.imaging_assay_type - array
+      # Proteomic
+      - aliquot_ids # proteomic.aliquot_id - array
+      - analytical_fractions # proteomic.analytical_fractions - array
+      - instrument_makes # proteomic.instrument_make - array
+      - proteomic_design_descriptions # proteomic.proteomic_design_description - array
+      - proteomic_instrument_models # proteomic.proteomic_instrument_model - array
+      # caNanoLab Publication
+      - publication_titles # Publication.Publication_Title - publication_titles_filter - array
+      - publication_statuses # Publication.Publication_Status - publication_statuses_filter - array
+      - pub_ids # Publication.DOI_or_Pub_ID - pub_ids_filter - array
+      # caNanoLab Composition
+      - nanomaterial_entities # Composition.Nanomaterial_Entity_Type - nanomaterial_entities_filter - array
+      - functionalizing_entities # Composition.Functionalizing_Entity_Type - functionalizing_entities_filter - array
+      # caNanoLab Characterization
+      - characterization_types # Characterization.Characterization_Type - characterization_types_filter - array
+      - characterization_names # Characterization.Characterization_Name - characterization_names_filter - array
+      long:
+        - number_of_study_participants # calculated - single value
+        - number_of_study_samples # calculated - single value
+      boolean:
+        - files_is_supplementary_file_filter # file.is_supplementary_file - array
     initial_query:
+      # protocol_pk_id
+      # protocol_name
+      # protocol_type
+      # doi
+      # doi_url
+      # protocol_types
+      # protocol_names
+      # doi_urls
+      # dois
       query: |
         MATCH (proto:Protocol)
         WITH DISTINCT proto, "Not specified in data" AS nsd
@@ -3900,21 +3972,106 @@ indices:
           COALESCE(proto.protocol_name, nsd) AS protocol_name,
           COALESCE(proto.protocol_type, nsd) AS protocol_type,
           COALESCE(proto.doi, nsd) AS doi,
-          COALESCE(proto.doi_url, nsd) AS doi_url
+          COALESCE(proto.doi_url, nsd) AS doi_url,
+          [COALESCE(proto.protocol_type, nsd)] AS protocol_types,
+          [COALESCE(proto.protocol_name, nsd)] AS protocol_names,
+          [COALESCE(proto.doi_url, nsd)] AS doi_urls,
+          [COALESCE(proto.doi, nsd)] AS dois
         SKIP $skip LIMIT $limit
       page_size: 5000
     update_queries:
-      # Protocol Files
-      - name: "Protocol Files"
+      # Studies
+      - name: Studies
+        # accesses
+        # acl
+        # phs_accession
+        # studies
+        # study_data_types
+        # number_of_study_participants
+        # number_of_study_samples
+        query: |
+          MATCH (s:study)
+          WITH s 
+          SKIP $skip LIMIT $limit 
+          WITH s, "Not specified in data" AS nsd, "Not applicable" AS na
+          CALL {
+            WITH s
+            OPTIONAL MATCH (s)<-[*]-(p:participant)
+            WITH s, COUNT(DISTINCT p) AS number_of_study_participants
+            OPTIONAL MATCH (s)<-[*]-(samp:sample)
+            RETURN number_of_study_participants, count(distinct samp) AS number_of_study_samples
+          }
+          WITH 
+            s, nsd, na, number_of_study_participants, number_of_study_samples,
+            split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types,
+            split(replace(replace(replace(s.acl, '[', ''), ']', ''), '"', ''), ", ") AS acl,
+            COLLECT(DISTINCT CASE WHEN s IS NULL THEN null ELSE COALESCE(s.study_name, nsd) END) AS studies,
+            COLLECT(DISTINCT CASE WHEN s IS NULL THEN null ELSE COALESCE(s.study_name, nsd) END) AS study_name,
+            COLLECT(DISTINCT CASE WHEN s IS NULL THEN null ELSE COALESCE(s.study_acronym, nsd) END) AS study_acronym,
+            COLLECT(DISTINCT CASE WHEN s IS NULL THEN null ELSE COALESCE(s.phs_accession, nsd) END) AS phs_accession,
+            COLLECT(DISTINCT CASE WHEN s IS NULL THEN null ELSE COALESCE(s.study_access, nsd) END) AS accesses
+          WITH 
+            s, nsd, na, number_of_study_participants, number_of_study_samples,
+            CASE WHEN study_data_types IS NULL OR size(study_data_types)=0 THEN [nsd] ELSE study_data_types END AS study_data_types,
+            CASE WHEN acl IS NULL OR size(acl)=0 THEN [nsd] ELSE acl END AS acl,
+            CASE WHEN studies IS NULL OR size(studies)=0 THEN [nsd] ELSE studies END AS studies,
+            CASE WHEN study_name IS NULL OR size(study_name)=0 THEN [nsd] ELSE study_name END AS study_name,
+            CASE WHEN study_acronym IS NULL OR size(study_acronym)=0 THEN [nsd] ELSE study_acronym END AS study_acronym,
+            CASE WHEN phs_accession IS NULL OR size(phs_accession)=0 THEN [nsd] ELSE phs_accession END AS phs_accession,
+            CASE WHEN accesses IS NULL OR size(accesses)=0 THEN [nsd] ELSE accesses END AS accesses
+          OPTIONAL MATCH (s)<--(proto:Protocol)
+          WITH DISTINCT proto, s, nsd, na, number_of_study_participants, number_of_study_samples, study_data_types, acl, studies, study_name, study_acronym, phs_accession, accesses
+          CALL {
+            WITH phs_accession, nsd
+            WITH CASE WHEN phs_accession IS NULL OR size(phs_accession)=0 THEN [nsd] ELSE phs_accession END AS phs_accession
+            UNWIND phs_accession AS phs_accession_value
+            WITH phs_accession_value
+            ORDER BY phs_accession_value
+            RETURN collect(phs_accession_value) AS sorted_phs_accession
+          }
+          RETURN DISTINCT
+            proto.protocol_pk_id AS protocol_pk_id,
+            studies,
+            sorted_phs_accession AS phs_accession,
+            study_data_types,
+            acl,
+            number_of_study_participants,
+            number_of_study_samples,
+            accesses
+        page_size: 1
+      # Files
+      - name: "Files"
+        # files
+        # experimental_strategies
+        # file_types
+        # files_is_supplementary_file_filter
         # file_names
         # file_names_sort
         query: |
           MATCH (proto:Protocol)
-          WITH DISTINCT proto, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT proto
           SKIP $skip LIMIT $limit
-          OPTIONAL MATCH (f)<-[*]-(proto:Protocol)
-          WITH proto.protocol_pk_id AS protocol_pk_id, f, nsd, na,
-            COLLECT(DISTINCT COALESCE(f.file_name, nsd)) AS file_names
+          OPTIONAL MATCH (f:file)<-[*]-(proto)
+          WITH proto.protocol_pk_id AS protocol_pk_id, COLLECT(DISTINCT f) AS fs, COLLECT(DISTINCT f.file_id) AS files, "Not specified in data" AS nsd, "Not applicable" AS na
+          CALL {
+            WITH protocol_pk_id, fs, nsd, na
+            WITH protocol_pk_id, nsd, na, fs
+            WITH protocol_pk_id, nsd, na, CASE WHEN fs IS NULL OR size(fs)=0 THEN [] ELSE fs END AS fs
+            WITH protocol_pk_id, nsd, na, fs, size(fs) = 0 AS no_files
+            UNWIND (CASE WHEN size(fs) = 0 THEN [null] ELSE fs END) AS f
+            WITH 
+              protocol_pk_id, f, nsd, na, no_files,
+              CASE WHEN f IS NULL THEN null ELSE split(replace(replace(replace(f.experimental_strategy_and_data_subtypes, '[', ''), ']', ''), '"', ''), ", ") END AS experimental_strategies
+            WITH 
+              protocol_pk_id, f, nsd, na, no_files,
+              CASE WHEN no_files THEN [na] WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
+            UNWIND experimental_strategies AS experimental_strategy
+            RETURN 
+              COLLECT(DISTINCT COALESCE(experimental_strategy, nsd)) AS experimental_strategies,
+              COLLECT(DISTINCT CASE WHEN f IS NULL THEN na ELSE COALESCE(f.file_type, nsd) END) AS file_types,
+              COLLECT(DISTINCT CASE WHEN f IS NULL THEN false ELSE COALESCE(f.is_supplementary_file, false) END) AS files_is_supplementary_file_filter,
+              COLLECT(DISTINCT CASE WHEN f IS NULL THEN null ELSE COALESCE(f.file_name, nsd) END) AS file_names
+          }
           CALL {
             WITH file_names, na
             WITH CASE WHEN file_names IS NULL OR size(file_names)=0 THEN [na] ELSE file_names END AS file_names
@@ -3926,6 +4083,247 @@ indices:
           }
           RETURN DISTINCT
             protocol_pk_id,
+            experimental_strategies,
+            file_types,
+            files_is_supplementary_file_filter,
             file_names,
             file_names_sort
+        page_size: 5000
+      # Participants
+      - name: "Participants"
+        # sex
+        # subject_ids
+        query: |
+          MATCH (proto:Protocol)
+          WITH DISTINCT proto
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (proto)-->(samp:sample)-[:of_participant]->(p:participant)
+          WITH DISTINCT proto, p, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH proto, nsd, na,
+            COLLECT(DISTINCT p.participant_id) AS participant_ids,
+            COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.sex, nsd) END) AS sex_values
+          WITH proto, nsd, na, participant_ids, sex_values,
+            CASE WHEN size(participant_ids) > 0 THEN participant_ids[0] ELSE na END AS subject_ids,
+            CASE WHEN size(sex_values) > 0 THEN sex_values[0] ELSE na END AS sex
+          RETURN DISTINCT
+            proto.protocol_pk_id AS protocol_pk_id,
+            subject_ids,
+            sex
+        page_size: 5000
+      # Samples
+      - name: Samples
+        # is_tumor
+        # sample_types
+        # analyte_type
+        # sample_id
+        query: |
+          MATCH (proto:Protocol)
+          WITH DISTINCT proto
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (proto)-->(samp:sample)
+          WITH DISTINCT proto.protocol_pk_id AS protocol_pk_id, samp, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH protocol_pk_id, nsd, na,
+            COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_tumor_status, nsd) END) AS sample_tumor_status,
+            COLLECT(DISTINCT samp.sample_type) AS raw_sample_types,
+            COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_id, nsd) END) AS sample_id
+          CALL {
+            WITH raw_sample_types, nsd
+            UNWIND (CASE WHEN size(raw_sample_types) = 0 THEN [null] ELSE raw_sample_types END) AS raw_sample_type
+            WITH CASE WHEN raw_sample_type IS NULL THEN null ELSE COALESCE(TRIM(LAST(split(raw_sample_type, ':'))), nsd) END AS processed_sample_type
+            RETURN COLLECT(DISTINCT processed_sample_type) AS sample_type
+          }
+          WITH protocol_pk_id, nsd, na, sample_tumor_status, sample_id, sample_type
+          WITH protocol_pk_id, nsd, na, 
+            CASE WHEN size(sample_tumor_status) = 0 THEN [na] ELSE sample_tumor_status END AS is_tumor,
+            CASE WHEN size(sample_type) = 0 THEN [na] ELSE sample_type END AS sample_types,
+            CASE WHEN size(sample_id) = 0 THEN [na] ELSE sample_id END AS sample_id
+          RETURN 
+            protocol_pk_id,
+            sample_types,
+            sample_types AS analyte_type,
+            is_tumor,
+            sample_id
+        page_size: 25000
+      # Diagnoses
+      - name: "Diagnoses"
+        # primary_diagnoses
+        # site
+        query: |
+          MATCH (proto:Protocol)
+          WITH DISTINCT proto
+          SKIP $skip LIMIT $limit
+          WITH proto, "Not specified in data" AS nsd, "Not applicable" AS na
+          OPTIONAL MATCH (proto)-->(samp:sample)-->(p:participant)<--(diag:diagnosis)
+          WITH proto.protocol_pk_id AS protocol_pk_id, nsd, na, diag,
+            COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(diag.primary_diagnosis, nsd) END) AS primary_diagnoses,
+            COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(diag.primary_site, nsd) END) AS site
+          WITH protocol_pk_id, nsd, na,
+            CASE WHEN site IS NULL OR SIZE(site) = 0 THEN [na] ELSE site END AS site,
+            CASE WHEN primary_diagnoses IS NULL OR SIZE(primary_diagnoses) = 0 THEN [na] ELSE primary_diagnoses END AS primary_diagnoses
+          RETURN DISTINCT
+            protocol_pk_id,
+            primary_diagnoses,
+            site
+        page_size: 20000
+      # File Genomic Info 
+      - name: "File Genomic Info"
+        # library_strategies
+        # library_source_materials
+        # library_source_molecules
+        # library_layouts
+        # library_selections
+        # platforms
+        # instrument_models
+        # reference_genome_assemblies
+        query: |
+          MATCH (proto:Protocol)
+          WITH DISTINCT proto
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (proto)-[*]->(f:file)
+          WITH DISTINCT proto.protocol_pk_id AS protocol_pk_id, f, "Not specified in data" AS nsd, "Not applicable" AS na
+          OPTIONAL MATCH (f)<-[:of_file]-(g:genomic_info)
+          WITH protocol_pk_id, nsd, na,
+            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_strategy, nsd) END) AS library_strategies,
+            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_source_material, nsd) END) AS library_source_materials,
+            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_source_molecule, nsd) END) AS library_source_molecules,
+            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_layout, nsd) END) AS library_layouts,
+            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_selection, nsd) END) AS library_selections,
+            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.platform, nsd) END) AS platforms,
+            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.instrument_model, nsd) END) AS instrument_models,
+            COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.reference_genome_assembly, nsd) END) AS reference_genome_assemblies
+          WITH protocol_pk_id, nsd, na,
+            CASE WHEN size(library_strategies) = 0 THEN [na] ELSE library_strategies END AS library_strategies,
+            CASE WHEN size(library_source_materials) = 0 THEN [na] ELSE library_source_materials END AS library_source_materials,
+            CASE WHEN size(library_source_molecules) = 0 THEN [na] ELSE library_source_molecules END AS library_source_molecules,
+            CASE WHEN size(library_layouts) = 0 THEN [na] ELSE library_layouts END AS library_layouts,
+            CASE WHEN size(library_selections) = 0 THEN [na] ELSE library_selections END AS library_selections,
+            CASE WHEN size(platforms) = 0 THEN [na] ELSE platforms END AS platforms,
+            CASE WHEN size(instrument_models) = 0 THEN [na] ELSE instrument_models END AS instrument_models,
+            CASE WHEN size(reference_genome_assemblies) = 0 THEN [na] ELSE reference_genome_assemblies END AS reference_genome_assemblies
+          RETURN DISTINCT 
+            protocol_pk_id,
+            library_strategies,
+            library_source_materials,
+            library_source_molecules,
+            library_layouts,
+            library_selections,
+            platforms,
+            instrument_models,
+            reference_genome_assemblies
+        page_size: 5000 
+      # File Imaging
+      - name: "File Imaging"
+        # image_modality
+        # organ_or_tissue
+        # tissue_fixative
+        # imaging_assay_type
+        query: |
+          MATCH (proto:Protocol)
+          WITH DISTINCT proto
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (proto)-[*]->(f:file)
+          WITH DISTINCT proto.protocol_pk_id AS protocol_pk_id, f, "Not specified in data" AS nsd, "Not applicable" AS na
+          OPTIONAL MATCH (f)<-[:of_file]-(i:image)
+          OPTIONAL MATCH (i)<-[:of_image]-(mm:MultiplexMicroscopy)
+          WITH DISTINCT protocol_pk_id, nsd, na,
+            COLLECT(DISTINCT CASE WHEN i IS NULL THEN null ELSE COALESCE(i.organ_or_tissue, nsd) END) AS organ_or_tissue,
+            COLLECT(DISTINCT CASE WHEN i IS NULL THEN null ELSE COALESCE(i.image_modality, nsd) END) AS image_modality,
+            COLLECT(DISTINCT CASE WHEN mm IS NULL THEN null ELSE COALESCE(mm.imaging_assay_type, nsd) END) AS imaging_assay_type,
+            COLLECT(DISTINCT CASE WHEN mm IS NULL THEN null ELSE COALESCE(mm.tissue_fixative, nsd) END) AS tissue_fixative
+          WITH protocol_pk_id, nsd, na,
+            CASE WHEN size(organ_or_tissue) = 0 THEN [na] ELSE organ_or_tissue END AS organ_or_tissue,
+            CASE WHEN size(image_modality) = 0 THEN [na] ELSE image_modality END AS image_modality,
+            CASE WHEN size(imaging_assay_type) = 0 THEN [na] ELSE imaging_assay_type END AS imaging_assay_type,
+            CASE WHEN size(tissue_fixative) = 0 THEN [na] ELSE tissue_fixative END AS tissue_fixative
+          RETURN DISTINCT 
+            protocol_pk_id,
+            organ_or_tissue,
+            image_modality,
+            imaging_assay_type,
+            tissue_fixative
+        page_size: 5000
+      # File Proteomic
+      - name: "File Proteomic"
+        # analytical_fractions
+        # instrument_makes
+        # aliquot_ids
+        # proteomic_instrument_models
+        # proteomic_design_descriptions
+        query: |
+          MATCH (proto:Protocol)
+          WITH DISTINCT proto
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (proto)-[*]->(f:file)
+          WITH DISTINCT proto.protocol_pk_id AS protocol_pk_id, f, "Not specified in data" AS nsd, "Not applicable" AS na
+          OPTIONAL MATCH (f)<-[:of_file]-(pr:proteomic)
+          WITH protocol_pk_id, nsd, na,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN null ELSE COALESCE(pr.analytical_fractions, nsd) END) AS analytical_fractions_raw,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN null ELSE COALESCE(pr.instrument_make, nsd) END) AS instrument_makes_raw,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN null ELSE COALESCE(pr.aliquot_id, nsd) END) AS aliquot_ids_raw,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN null ELSE COALESCE(pr.proteomic_instrument_model, nsd) END) AS proteomic_instrument_models_raw,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN null ELSE COALESCE(pr.proteomic_design_description, nsd) END) AS proteomic_design_descriptions_raw
+          RETURN DISTINCT 
+            protocol_pk_id,
+            CASE WHEN size(analytical_fractions_raw)=0 THEN [na] ELSE analytical_fractions_raw END AS analytical_fractions,
+            CASE WHEN size(instrument_makes_raw)=0 THEN [na] ELSE instrument_makes_raw END AS instrument_makes,
+            CASE WHEN size(aliquot_ids_raw)=0 THEN [na] ELSE aliquot_ids_raw END AS aliquot_ids,
+            CASE WHEN size(proteomic_instrument_models_raw)=0 THEN [na] ELSE proteomic_instrument_models_raw END AS proteomic_instrument_models,
+            CASE WHEN size(proteomic_design_descriptions_raw)=0 THEN [na] ELSE proteomic_design_descriptions_raw END AS proteomic_design_descriptions
+        page_size: 5000
+      # caNanoLab Publication
+      - name: "caNanoLab Publication"
+        # publication_titles
+        # publication_statuses
+        # pub_ids
+        query: |
+          MATCH (proto:Protocol)
+          WITH DISTINCT proto
+          SKIP $skip LIMIT $limit
+          WITH proto, "Not specified in data" AS nsd, "Not applicable" AS na
+          OPTIONAL MATCH (proto)-->(samp:sample)<-[*]-(pub:Publication)
+          WITH proto, nsd, na,
+            COLLECT(DISTINCT CASE WHEN pub IS NULL THEN null ELSE COALESCE(pub.Publication_Title, nsd) END) AS publication_titles_raw,
+            COLLECT(DISTINCT CASE WHEN pub IS NULL THEN null ELSE COALESCE(pub.Publication_Status, nsd) END) AS publication_statuses_raw,
+            COLLECT(DISTINCT CASE WHEN pub IS NULL THEN null ELSE COALESCE(pub.DOI_or_Pub_ID, nsd) END) AS pub_ids_raw
+          RETURN DISTINCT 
+            proto.protocol_pk_id AS protocol_pk_id,
+            CASE WHEN size(publication_titles_raw)=0 THEN [na] ELSE publication_titles_raw END AS publication_titles,
+            CASE WHEN size(publication_statuses_raw)=0 THEN [na] ELSE publication_statuses_raw END AS publication_statuses,
+            CASE WHEN size(pub_ids_raw)=0 THEN [na] ELSE pub_ids_raw END AS pub_ids
+        page_size: 5000
+      # caNanoLab Composition
+      - name: "caNanoLab Composition"
+        # nanomaterial_entities
+        # functionalizing_entities
+        query: |
+          MATCH (proto:Protocol)
+          WITH DISTINCT proto
+          SKIP $skip LIMIT $limit
+          WITH proto, "Not specified in data" AS nsd, "Not applicable" AS na
+          OPTIONAL MATCH (proto)-->(samp:sample)<-[*]-(comp:Composition)
+          WITH proto, samp, nsd, na,
+            COLLECT(DISTINCT CASE WHEN comp IS NULL OR comp.Nanomaterial_Entity_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(comp.Nanomaterial_Entity_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS nanomaterial_entities_raw,
+            COLLECT(DISTINCT CASE WHEN comp IS NULL OR comp.Functionalizing_Entity_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(comp.Functionalizing_Entity_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS functionalizing_entities_raw
+          RETURN DISTINCT
+            proto.protocol_pk_id AS protocol_pk_id,
+            CASE WHEN size(nanomaterial_entities_raw)=0 THEN [na] ELSE nanomaterial_entities_raw END AS nanomaterial_entities,
+            CASE WHEN size(functionalizing_entities_raw)=0 THEN [na] ELSE functionalizing_entities_raw END AS functionalizing_entities
+        page_size: 5000
+      # caNanoLab Characterization
+      - name: "caNanoLab Characterization"
+        # characterization_types
+        # characterization_names
+        query: |
+          MATCH (proto:Protocol)
+          WITH DISTINCT proto
+          SKIP $skip LIMIT $limit
+          WITH proto, "Not specified in data" AS nsd, "Not applicable" AS na
+          OPTIONAL MATCH (proto)-->(samp:sample)<-[*]-(char:Characterization)
+          WITH proto, samp, nsd, na,
+            COLLECT(DISTINCT CASE WHEN char IS NULL OR char.Characterization_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(char.Characterization_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS characterization_types_raw,
+            COLLECT(DISTINCT CASE WHEN char IS NULL OR char.Characterization_Name = "[]" THEN null ELSE COALESCE(replace(replace(replace(char.Characterization_Name, '[', ''), ']', ''), '"', ''), nsd) END) AS characterization_names_raw
+          RETURN DISTINCT
+            proto.protocol_pk_id AS protocol_pk_id,
+            CASE WHEN size(characterization_types_raw)=0 THEN [na] ELSE characterization_types_raw END AS characterization_types,
+            CASE WHEN size(characterization_names_raw)=0 THEN [na] ELSE characterization_names_raw END AS characterization_names
         page_size: 5000
