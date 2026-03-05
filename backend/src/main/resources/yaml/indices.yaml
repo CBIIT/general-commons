@@ -954,7 +954,11 @@ indices:
           WITH DISTINCT samp
           SKIP $skip LIMIT $limit
           WITH samp, "Not specified in data" AS nsd, "Not applicable" AS na
-          OPTIONAL MATCH (samp)-->(p:participant)<--(diag:diagnosis)
+          OPTIONAL MATCH (samp)-->(p:participant)<--(diag1:diagnosis)
+          OPTIONAL MATCH (diag2:diagnosis)-->(samp)
+          WITH samp, [diag1, diag2] AS diag_list, nsd, na
+          UNWIND diag_list AS diag
+          WITH DISTINCT diag as diag, samp, nsd, na
           WITH samp.sample_id AS sample_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(diag.primary_diagnosis, nsd) END) AS primary_diagnoses,
             COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(diag.primary_site, nsd) END) AS site
@@ -1748,7 +1752,11 @@ indices:
           MATCH (f:file)
           WITH DISTINCT f, "Not specified in data" AS nsd, "Not applicable" AS na
           SKIP $skip LIMIT $limit
-          OPTIONAL MATCH (f)-->(p:participant)<--(diag:diagnosis)
+          OPTIONAL MATCH (f)-->(p:participant)<--(diag1:diagnosis)
+          OPTIONAL MATCH (diag2:diagnosis)-->(samp:sample)<--(f)
+          WITH f, [diag1, diag2] AS diagList, nsd, na
+          UNWIND diagList AS diag
+          WITH DISTINCT diag as diag, f, nsd, na
           WITH f.file_id AS file_id, nsd, na, 
           COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(TRIM(LAST(split(diag.primary_diagnosis, ':'))), nsd) END) AS primary_diagnoses,
           COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(diag.primary_site, nsd) END) AS primary_sites
@@ -2324,7 +2332,11 @@ indices:
           WITH f, nsd, na,
             CASE WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
           UNWIND experimental_strategies AS experimental_strategy
-          OPTIONAL MATCH (f)-->(p:participant)<--(diag:diagnosis)
+          OPTIONAL MATCH (f)-->(p:participant)<--(diag1:diagnosis)
+          OPTIONAL MATCH (diag2:diagnosis)-->(samp:sample)<--(f)
+          WITH f, [diag1, diag2] AS diagList, nsd, na, experimental_strategy
+          UNWIND diagList AS diag
+          WITH DISTINCT diag as diag, f, nsd, na, experimental_strategy
           WITH f, experimental_strategy, nsd, na,
             COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(TRIM(LAST(split(diag.primary_diagnosis, ':'))), nsd) END) AS primary_diagnoses,
             COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(diag.primary_site, nsd) END) AS site
@@ -4153,7 +4165,11 @@ indices:
           WITH DISTINCT proto
           SKIP $skip LIMIT $limit
           WITH proto, "Not specified in data" AS nsd, "Not applicable" AS na
-          OPTIONAL MATCH (proto)-->(samp:sample)-->(p:participant)<--(diag:diagnosis)
+          OPTIONAL MATCH (proto)-->(samp:sample)-->(p:participant)<--(diag1:diagnosis)
+          OPTIONAL MATCH (diag2:diagnosis)-->(samp:sample)<--(proto)
+          WITH proto, [diag1, diag2] AS diagList, nsd, na
+          UNWIND diagList AS diag
+          WITH DISTINCT diag as diag, proto, nsd, na
           WITH proto.protocol_pk_id AS protocol_pk_id, nsd, na, diag,
             COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(diag.primary_diagnosis, nsd) END) AS primary_diagnoses,
             COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(diag.primary_site, nsd) END) AS site
