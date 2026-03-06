@@ -100,20 +100,6 @@ jobs:
         run: |
           docker build --no-cache -t $BE_IMAGE_NAME -f backend/Dockerfile .
 
-      - name: Run Twistlock scan
-        id: twistlock-scan-be
-        if: github.event.inputs.trivy_scan_be == 'true'
-        env:
-          REGISTRY_URL: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-          BE_IMAGE_NAME: ${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_BE }}:${{ env.IMAGE_TAG }}
-        uses: PaloAltoNetworks/prisma-cloud-scan@v1
-        with:
-          pcc_console_url: ${{ secrets.TL_CONSOLE }}
-          pcc_user: ${{ secrets.TL_USER }}
-          pcc_pass: ""
-          image_name: '${{ env.BE_IMAGE_NAME }}'
-          severity: high    
-
       - name: Run Trivy test scan for BE Docker Image
         id: trivy-scan-be
         if: github.event.inputs.trivy_scan_be == 'true'
