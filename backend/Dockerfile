@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 COPY backend/ .
 RUN mvn package -DskipTests
 # Stage 2: Production
-FROM tomcat:10.1.45-jdk21 as fnl_base_image
+FROM tomcat:10.1.52-jdk25 as fnl_base_image
 ENV JAVA_OPTS $JAVA_OPTS -XX:InitialRAMPercentage=25 -XX:MaxRAMPercentage=70
 ENV TZ America/New_York
 

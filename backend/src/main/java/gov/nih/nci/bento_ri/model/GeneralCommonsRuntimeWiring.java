@@ -40,6 +40,10 @@ public class GeneralCommonsRuntimeWiring {
                             Map<String, Object> args = env.getArguments();
                             return privateESDataFetcher.subjectOverview(args);
                         })
+                        .dataFetcher("protocolOverview", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return privateESDataFetcher.protocolOverview(args);
+                        })
                         .dataFetcher("sampleOverview", env -> {
                             Map<String, Object> args = env.getArguments();
                             return privateESDataFetcher.sampleOverview(args);
@@ -136,6 +140,30 @@ public class GeneralCommonsRuntimeWiring {
                             Map<String, Object> args = env.getArguments();
                             return memgraphDataFetcher.pdxDataFetcher(args);
                         })
+                        .dataFetcher("investigators", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.investigatorDataFetcher(args);
+                        })
+                        .dataFetcher("characterizations", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.characterizationDataFetcher(args);
+                        })
+                        .dataFetcher("publications", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.publicationDataFetcher(args);
+                        })
+                        .dataFetcher("protocols", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.protocolDataFetcher(args);
+                        })
+                        .dataFetcher("compositions", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.compositionDataFetcher(args);
+                        })
+                        .dataFetcher("consent_groups", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.consentGroupDataFetcher(args);
+                        })
                         // Memgraph node count queries
                         .dataFetcher("programsCount", env -> {
                             Map<String, Object> args = env.getArguments();
@@ -204,6 +232,30 @@ public class GeneralCommonsRuntimeWiring {
                         .dataFetcher("nonDICOMradiologyAllModalitiesCount", env -> {
                             Map<String, Object> args = env.getArguments();
                             return memgraphDataFetcher.getNumberOfNonDICOMradiologyAllModalities(args);
+                        })
+                        .dataFetcher("investigatorsCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfInvestigators(args);
+                        })
+                        .dataFetcher("characterizationsCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfCharacterizations(args);
+                        })
+                        .dataFetcher("publicationsCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfPublications(args);
+                        })
+                        .dataFetcher("protocolsCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfProtocols(args);
+                        })
+                        .dataFetcher("compositionsCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfCompositions(args);
+                        })
+                        .dataFetcher("consentGroupsCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfConsentGroups(args);
                         })
                         .dataFetcher("versionsCount", env -> {
                             Map<String, Object> args = env.getArguments();

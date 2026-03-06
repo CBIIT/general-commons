@@ -64,6 +64,15 @@ type FileOverview {
     study_name: [String]
 }
 
+type ProtocolOverview{
+    protocol_pk_id: String
+    protocol_name: String
+    protocol_type: String
+    doi: String
+    doi_url: String
+    file_names: [String]
+}
+
 type FilesInList {
     file_name: String
     file_type: String
@@ -112,6 +121,7 @@ type SearchResult {
     numberOfSamples: Int
     numberOfFiles: Int
     numberOfDiseaseSites: Int
+    numberOfProtocols: Int
 
     subjectCountByStudy: [GroupCount]
     subjectCountByExperimentalStrategy: [GroupCount]
@@ -144,6 +154,8 @@ type SearchResult {
     subjectCountByIsSupplementaryFile: [GroupCount]
     subjectCountByProtocolName: [GroupCount]
     subjectCountByProtocolType: [GroupCount]
+    subjectCountByDoi: [GroupCount]
+    subjectCountByDoiUrl: [GroupCount]
     subjectCountByPublicationTitle: [GroupCount]
     subjectCountByPublicationStatus: [GroupCount]
     subjectCountByPubId: [GroupCount]
@@ -185,6 +197,8 @@ type SearchResult {
     filterSubjectCountByIsSupplementaryFile: [GroupCount]
     filterSubjectCountByProtocolName: [GroupCount]
     filterSubjectCountByProtocolType: [GroupCount]
+    filterSubjectCountByDoi: [GroupCount]
+    filterSubjectCountByDoiUrl: [GroupCount]
     filterSubjectCountByPublicationTitle: [GroupCount]
     filterSubjectCountByPublicationStatus: [GroupCount]
     filterSubjectCountByPubId: [GroupCount]
@@ -409,6 +423,7 @@ type Study {
     # id property
     phs_accession: String
     # node properties
+    study_id: String
     study_name: String
     study_acronym: String
     study_description: String
@@ -514,6 +529,8 @@ type Sample {
     sample_age_at_collection: String
     derived_from_specimen: String
     biosample_accession: String
+    tumor_classification: String
+    Organization_Name: String
     crdc_id: String
     # relationship properties
     phs_accession: String
@@ -748,6 +765,7 @@ type NonDICOMradiologyAllModalities {
     performed_imaging_study_reconstructionDiameter: String
     performed_imaging_study_sliceThickness: String
     performed_imaging_study_reconstructionInterval: String
+    performed_imaging_study_typeCode: String
     crdc_id: String
     # relationship properties
     phs_accession: String
@@ -785,11 +803,97 @@ type PDX {
     sample_id: String
 }
 
+type Investigator {
+    # id property
+    investigator_id: String
+    # node properties
+    primary_investigator_name: String
+    primary_investigator_email: String
+    co_investigator_name: String
+    co_investigator_email: String
+    role_or_affiliation: String
+    title: String
+    first_name: String
+    middle_name: String
+    last_name: String
+    suffix: String
+    email: String
+    # relationship properties
+    phs_accession: String
+}
+
+type Characterization {
+    # id property
+    Characterization_ID: String
+    # node properties
+    Characterization_Assay_Type: String
+    Characterization_Name: String
+    crdc_id: String
+    # relationship properties
+    phs_accession: String
+    sample_id: String
+}
+
+type Publication {
+    # id property
+    DOI_or_Pub_ID: String
+    # node properties
+    Publication_Type: String
+    Publication_Status: String
+    Publication_Title: String
+    crdc_id: String
+    # relationship properties
+    phs_accession: String
+    sample_id: String
+}
+
+type Protocol {
+    # id property
+    protocol_pk_id: String
+    # node properties
+    protocol_name: String
+    protocol_type: String
+    doi: String
+    crdc_id: String
+    # relationship properties
+    phs_accession: String
+    file_id: String
+    sample_id: String
+}
+
+type Composition {
+    # id property
+    Composition_ID: String
+    # node properties
+    Nanomaterial_Entity_Type: String
+    Functionalizing_Entity_Type: String
+    Functionalizing_Entity_Inherent_Function_Type: String
+    crdc_id: String
+    # relationship properties
+    phs_accession: String
+    sample_id: String
+}
+
+type ConsentGroup {
+    # id property
+    consent_group_id: String
+    # node properties
+    consent_group_name: String
+    consent_group_number: String
+    crdc_id: String
+    # relationship properties
+    phs_accession: String
+}
+
 type Version {
+    # id property
+    data_version_id: String
+    # node properties
     data_version: String
     datetime: String
     model_version: String
     description: String
+    crdc_id: String
 }
 
 schema {
@@ -809,7 +913,6 @@ type QueryType {
     numberOfDiseaseSites: Int
     numberOfImages: Int
     numberOfProteomics: Int
-
     idsLists: IdsLists
 
     programDetail(
@@ -866,6 +969,7 @@ type QueryType {
         # Protocol filters
         protocol_names: [String] = []
         protocol_types: [String] = []
+        dois: [String] = []
         # Publication filters
         publication_titles: [String] = []
         publication_statuses: [String] = []
@@ -915,6 +1019,7 @@ type QueryType {
         # Protocol filters
         protocol_names: [String] = []
         protocol_types: [String] = []
+        dois: [String] = []
         # Publication filters
         publication_titles: [String] = []
         publication_statuses: [String] = []
@@ -931,6 +1036,67 @@ type QueryType {
         first: Int = 10
         offset: Int = 0
     ): [SubjectOverview]
+
+    protocolOverview (
+        # id filters
+        protocol_pk_id: [String] = []
+        protocol_name: [String] = []
+        protocol_type: [String] = []
+        doi: [String] = []
+        doi_url: [String] = []
+        # standard filters
+        acl: [String] = []
+        accesses: [String] = []
+        experimental_strategies: [String] = []
+        file_types: [String] = []
+        file_names: [String] = []
+        sex: [String] = []
+        image_modality: [String] = []
+        instrument_models: [String] = []
+        is_tumor: [String] = []
+        library_layouts: [String] = []
+        library_selections: [String] = []
+        library_source_materials: [String] = []
+        library_source_molecules: [String] = []
+        library_strategies: [String] = []
+        number_of_study_participants: [Float] = []
+        number_of_study_samples: [Float] = []
+        phs_accession: [String] = []
+        platforms: [String] = []
+        primary_diagnoses: [String] = []
+        reference_genome_assemblies: [String] = []
+        sample_types: [String] = []
+        site: [String] = []
+        studies: [String] = []
+        study_data_types: [String] = []
+        analytical_fractions: [String] = []
+        instrument_makes: [String] = []
+        proteomic_design_descriptions: [String] = []
+        organ_or_tissue: [String] = []
+        tissue_fixative: [String] = []
+        imaging_assay_type: [String] = []
+        is_supplementary_file: [String] = []
+        # Protocol filters
+        protocol_names: [String] = []
+        protocol_types: [String] = []
+        doi_urls: [String] = []
+        dois: [String] = []
+        # Publication filters
+        publication_titles: [String] = []
+        publication_statuses: [String] = []
+        pub_ids: [String] = []
+        # Composition filters
+        nanomaterial_entities: [String] = []
+        functionalizing_entities: [String] = []
+        # Characterization filters
+        characterization_types: [String] = []
+        characterization_names: [String] = []
+        # pagination and sorting
+        order_by: String = ""
+        sort_direction: String = "ASC"
+        first: Int = 10
+        offset: Int = 0
+    ): [ProtocolOverview]
 
     sampleOverview (
         # id filters
@@ -970,6 +1136,7 @@ type QueryType {
         # Protocol filters
         protocol_names: [String] = []
         protocol_types: [String] = []
+        dois: [String] = []
         # Publication filters
         publication_titles: [String] = []
         publication_statuses: [String] = []
@@ -1026,6 +1193,7 @@ type QueryType {
         # Protocol filters
         protocol_names: [String] = []
         protocol_types: [String] = []
+        dois: [String] = []
         # Publication filters
         publication_titles: [String] = []
         publication_statuses: [String] = []
@@ -1106,6 +1274,7 @@ type QueryType {
         file_names: [String] = [""]
         file_ids: [String] = [""]
         study_participant_ids: [String] = [""]
+        protocol_pk_ids: [String] = [""]
     ): [String]
 
     findSubjectIdsInList(subject_ids: [String] = []): [SubjectResult]
@@ -1300,6 +1469,71 @@ type QueryType {
         offset: Int = 0
     ): [PDX]
 
+    investigators(
+        # id filter
+        investigator_ids: [String] = [],
+        # relationship filters
+        phs_accession: String!,
+        # formatting
+        first: Int = 10,
+        offset: Int = 0
+    ): [Investigator]
+
+    characterizations(
+        # id filter
+        characterization_ids: [String] = [],
+        # relationship filters
+        phs_accession: String!,
+        sample_ids: [String] = [],
+        # formatting
+        first: Int = 10,
+        offset: Int = 0
+    ): [Characterization]
+
+    publications(
+        # id filter
+        publication_ids: [String] = [],
+        # relationship filters
+        phs_accession: String!,
+        sample_ids: [String] = [],
+        # formatting
+        first: Int = 10,
+        offset: Int = 0
+    ): [Publication]
+
+    protocols(
+        # id filter
+        protocol_ids: [String] = [],
+        # relationship filters
+        phs_accession: String!,
+        file_ids: [String] = [],
+        sample_ids: [String] = [],
+        # formatting
+        first: Int = 10,
+        offset: Int = 0
+    ): [Protocol]
+
+    compositions(
+        # id filter
+        composition_ids: [String] = [],
+        # relationship filters
+        phs_accession: String!,
+        sample_ids: [String] = [],
+        # formatting
+        first: Int = 10,
+        offset: Int = 0
+    ): [Composition]
+
+    consent_groups(
+        # id filter
+        consent_group_ids: [String] = [],
+        # relationship filters
+        phs_accession: String!,
+        # formatting
+        first: Int = 10,
+        offset: Int = 0
+    ): [ConsentGroup]
+
     version: Version
 
     # Memgraph node count queries
@@ -1320,5 +1554,11 @@ type QueryType {
     nonDICOMPETimagesCount(phs_accession: String!): Int
     nonDICOMpathologyImagesCount(phs_accession: String!): Int
     nonDICOMradiologyAllModalitiesCount(phs_accession: String!): Int
+    investigatorsCount(phs_accession: String!): Int
+    characterizationsCount(phs_accession: String!): Int
+    publicationsCount(phs_accession: String!): Int
+    protocolsCount(phs_accession: String!): Int
+    compositionsCount(phs_accession: String!): Int
+    consentGroupsCount(phs_accession: String!): Int
     versionsCount: Int
 }

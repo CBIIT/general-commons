@@ -190,7 +190,7 @@ export const facetsConfig = [
     field: "group",
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
-    show: true,
+    show: false,
     customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   // GENOMIC
@@ -432,6 +432,17 @@ export const facetsConfig = [
   },
   {
     section: CANCER_NANOTECHNOLOGY,
+    label: "DOI",
+    apiPath: "filterSubjectCountByDoi",
+    apiForFiltering: "filterSubjectCountByDoi",
+    datafield: "dois",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
+  {
+    section: CANCER_NANOTECHNOLOGY,
     label: "Publication Title",
     apiPath: "filterSubjectCountByPublicationTitle",
     apiForFiltering: "filterSubjectCountByPublicationTitle",
@@ -450,7 +461,7 @@ export const facetsConfig = [
     field: "group",
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
-    show: true,
+    show: false,
   },
   {
     section: CANCER_NANOTECHNOLOGY,
