@@ -969,6 +969,7 @@ type QueryType {
         # Protocol filters
         protocol_names: [String] = []
         protocol_types: [String] = []
+        dois: [String] = []
         # Publication filters
         publication_titles: [String] = []
         publication_statuses: [String] = []
