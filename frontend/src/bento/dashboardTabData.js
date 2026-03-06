@@ -30,6 +30,7 @@ export const tabIndexMap = {
   'participants': 0,
   'samples': 1,
   'files': 2,
+  'protocols': 3,
 };
 
 // --------------- Tabs Header Data configuration --------------
@@ -51,6 +52,12 @@ export const tabs = [
     title: 'Files',
     dataField: 'dataFile',
     count: 'numberOfFiles',
+  },
+  {
+    id: 'protocol_tab',
+    title: 'Protocols',
+    dataField: 'dataProtocol',
+    count: 'numberOfProtocols',
   },
 ];
 
@@ -164,6 +171,7 @@ query searchSubjects(
         numberOfSubjects
         numberOfSamples
         numberOfFiles
+        numberOfProtocols
         numberOfDiseaseSites
         donutCountByExperimentalStrategy{
             group
@@ -847,6 +855,124 @@ query sampleOverview(
 
 `;
 
+export const GET_PROTOCOLS_OVERVIEW_QUERY = gql`
+query protocolOverview(
+  $protocol_pk_id: [String],
+  $protocol_name: [String],
+  $protocol_type: [String],
+  $doi: [String],
+  $doi_url: [String],
+  $file_names: [String],
+  $acl: [String],
+  $accesses: [String],
+  $experimental_strategies: [String],
+  $file_types: [String],
+  $sex: [String],
+  $image_modality: [String],
+  $instrument_models: [String],
+  $is_tumor: [String],
+  $library_layouts: [String],
+  $library_selections: [String],
+  $library_source_materials: [String],
+  $library_source_molecules: [String],
+  $library_strategies: [String],
+  $number_of_study_participants: [Float],
+  $number_of_study_samples: [Float],
+  $phs_accession: [String],
+  $platforms: [String],
+  $primary_diagnoses: [String],
+  $reference_genome_assemblies: [String],
+  $sample_types: [String],
+  $site: [String],
+  $studies: [String],
+  $study_data_types: [String],
+  $analytical_fractions: [String],
+  $instrument_makes: [String],
+  $proteomic_design_descriptions: [String],
+  $organ_or_tissue: [String],
+  $tissue_fixative: [String],
+  $imaging_assay_type: [String],
+  $is_supplementary_file: [String],
+  $protocol_names: [String],
+  $protocol_types: [String],
+  $doi_urls: [String],
+  $dois: [String],
+  $publication_titles: [String],
+  $publication_statuses: [String],
+  $pub_ids: [String],
+  $nanomaterial_entities: [String],
+  $functionalizing_entities: [String],
+  $characterization_types: [String],
+  $characterization_names: [String],
+  $order_by: String,
+  $sort_direction: String,
+  $first: Int,
+  $offset: Int
+){
+  protocolOverview(
+      protocol_pk_id: $protocol_pk_id,
+      protocol_name: $protocol_name,
+      protocol_type: $protocol_type,
+      doi: $doi,
+      doi_url: $doi_url,
+      file_names: $file_names,
+      acl: $acl,
+      accesses: $accesses,
+      experimental_strategies: $experimental_strategies,
+      file_types: $file_types,
+      sex: $sex,
+      image_modality: $image_modality,
+      instrument_models: $instrument_models,
+      is_tumor: $is_tumor,
+      library_layouts: $library_layouts,
+      library_selections: $library_selections,
+      library_source_materials: $library_source_materials,
+      library_source_molecules: $library_source_molecules,
+      library_strategies: $library_strategies,
+      number_of_study_participants: $number_of_study_participants,
+      number_of_study_samples: $number_of_study_samples,
+      phs_accession: $phs_accession,
+      platforms: $platforms,
+      primary_diagnoses: $primary_diagnoses,
+      reference_genome_assemblies: $reference_genome_assemblies,
+      sample_types: $sample_types,
+      site: $site,
+      studies: $studies,
+      study_data_types: $study_data_types,
+      analytical_fractions: $analytical_fractions,
+      instrument_makes: $instrument_makes,
+      proteomic_design_descriptions: $proteomic_design_descriptions,
+      organ_or_tissue: $organ_or_tissue,
+      tissue_fixative: $tissue_fixative,
+      imaging_assay_type: $imaging_assay_type,
+      is_supplementary_file: $is_supplementary_file,
+      protocol_names: $protocol_names,
+      protocol_types: $protocol_types,
+      doi_urls: $doi_urls,
+      dois: $dois,
+      publication_titles: $publication_titles,
+      publication_statuses: $publication_statuses,
+      pub_ids: $pub_ids,
+      nanomaterial_entities: $nanomaterial_entities,
+      functionalizing_entities: $functionalizing_entities,
+      characterization_types: $characterization_types,
+      characterization_names: $characterization_names,
+      order_by: $order_by,
+      sort_direction: $sort_direction,
+      first: $first,
+      offset: $offset
+  ){
+      protocol_pk_id
+      protocol_name
+      protocol_type
+      doi
+      doi_url
+      file_names
+  }
+}
+
+`;
+
 // --------------- GraphQL query - select all check box --------------
 
 export const GET_ALL_FILEIDS_CASESTAB_FOR_SELECT_ALL = gql`
@@ -875,6 +1001,16 @@ query search (
 ){
   fileIDsFromList (          
       file_names: $file_names
+  ) 
+}
+  `;
+
+export const GET_ALL_FILEIDS_PROTOCOLSTAB_FOR_SELECT_ALL = gql`
+query search (          
+  $protocol_pk_ids: [String],
+){
+  fileIDsFromList (          
+      protocol_pk_ids: $protocol_pk_ids,
   ) 
 }
   `;
@@ -1553,6 +1689,82 @@ export const tabContainers = [
     addAllFilesResponseKeys: ['fileOverview', 'file_id'],
     addAllFileQuery: GET_ALL_FILEIDS_FROM_FILESTAB_FOR_ADD_ALL_CART,
     //addSelectedFilesQuery: GET_ALL_FILEIDS_FILESTAB_FOR_SELECT_ALL,
+  },
+  {
+    name: 'Protocols',
+    dataField: 'dataProtocol',
+    api: GET_PROTOCOLS_OVERVIEW_QUERY,
+    paginationAPIField: 'protocolOverview',
+    defaultSortField: 'doi',
+    defaultSortDirection: 'desc',
+    count: 'numberOfProtocols',
+    dataKey: 'protocol_pk_id',
+    tableID: 'protocol_tab_table',
+    tooltipConfig: {
+      title: 'This tab provides information about protocols associated with caNano data. Review protocol details and their connections to DOIs.',
+      arrow: true,
+      placement: "top",
+    },
+    extendedViewConfig: {
+      pagination: true,
+      manageViewColumns: {
+        title: 'View Columns',
+      },
+      download: {
+        downloadCsv: 'Download Table Content As CSV',
+        downloadFileName: 'GC_protocol_Download',
+      },
+    },
+    columns: [
+      {
+        cellType: cellTypes.CHECKBOX,
+        display: true,
+        role: cellTypes.CHECKBOX,
+      },
+      {
+        dataField: 'protocol_name',
+        header: 'Protocol Name',
+        display: true,
+        tooltipText: 'Name assigned to protocol associated with the study.',
+      },
+      {
+        dataField: 'protocol_type',
+        header: 'Protocol Type',
+        display: true,
+        tooltipText: 'Type of protocol associated with the study.',
+        role: cellTypes.DISPLAY,
+      },
+      {
+        dataField: 'doi',
+        header: 'DOI',
+        display: true,
+        tooltipText: 'Unique digital object identifier associated with the study.',
+        role: cellTypes.DISPLAY,
+        cellType: cellTypes.CUSTOM_ELEM,
+        externalLinkAttr: {
+          urlField: 'doi_url',
+        },
+      },
+      {
+        dataField: 'file_names',
+        header: 'File Name',
+        display: true,
+        tooltipText: 'Name of file associated with the study.',
+        role: cellTypes.DISPLAY,
+        cellType: cellTypes.CUSTOM_ELEM,
+      },
+    ],
+    id: 'protocol_tab',
+    selectableRows: true,
+    downloadFileName: 'GC_protocol_Download',
+    tableMsg: {
+      noMatch: 'No Matching Records Found',
+    },
+    addFilesRequestVariableKey: 'protocol_pk_ids',
+    addFilesResponseKeys: ['fileIDsFromList'],
+    addAllFilesResponseKeys: ['fileOverview', 'file_id'],
+    addAllFileQuery: GET_ALL_FILEIDS_FROM_FILESTAB_FOR_ADD_ALL_CART,
+    addSelectedFilesQuery: GET_ALL_FILEIDS_PROTOCOLSTAB_FOR_SELECT_ALL,
   },
 ];
 
