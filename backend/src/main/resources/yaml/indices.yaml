@@ -120,7 +120,7 @@ indices:
         # sample_types_sort
         query: |
           MATCH (p:participant)
-          WITH p, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH p, "Not specified in data" AS nsd, "Not Applicable" AS na
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (p)<--(samp:sample)
           WITH p.study_participant_id AS study_participant_id, nsd, na,
@@ -173,7 +173,7 @@ indices:
           MATCH (s:study)
           WITH s 
           SKIP $skip LIMIT $limit 
-          WITH s, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH s, "Not specified in data" AS nsd, "Not Applicable" AS na
           CALL {
             WITH s
             OPTIONAL MATCH (s)<-[*]-(p:participant)
@@ -239,7 +239,7 @@ indices:
             COLLECT(DISTINCT f) AS fs, 
             COLLECT(DISTINCT f.file_id) AS files, 
             "Not specified in data" AS nsd, 
-            "Not applicable" AS na
+            "Not Applicable" AS na
           CALL {
             WITH files
             UNWIND files AS file
@@ -303,7 +303,7 @@ indices:
           WITH DISTINCT p
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f:file)-->(p)
-          WITH DISTINCT f, p.study_participant_id AS study_participant_id, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT f, p.study_participant_id AS study_participant_id, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (f)-->(p:participant)<--(diag:diagnosis)
           WITH DISTINCT study_participant_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN diag IS NULL THEN null ELSE COALESCE(diag.primary_diagnosis, nsd) END) AS primary_diagnoses,
@@ -359,7 +359,7 @@ indices:
           WITH DISTINCT p
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f:file)-[:of_participant]->(p)
-          WITH DISTINCT f, p.study_participant_id AS study_participant_id, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT f, p.study_participant_id AS study_participant_id, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (f)<-[:of_file]-(g:genomic_info)
           WITH study_participant_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_strategy, nsd) END) AS library_strategies,
@@ -468,7 +468,7 @@ indices:
           WITH DISTINCT p
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f:file)-[:of_participant]->(p)
-          WITH DISTINCT f, p.study_participant_id AS study_participant_id, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT f, p.study_participant_id AS study_participant_id, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (f)<-[:of_file]-(i:image)
           OPTIONAL MATCH (i)<-[:of_image]-(mm:MultiplexMicroscopy)
           WITH DISTINCT study_participant_id, nsd, na,
@@ -535,7 +535,7 @@ indices:
           WITH DISTINCT p
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f:file)-[:of_participant]->(p)
-          WITH DISTINCT f, p.study_participant_id AS study_participant_id, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT f, p.study_participant_id AS study_participant_id, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (f)<-[:of_file]-(pr:proteomic)
           WITH study_participant_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN pr IS NULL THEN null ELSE COALESCE(pr.analytical_fractions, nsd) END) AS analytical_fractions_raw,
@@ -561,7 +561,7 @@ indices:
           MATCH (p:participant)
           WITH DISTINCT p
           SKIP $skip LIMIT $limit
-          WITH p, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH p, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (p)<-[*]-(proto:Protocol)
           WITH p, nsd, na,
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_name, nsd) END) AS protocol_names_raw,
@@ -584,7 +584,7 @@ indices:
           MATCH (p:participant)
           WITH DISTINCT p
           SKIP $skip LIMIT $limit
-          WITH p, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH p, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (p)<-[*]-(pub:Publication)
           WITH p, nsd, na,
             COLLECT(DISTINCT CASE WHEN pub IS NULL THEN null ELSE COALESCE(pub.Publication_Title, nsd) END) AS publication_titles_raw,
@@ -604,7 +604,7 @@ indices:
           MATCH (p:participant)
           WITH DISTINCT p
           SKIP $skip LIMIT $limit
-          WITH p, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH p, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (p)<-[*]-(comp:Composition)
           WITH p, nsd, na,
             COLLECT(DISTINCT CASE WHEN comp IS NULL OR comp.Nanomaterial_Entity_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(comp.Nanomaterial_Entity_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS nanomaterial_entities_raw,
@@ -622,7 +622,7 @@ indices:
           MATCH (p:participant)
           WITH DISTINCT p
           SKIP $skip LIMIT $limit
-          WITH p, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH p, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (p)<-[*]-(char:Characterization)
           WITH p, nsd, na,
             COLLECT(DISTINCT CASE WHEN char IS NULL OR char.Characterization_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(char.Characterization_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS characterization_types_raw,
@@ -778,7 +778,7 @@ indices:
           WITH DISTINCT samp
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (samp)-[:of_participant]->(p:participant)
-          WITH DISTINCT samp, p, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT samp, p, "Not specified in data" AS nsd, "Not Applicable" AS na
           WITH samp, nsd, na,
             COLLECT(DISTINCT p.participant_id) AS participant_ids,
             COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.participant_id, nsd) END) AS subject_ids_filter,
@@ -808,7 +808,7 @@ indices:
           MATCH (s:study)
           WITH s 
           SKIP $skip LIMIT $limit 
-          WITH s, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH s, "Not specified in data" AS nsd, "Not Applicable" AS na
           CALL {
             WITH s
             OPTIONAL MATCH (s)<-[*]-(p:participant)
@@ -889,7 +889,7 @@ indices:
           WITH DISTINCT samp
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (samp)<-[*]-(f:file)
-          WITH samp.sample_id AS sample_id, COLLECT(DISTINCT f) AS fs, COLLECT(DISTINCT f.file_id) AS files, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH samp.sample_id AS sample_id, COLLECT(DISTINCT f) AS fs, COLLECT(DISTINCT f.file_id) AS files, "Not specified in data" AS nsd, "Not Applicable" AS na
           CALL {
             WITH files
             UNWIND files AS file
@@ -953,7 +953,7 @@ indices:
           MATCH (samp:sample)
           WITH DISTINCT samp
           SKIP $skip LIMIT $limit
-          WITH samp, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH samp, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (samp)-->(p:participant)<--(diag1:diagnosis)
           OPTIONAL MATCH (diag2:diagnosis)-->(samp)
           WITH samp, [diag1, diag2] AS diag_list, nsd, na
@@ -1011,7 +1011,7 @@ indices:
           WITH DISTINCT samp
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (samp)<-[*]-(f:file)
-          WITH DISTINCT samp.sample_id AS sample_id, f, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT samp.sample_id AS sample_id, f, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (f)<-[:of_file]-(g:genomic_info)
           WITH sample_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_strategy, nsd) END) AS library_strategies,
@@ -1120,7 +1120,7 @@ indices:
           WITH DISTINCT samp
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (samp)<-[*]-(f:file)
-          WITH DISTINCT samp.sample_id AS sample_id, f, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT samp.sample_id AS sample_id, f, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (f)<-[:of_file]-(i:image)
           OPTIONAL MATCH (i)<-[:of_image]-(mm:MultiplexMicroscopy)
           WITH DISTINCT sample_id, nsd, na,
@@ -1191,7 +1191,7 @@ indices:
           WITH DISTINCT samp
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (samp)<-[*]-(f:file)
-          WITH DISTINCT samp.sample_id AS sample_id, f, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT samp.sample_id AS sample_id, f, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (f)<-[:of_file]-(pr:proteomic)
           WITH sample_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN pr IS NULL THEN null ELSE COALESCE(pr.analytical_fractions, nsd) END) AS analytical_fractions_raw,
@@ -1217,7 +1217,7 @@ indices:
           MATCH (samp:sample)
           WITH DISTINCT samp
           SKIP $skip LIMIT $limit
-          WITH samp, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH samp, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (samp)<-[*]-(proto:Protocol)
           WITH samp, nsd, na,
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_name, nsd) END) AS protocol_names_raw,
@@ -1240,7 +1240,7 @@ indices:
           MATCH (samp:sample)
           WITH DISTINCT samp
           SKIP $skip LIMIT $limit
-          WITH samp, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH samp, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (samp)<-[*]-(pub:Publication)
           WITH samp, nsd, na,
             COLLECT(DISTINCT CASE WHEN pub IS NULL THEN null ELSE COALESCE(pub.Publication_Title, nsd) END) AS publication_titles_raw,
@@ -1260,7 +1260,7 @@ indices:
           MATCH (samp:sample)
           WITH DISTINCT samp
           SKIP $skip LIMIT $limit
-          WITH samp, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH samp, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (samp)<-[*]-(comp:Composition)
           WITH samp, nsd, na,
             COLLECT(DISTINCT CASE WHEN comp IS NULL OR comp.Nanomaterial_Entity_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(comp.Nanomaterial_Entity_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS nanomaterial_entities_raw,
@@ -1278,7 +1278,7 @@ indices:
           MATCH (samp:sample)
           WITH DISTINCT samp
           SKIP $skip LIMIT $limit
-          WITH samp, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH samp, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (samp)<-[*]-(char:Characterization)
           WITH samp, nsd, na,
             COLLECT(DISTINCT CASE WHEN char IS NULL OR char.Characterization_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(char.Characterization_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS characterization_types_raw,
@@ -1547,7 +1547,7 @@ indices:
           WITH s 
           SKIP $skip LIMIT $limit 
           OPTIONAL MATCH (s)<-[*]-(f:file)
-          WITH DISTINCT s, COLLECT(DISTINCT f.file_id) AS file_ids, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT s, COLLECT(DISTINCT f.file_id) AS file_ids, "Not specified in data" AS nsd, "Not Applicable" AS na
           CALL {
             WITH s
             OPTIONAL MATCH (s)<-[*]-(p:participant)
@@ -1632,7 +1632,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-->(p:participant)
-          WITH f.file_id AS file_id, p, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH f.file_id AS file_id, p, "Not specified in data" AS nsd, "Not Applicable" AS na
           WITH file_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.sex, nsd) END) AS sex,
             COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.race, nsd) END) AS races,
@@ -1689,7 +1689,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-->(samp:sample)
-          WITH DISTINCT f.file_id AS file_id, samp, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT f.file_id AS file_id, samp, "Not specified in data" AS nsd, "Not Applicable" AS na
           WITH file_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_tumor_status, nsd) END) AS sample_tumor_status,
             COLLECT(DISTINCT samp.sample_type) AS raw_sample_types,
@@ -1750,7 +1750,7 @@ indices:
         # site_sort
         query: |
           MATCH (f:file)
-          WITH DISTINCT f, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT f, "Not specified in data" AS nsd, "Not Applicable" AS na
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-->(p:participant)<--(diag1:diagnosis)
           OPTIONAL MATCH (diag2:diagnosis)-->(samp:sample)<--(f)
@@ -1808,7 +1808,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)<-[:of_file]-(g:genomic_info)
-          WITH f.file_id AS file_id, g, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH f.file_id AS file_id, g, "Not specified in data" AS nsd, "Not Applicable" AS na
           WITH file_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_strategy, nsd) END) AS library_strategies,
             COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_source_material, nsd) END) AS library_source_materials,
@@ -1917,7 +1917,7 @@ indices:
         # license
         query: |
           MATCH (f:file)
-          WITH DISTINCT f, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT f, "Not specified in data" AS nsd, "Not Applicable" AS na
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)<-[:of_file]-(i:image)
           OPTIONAL MATCH (i)<-[:of_image]-(mm:MultiplexMicroscopy)
@@ -1987,7 +1987,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)<-[:of_file]-(pr:proteomic)
-          WITH f.file_id AS file_id, pr, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH f.file_id AS file_id, pr, "Not specified in data" AS nsd, "Not Applicable" AS na
           WITH file_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN pr IS NULL THEN null ELSE COALESCE(pr.analytical_fractions, nsd) END) AS analytical_fractions,
             COLLECT(DISTINCT CASE WHEN pr IS NULL THEN null ELSE COALESCE(pr.instrument_make, nsd) END) AS instrument_makes,
@@ -2012,7 +2012,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-->(af:file)
-          WITH f.file_id AS file_id, af, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH f.file_id AS file_id, af, "Not specified in data" AS nsd, "Not Applicable" AS na
           RETURN DISTINCT
             file_id,
             CASE WHEN af IS NULL THEN na ELSE COALESCE(af.file_name, nsd) END AS associated_file,
@@ -2029,7 +2029,7 @@ indices:
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-[:of_file]->(sf:file)
           WHERE sf.is_supplementary_file = true
-          WITH f.file_id AS file_id, COLLECT(DISTINCT sf.file_name) AS supplementary_file_names, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH f.file_id AS file_id, COLLECT(DISTINCT sf.file_name) AS supplementary_file_names, "Not specified in data" AS nsd, "Not Applicable" AS na
           WITH file_id, nsd, na,
             CASE WHEN size(supplementary_file_names) = 0 THEN [] ELSE supplementary_file_names END AS supplementary_file_names
           CALL {
@@ -2056,7 +2056,7 @@ indices:
           MATCH (f:file)
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH f, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH f, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (f)<-[*]-(proto:Protocol)
           WITH f, nsd, na,
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_name, nsd) END) AS protocol_names_raw,
@@ -2081,7 +2081,7 @@ indices:
           MATCH (f:file)
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH f, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH f, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (f)-->(samp:sample)<-[*]-(pub:Publication)
           WITH f, nsd, na,
             COLLECT(DISTINCT CASE WHEN pub IS NULL THEN null ELSE COALESCE(pub.Publication_Title, nsd) END) AS publication_titles_raw,
@@ -2101,7 +2101,7 @@ indices:
           MATCH (f:file)
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH f, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH f, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (f)-->(samp:sample)<-[*]-(comp:Composition)
           WITH f, nsd, na,
             COLLECT(DISTINCT CASE WHEN comp IS NULL OR comp.Nanomaterial_Entity_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(comp.Nanomaterial_Entity_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS nanomaterial_entities_raw,
@@ -2119,7 +2119,7 @@ indices:
           MATCH (f:file)
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH f, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH f, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (f)-->(samp:sample)<-[*]-(char:Characterization)
           WITH f, nsd, na,
             COLLECT(DISTINCT CASE WHEN char IS NULL OR char.Characterization_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(char.Characterization_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS characterization_types_raw,
@@ -2230,7 +2230,7 @@ indices:
           WITH s 
           SKIP $skip LIMIT $limit 
           OPTIONAL MATCH (s)<-[:of_study]-(f:file)
-          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not Applicable" AS na
           CALL {
             WITH s
             OPTIONAL MATCH (s)<-[*]-(p:participant)
@@ -2268,7 +2268,7 @@ indices:
           MATCH (f:file)
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH f, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH f, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(f.experimental_strategy_and_data_subtypes, '[', ''), ']', ''), '"', ''), ", ") AS experimental_strategies
           WITH f, nsd, na,
             CASE WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
@@ -2297,7 +2297,7 @@ indices:
           MATCH (f:file)
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH f, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH f, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(f.experimental_strategy_and_data_subtypes, '[', ''), ']', ''), '"', ''), ", ") AS experimental_strategies
           WITH f, nsd, na,
             CASE WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
@@ -2327,7 +2327,7 @@ indices:
           MATCH (f:file)
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH f, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH f, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(f.experimental_strategy_and_data_subtypes, '[', ''), ']', ''), '"', ''), ", ") AS experimental_strategies
           WITH f, nsd, na,
             CASE WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
@@ -2362,7 +2362,7 @@ indices:
           MATCH (f:file)
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH f, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH f, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(f.experimental_strategy_and_data_subtypes, '[', ''), ']', ''), '"', ''), ", ") AS experimental_strategies
           WITH f, nsd, na,
             CASE WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
@@ -2410,7 +2410,7 @@ indices:
           MATCH (f:file)
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH f, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH f, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(f.experimental_strategy_and_data_subtypes, '[', ''), ']', ''), '"', ''), ", ") AS experimental_strategies
           WITH f, nsd, na,
             CASE WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
@@ -2443,7 +2443,7 @@ indices:
           MATCH (f:file)
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH f, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH f, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(f.experimental_strategy_and_data_subtypes, '[', ''), ']', ''), '"', ''), ", ") AS experimental_strategies
           WITH f, nsd, na,
             CASE WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
@@ -2475,7 +2475,7 @@ indices:
           MATCH (f:file)
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH f, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH f, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(f.experimental_strategy_and_data_subtypes, '[', ''), ']', ''), '"', ''), ", ") AS experimental_strategies
           WITH f, nsd, na,
             CASE WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
@@ -2502,7 +2502,7 @@ indices:
           MATCH (f:file)
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH f, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH f, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(f.experimental_strategy_and_data_subtypes, '[', ''), ']', ''), '"', ''), ", ") AS experimental_strategies
           WITH f, nsd, na,
             CASE WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
@@ -2526,7 +2526,7 @@ indices:
           MATCH (f:file)
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH f, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH f, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(f.experimental_strategy_and_data_subtypes, '[', ''), ']', ''), '"', ''), ", ") AS experimental_strategies
           WITH f, nsd, na,
             CASE WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
@@ -2548,7 +2548,7 @@ indices:
           MATCH (f:file)
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
-          WITH f, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH f, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(f.experimental_strategy_and_data_subtypes, '[', ''), ']', ''), '"', ''), ", ") AS experimental_strategies
           WITH f, nsd, na,
             CASE WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
@@ -2652,7 +2652,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-[:of_study]->(s:study)
-          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not Applicable" AS na
           CALL {
             WITH s
             OPTIONAL MATCH (s)<-[*]-(p:participant)
@@ -2684,7 +2684,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-[:of_study]->(s:study)
-          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
           WITH s, fs, nsd, na,
             CASE WHEN study_data_types IS NULL OR size(study_data_types)=0 THEN [nsd] ELSE study_data_types END AS study_data_types
@@ -2720,7 +2720,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-[:of_study]->(s:study)
-          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
           WITH s, fs, nsd, na,
             CASE WHEN study_data_types IS NULL OR size(study_data_types)=0 THEN [nsd] ELSE study_data_types END AS study_data_types
@@ -2744,7 +2744,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-[:of_study]->(s:study)
-          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
           WITH s, fs, nsd, na,
             CASE WHEN study_data_types IS NULL OR size(study_data_types)=0 THEN [nsd] ELSE study_data_types END AS study_data_types
@@ -2771,7 +2771,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-[:of_study]->(s:study)
-          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
           WITH s, fs, nsd, na,
             CASE WHEN study_data_types IS NULL OR size(study_data_types)=0 THEN [nsd] ELSE study_data_types END AS study_data_types
@@ -2801,7 +2801,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-[:of_study]->(s:study)
-          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
           WITH s, fs, nsd, na,
             CASE WHEN study_data_types IS NULL OR size(study_data_types)=0 THEN [nsd] ELSE study_data_types END AS study_data_types
@@ -2848,7 +2848,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-[:of_study]->(s:study)
-          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
           WITH s, fs, nsd, na,
             CASE WHEN study_data_types IS NULL OR size(study_data_types)=0 THEN [nsd] ELSE study_data_types END AS study_data_types
@@ -2882,7 +2882,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-[:of_study]->(s:study)
-          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
           WITH s, fs, nsd, na,
             CASE WHEN study_data_types IS NULL OR size(study_data_types)=0 THEN [nsd] ELSE study_data_types END AS study_data_types
@@ -2911,7 +2911,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-[:of_study]->(s:study)
-          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
           WITH s, fs, nsd, na,
             CASE WHEN study_data_types IS NULL OR size(study_data_types)=0 THEN [nsd] ELSE study_data_types END AS study_data_types
@@ -2940,7 +2940,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-[:of_study]->(s:study)
-          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
           WITH s, fs, nsd, na,
             CASE WHEN study_data_types IS NULL OR size(study_data_types)=0 THEN [nsd] ELSE study_data_types END AS study_data_types
@@ -2966,7 +2966,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-[:of_study]->(s:study)
-          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
           WITH s, fs, nsd, na,
             CASE WHEN study_data_types IS NULL OR size(study_data_types)=0 THEN [nsd] ELSE study_data_types END AS study_data_types
@@ -2990,7 +2990,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-[:of_study]->(s:study)
-          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not applicable" AS na,
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not Applicable" AS na,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
           WITH s, fs, nsd, na,
             CASE WHEN study_data_types IS NULL OR size(study_data_types)=0 THEN [nsd] ELSE study_data_types END AS study_data_types
@@ -3021,7 +3021,7 @@ indices:
       query: |
         MATCH (p:participant)
         OPTIONAL MATCH (p)-[:of_participant]->(s:study)
-        WITH DISTINCT p, s, "Not specified in data" AS nsd, "Not applicable" AS na
+        WITH DISTINCT p, s, "Not specified in data" AS nsd, "Not Applicable" AS na
         ORDER BY p.participant_id
         RETURN DISTINCT
           COALESCE(p.study_participant_id, nsd) as study_participant_id,
@@ -3120,7 +3120,7 @@ indices:
           WITH DISTINCT p
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (p)<-[:of_participant]-(:file)-[:of_study]-(s:study)
-          WITH p.study_participant_id AS study_participant_id, COLLECT(DISTINCT s.study_name) AS study_names, "Not applicable" AS na
+          WITH p.study_participant_id AS study_participant_id, COLLECT(DISTINCT s.study_name) AS study_names, "Not Applicable" AS na
           CALL {
             WITH study_names
             UNWIND study_names AS study_name
@@ -3141,7 +3141,7 @@ indices:
           WITH DISTINCT p
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (p)<-[*]-(d:diagnosis)
-          WITH p.study_participant_id AS study_participant_id, COLLECT(DISTINCT d.primary_site) AS sites, "Not applicable" AS na
+          WITH p.study_participant_id AS study_participant_id, COLLECT(DISTINCT d.primary_site) AS sites, "Not Applicable" AS na
           WITH study_participant_id, CASE WHEN size(sites) = 0 THEN [na] ELSE sites END AS site_gs
           RETURN DISTINCT
             study_participant_id,
@@ -3196,7 +3196,7 @@ indices:
           OPTIONAL MATCH (samp)-[:of_participant]->(p:participant)
           WITH samp.sample_id AS sample_id, 
             COLLECT(DISTINCT p.participant_id) AS participant_ids,
-            "Not applicable" AS na
+            "Not Applicable" AS na
           RETURN DISTINCT
             sample_id,
             CASE WHEN size(participant_ids) = 0 THEN [na] ELSE participant_ids END AS subject_ids_filter
@@ -3256,7 +3256,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-[:of_participant]->(p:participant)
-          WITH f.file_id AS file_id, COLLECT(DISTINCT p.participant_id) AS participant_ids, "Not applicable" AS na
+          WITH f.file_id AS file_id, COLLECT(DISTINCT p.participant_id) AS participant_ids, "Not Applicable" AS na
           WITH file_id, na, CASE WHEN size(participant_ids) = 0 THEN [] ELSE participant_ids END AS participant_ids
           RETURN DISTINCT
             file_id,
@@ -3290,7 +3290,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-[:of_study]->(s:study)
-          WITH f.file_id AS file_id, s, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH f.file_id AS file_id, s, "Not specified in data" AS nsd, "Not Applicable" AS na
           WITH file_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN s IS NULL THEN null ELSE COALESCE(s.study_access, nsd) END) AS accesses,
             CASE WHEN s.acl = '[]' THEN nsd ELSE replace(replace(replace(s.acl, '[', ''), ']', ''), '"', '') END AS acl
@@ -3327,7 +3327,7 @@ indices:
           WITH DISTINCT f
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)<-[:of_file]-(g:genomic_info)
-          WITH f.file_id AS file_id, g, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH f.file_id AS file_id, g, "Not specified in data" AS nsd, "Not Applicable" AS na
           WITH file_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_strategy, nsd) END) AS library_strategies,
             COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_source_material, nsd) END) AS library_source_materials,
@@ -3353,7 +3353,7 @@ indices:
         # sites_gs
         query: |
           MATCH (f:file)
-          WITH DISTINCT f, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT f, "Not specified in data" AS nsd, "Not Applicable" AS na
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-->(p:participant)<--(diag:diagnosis)
           WITH f.file_id AS file_id, nsd, na,
@@ -3768,7 +3768,7 @@ indices:
       # sex
       query: |
         MATCH (p:participant)
-        WITH DISTINCT p, "Not specified in data" AS nsd, "Not applicable" AS na
+        WITH DISTINCT p, "Not specified in data" AS nsd, "Not Applicable" AS na
         SKIP $skip LIMIT $limit
         OPTIONAL MATCH (s:study)<--(p)
         RETURN DISTINCT
@@ -3785,7 +3785,7 @@ indices:
         # site
         query: |
           MATCH (p:participant)
-          WITH DISTINCT p, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT p, "Not specified in data" AS nsd, "Not Applicable" AS na
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (p)<-[:of_participant]-(samp:sample)
           WITH p, nsd, na, COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE {
@@ -4005,7 +4005,7 @@ indices:
           MATCH (s:study)
           WITH s 
           SKIP $skip LIMIT $limit 
-          WITH s, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH s, "Not specified in data" AS nsd, "Not Applicable" AS na
           CALL {
             WITH s
             OPTIONAL MATCH (s)<-[*]-(p:participant)
@@ -4064,7 +4064,7 @@ indices:
           WITH DISTINCT proto
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f:file)<-[*]-(proto)
-          WITH proto.protocol_pk_id AS protocol_pk_id, COLLECT(DISTINCT f) AS fs, COLLECT(DISTINCT f.file_id) AS files, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH proto.protocol_pk_id AS protocol_pk_id, COLLECT(DISTINCT f) AS fs, COLLECT(DISTINCT f.file_id) AS files, "Not specified in data" AS nsd, "Not Applicable" AS na
           CALL {
             WITH protocol_pk_id, fs, nsd, na
             WITH protocol_pk_id, nsd, na, fs
@@ -4110,7 +4110,7 @@ indices:
           WITH DISTINCT proto
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (proto)-->(samp:sample)-[:of_participant]->(p:participant)
-          WITH DISTINCT proto, p, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT proto, p, "Not specified in data" AS nsd, "Not Applicable" AS na
           WITH proto, nsd, na,
             COLLECT(DISTINCT p.participant_id) AS participant_ids,
             COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.sex, nsd) END) AS sex_values
@@ -4133,7 +4133,7 @@ indices:
           WITH DISTINCT proto
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (proto)-->(samp:sample)
-          WITH DISTINCT proto.protocol_pk_id AS protocol_pk_id, samp, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT proto.protocol_pk_id AS protocol_pk_id, samp, "Not specified in data" AS nsd, "Not Applicable" AS na
           WITH protocol_pk_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_tumor_status, nsd) END) AS sample_tumor_status,
             COLLECT(DISTINCT samp.sample_type) AS raw_sample_types,
@@ -4164,7 +4164,7 @@ indices:
           MATCH (proto:Protocol)
           WITH DISTINCT proto
           SKIP $skip LIMIT $limit
-          WITH proto, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH proto, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (proto)-->(samp:sample)-->(p:participant)<--(diag1:diagnosis)
           OPTIONAL MATCH (diag2:diagnosis)-->(samp:sample)<--(proto)
           WITH proto, [diag1, diag2] AS diagList, nsd, na
@@ -4196,7 +4196,7 @@ indices:
           WITH DISTINCT proto
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (proto)-[*]->(f:file)
-          WITH DISTINCT proto.protocol_pk_id AS protocol_pk_id, f, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT proto.protocol_pk_id AS protocol_pk_id, f, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (f)<-[:of_file]-(g:genomic_info)
           WITH protocol_pk_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN g IS NULL THEN null ELSE COALESCE(g.library_strategy, nsd) END) AS library_strategies,
@@ -4238,7 +4238,7 @@ indices:
           WITH DISTINCT proto
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (proto)-[*]->(f:file)
-          WITH DISTINCT proto.protocol_pk_id AS protocol_pk_id, f, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT proto.protocol_pk_id AS protocol_pk_id, f, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (f)<-[:of_file]-(i:image)
           OPTIONAL MATCH (i)<-[:of_image]-(mm:MultiplexMicroscopy)
           WITH DISTINCT protocol_pk_id, nsd, na,
@@ -4270,7 +4270,7 @@ indices:
           WITH DISTINCT proto
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (proto)-[*]->(f:file)
-          WITH DISTINCT proto.protocol_pk_id AS protocol_pk_id, f, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH DISTINCT proto.protocol_pk_id AS protocol_pk_id, f, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (f)<-[:of_file]-(pr:proteomic)
           WITH protocol_pk_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN pr IS NULL THEN null ELSE COALESCE(pr.analytical_fractions, nsd) END) AS analytical_fractions_raw,
@@ -4295,7 +4295,7 @@ indices:
           MATCH (proto:Protocol)
           WITH DISTINCT proto
           SKIP $skip LIMIT $limit
-          WITH proto, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH proto, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (proto)-->(samp:sample)<-[*]-(pub:Publication)
           WITH proto, nsd, na,
             COLLECT(DISTINCT CASE WHEN pub IS NULL THEN null ELSE COALESCE(pub.Publication_Title, nsd) END) AS publication_titles_raw,
@@ -4315,7 +4315,7 @@ indices:
           MATCH (proto:Protocol)
           WITH DISTINCT proto
           SKIP $skip LIMIT $limit
-          WITH proto, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH proto, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (proto)-->(samp:sample)<-[*]-(comp:Composition)
           WITH proto, samp, nsd, na,
             COLLECT(DISTINCT CASE WHEN comp IS NULL OR comp.Nanomaterial_Entity_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(comp.Nanomaterial_Entity_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS nanomaterial_entities_raw,
@@ -4333,7 +4333,7 @@ indices:
           MATCH (proto:Protocol)
           WITH DISTINCT proto
           SKIP $skip LIMIT $limit
-          WITH proto, "Not specified in data" AS nsd, "Not applicable" AS na
+          WITH proto, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (proto)-->(samp:sample)<-[*]-(char:Characterization)
           WITH proto, samp, nsd, na,
             COLLECT(DISTINCT CASE WHEN char IS NULL OR char.Characterization_Type = "[]" THEN null ELSE COALESCE(replace(replace(replace(char.Characterization_Type, '[', ''), ']', ''), '"', ''), nsd) END) AS characterization_types_raw,
