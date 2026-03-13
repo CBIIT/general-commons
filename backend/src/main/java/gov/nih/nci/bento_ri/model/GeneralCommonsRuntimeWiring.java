@@ -29,6 +29,9 @@ public class GeneralCommonsRuntimeWiring {
                         .dataFetcher("schemaVersion", env -> "3.1.0")
                         .dataFetcher("schemaModelVersion", env -> "8.0.1")
                         .dataFetchers(yamlQueryFactory.createYamlQueries(Const.ES_ACCESS_TYPE.PRIVATE))
+                        .dataFetcher("idsLists", env -> {
+                            return privateESDataFetcher.idsLists();
+                        })
                         .dataFetcher("searchSubjects", env -> {
                             Map<String, Object> args = env.getArguments();
                             return privateESDataFetcher.searchSubjects(args);
@@ -36,6 +39,10 @@ public class GeneralCommonsRuntimeWiring {
                         .dataFetcher("subjectOverview", env -> {
                             Map<String, Object> args = env.getArguments();
                             return privateESDataFetcher.subjectOverview(args);
+                        })
+                        .dataFetcher("protocolOverview", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return privateESDataFetcher.protocolOverview(args);
                         })
                         .dataFetcher("sampleOverview", env -> {
                             Map<String, Object> args = env.getArguments();
@@ -133,6 +140,30 @@ public class GeneralCommonsRuntimeWiring {
                             Map<String, Object> args = env.getArguments();
                             return memgraphDataFetcher.pdxDataFetcher(args);
                         })
+                        .dataFetcher("investigators", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.investigatorDataFetcher(args);
+                        })
+                        .dataFetcher("characterizations", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.characterizationDataFetcher(args);
+                        })
+                        .dataFetcher("publications", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.publicationDataFetcher(args);
+                        })
+                        .dataFetcher("protocols", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.protocolDataFetcher(args);
+                        })
+                        .dataFetcher("compositions", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.compositionDataFetcher(args);
+                        })
+                        .dataFetcher("consent_groups", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.consentGroupDataFetcher(args);
+                        })
                         // Memgraph node count queries
                         .dataFetcher("programsCount", env -> {
                             Map<String, Object> args = env.getArguments();
@@ -202,9 +233,55 @@ public class GeneralCommonsRuntimeWiring {
                             Map<String, Object> args = env.getArguments();
                             return memgraphDataFetcher.getNumberOfNonDICOMradiologyAllModalities(args);
                         })
+                        .dataFetcher("investigatorsCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfInvestigators(args);
+                        })
+                        .dataFetcher("characterizationsCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfCharacterizations(args);
+                        })
+                        .dataFetcher("publicationsCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfPublications(args);
+                        })
+                        .dataFetcher("protocolsCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfProtocols(args);
+                        })
+                        .dataFetcher("compositionsCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfCompositions(args);
+                        })
+                        .dataFetcher("consentGroupsCount", env -> {
+                            Map<String, Object> args = env.getArguments();
+                            return memgraphDataFetcher.getNumberOfConsentGroups(args);
+                        })
                         .dataFetcher("versionsCount", env -> {
                             Map<String, Object> args = env.getArguments();
                             return memgraphDataFetcher.getNumberOfVersions(args);
+                        })
+                        // numberOf... queries (replacing YAML-based queries) - total counts, no arguments required
+                        .dataFetcher("numberOfStudies", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfStudies();
+                        })
+                        .dataFetcher("numberOfSubjects", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfParticipants();
+                        })
+                        .dataFetcher("numberOfSamples", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfSamples();
+                        })
+                        .dataFetcher("numberOfFiles", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfFiles();
+                        })
+                        .dataFetcher("numberOfDiseaseSites", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfDiseaseSites();
+                        })
+                        .dataFetcher("numberOfImages", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfImages();
+                        })
+                        .dataFetcher("numberOfProteomics", env -> {
+                            return memgraphDataFetcher.getTotalNumberOfProteomics();
                         })
                 )
                 .build();

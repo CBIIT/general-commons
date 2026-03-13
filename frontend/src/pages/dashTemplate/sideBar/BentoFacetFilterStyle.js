@@ -150,6 +150,9 @@ export default () => ({
   activeFacetProteomic: {
     color: '#942A90',
   },
+  activeFacetCancer_Nanotechnology: {
+    color: '#A35719',
+  },
   searchContainer: {
     margin: '0 2px',
     marginRight: 6,

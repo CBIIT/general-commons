@@ -8,6 +8,7 @@ const IMAGING = 'Imaging';
 const DIAGNOSIS = 'Diagnosis';
 const FILES = 'Files';
 const PROTEOMIC = 'Proteomic';
+const CANCER_NANOTECHNOLOGY = 'Cancer Nanotechnology';
 
 // --------------- Facet resetIcon link configuration --------------
 // Ideal size for resetIcon is 16x16 px
@@ -47,6 +48,9 @@ export const facetSectionVariables = {
   Proteomic: {
     isExpanded: true,
   },
+  "Cancer Nanotechnology": {
+    isExpanded: true,
+  }
 };
 
 export const facetsConfig = [
@@ -61,6 +65,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   // STUDY
   {
@@ -76,6 +81,7 @@ export const facetsConfig = [
     search: true,
     disableSearchModal: true,
     searchPlaceholder: "e.g. Study Name",
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: STUDY,
@@ -90,6 +96,7 @@ export const facetsConfig = [
     search: true,
     disableSearchModal: true,
     searchPlaceholder: "e.g. phs000000",
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: STUDY,
@@ -101,6 +108,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: STUDY,
@@ -112,6 +120,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: STUDY,
@@ -128,6 +137,7 @@ export const facetsConfig = [
     minLowerBound: 0,
     maxUpperBound: 25445,
     quantifier: "Study Participants",
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   //SAMPLES
   {
@@ -140,6 +150,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: SAMPLES,
@@ -151,6 +162,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: SAMPLES,
@@ -167,6 +179,19 @@ export const facetsConfig = [
     minLowerBound: 0,
     maxUpperBound: 40872,
     quantifier: "Study Samples",
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
+  },
+  {
+    section: SAMPLES,
+    label: "Organization Name",
+    apiPath: "filterSubjectCountByOrganizationName",
+    apiForFiltering: "filterSubjectCountByOrganizationName",
+    datafield: "organization_name",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: false,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   // GENOMIC
   {
@@ -179,6 +204,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: GENOMIC,
@@ -190,6 +216,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: GENOMIC,
@@ -201,6 +228,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: GENOMIC,
@@ -212,6 +240,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: GENOMIC,
@@ -223,6 +252,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: GENOMIC,
@@ -234,6 +264,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: GENOMIC,
@@ -256,6 +287,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   // IMAGING
   {
@@ -268,6 +300,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: IMAGING,
@@ -279,6 +312,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: IMAGING,
@@ -290,6 +324,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: IMAGING,
@@ -301,6 +336,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   // DIAGNOSIS
   {
@@ -315,6 +351,7 @@ export const facetsConfig = [
     show: true,
     search: true,
     disableSearchModal: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
     //searchPlaceholder: "Customize Placeholder Text",
   },
   // FILES
@@ -331,6 +368,7 @@ export const facetsConfig = [
     search: true,
     disableSearchModal: true,
     searchPlaceholder: "e.g. BAM",
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: FILES,
@@ -342,6 +380,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   // PROTEOMIC
   {
@@ -354,6 +393,7 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   {
     section: PROTEOMIC,
@@ -365,18 +405,108 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
-  // {
-  //   section: PROTEOMIC,
-  //   label: "Proteomic Design Description",
-  //   apiPath: "filterSubjectCountByProteomicDesignDescriptions",
-  //   apiForFiltering: "filterSubjectCountByProteomicDesignDescriptions",
-  //   datafield: "proteomic_design_descriptions",
-  //   field: "group",
-  //   type: InputTypes.CHECKBOX,
-  //   sort_type: sortType.ALPHABET,
-  //   show: true,
-  // },
+  // Cancer Nanotechnology
+  {
+    section: CANCER_NANOTECHNOLOGY,
+    label: "Protocol Name",
+    apiPath: "filterSubjectCountByProtocolName",
+    apiForFiltering: "filterSubjectCountByProtocolName",
+    datafield: "protocol_names",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
+  {
+    section: CANCER_NANOTECHNOLOGY,
+    label: "Protocol Type",
+    apiPath: "filterSubjectCountByProtocolType",
+    apiForFiltering: "filterSubjectCountByProtocolType",
+    datafield: "protocol_types",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
+  {
+    section: CANCER_NANOTECHNOLOGY,
+    label: "DOI",
+    apiPath: "filterSubjectCountByDoi",
+    apiForFiltering: "filterSubjectCountByDoi",
+    datafield: "dois",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
+  {
+    section: CANCER_NANOTECHNOLOGY,
+    label: "Publication Title",
+    apiPath: "filterSubjectCountByPublicationTitle",
+    apiForFiltering: "filterSubjectCountByPublicationTitle",
+    datafield: "publication_titles",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
+  {
+    section: CANCER_NANOTECHNOLOGY,
+    label: "Publication Status",
+    apiPath: "filterSubjectCountByPublicationStatus",
+    apiForFiltering: "filterSubjectCountByPublicationStatus",
+    datafield: "publication_statuses",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: false,
+  },
+  {
+    section: CANCER_NANOTECHNOLOGY,
+    label: "Nanomaterial Entity",
+    apiPath: "filterSubjectCountByNanomaterialEntity",
+    apiForFiltering: "filterSubjectCountByNanomaterialEntity",
+    datafield: "nanomaterial_entities",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
+  {
+    section: CANCER_NANOTECHNOLOGY,
+    label: "Functionalizing Entity",
+    apiPath: "filterSubjectCountByFunctionalizingEntity",
+    apiForFiltering: "filterSubjectCountByFunctionalizingEntity",
+    datafield: "functionalizing_entities",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
+  {
+    section: CANCER_NANOTECHNOLOGY,
+    label: "Characterization Type",
+    apiPath: "filterSubjectCountByCharacterizationType",
+    apiForFiltering: "filterSubjectCountByCharacterizationType",
+    datafield: "characterization_types",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
+  {
+    section: CANCER_NANOTECHNOLOGY,
+    label: "Characterization Name",
+    apiPath: "filterSubjectCountByCharacterizationName",
+    apiForFiltering: "filterSubjectCountByCharacterizationName",
+    datafield: "characterization_names",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+  },
 ];
 
 // --------------- Dashboard Widgets configuration --------------

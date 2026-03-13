@@ -134,6 +134,30 @@ public class MemgraphDataFetcher implements AutoCloseable{
     public List<Map<String, Object>> pdxDataFetcher(Map<String, Object> params){
         return listQuery(PDXQuery.PDX_QUERY, params);
     }
+
+    public List<Map<String, Object>> investigatorDataFetcher(Map<String, Object> params){
+        return listQuery(InvestigatorQuery.INVESTIGATORS_QUERY, params);
+    }
+
+    public List<Map<String, Object>> characterizationDataFetcher(Map<String, Object> params){
+        return listQuery(CharacterizationQuery.CHARACTERIZATIONS_QUERY, params);
+    }
+
+    public List<Map<String, Object>> publicationDataFetcher(Map<String, Object> params){
+        return listQuery(PublicationQuery.PUBLICATIONS_QUERY, params);
+    }
+
+    public List<Map<String, Object>> protocolDataFetcher(Map<String, Object> params){
+        return listQuery(ProtocolQuery.PROTOCOLS_QUERY, params);
+    }
+
+    public List<Map<String, Object>> compositionDataFetcher(Map<String, Object> params){
+        return listQuery(CompositionQuery.COMPOSITIONS_QUERY, params);
+    }
+
+    public List<Map<String, Object>> consentGroupDataFetcher(Map<String, Object> params){
+        return listQuery(ConsentGroupQuery.CONSENT_GROUPS_QUERY, params);
+    }
     
     // NumberOf query data fetchers
     public Long getNumberOfPrograms(Map<String, Object> params){
@@ -158,6 +182,10 @@ public class MemgraphDataFetcher implements AutoCloseable{
     
     public Long getNumberOfDiagnoses(Map<String, Object> params){
         return countQuery(DiagnosesQuery.DIAGNOSES_COUNT_QUERY, params);
+    }
+    
+    public Long getNumberOfDiseaseSites(Map<String, Object> params){
+        return countQuery(DiagnosesQuery.DIAGNOSES_DISEASE_SITES_COUNT_QUERY, params);
     }
     
     public Long getNumberOfTreatments(Map<String, Object> params){
@@ -203,11 +231,63 @@ public class MemgraphDataFetcher implements AutoCloseable{
     public Long getNumberOfNonDICOMradiologyAllModalities(Map<String, Object> params){
         return countQuery(NonDICOMradiologyAllModalitiesQuery.NON_DICOM_RADIOLOGY_ALL_MODALITIES_COUNT_QUERY, params);
     }
+
+    public Long getNumberOfInvestigators(Map<String, Object> params){
+        return countQuery(InvestigatorQuery.INVESTIGATORS_COUNT_QUERY, params);
+    }
+
+    public Long getNumberOfCharacterizations(Map<String, Object> params){
+        return countQuery(CharacterizationQuery.CHARACTERIZATIONS_COUNT_QUERY, params);
+    }
+
+    public Long getNumberOfPublications(Map<String, Object> params){
+        return countQuery(PublicationQuery.PUBLICATIONS_COUNT_QUERY, params);
+    }
+
+    public Long getNumberOfProtocols(Map<String, Object> params){
+        return countQuery(ProtocolQuery.PROTOCOLS_COUNT_QUERY, params);
+    }
+
+    public Long getNumberOfCompositions(Map<String, Object> params){
+        return countQuery(CompositionQuery.COMPOSITIONS_COUNT_QUERY, params);
+    }
+
+    public Long getNumberOfConsentGroups(Map<String, Object> params){
+        return countQuery(ConsentGroupQuery.CONSENT_GROUPS_COUNT_QUERY, params);
+    }
     
     public Long getNumberOfVersions(Map<String, Object> params){
         return countQuery(VersionQuery.VERSION_COUNT_QUERY, params);
     }
     
+    // Total count queries (no arguments required)
+    public Long getTotalNumberOfStudies(){
+        return countQuery(StudiesQuery.STUDIES_TOTAL_COUNT_QUERY, new HashMap<>());
+    }
+    
+    public Long getTotalNumberOfParticipants(){
+        return countQuery(ParticipantsQuery.PARTICIPANTS_TOTAL_COUNT_QUERY, new HashMap<>());
+    }
+    
+    public Long getTotalNumberOfSamples(){
+        return countQuery(SamplesQuery.SAMPLES_TOTAL_COUNT_QUERY, new HashMap<>());
+    }
+    
+    public Long getTotalNumberOfFiles(){
+        return countQuery(FilesQuery.FILES_TOTAL_COUNT_QUERY, new HashMap<>());
+    }
+    
+    public Long getTotalNumberOfDiseaseSites(){
+        return countQuery(DiagnosesQuery.DIAGNOSES_DISEASE_SITES_COUNT_QUERY, new HashMap<>());
+    }
+    
+    public Long getTotalNumberOfImages(){
+        return countQuery(ImagesQuery.IMAGES_TOTAL_COUNT_QUERY, new HashMap<>());
+    }
+    
+    public Long getTotalNumberOfProteomics(){
+        return countQuery(ProteomicsQuery.PROTEOMICS_TOTAL_COUNT_QUERY, new HashMap<>());
+    }
 
     private Map<String, Object> mapQuery(String query, Map<String, Object> params){
         try (Session session = driver.session()) {

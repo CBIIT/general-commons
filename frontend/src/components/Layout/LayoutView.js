@@ -71,14 +71,14 @@ const Layout = ({ classes, isSidebarOpened }) => {
       <HashRouter>
         <>
           <Prompt
-            when={maintenanceMode.enabled && hash === "#/"}
+            when={!!(maintenanceMode.enabled && hash === "#/")}
             message={() => false}
           />
           <Notifactions />
           <AuthSessionTimeoutController />
           <TextBanner
-            heading="CRDC’s Cancer Data Service (CDS) is now the General Commons (GC): Hosting and sharing NCI data of multiple data types that are not a match for other Data Commons."
-            aria-label="GC announcement banner"
+            heading={<>Cancer Nanotechnology data (caNanoLab) has now been integrated into the CRDC's General Commons. Please refer to the '<a href={STATIC_CONTENT.about.CANCER_NANOTECHNOLOGY_USER_GUIDE_PDF} download>caNanoLab User Guide</a>' to learn more about the integration and how to search and access caNanoLab data on the GC portal.</>}
+            aria-label="Announcement banner"
           />
           <Header />
           {

@@ -28,4 +28,9 @@ public class FilesQuery {
         MATCH (f:file)-[:of_study]->(s:study {phs_accession: $phs_accession})
         RETURN COUNT(DISTINCT f) AS count
     """;
+
+    public static final String FILES_TOTAL_COUNT_QUERY = """
+        MATCH (f:file)
+        RETURN COUNT(DISTINCT f) AS count
+    """;
 }

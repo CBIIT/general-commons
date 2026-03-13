@@ -7,25 +7,25 @@
     "@apollo/client": "^3.6.9",
     "@apollo/react-components": "^4.0.0",
     "@babel/core": "7.2.2",
-    "@bento-core/about": "^1.0.1-CDS.15",
-    "@bento-core/all": "^1.0.1-CDS.39",
-    "@bento-core/cart": "^1.0.1-CDS.1",
-    "@bento-core/data-table": "^1.0.1-CDS.0",
-    "@bento-core/facet-filter": "^1.0.1-CDS.9",
-    "@bento-core/footer": "^1.0.1-CDS.4",
-    "@bento-core/global-search": "^1.0.1-CDS.4",
-    "@bento-core/header": "^1.0.1-CDS.4",
-    "@bento-core/local-find": "^1.0.1-CDS.7",
-    "@bento-core/nav-bar": "1.0.1-CDS.3",
-    "@bento-core/paginated-table": "^1.0.1-CDS.17",
-    "@bento-core/profile": "^1.0.1-CDS.17",
-    "@bento-core/query-bar": "^1.0.1-CDS.10",
-    "@bento-core/session-timeout": "^1.0.1-CDS.0",
-    "@bento-core/stats-bar": "^1.0.1-CDS.2",
-    "@bento-core/tab": "^1.0.1-CDS.0",
-    "@bento-core/table": "^1.0.1-CDS.9",
-    "@bento-core/util": "^1.0.1-CDS.0",
-    "@bento-core/widgets": "^1.0.1-CDS.0",
+    "@bento-core/about": "1.0.1-CDS.18",
+    "@bento-core/all": "1.0.1-CDS.43",
+    "@bento-core/cart": "1.0.1-CDS.2",
+    "@bento-core/data-table": "1.0.1-CDS.0",
+    "@bento-core/facet-filter": "1.0.1-CDS.12",
+    "@bento-core/footer": "1.0.1-CDS.4",
+    "@bento-core/global-search": "1.0.1-CDS.5",
+    "@bento-core/header": "1.0.1-CDS.4",
+    "@bento-core/local-find": "1.0.1-CDS.8",
+    "@bento-core/nav-bar": "1.0.1-CDS.4",
+    "@bento-core/paginated-table": "1.0.1-CDS.18",
+    "@bento-core/profile": "1.0.1-CDS.18",
+    "@bento-core/query-bar": "1.0.1-CDS.13",
+    "@bento-core/session-timeout": "1.0.1-CDS.0",
+    "@bento-core/stats-bar": "1.0.1-CDS.3",
+    "@bento-core/tab": "1.0.1-CDS.0",
+    "@bento-core/table": "1.0.1-CDS.10",
+    "@bento-core/util": "1.0.1-CDS.0",
+    "@bento-core/widgets": "1.0.1-CDS.1",
     "@jbrowse/react-linear-genome-view": "^2.1.5",
     "@librpc/web": "^1.1.1",
     "@material-ui/core": "^4.12.4",
@@ -122,8 +122,10 @@
     "start": "PORT=3010 node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
+    "test:ci": "TZ=UTC node scripts/test.js --ci --passWithNoTests --coverage --maxWorkers=2 --logHeapUsage",
     "lint": "eslint src",
-    "lint-fix": "eslint src --fix"
+    "lint:ci": "eslint src --ignore-path .gitignore --max-warnings=0",
+    "lint:fix": "eslint src --fix"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -143,6 +145,7 @@
     "setupFiles": [
       "react-app-polyfill/jsdom"
     ],
+    "setupTestFrameworkScriptFile": "<rootDir>/src/setupTests.js",
     "testMatch": [
       "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
       "<rootDir>/src/**/?(*.)(spec|test).{js,jsx,ts,tsx}"
@@ -174,10 +177,7 @@
       "jsx",
       "node"
     ],
-    "watchPlugins": [
-      "/Users/doddapanenis2/Desktop/Develop/icdc-frontend/node_modules/jest-watch-typeahead/filename.js",
-      "/Users/doddapanenis2/Desktop/Develop/icdc-frontend/node_modules/jest-watch-typeahead/testname.js"
-    ]
+    "watchPlugins": []
   },
   "babel": {
     "presets": [
@@ -185,12 +185,15 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^12.1.5",
     "eslint": "^6.2.2",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jsx-a11y": "^6.3.1",
     "eslint-plugin-react": "^7.20.5",
-    "eslint-plugin-react-hooks": "^1.7.0"
+    "eslint-plugin-react-hooks": "^1.7.0",
+    "jest-axe": "^10.0.0"
   },
   "bentoFramework": {
     "referenceImplementation": "4.0.0.212"

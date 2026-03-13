@@ -4,6 +4,7 @@ export const STATIC_CONTENT = {
   about: {
     USER_GUIDE_PDF: `${env.REACT_APP_STATIC_CONTENT_URL}about/GeneralCommonsUserGuide.pdf`,
     QUERY_GC_DATABASE_PDF: `${env.REACT_APP_STATIC_CONTENT_URL}about/QueryGCDatabase.pdf`,
+    CANCER_NANOTECHNOLOGY_USER_GUIDE_PDF: `${env.REACT_APP_STATIC_CONTENT_URL}about/CancerNanotechnologyUserGuide.pdf`,
     CDS_CONTENT_IMAGE: `${env.REACT_APP_STATIC_CONTENT_URL}about/cds.png`,
     CRDC_CONTENT_IMAGE: `${env.REACT_APP_STATIC_CONTENT_URL}about/crdc.png`,
     LEFT_BG_IMAGE: `${env.REACT_APP_STATIC_CONTENT_URL}about/leftBg.jpg`,
@@ -11,7 +12,6 @@ export const STATIC_CONTENT = {
     PURPOSE_CONTENT_IMAGE: `${env.REACT_APP_STATIC_CONTENT_URL}about/purpose.png`,
     RESOURCES_CONTENT_IMAGE: `${env.REACT_APP_STATIC_CONTENT_URL}about/resources.png`,
     SUBMIT_CONTENT_IMAGE: `${env.REACT_APP_STATIC_CONTENT_URL}about/submit.png`,
-    SUPPORT_CONTENT_IMAGE: `${env.REACT_APP_STATIC_CONTENT_URL}about/support.jpeg`,
   },
   icons: {
     svgs: {

@@ -54,9 +54,9 @@ const styles = (theme) => ({
     background: theme.palette.widgetBackground.main,
   },
   floatRight: {
-    float: 'right',
     position: 'absolute',
     right: '80px',
+    top: '4px',
     zIndex: '1',
   },
   floatLeft: {

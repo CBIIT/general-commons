@@ -29,7 +29,7 @@ const LandingStatsView = ({ classes, stats, statsData }) => (
                   {stat.statTitle}
                 </div>
                 <div className={classes.statCount} id={`count_${index + 1}`}>
-                  {statsData[stat.statAPI]}
+                  {Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(statsData[stat.statAPI] || 0)}
                 </div>
               </div>
             </div>

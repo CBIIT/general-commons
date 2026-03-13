@@ -3,6 +3,7 @@ package gov.nih.nci.bento_ri.model;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import gov.nih.nci.bento.model.AbstractPrivateESDataFetcher;
 import gov.nih.nci.bento.model.search.mapper.TypeMapperImpl;
 import gov.nih.nci.bento.model.search.mapper.TypeMapperService;
@@ -26,20 +27,24 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     final String ORDER_BY = "order_by";
     final String SORT_DIRECTION = "sort_direction";
 
-    final String STUDIES_END_POINT = "/studies/_search";
-    final String STUDIES_COUNT_END_POINT = "/studies/_count";
+    final String STUDIES_END_POINT = "/study/_search";
+    final String STUDIES_COUNT_END_POINT = "/study/_count";
 
-    final String SUBJECTS_END_POINT = "/subjects/_search";
-    final String SUBJECTS_COUNT_END_POINT = "/subjects/_count";
+    final String SUBJECTS_END_POINT = "/dashboard_participant/_search";
+    final String SUBJECTS_COUNT_END_POINT = "/dashboard_participant/_count";
     final String SUBJECT_IDS_END_POINT = "/subject_ids/_search";
-    final String SAMPLES_END_POINT = "/samples/_search";
-    final String SAMPLES_COUNT_END_POINT = "/samples/_count";
-    final String FILES_END_POINT = "/files/_search";
-    final String STUDY_DATA_TYPES_END_POINT = "/study_data_types/_search";
-    final String FILES_EXPERIMENTAL_STRATEGY_END_POINT = "/file_experimental_strategies/_search";
-    final String FILES_COUNT_END_POINT = "/files/_count";
-    final String PROGRAMS_END_POINT = "/programs/_search";
-    final String PROGRAMS_COUNT_END_POINT = "/programs/_count";
+    final String SAMPLES_END_POINT = "/dashboard_sample/_search";
+    final String SAMPLES_COUNT_END_POINT = "/dashboard_sample/_count";
+    final String FILES_END_POINT = "/dashboard_file/_search";
+    final String FILES_COUNT_END_POINT = "/dashboard_file/_count";
+    final String STUDY_DATA_TYPES_END_POINT = "/dashboard_study_data_type/_search";
+    final String FILES_EXPERIMENTAL_STRATEGY_END_POINT = "/dashboard_file_experimental_strategy/_search";
+
+    final String PROTOCOLS_END_POINT = "/dashboard_protocol/_search";
+    final String PROTOCOLS_COUNT_END_POINT = "/dashboard_protocol/_count";
+
+    final String PROGRAMS_END_POINT = "/program/_search";
+    final String PROGRAMS_COUNT_END_POINT = "/program/_count";
     final String NODES_END_POINT = "/model_nodes/_search";
     final String NODES_COUNT_END_POINT = "/model_nodes/_count";
     final String PROPERTIES_END_POINT = "/model_properties/_search";
@@ -47,8 +52,18 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     final String VALUES_END_POINT = "/model_values/_search";
     final String VALUES_COUNT_END_POINT = "/model_values/_count";
     final String GS_ABOUT_END_POINT = "/about_page/_search";
-    final String GS_MODEL_END_POINT = "/data_model/_search";
-    final String VERSION_END_POINT = "/version/_search";
+
+    // GlobalSearch endpoints - use GS-prefixed indices
+    final String GS_STUDY_END_POINT = "/gs_study/_search";
+    final String GS_STUDY_COUNT_END_POINT = "/gs_study/_count";
+    final String GS_PARTICIPANT_END_POINT = "/gs_participant/_search";
+    final String GS_PARTICIPANT_COUNT_END_POINT = "/gs_participant/_count";
+    final String GS_SAMPLE_END_POINT = "/gs_sample/_search";
+    final String GS_SAMPLE_COUNT_END_POINT = "/gs_sample/_count";
+    final String GS_FILE_END_POINT = "/gs_file/_search";
+    final String GS_FILE_COUNT_END_POINT = "/gs_file/_count";
+    final String GS_PROGRAM_END_POINT = "/gs_program/_search";
+    final String GS_PROGRAM_COUNT_END_POINT = "/gs_program/_count";
 
     final int GS_LIMIT = 10;
     final String GS_END_POINT = "endpoint";
@@ -253,6 +268,76 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 FILTER_COUNT_QUERY, "filterSubjectCountByIsSupplementaryFile",
                 AGG_ENDPOINT, FILES_END_POINT
         ));
+        // caNanoLab Protocol filters
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "protocol_names",
+                WIDGET_QUERY, "subjectCountByProtocolName",
+                FILTER_COUNT_QUERY, "filterSubjectCountByProtocolName",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "protocol_types",
+                WIDGET_QUERY, "subjectCountByProtocolType",
+                FILTER_COUNT_QUERY, "filterSubjectCountByProtocolType",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "dois",
+                WIDGET_QUERY, "subjectCountByDoi",
+                FILTER_COUNT_QUERY, "filterSubjectCountByDoi",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "doi_urls",
+                WIDGET_QUERY, "subjectCountByDoiUrl",
+                FILTER_COUNT_QUERY, "filterSubjectCountByDoiUrl",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        // caNanoLab Publication filters
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "publication_titles",
+                WIDGET_QUERY, "subjectCountByPublicationTitle",
+                FILTER_COUNT_QUERY, "filterSubjectCountByPublicationTitle",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "publication_statuses",
+                WIDGET_QUERY, "subjectCountByPublicationStatus",
+                FILTER_COUNT_QUERY, "filterSubjectCountByPublicationStatus",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "pub_ids",
+                WIDGET_QUERY, "subjectCountByPubId",
+                FILTER_COUNT_QUERY, "filterSubjectCountByPubId",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        // caNanoLab Composition filters
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "nanomaterial_entities",
+                WIDGET_QUERY, "subjectCountByNanomaterialEntity",
+                FILTER_COUNT_QUERY, "filterSubjectCountByNanomaterialEntity",
+                AGG_ENDPOINT, SAMPLES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "functionalizing_entities",
+                WIDGET_QUERY, "subjectCountByFunctionalizingEntity",
+                FILTER_COUNT_QUERY, "filterSubjectCountByFunctionalizingEntity",
+                AGG_ENDPOINT, SAMPLES_END_POINT
+        ));
+        // caNanoLab Characterization filters
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "characterization_types",
+                WIDGET_QUERY, "subjectCountByCharacterizationType",
+                FILTER_COUNT_QUERY, "filterSubjectCountByCharacterizationType",
+                AGG_ENDPOINT, SAMPLES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "characterization_names",
+                WIDGET_QUERY, "subjectCountByCharacterizationName",
+                FILTER_COUNT_QUERY, "filterSubjectCountByCharacterizationName",
+                AGG_ENDPOINT, SAMPLES_END_POINT
+        ));
         // Donut Count Fields
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "experimental_strategies",
@@ -308,6 +393,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         JsonObject subjectCountResult = esService.send(subjectCountRequest);
         int numberOfSubjects = subjectCountResult.get("count").getAsInt();
 
+        Request protocolCountRequest = new Request("GET", PROTOCOLS_COUNT_END_POINT);
+        protocolCountRequest.setJsonEntity(gson.toJson(query));
+        JsonObject protocolCountResult = esService.send(protocolCountRequest);
+        int numberOfProtocols = protocolCountResult.get("count").getAsInt();
 
         // Get aggregations
         Map<String, Object> aggQuery = esService.addAggregations(query, TERM_AGG_NAMES);
@@ -322,6 +411,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         data.put("numberOfSamples", numberOfSamples);
         data.put("numberOfFiles", numberOfFiles);
         data.put("numberOfDiseaseSites", aggs.get("site").size());
+        data.put("numberOfProtocols", numberOfProtocols);
 
         // widgets data and facet filter counts
         for (var agg: TERM_AGGS) {
@@ -366,6 +456,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     List<Map<String, Object>> subjectOverview(Map<String, Object> params) throws IOException {
         final String[][] PROPERTIES = new String[][]{
                 new String[]{"subject_id", "subject_ids"},
+                new String[]{"study_participant_id", "study_participant_id"},
                 new String[]{"study_acronym", "studies"},
                 new String[]{"phs_accession", "phs_accession"},
                 new String[]{"sex", "sex"},
@@ -398,10 +489,34 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
 
         return overview(SUBJECTS_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
     }
+    
+    List<Map<String, Object>> protocolOverview(Map<String, Object> params) throws IOException {
+        final String[][] PROPERTIES = new String[][]{
+                new String[]{"protocol_pk_id", "protocol_pk_id"},
+                new String[]{"protocol_name", "protocol_name"},
+                new String[]{"protocol_type", "protocol_type"},
+                new String[]{"doi", "doi"},
+                new String[]{"doi_url", "doi_url"},
+                new String[]{"file_names", "file_names"}
+        };
+
+        String defaultSort = "protocol_pk_id"; // Default sort order
+
+        Map<String, String> sortFieldMapping = Map.ofEntries(
+                Map.entry("protocol_pk_id", "protocol_pk_id"),
+                Map.entry("protocol_name", "protocol_name"),
+                Map.entry("protocol_type", "protocol_type"),
+                Map.entry("doi", "doi"),
+                Map.entry("doi_url", "doi_url"),
+                Map.entry("file_names", "file_names_sort")
+        );
+
+        return overview(PROTOCOLS_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
+    }
 
     List<Map<String, Object>> sampleOverview(Map<String, Object> params) throws IOException {
         final String[][] PROPERTIES = new String[][]{
-                new String[]{"study_acronym", "studies"},
+                new String[]{"study_acronym", "study_acronym"},
                 new String[]{"phs_accession", "phs_accession"},
                 new String[]{"subject_id", "subject_ids"},
                 new String[]{"sample_id", "sample_id"},
@@ -410,13 +525,16 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"files", "files"},
                 new String[]{"sample_type", "analyte_type"},
                 new String[]{"sample_tumor_status", "is_tumor"},
-                new String[]{"organ_or_tissue", "organ_or_tissue"}
+                new String[]{"organ_or_tissue", "organ_or_tissue"},
+                new String[]{"study_name", "study_name"},
+                new String[]{"sample_name", "sample_name"},
+                new String[]{"organization_name", "organization_name"}
         };
 
         String defaultSort = "sample_id"; // Default sort order
 
         Map<String, String> sortFieldMapping = Map.ofEntries(
-                Map.entry("study_acronym", "studies"),
+                Map.entry("study_acronym", "study_acronym_sort"),
                 Map.entry("phs_accession", "phs_accession"),
                 Map.entry("subject_id", "subject_ids"),
                 Map.entry("sample_id", "sample_id"),
@@ -427,7 +545,10 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("image_modality", "image_modality_sort"),
                 Map.entry("organ_or_tissue", "organ_or_tissue_sort"),
                 Map.entry("imaging_assay_type", "imaging_assay_type_sort"),
-                Map.entry("tissue_fixative", "tissue_fixative_sort")
+                Map.entry("tissue_fixative", "tissue_fixative_sort"),
+                Map.entry("study_name", "study_name_sort"),
+                Map.entry("sample_name", "sample_name"),
+                Map.entry("organization_name", "organization_name_sort")
         );
 
         return overview(SAMPLES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
@@ -460,7 +581,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             new String[]{"organ_or_tissue", "organ_or_tissue"},
             new String[]{"release_datetime", "release_datetime"},
             new String[]{"is_supplementary_file", "is_supplementary_file"},
-            new String[]{"supplementary_file_names", "supplementary_file_names"}
+            new String[]{"supplementary_file_names", "supplementary_file_names"},
+            new String[]{"study_name", "study_name"}
     };
 
         String defaultSort = "file_name"; // Default sort order
@@ -490,7 +612,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 Map.entry("imaging_assay_type", "imaging_assay_type_sort"),
                 Map.entry("tissue_fixative", "tissue_fixative_sort"),
                 Map.entry("is_supplementary_file", "is_supplementary_file"),
-                Map.entry("supplementary_file_names", "supplementary_file_names_sort")
+                Map.entry("supplementary_file_names", "supplementary_file_names_sort"),
+                Map.entry("study_name", "study_name_sort")
         );
 
         List<Map<String, Object>> fileOverview = overview(FILES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
@@ -636,15 +759,16 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         int size = (int) params.get("first");
         int offset = (int) params.get("offset");
         List<Map<String, Object>> searchCategories = new ArrayList<>();
+        // gs_study index - fields: phs_accession_gs, study_name_gs, study_code_gs, study_data_types_gs
         searchCategories.add(Map.of(
-                GS_END_POINT, STUDIES_END_POINT,
-                GS_COUNT_ENDPOINT, STUDIES_COUNT_END_POINT,
+                GS_END_POINT, GS_STUDY_END_POINT,
+                GS_COUNT_ENDPOINT, GS_STUDY_COUNT_END_POINT,
                 GS_COUNT_RESULT_FIELD, "study_count",
                 GS_RESULT_FIELD, "studies",
                 GS_SEARCH_FIELD, List.of("phs_accession_gs", "study_name_gs", "study_code_gs", "study_data_types_gs"),
                 GS_SORT_FIELD, "phs_accession",
                 GS_COLLECT_FIELDS, new String[][]{
-                        new String[]{"phs_accession", "phs_accession_gs"},
+                        new String[]{"phs_accession", "phs_accession"},
                         new String[]{"study_code", "study_code_gs"},
                         new String[]{"study_name", "study_name_gs"},
                         new String[]{"study_data_types", "study_data_types_gs"}
@@ -652,80 +776,86 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 GS_CATEGORY_TYPE, "study"
 
         ));
+        // gs_participant index - fields: study_gs, subject_id_gs, site_gs, sex_gs, subject_ids_filter
         searchCategories.add(Map.of(
-                GS_END_POINT, SUBJECTS_END_POINT,
-                GS_COUNT_ENDPOINT, SUBJECTS_COUNT_END_POINT,
+                GS_END_POINT, GS_PARTICIPANT_END_POINT,
+                GS_COUNT_ENDPOINT, GS_PARTICIPANT_COUNT_END_POINT,
                 GS_COUNT_RESULT_FIELD, "subject_count",
                 GS_RESULT_FIELD, "subjects",
                 GS_SEARCH_FIELD, List.of("study_gs", "subject_id_gs", "site_gs", "sex_gs"),
-                GS_SORT_FIELD, "subject_ids",
+                GS_SORT_FIELD, "study_participant_id",
                 GS_COLLECT_FIELDS, new String[][]{
                         new String[]{"study", "study_gs"},
                         new String[]{"subject_id", "subject_id_gs"},
                         new String[]{"site", "site_gs"},
                         new String[]{"sex", "sex_gs"},
-                        new String[]{"subject_ids_filter", "subject_ids_filter"},
+                        new String[]{"study_participant_id", "study_participant_id"},
+                        new String[]{"subject_ids_filter", "subject_ids_filter"}
                 },
                 GS_CATEGORY_TYPE, "subject"
         ));
+        // gs_sample index - fields: sample_id_gs, is_tumor_gs, analyte_type_gs, subject_ids_filter
         searchCategories.add(Map.of(
-                GS_END_POINT, SAMPLES_END_POINT,
-                GS_COUNT_ENDPOINT, SAMPLES_COUNT_END_POINT,
+                GS_END_POINT, GS_SAMPLE_END_POINT,
+                GS_COUNT_ENDPOINT, GS_SAMPLE_COUNT_END_POINT,
                 GS_COUNT_RESULT_FIELD, "sample_count",
                 GS_RESULT_FIELD, "samples",
                 GS_SEARCH_FIELD, List.of("sample_id_gs", "is_tumor_gs", "analyte_type_gs"),
                 GS_SORT_FIELD, "sample_id",
                 GS_COLLECT_FIELDS, new String[][]{
-                        new String[]{"sample_id", "sample_id_gs"},
+                        new String[]{"sample_id", "sample_id"},
                         new String[]{"is_tumor", "is_tumor_gs"},
                         new String[]{"analyte_type", "analyte_type_gs"},
                         new String[]{"subject_ids_filter", "subject_ids_filter"}
                 },
                 GS_CATEGORY_TYPE, "sample"
         ));
+        // gs_file index - all GS_File fields from GraphQL schema
         searchCategories.add(Map.of(
-                GS_END_POINT, FILES_END_POINT,
-                GS_COUNT_ENDPOINT, FILES_COUNT_END_POINT,
+                GS_END_POINT, GS_FILE_END_POINT,
+                GS_COUNT_ENDPOINT, GS_FILE_COUNT_END_POINT,
                 GS_COUNT_RESULT_FIELD, "file_count",
                 GS_RESULT_FIELD, "files",
-                GS_SEARCH_FIELD, List.of("subject_id_gs","sample_id_gs","file_id_gs","file_name_gs",
-                        "file_type_gs","accesses_gs","acl_gs","experimental_strategies_gs","instrument_models_gs",
-                        "library_layouts_gs","library_selections_gs","library_source_materials_gs","library_source_molecules_gs","library_strategies_gs",
-                        "platforms_gs","reference_genome_assemblies_gs","sites_gs", "is_supplementary_file_gs"),
+                GS_SEARCH_FIELD, List.of("subject_id_gs", "sample_id_gs", "file_id_gs", "file_name_gs",
+                        "file_type_gs", "accesses_gs", "acl_gs", "experimental_strategies_gs", "instrument_models_gs",
+                        "library_layouts_gs", "library_selections_gs", "library_source_materials_gs",
+                        "library_source_molecules_gs", "library_strategies_gs", "platforms_gs",
+                        "reference_genome_assemblies_gs", "sites_gs", "is_supplementary_file_gs"),
                 GS_SORT_FIELD, "file_id",
                 GS_COLLECT_FIELDS, new String[][]{
                         new String[]{"subject_id", "subject_id_gs"},
                         new String[]{"sample_id", "sample_id_gs"},
-                        new String[]{"file_id", "file_id_gs"},
+                        new String[]{"file_id", "file_id"},
                         new String[]{"file_name", "file_name_gs"},
                         new String[]{"file_type", "file_type_gs"},
                         new String[]{"accesses", "accesses_gs"},
-                        new String[]{"acl","acl_gs"},
-                        new String[]{"experimental_strategies","experimental_strategies_gs"},
-                        new String[]{"instrument_models","instrument_models_gs"},
-                        new String[]{"library_layouts","library_layouts_gs"},
-                        new String[]{"library_selections","library_selections_gs"},
-                        new String[]{"library_source_materials","library_source_materials_gs"},
+                        new String[]{"acl", "acl_gs"},
+                        new String[]{"experimental_strategies", "experimental_strategies_gs"},
+                        new String[]{"instrument_models", "instrument_models_gs"},
+                        new String[]{"library_layouts", "library_layouts_gs"},
+                        new String[]{"library_selections", "library_selections_gs"},
+                        new String[]{"library_source_materials", "library_source_materials_gs"},
                         new String[]{"library_source_molecules", "library_source_molecules_gs"},
-                        new String[]{"library_strategies","library_strategies_gs"},
-                        new String[]{"platforms","platforms_gs"},
-                        new String[]{"reference_genome_assemblies","reference_genome_assemblies_gs"},
-                        new String[]{"sites","sites_gs"},
+                        new String[]{"library_strategies", "library_strategies_gs"},
+                        new String[]{"platforms", "platforms_gs"},
+                        new String[]{"reference_genome_assemblies", "reference_genome_assemblies_gs"},
+                        new String[]{"sites", "sites_gs"},
                         new String[]{"subject_ids_filter", "subject_ids_filter"},
                         new String[]{"is_supplementary_file", "is_supplementary_file_gs"}
                 },
                 GS_CATEGORY_TYPE, "file"
         ));
+        // gs_program index - fields: program_name_gs, program_short_description_gs, program_full_description_gs, program_external_url_gs, program_sort_order_gs, type_gs
         searchCategories.add(Map.of(
-                GS_END_POINT, PROGRAMS_END_POINT,
-                GS_COUNT_ENDPOINT, PROGRAMS_COUNT_END_POINT,
+                GS_END_POINT, GS_PROGRAM_END_POINT,
+                GS_COUNT_ENDPOINT, GS_PROGRAM_COUNT_END_POINT,
                 GS_COUNT_RESULT_FIELD, "program_count",
                 GS_RESULT_FIELD, "programs",
                 GS_SEARCH_FIELD, List.of("program_name_gs", "program_short_description_gs", "program_full_description_gs",
                         "program_external_url_gs", "program_sort_order_gs"),
-                GS_SORT_FIELD, "program_sort_order",
+                GS_SORT_FIELD, "program_name",
                 GS_COLLECT_FIELDS, new String[][]{
-                        new String[]{"program_name", "program_name_gs"},
+                        new String[]{"program_name", "program_name"},
                         new String[]{"program_short_description", "program_short_description_gs"},
                         new String[]{"program_full_description", "program_full_description_gs"},
                         new String[]{"program_external_url", "program_external_url_gs"},
@@ -801,9 +931,11 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             String[][] highlights = (String[][]) category.get(GS_HIGHLIGHT_FIELDS);
             Map<String, Object> query = getGlobalSearchQuery(input, category);
 
-            // Get count
+            // Get count - use a clean query without highlights since _count endpoint doesn't support highlights
+            Map<String, Object> countQuery = new HashMap<>(query);
+            countQuery.remove("highlight"); // Remove any existing highlights
             Request countRequest = new Request("GET", (String) category.get(GS_COUNT_ENDPOINT));
-            countRequest.setJsonEntity(gson.toJson(query));
+            countRequest.setJsonEntity(gson.toJson(countQuery));
             JsonObject countResult = esService.send(countRequest);
             int oldCount = (int)result.getOrDefault(countResultFieldName, 0);
             result.put(countResultFieldName, countResult.get("count").getAsInt() + oldCount);
@@ -811,19 +943,37 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             // Get results
             Request request = new Request("GET", (String)category.get(GS_END_POINT));
             String sortFieldName = (String)category.get(GS_SORT_FIELD);
-            query.put("sort", Map.of(sortFieldName, "asc"));
+            
+            // Implement deterministic sorting with tie-breaker for consistent pagination
+            List<Map<String, Object>> sortClauses = new ArrayList<>();
+            sortClauses.add(Map.of(sortFieldName, "asc"));
+            sortClauses.add(Map.of("_id", "asc")); // Tie-breaker for deterministic ordering
+            query.put("sort", sortClauses);
+            
             query = addHighlight(query, category);
 
+            List<Map<String, Object>> objects;
             if (combinedCategories.contains(resultFieldName)) {
+                // For combined categories, use scroll API to get all data
                 query.put("size", ESService.MAX_ES_SIZE);
                 query.put("from", 0);
+                request.setJsonEntity(gson.toJson(query));
+                JsonObject jsonObject = esService.send(request);
+                objects = esService.collectPage(jsonObject, properties, highlights, ESService.MAX_ES_SIZE, 0);
             } else {
-                query.put("size", size);
-                query.put("from", offset);
+                // For regular categories, check if scroll is needed
+                if (size + offset > ESService.MAX_ES_SIZE) {
+                    // Use scroll API for large pagination requests
+                    objects = collectPageWithScroll(request, query, properties, highlights, size, offset);
+                } else {
+                    // Use regular pagination for smaller requests
+                    query.put("size", size);
+                    query.put("from", offset);
+                    request.setJsonEntity(gson.toJson(query));
+                    JsonObject jsonObject = esService.send(request);
+                    objects = esService.collectPage(jsonObject, properties, highlights, size, 0);
+                }
             }
-            request.setJsonEntity(gson.toJson(query));
-            JsonObject jsonObject = esService.send(request);
-            List<Map<String, Object>> objects = esService.collectPage(jsonObject, properties, highlights, (int)query.get("size"), 0);
 
             for (var object: objects) {
                 object.put(GS_CATEGORY_TYPE, category.get(GS_CATEGORY_TYPE));
@@ -850,6 +1000,148 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         }
 
         return result;
+    }
+
+    /**
+     * Collect a page of data using scroll API when regular pagination exceeds OpenSearch limits
+     * This method handles highlights unlike the ESService.collectPageWithScroll method
+     */
+    private List<Map<String, Object>> collectPageWithScroll(
+            Request request, Map<String, Object> query, String[][] properties, String[][] highlights, int pageSize, int offset) throws IOException {
+        
+        // Use maximum page size for scroll requests and paginate in memory
+        int maxScrollSize = Math.min(ESService.MAX_ES_SIZE, 5000); // Use 5000 as max for efficiency
+        
+        // Calculate how many results we need to fetch
+        int totalResultsNeeded = offset + pageSize;
+        
+        logger.info("Fetching {} results with scroll (offset: {}, pageSize: {}, maxScrollSize: {})", 
+                   totalResultsNeeded, offset, pageSize, maxScrollSize);
+        
+        // Initialize scroll context with maximum size
+        query.put("size", maxScrollSize);
+        request.setJsonEntity(gson.toJson(query));
+        request.addParameter("scroll", "30S");
+        JsonObject initialResponse = esService.send(request);
+        String scrollId = initialResponse.get("_scroll_id").getAsString();
+        
+        List<Map<String, Object>> allResults = new ArrayList<>();
+        int currentOffset = 0;
+        
+        try {
+            // Collect all results we need
+            while (currentOffset < totalResultsNeeded) {
+                JsonObject page;
+                if (currentOffset == 0) {
+                    // Use initial response
+                    page = initialResponse;
+                } else {
+                    // Continue scrolling
+                    Request scrollRequest = buildScrollRequest(ESService.SCROLL_ENDPOINT, scrollId);
+                    page = esService.send(scrollRequest);
+                    scrollId = page.get("_scroll_id").getAsString();
+                }
+                
+                JsonArray hits = page.getAsJsonObject("hits").getAsJsonArray("hits");
+                
+                if (hits.size() == 0) {
+                    logger.info("No more results available after {} total results", allResults.size());
+                    break;
+                }
+                
+                // Process all hits in this batch
+                for (int i = 0; i < hits.size(); i++) {
+                    Map<String, Object> result = new HashMap<>();
+                    
+                    // Extract properties
+                    for (String[] prop : properties) {
+                        String propName = prop[0];
+                        String dataField = prop[1];
+                        JsonElement element = hits.get(i).getAsJsonObject().get("_source").getAsJsonObject().get(dataField);
+                        result.put(propName, getValue(element));
+                    }
+                    
+                    // Extract highlights if available
+                    if (highlights != null) {
+                        JsonObject highlightObj = hits.get(i).getAsJsonObject().get("highlight").getAsJsonObject();
+                        for (String[] highlight : highlights) {
+                            String hlName = highlight[0];
+                            String hlField = highlight[1];
+                            JsonElement element = highlightObj.get(hlField);
+                            if (element != null) {
+                                result.put(hlName, ((List<String>)getValue(element)).get(0));
+                            }
+                        }
+                    }
+                    
+                    allResults.add(result);
+                    currentOffset++;
+                    
+                    // Stop if we have enough results
+                    if (currentOffset >= totalResultsNeeded) {
+                        break;
+                    }
+                }
+                
+                logger.info("Collected {} results so far", allResults.size());
+            }
+            
+        } finally {
+            // Clean up scroll context to prevent resource leaks
+            try {
+                Request clearScrollRequest = new Request("DELETE", ESService.SCROLL_ENDPOINT);
+                clearScrollRequest.setJsonEntity("{\"scroll_id\":\"" + scrollId + "\"}");
+                esService.send(clearScrollRequest);
+            } catch (Exception e) {
+                logger.warn("Failed to clean up scroll context for scroll_id: " + scrollId, e);
+            }
+        }
+        
+        // Paginate in memory
+        int startIndex = offset;
+        int endIndex = Math.min(startIndex + pageSize, allResults.size());
+        
+        logger.info("Returning results from index {} to {} (total collected: {})", startIndex, endIndex, allResults.size());
+        
+        if (startIndex >= allResults.size()) {
+            return new ArrayList<>();
+        }
+        
+        return allResults.subList(startIndex, endIndex);
+    }
+    
+    /**
+     * Helper method to extract value from JsonElement
+     */
+    private Object getValue(JsonElement element) {
+        if (element == null || element.isJsonNull()) {
+            return null;
+        } else if (element.isJsonArray()) {
+            List<String> list = new ArrayList<>();
+            for (JsonElement item : element.getAsJsonArray()) {
+                list.add(item.getAsString());
+            }
+            return list;
+        } else if (element.isJsonPrimitive()) {
+            JsonPrimitive primitive = element.getAsJsonPrimitive();
+            if (primitive.isString()) {
+                return primitive.getAsString();
+            } else if (primitive.isNumber()) {
+                return primitive.getAsNumber();
+            } else if (primitive.isBoolean()) {
+                return primitive.getAsBoolean();
+            }
+        }
+        return element.toString();
+    }
+
+    private Request buildScrollRequest(String endpoint, String scrollId) {
+        Request request = new Request("POST", endpoint);
+        Map<String, Object> scrollQuery = new HashMap<>();
+        scrollQuery.put("scroll", "30S");
+        scrollQuery.put("scroll_id", scrollId);
+        request.setJsonEntity(gson.toJson(scrollQuery));
+        return request;
     }
 
     private List paginate(List org, int pageSize, int offset) {
@@ -1001,6 +1293,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         List<Map<String, Object>> filesInListResult = overview(FILES_END_POINT, params, PROPERTIES, defaultSort, sortFieldMapping);
 
         // Transform the specified properties in the "joinProperties" list from an arrays to a comma separated strings
+        /*
         try{
             ArrayList<String> joinProperties = new ArrayList<>(Arrays.asList(
                     "experimental_strategy", "library_layouts", "library_strategy", "subject_id", "sample_id",
@@ -1020,6 +1313,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
             logger.error(e);
             throw new Exception(message);
         }
+        */
 
         /*result.put("associated_file", associatedFileValue);
         result.put("associated_drs_uri", associatedDrsUriValue);
@@ -1040,6 +1334,31 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         request.setJsonEntity(gson.toJson(query));
         JsonObject jsonObject = esService.send(request);
         return esService.collectTerms(jsonObject, collectField);
+    }
+
+    /**
+     * Get all subject IDs using aggregation on dashboard_participant_ids index.
+     * This is more efficient than storing all IDs in a single document.
+     */
+    Map<String, Object> idsLists() throws IOException {
+        final String PARTICIPANT_IDS_END_POINT = "/dashboard_participant_ids/_search";
+        final String FIELD_NAME = "participant_id";
+        
+        // Build a match_all query with aggregation
+        Map<String, Object> query = new HashMap<>();
+        query.put("size", 0);
+        query.put("query", Map.of("match_all", Map.of()));
+        query = esService.addAggregations(query, new String[]{FIELD_NAME});
+        
+        Request request = new Request("GET", PARTICIPANT_IDS_END_POINT);
+        request.setJsonEntity(gson.toJson(query));
+        JsonObject jsonObject = esService.send(request);
+        
+        List<String> subjectIds = esService.collectTerms(jsonObject, FIELD_NAME);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("subjectIds", subjectIds);
+        return result;
     }
 
 }

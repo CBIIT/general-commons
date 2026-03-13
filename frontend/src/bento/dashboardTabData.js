@@ -30,6 +30,7 @@ export const tabIndexMap = {
   'participants': 0,
   'samples': 1,
   'files': 2,
+  'protocols': 3,
 };
 
 // --------------- Tabs Header Data configuration --------------
@@ -51,6 +52,12 @@ export const tabs = [
     title: 'Files',
     dataField: 'dataFile',
     count: 'numberOfFiles',
+  },
+  {
+    id: 'protocol_tab',
+    title: 'Protocols',
+    dataField: 'dataProtocol',
+    count: 'numberOfProtocols',
   },
 ];
 
@@ -107,7 +114,18 @@ query searchSubjects(
   $proteomic_design_descriptions: [String], 
   $organ_or_tissue: [String], 
   $tissue_fixative: [String], $imaging_assay_type: [String], 
-  $is_supplementary_file: [String]){
+  $is_supplementary_file: [String],
+  $protocol_names: [String],
+  $protocol_types: [String],
+  $dois: [String],
+  $publication_titles: [String],
+  $publication_statuses: [String],
+  $pub_ids: [String],
+  $nanomaterial_entities: [String],
+  $functionalizing_entities: [String],
+  $characterization_types: [String],
+  $characterization_names: [String],
+  ){
     searchSubjects(
     subject_ids: $subject_ids, 
     accesses: $accesses, 
@@ -139,11 +157,23 @@ query searchSubjects(
     organ_or_tissue: $organ_or_tissue, 
     tissue_fixative: $tissue_fixative, 
     imaging_assay_type: $imaging_assay_type, 
-    is_supplementary_file: $is_supplementary_file){
+    is_supplementary_file: $is_supplementary_file,
+    protocol_names: $protocol_names,
+    protocol_types: $protocol_types,
+    dois: $dois,
+    publication_titles: $publication_titles,
+    publication_statuses: $publication_statuses,
+    pub_ids: $pub_ids,
+    nanomaterial_entities: $nanomaterial_entities,
+    functionalizing_entities: $functionalizing_entities,
+    characterization_types: $characterization_types,
+    characterization_names: $characterization_names
+    ){
         numberOfStudies
         numberOfSubjects
         numberOfSamples
         numberOfFiles
+        numberOfProtocols
         numberOfDiseaseSites
         donutCountByExperimentalStrategy{
             group
@@ -285,6 +315,50 @@ query searchSubjects(
             group
             subjects
         }
+        subjectCountByProtocolName{
+            group
+            subjects
+        }
+        subjectCountByProtocolType{
+            group
+            subjects
+        }
+        subjectCountByDoi{
+            group
+            subjects
+        }
+        subjectCountByDoiUrl{
+            group
+            subjects
+        }    
+        subjectCountByPublicationTitle{
+            group
+            subjects
+        }
+        subjectCountByPublicationStatus{
+            group
+            subjects
+        }
+        subjectCountByPubId{
+            group
+            subjects
+        }
+        subjectCountByNanomaterialEntity{
+            group
+            subjects
+        }
+        subjectCountByFunctionalizingEntity{
+            group
+            subjects
+        }
+        subjectCountByCharacterizationType{
+            group
+            subjects
+        }
+        subjectCountByCharacterizationName{
+            group
+            subjects
+        }
         filterSubjectCountByStudy{
             group
             subjects
@@ -407,6 +481,50 @@ query searchSubjects(
             group
             subjects
         }
+        filterSubjectCountByProtocolName{
+            group
+            subjects
+        }
+        filterSubjectCountByProtocolType{
+            group
+            subjects
+        }
+        filterSubjectCountByDoi{
+            group
+            subjects
+        }
+        filterSubjectCountByDoiUrl{
+            group
+            subjects
+        }
+        filterSubjectCountByPublicationTitle{
+            group
+            subjects
+        }
+        filterSubjectCountByPublicationStatus{
+            group
+            subjects
+        }
+        filterSubjectCountByPubId{
+            group
+            subjects
+        }
+        filterSubjectCountByNanomaterialEntity{
+            group
+            subjects
+        }
+        filterSubjectCountByFunctionalizingEntity{
+            group
+            subjects
+        }
+        filterSubjectCountByCharacterizationType{
+            group
+            subjects
+        }
+        filterSubjectCountByCharacterizationName{
+            group
+            subjects
+        }
     }
 }
 `;
@@ -446,6 +564,16 @@ query subjectOverview(
   $tissue_fixative:[String],
   $imaging_assay_type:[String],
   $is_supplementary_file: [String],
+  $protocol_names: [String],
+  $protocol_types: [String],
+  $dois: [String],
+  $publication_titles: [String],
+  $publication_statuses: [String],
+  $pub_ids: [String],
+  $nanomaterial_entities: [String],
+  $functionalizing_entities: [String],
+  $characterization_types: [String],
+  $characterization_names: [String],
 
   $order_by: String,
   $sort_direction: String,
@@ -484,6 +612,16 @@ query subjectOverview(
       tissue_fixative:$tissue_fixative,
       imaging_assay_type:$imaging_assay_type,
       is_supplementary_file: $is_supplementary_file,
+      protocol_names: $protocol_names,
+      protocol_types: $protocol_types,
+      dois: $dois,
+      publication_titles: $publication_titles,
+      publication_statuses: $publication_statuses,
+      pub_ids: $pub_ids,
+      nanomaterial_entities: $nanomaterial_entities,
+      functionalizing_entities: $functionalizing_entities,
+      characterization_types: $characterization_types,
+      characterization_names: $characterization_names,
 
       order_by:$order_by,
       sort_direction:$sort_direction,
@@ -491,6 +629,7 @@ query subjectOverview(
       offset:$offset
   ){
       subject_id
+      study_participant_id
       study_acronym
       phs_accession
       sex
@@ -538,6 +677,16 @@ query fileOverview(
   $tissue_fixative:[String],
   $imaging_assay_type:[String],
   $is_supplementary_file: [String],
+  $protocol_names: [String],
+  $protocol_types: [String],
+  $dois: [String],
+  $publication_titles: [String],
+  $publication_statuses: [String],
+  $pub_ids: [String],
+  $nanomaterial_entities: [String],
+  $functionalizing_entities: [String],
+  $characterization_types: [String],
+  $characterization_names: [String],
 
   $order_by: String,
   $sort_direction: String,
@@ -577,6 +726,16 @@ query fileOverview(
       tissue_fixative:$tissue_fixative,
       imaging_assay_type:$imaging_assay_type,
       is_supplementary_file: $is_supplementary_file,
+      protocol_names: $protocol_names,
+      protocol_types: $protocol_types,
+      dois: $dois,
+      publication_titles: $publication_titles,
+      publication_statuses: $publication_statuses,
+      pub_ids: $pub_ids,
+      nanomaterial_entities: $nanomaterial_entities,
+      functionalizing_entities: $functionalizing_entities,
+      characterization_types: $characterization_types,
+      characterization_names: $characterization_names,
 
       order_by:$order_by,
       sort_direction:$sort_direction,
@@ -590,6 +749,7 @@ query fileOverview(
       experimental_strategy
       sex
       analyte_type
+      study_name
       is_tumor
       file_name
       file_type
@@ -638,6 +798,16 @@ query sampleOverview(
   $tissue_fixative:[String],
   $imaging_assay_type:[String],
   $is_supplementary_file: [String],
+  $protocol_names: [String],
+  $protocol_types: [String],
+  $dois: [String],
+  $publication_titles: [String],
+  $publication_statuses: [String],
+  $pub_ids: [String],
+  $nanomaterial_entities: [String],
+  $functionalizing_entities: [String],
+  $characterization_types: [String],
+  $characterization_names: [String],
 
   $order_by: String,
   $sort_direction: String,
@@ -677,6 +847,16 @@ query sampleOverview(
       tissue_fixative:$tissue_fixative,
       imaging_assay_type:$imaging_assay_type,
       is_supplementary_file: $is_supplementary_file,
+      protocol_names: $protocol_names,
+      protocol_types: $protocol_types,
+      dois: $dois,
+      publication_titles: $publication_titles,
+      publication_statuses: $publication_statuses,
+      pub_ids: $pub_ids,
+      nanomaterial_entities: $nanomaterial_entities,
+      functionalizing_entities: $functionalizing_entities,
+      characterization_types: $characterization_types,
+      characterization_names: $characterization_names,
 
       order_by:$order_by,
       sort_direction:$sort_direction,
@@ -689,6 +869,9 @@ query sampleOverview(
       sample_id
       is_tumor
       analyte_type
+      study_name
+      sample_name
+      organization_name
       files
       sample_type
       sample_tumor_status
@@ -698,14 +881,132 @@ query sampleOverview(
 
 `;
 
+export const GET_PROTOCOLS_OVERVIEW_QUERY = gql`
+query protocolOverview(
+  $protocol_pk_id: [String],
+  $protocol_name: [String],
+  $protocol_type: [String],
+  $doi: [String],
+  $doi_url: [String],
+  $file_names: [String],
+  $acl: [String],
+  $accesses: [String],
+  $experimental_strategies: [String],
+  $file_types: [String],
+  $sex: [String],
+  $image_modality: [String],
+  $instrument_models: [String],
+  $is_tumor: [String],
+  $library_layouts: [String],
+  $library_selections: [String],
+  $library_source_materials: [String],
+  $library_source_molecules: [String],
+  $library_strategies: [String],
+  $number_of_study_participants: [Float],
+  $number_of_study_samples: [Float],
+  $phs_accession: [String],
+  $platforms: [String],
+  $primary_diagnoses: [String],
+  $reference_genome_assemblies: [String],
+  $sample_types: [String],
+  $site: [String],
+  $studies: [String],
+  $study_data_types: [String],
+  $analytical_fractions: [String],
+  $instrument_makes: [String],
+  $proteomic_design_descriptions: [String],
+  $organ_or_tissue: [String],
+  $tissue_fixative: [String],
+  $imaging_assay_type: [String],
+  $is_supplementary_file: [String],
+  $protocol_names: [String],
+  $protocol_types: [String],
+  $doi_urls: [String],
+  $dois: [String],
+  $publication_titles: [String],
+  $publication_statuses: [String],
+  $pub_ids: [String],
+  $nanomaterial_entities: [String],
+  $functionalizing_entities: [String],
+  $characterization_types: [String],
+  $characterization_names: [String],
+  $order_by: String,
+  $sort_direction: String,
+  $first: Int,
+  $offset: Int
+){
+  protocolOverview(
+      protocol_pk_id: $protocol_pk_id,
+      protocol_name: $protocol_name,
+      protocol_type: $protocol_type,
+      doi: $doi,
+      doi_url: $doi_url,
+      file_names: $file_names,
+      acl: $acl,
+      accesses: $accesses,
+      experimental_strategies: $experimental_strategies,
+      file_types: $file_types,
+      sex: $sex,
+      image_modality: $image_modality,
+      instrument_models: $instrument_models,
+      is_tumor: $is_tumor,
+      library_layouts: $library_layouts,
+      library_selections: $library_selections,
+      library_source_materials: $library_source_materials,
+      library_source_molecules: $library_source_molecules,
+      library_strategies: $library_strategies,
+      number_of_study_participants: $number_of_study_participants,
+      number_of_study_samples: $number_of_study_samples,
+      phs_accession: $phs_accession,
+      platforms: $platforms,
+      primary_diagnoses: $primary_diagnoses,
+      reference_genome_assemblies: $reference_genome_assemblies,
+      sample_types: $sample_types,
+      site: $site,
+      studies: $studies,
+      study_data_types: $study_data_types,
+      analytical_fractions: $analytical_fractions,
+      instrument_makes: $instrument_makes,
+      proteomic_design_descriptions: $proteomic_design_descriptions,
+      organ_or_tissue: $organ_or_tissue,
+      tissue_fixative: $tissue_fixative,
+      imaging_assay_type: $imaging_assay_type,
+      is_supplementary_file: $is_supplementary_file,
+      protocol_names: $protocol_names,
+      protocol_types: $protocol_types,
+      doi_urls: $doi_urls,
+      dois: $dois,
+      publication_titles: $publication_titles,
+      publication_statuses: $publication_statuses,
+      pub_ids: $pub_ids,
+      nanomaterial_entities: $nanomaterial_entities,
+      functionalizing_entities: $functionalizing_entities,
+      characterization_types: $characterization_types,
+      characterization_names: $characterization_names,
+      order_by: $order_by,
+      sort_direction: $sort_direction,
+      first: $first,
+      offset: $offset
+  ){
+      protocol_pk_id
+      protocol_name
+      protocol_type
+      doi
+      doi_url
+      file_names
+  }
+}
+
+`;
+
 // --------------- GraphQL query - select all check box --------------
 
 export const GET_ALL_FILEIDS_CASESTAB_FOR_SELECT_ALL = gql`
 query search (          
-  $subject_ids: [String],
+  $study_participant_ids: [String],
 ){
   fileIDsFromList (          
-      subject_ids: $subject_ids,
+      study_participant_ids: $study_participant_ids,
   ) 
 }
   `;
@@ -726,6 +1027,16 @@ query search (
 ){
   fileIDsFromList (          
       file_names: $file_names
+  ) 
+}
+  `;
+
+export const GET_ALL_FILEIDS_PROTOCOLSTAB_FOR_SELECT_ALL = gql`
+query search (          
+  $protocol_pk_ids: [String],
+){
+  fileIDsFromList (          
+      protocol_pk_ids: $protocol_pk_ids,
   ) 
 }
   `;
@@ -907,6 +1218,16 @@ query fileOverview(
   $tissue_fixative:[String],
   $imaging_assay_type:[String],
   $is_supplementary_file: [String],
+  $protocol_names: [String],
+  $protocol_types: [String],
+  $dois: [String],
+  $publication_titles: [String],
+  $publication_statuses: [String],
+  $pub_ids: [String],
+  $nanomaterial_entities: [String],
+  $functionalizing_entities: [String],
+  $characterization_types: [String],
+  $characterization_names: [String],
 
   $order_by: String,
   $sort_direction: String,
@@ -946,6 +1267,16 @@ query fileOverview(
       tissue_fixative:$tissue_fixative,
       imaging_assay_type:$imaging_assay_type,
       is_supplementary_file: $is_supplementary_file,
+      protocol_names: $protocol_names,
+      protocol_types: $protocol_types,
+      dois: $dois,
+      publication_titles: $publication_titles,
+      publication_statuses: $publication_statuses,
+      pub_ids: $pub_ids,
+      nanomaterial_entities: $nanomaterial_entities,
+      functionalizing_entities: $functionalizing_entities,
+      characterization_types: $characterization_types,
+      characterization_names: $characterization_names,
 
       order_by:$order_by,
       sort_direction:$sort_direction,
@@ -966,7 +1297,7 @@ export const tabContainers = [
     api: GET_CASES_OVERVIEW_QUERY,
     paginationAPIField: 'subjectOverview',
     count: 'numberOfSubjects',
-    dataKey: 'subject_id',
+    dataKey: 'study_participant_id',
     defaultSortField: 'subject_id',
     defaultSortDirection: 'asc',
     buttonText: 'Add Selected Files',
@@ -1065,7 +1396,7 @@ export const tabContainers = [
     tableMsg: {
       noMatch: 'No Matching Records Found',
     },
-    addFilesRequestVariableKey: 'subject_ids',
+    addFilesRequestVariableKey: 'study_participant_ids',
     addFilesResponseKeys: ['fileIDsFromList'],
     addAllFilesResponseKeys: ['fileOverview', 'file_id'],
     addAllFileQuery: GET_ALL_FILEIDS_FROM_FILESTAB_FOR_ADD_ALL_CART,
@@ -1120,19 +1451,6 @@ export const tabContainers = [
         role: cellTypes.CHECKBOX,
       },
       {
-        dataField: 'sample_id',
-        header: 'Sample ID',
-        display: true,
-        tooltipText: 'Unique identifier for each sample.',
-      },
-      {
-        dataField: 'subject_id',
-        header: 'Participant ID',
-        display: true,
-        tooltipText: 'ID of the participant from whom the sample was collected.',
-        role: cellTypes.DISPLAY,
-      },
-      {
         dataField: 'study_acronym',
         header: 'Study Name',
         tooltipText: 'Name of the study to which the sample belongs.',
@@ -1151,6 +1469,33 @@ export const tabContainers = [
         tooltipText: 'Unique accession number for the sample\'s data.',
         role: cellTypes.DISPLAY,
         cellType: cellTypes.CUSTOM_ELEM,
+      },
+      {
+        dataField: 'sample_id',
+        header: 'Sample ID',
+        display: true,
+        tooltipText: 'Unique identifier for each sample.',
+      },
+      {
+        dataField: 'sample_name',
+        header: 'Sample Name',
+        display: true,
+        tooltipText: 'Name or label of referenced sample.',
+        role: cellTypes.DISPLAY,
+      },
+      {
+        dataField: 'organization_name',
+        header: 'Organization Name',
+        display: true,
+        tooltipText: 'Organization where the sample was collected.',
+        role: cellTypes.DISPLAY,
+      },
+      {
+        dataField: 'subject_id',
+        header: 'Participant ID',
+        display: false,
+        tooltipText: 'ID of the participant from whom the sample was collected.',
+        role: cellTypes.DISPLAY,
       },
       {
         dataField: 'files',
@@ -1229,28 +1574,17 @@ export const tabContainers = [
         role: cellTypes.CHECKBOX,
       },
       {
-        dataField: 'file_id',
-        header: 'File ID',
-        display: false,
-        tooltipText: 'sort',
-      },
-      {
-        dataField: 'file_name',
-        header: 'File Name',
-        display: true,
-        tooltipText: 'Names of the files associated with the study.',
-      },
-      {
         dataField: 'study_acronym',
         header: 'Study Name',
         display: true,
         tooltipText: 'Name of the study to which the files belong.',
         role: cellTypes.DISPLAY,
+        cellType: cellTypes.CUSTOM_ELEM,
       },
       {
         dataField: 'phs_accession',
         header: 'Accession',
-        cellType: cellTypes.LINK,
+        cellType: cellTypes.CUSTOM_ELEM,
         linkAttr: {
           rootPath: '/study',
           pathParams: ['phs_accession'],
@@ -1261,18 +1595,38 @@ export const tabContainers = [
         role: cellTypes.DISPLAY,
       },
       {
-        dataField: 'subject_id',
-        header: 'Participant Id',
+        dataField: 'file_name',
+        header: 'File Name',
         display: true,
-        tooltipText: 'ID of the participant linked to the file.',
+        tooltipText: 'Names of the files associated with the study.',
+      },
+      {
+        dataField: 'file_id',
+        header: 'File ID',
+        display: true,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'file_type',
+        header: 'File Type',
+        sort: 'asc',
+        display: true,
+        tooltipText: 'Format of the file (e.g., BAM, FASTQ).',
+        role: cellTypes.DISPLAY,
+      },
+      {
+        dataField: 'sample_id',
+        header: 'Sample ID',
+        display: true,
+        tooltipText: 'ID of the sample linked to the file.',
         role: cellTypes.DISPLAY,
         cellType: cellTypes.CUSTOM_ELEM,
       },
       {
-        dataField: 'sample_id',
-        header: 'Sample Id',
-        display: true,
-        tooltipText: 'ID of the sample linked to the file.',
+        dataField: 'subject_id',
+        header: 'Participant ID',
+        display: false,
+        tooltipText: 'ID of the participant linked to the file.',
         role: cellTypes.DISPLAY,
         cellType: cellTypes.CUSTOM_ELEM,
       },
@@ -1312,14 +1666,6 @@ export const tabContainers = [
       //   role: cellTypes.DISPLAY,
       // },
       {
-        dataField: 'file_type',
-        header: 'File Type',
-        sort: 'asc',
-        display: true,
-        tooltipText: 'Format of the file (e.g., BAM, FASTQ).',
-        role: cellTypes.DISPLAY,
-      },
-      {
         dataField: 'file_size',
         header: 'File Size',
         display: false,
@@ -1332,11 +1678,12 @@ export const tabContainers = [
         display: false,
         tooltipText: 'Type of data contained in the file (e.g., genomic, imagining).',
         role: cellTypes.DISPLAY,
+        cellType: cellTypes.CUSTOM_ELEM,
       },
       {
         dataField: 'library_strategy',
         header: 'Library Strategy',
-        display: true,
+        display: false,
         tooltipText: 'Experimental library preparation strategy used for the file.',
         role: cellTypes.DISPLAY,
         cellType: cellTypes.CUSTOM_ELEM,
@@ -1344,9 +1691,10 @@ export const tabContainers = [
       {
         dataField: 'supplementary_file_names',
         header: 'Supplementary Files',
-        display: true,
+        display: false,
         tooltipText: 'Supplemental files contain additional data and references supporting the study.',
         role: cellTypes.DISPLAY,
+        cellType: cellTypes.CUSTOM_ELEM,
       },
       {
         dataField: 'image_modality',
@@ -1369,6 +1717,82 @@ export const tabContainers = [
     addAllFilesResponseKeys: ['fileOverview', 'file_id'],
     addAllFileQuery: GET_ALL_FILEIDS_FROM_FILESTAB_FOR_ADD_ALL_CART,
     //addSelectedFilesQuery: GET_ALL_FILEIDS_FILESTAB_FOR_SELECT_ALL,
+  },
+  {
+    name: 'Protocols',
+    dataField: 'dataProtocol',
+    api: GET_PROTOCOLS_OVERVIEW_QUERY,
+    paginationAPIField: 'protocolOverview',
+    defaultSortField: 'doi',
+    defaultSortDirection: 'desc',
+    count: 'numberOfProtocols',
+    dataKey: 'protocol_pk_id',
+    tableID: 'protocol_tab_table',
+    tooltipConfig: {
+      title: 'This tab provides information about protocols associated with caNano data. Review protocol details and their connections to DOIs.',
+      arrow: true,
+      placement: "top",
+    },
+    extendedViewConfig: {
+      pagination: true,
+      manageViewColumns: {
+        title: 'View Columns',
+      },
+      download: {
+        downloadCsv: 'Download Table Content As CSV',
+        downloadFileName: 'GC_protocol_Download',
+      },
+    },
+    columns: [
+      {
+        cellType: cellTypes.CHECKBOX,
+        display: true,
+        role: cellTypes.CHECKBOX,
+      },
+      {
+        dataField: 'protocol_name',
+        header: 'Protocol Name',
+        display: true,
+        tooltipText: 'Name assigned to protocol associated with the study.',
+      },
+      {
+        dataField: 'protocol_type',
+        header: 'Protocol Type',
+        display: true,
+        tooltipText: 'Type of protocol associated with the study.',
+        role: cellTypes.DISPLAY,
+      },
+      {
+        dataField: 'doi',
+        header: 'DOI',
+        display: true,
+        tooltipText: 'Unique digital object identifier associated with the study.',
+        role: cellTypes.DISPLAY,
+        cellType: cellTypes.CUSTOM_ELEM,
+        externalLinkAttr: {
+          urlField: 'doi_url',
+        },
+      },
+      {
+        dataField: 'file_names',
+        header: 'File Name',
+        display: true,
+        tooltipText: 'Name of file associated with the study.',
+        role: cellTypes.DISPLAY,
+        cellType: cellTypes.CUSTOM_ELEM,
+      },
+    ],
+    id: 'protocol_tab',
+    selectableRows: true,
+    downloadFileName: 'GC_protocol_Download',
+    tableMsg: {
+      noMatch: 'No Matching Records Found',
+    },
+    addFilesRequestVariableKey: 'protocol_pk_ids',
+    addFilesResponseKeys: ['fileIDsFromList'],
+    addAllFilesResponseKeys: ['fileOverview', 'file_id'],
+    addAllFileQuery: GET_ALL_FILEIDS_FROM_FILESTAB_FOR_ADD_ALL_CART,
+    addSelectedFilesQuery: GET_ALL_FILEIDS_PROTOCOLSTAB_FOR_SELECT_ALL,
   },
 ];
 

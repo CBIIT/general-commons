@@ -2,7 +2,7 @@ package gov.nih.nci.bento_ri.model.cypher_queries;
 
 public class SamplesQuery {
     public static final String SAMPLES_QUERY = """
-        MATCH (samp:sample)-[:of_participant]->(:participant)-[:of_study]->(s:study {phs_accession: $phs_accession})
+        MATCH (samp:sample)-[*]->(s:study {phs_accession: $phs_accession})
         WHERE
             $sample_ids = [] OR samp.sample_id IN $sample_ids
         WITH DISTINCT samp, {
@@ -19,7 +19,12 @@ public class SamplesQuery {
     """;
 
     public static final String SAMPLES_COUNT_QUERY = """
-        MATCH (samp:sample)-[:of_participant]->(:participant)-[:of_study]->(s:study {phs_accession: $phs_accession})
+        MATCH (samp:sample)-[*]->(s:study {phs_accession: $phs_accession})
         RETURN COUNT(DISTINCT samp) AS count
-    """;    
+    """;
+
+    public static final String SAMPLES_TOTAL_COUNT_QUERY = """
+        MATCH (samp:sample)
+        RETURN COUNT(DISTINCT samp) AS count
+    """;   
 }
