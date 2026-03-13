@@ -176,7 +176,7 @@ indices:
           WITH s, "Not specified in data" AS nsd, "Not Applicable" AS na
           CALL {
             WITH s
-            OPTIONAL MATCH (s)<-[*]-(p:participant)
+            OPTIONAL MATCH (s)<--(p:participant)
             WITH s, COUNT(DISTINCT p) AS number_of_study_participants
             OPTIONAL MATCH (s)<-[*]-(samp:sample)
             RETURN number_of_study_participants, count(distinct samp) AS number_of_study_samples
@@ -811,7 +811,7 @@ indices:
           WITH s, "Not specified in data" AS nsd, "Not Applicable" AS na
           CALL {
             WITH s
-            OPTIONAL MATCH (s)<-[*]-(p:participant)
+            OPTIONAL MATCH (s)<--(p:participant)
             WITH s, COUNT(DISTINCT p) AS number_of_study_participants
             OPTIONAL MATCH (s)<-[*]-(samp:sample)
             RETURN number_of_study_participants, count(distinct samp) AS number_of_study_samples
@@ -1546,7 +1546,7 @@ indices:
           MATCH (s:study)
           WITH s 
           SKIP $skip LIMIT $limit 
-          OPTIONAL MATCH (s)<-[*]-(f:file)
+          OPTIONAL MATCH (s)<--(f:file)
           WITH DISTINCT s, COLLECT(DISTINCT f.file_id) AS file_ids, "Not specified in data" AS nsd, "Not Applicable" AS na
           CALL {
             WITH s
@@ -2655,7 +2655,7 @@ indices:
           WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, "Not Applicable" AS na
           CALL {
             WITH s
-            OPTIONAL MATCH (s)<-[*]-(p:participant)
+            OPTIONAL MATCH (s)<--(p:participant)
             WITH s, COUNT(DISTINCT p) AS number_of_study_participants
             OPTIONAL MATCH (s)<-[*]-(samp:sample)
             RETURN number_of_study_participants, count(distinct samp) AS number_of_study_samples
@@ -3042,11 +3042,11 @@ indices:
           WITH s 
           SKIP $skip LIMIT $limit
           WITH s
-          OPTIONAL MATCH (s)<-[*]-(p:participant)
+          OPTIONAL MATCH (s)<--(p:participant)
           WITH s, COUNT(DISTINCT p) AS number_of_study_participants
           OPTIONAL MATCH (s)<-[*]-(samp:sample)
           WITH s, number_of_study_participants, count(distinct samp) AS number_of_study_samples
-          MATCH (s)<-[*]-(p:participant)
+          MATCH (s)<--(p:participant)
           WITH DISTINCT p, s, number_of_study_participants, number_of_study_samples, "Not specified in data" AS nsd
           RETURN DISTINCT
             COALESCE(p.study_participant_id, nsd) as study_participant_id,
@@ -3522,11 +3522,11 @@ indices:
           OPTIONAL MATCH (pr:program)<-[:of_program]-(s:study)
           CALL {
             WITH s
-            OPTIONAL MATCH (s)<-[*]-(p:participant)
+            OPTIONAL MATCH (s)<--(p:participant)
             WITH s, COUNT(DISTINCT p) AS num_participants
             OPTIONAL MATCH (s)<-[*]-(samp:sample)
             WITH s, num_participants, COUNT(DISTINCT samp) AS num_samples
-            OPTIONAL MATCH (s)<-[*]-(f:file)
+            OPTIONAL MATCH (s)<--(f:file)
             RETURN num_participants, num_samples, COUNT(DISTINCT f) AS num_files
           }
           WITH DISTINCT pr, s, num_participants, num_samples, num_files, 'Not specified in data' AS nsd
@@ -3692,7 +3692,7 @@ indices:
           MATCH (s:study)
           WITH DISTINCT s
           SKIP $skip LIMIT $limit
-          OPTIONAL MATCH (s)<-[*]-(p:participant)
+          OPTIONAL MATCH (s)<--(p:participant)
           WITH DISTINCT s, COUNT(DISTINCT p) AS number_of_participants
           RETURN DISTINCT s.phs_accession AS phs_accession, number_of_participants, number_of_participants AS numberOfSubjects
         page_size: 1
@@ -3716,7 +3716,7 @@ indices:
           MATCH (s:study)
           WITH DISTINCT s
           SKIP $skip LIMIT $limit
-          OPTIONAL MATCH (s)<-[*]-(f:file)
+          OPTIONAL MATCH (s)<--(f:file)
           WITH DISTINCT s, COUNT(DISTINCT f) AS number_of_files
           RETURN DISTINCT s.phs_accession AS phs_accession, number_of_files, number_of_files AS numberOfFiles
         page_size: 1
@@ -4008,7 +4008,7 @@ indices:
           WITH s, "Not specified in data" AS nsd, "Not Applicable" AS na
           CALL {
             WITH s
-            OPTIONAL MATCH (s)<-[*]-(p:participant)
+            OPTIONAL MATCH (s)<--(p:participant)
             WITH s, COUNT(DISTINCT p) AS number_of_study_participants
             OPTIONAL MATCH (s)<-[*]-(samp:sample)
             RETURN number_of_study_participants, count(distinct samp) AS number_of_study_samples
