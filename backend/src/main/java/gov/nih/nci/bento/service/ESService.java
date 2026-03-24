@@ -344,15 +344,13 @@ public class ESService {
                 for (String[] highlight: highlights) {
                     String hlName = highlight[0];
                     String hlField = highlight[1];
-                    JsonElement highlightObj = searchHits.get(i).getAsJsonObject().get("highlight");
-                    if (highlightObj != null) {
+                    try {
                         JsonElement element = searchHits.get(i).getAsJsonObject().get("highlight").getAsJsonObject().get(hlField);
                         if (element != null) {
                             row.put(hlName, ((List<String>)getValue(element)).get(0));
                         }
-                    }
-                    else {
-                        logger.info("Highlight object is null for searchHits " + searchHits.get(i).getAsJsonObject().get("_id").getAsString());
+                    } catch (Exception e) {
+                        logger.error(e.toString());
                     }
                 }
             }
