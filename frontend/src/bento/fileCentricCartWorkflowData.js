@@ -304,6 +304,7 @@ export const table = {
       display: false,
       tooltipText: 'Type of data contained in the file (e.g., genomic, imagining).',
       role: cellTypes.DISPLAY,
+      cellType: cellTypes.CUSTOM_ELEM,
     },
     {
       dataField: 'library_strategy',
