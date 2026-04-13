@@ -5,17 +5,13 @@ public class SamplesQuery {
         MATCH (samp:sample)-[*]->(s:study {phs_accession: $phs_accession})
         WHERE
             $sample_ids = [] OR samp.sample_id IN $sample_ids
-        WITH DISTINCT samp, {
-            phs_accession: s.phs_accession
-        } AS output
-        MATCH (samp)-->(p:participant)
+        WITH samp, s
+        OPTIONAL MATCH (samp)-->(p:participant)
         WHERE
             $participant_ids = [] OR p.participant_id IN $participant_ids
-        WITH samp, apoc_replacement_poc.merge(output, {
-            participant_id: p.participant_id
-        }) AS output
-        RETURN apoc_replacement_poc.merge(output, samp {.*}) AS output
-        ORDER BY output.sample_id ASC
+        WITH DISTINCT samp, s, p
+        ORDER BY samp.sample_id ASC
+        RETURN samp {.*, phs_accession: s.phs_accession, participant_id: p.participant_id} as output
     """;
 
     public static final String SAMPLES_COUNT_QUERY = """
