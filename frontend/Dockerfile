@@ -2,8 +2,8 @@ FROM node:16.20.2-alpine3.18 as build
 
 WORKDIR /usr/src/app
 
-#COPY . .
-COPY frontend/ .
+COPY . .
+#COPY frontend/ .
 
 RUN NODE_OPTIONS="--max-old-space-size=4096" npm install --legacy-peer-deps
 

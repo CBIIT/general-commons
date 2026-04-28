@@ -1,8 +1,8 @@
 ARG ECR_REPO
 FROM maven:3.9.6-eclipse-temurin-17 as build
 WORKDIR /usr/src/app
-#COPY . .
-COPY backend/ .
+COPY . .
+#COPY backend/ .
 RUN mvn package -DskipTests
 # Stage 2: Production
 FROM tomcat:10.1.52-jdk25 as fnl_base_image

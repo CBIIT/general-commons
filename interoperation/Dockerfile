@@ -12,7 +12,8 @@ RUN apk update && \
     apk del gnupg 2>/dev/null || true && \
     rm -rf /var/cache/apk/* && \
     rm -rf /usr/local/include/node/openssl
-COPY interoperation/ package*.json ./
+#COPY interoperation/ package*.json ./
+COPY package*.json ./
 #RUN npm ci --only=production
 RUN npm install -g npm@11.7.0
 RUN npm install --omit=dev \
