@@ -302,8 +302,9 @@ export const table = {
       dataField: 'study_data_type',
       header: 'Study Data Type',
       display: false,
-      tooltipText: 'Type of data contained in the file (e.g., genomic, imagining).',
+      tooltipText: 'Type of data contained in the file (e.g., genomic, imaging).',
       role: cellTypes.DISPLAY,
+      cellType: cellTypes.CUSTOM_ELEM,
     },
     {
       dataField: 'library_strategy',

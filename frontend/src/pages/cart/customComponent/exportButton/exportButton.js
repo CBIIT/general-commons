@@ -81,10 +81,11 @@ const ExportButtonView = (props,) => {
                 "";
             }
             else {
-              obj[manifestData.header[i]] = el && el[manifestData.keysToInclude[i]] ? 
+              const val = el && el[manifestData.keysToInclude[i]] ? 
               el[manifestData.keysToInclude[i]] 
               : 
               "";
+              obj[manifestData.header[i]] = Array.isArray(val) ? val.join(', ') : val;
             }
           }
           return obj;

@@ -253,4 +253,23 @@ export const wrapperThemConfig = {
       },
     },
   },
+  MuiDialog: {
+    paper: {
+      width: '431px',
+      height: '170px',
+      borderRadius: '25px !important',
+      textAlign: 'center',
+      backgroundColor: '#E8DFDC !important',
+      border: '2px solid #A61401',
+    },
+  },
+  MuiDialogContent: {
+    root: {
+      padding: '40px 20px 0px 20px',
+      '&.alter-content': {
+        fontFamily: 'Lato',
+        size: '16px',
+      },
+    },
+  },
 };
