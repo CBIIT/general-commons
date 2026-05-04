@@ -20,7 +20,7 @@ ENV PORT 80
 
 ENV HOST 0.0.0.0
 
-RUN apk update && apk add --no-cache zlib=1.3.2-r0
+RUN apk update && apk add --no-cache zlib=1.3.2-r0 openssl
 
 RUN sh -c "envsubst '\$PORT'  < /etc/nginx/conf.d/configfile.template > /etc/nginx/conf.d/default.conf"
 
