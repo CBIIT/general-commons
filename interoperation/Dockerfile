@@ -1,17 +1,9 @@
 #ARG ECR_REPO
 #FROM ${ECR_REPO}/base-images:20.11.1
-FROM node:25.5.0-alpine3.22 AS fnl_base_image
+FROM node:26.1.0-alpine3.23 AS fnl_base_image
 ENV PORT=4030
 ENV NODE_ENV=production
 WORKDIR /usr/src/app
-# Upgrade OpenSSL to 3.5.5+ and remove gnupg (CVE-2026-24882 has no fix)
-# Remove Node.js OpenSSL headers to avoid false positive detection (CVE-2025-15467)
-# Note: The actual fix requires a Node.js release with patched OpenSSL
-RUN apk update && \
-    apk upgrade --no-cache libcrypto3 libssl3 && \
-    apk del gnupg 2>/dev/null || true && \
-    rm -rf /var/cache/apk/* && \
-    rm -rf /usr/local/include/node/openssl
 #COPY interoperation/ package*.json ./
 COPY package*.json ./
 #RUN npm ci --only=production
