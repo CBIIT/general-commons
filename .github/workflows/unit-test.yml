@@ -65,7 +65,7 @@ jobs:
           node-version: '26'
 
       - name: Set up Java
-        if: matrix.name = 'backend'
+        if: matrix.name == 'backend'
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -115,7 +115,7 @@ jobs:
           node-version: '26'
 
       - name: Set up Java
-        if: matrix.name = 'backend'
+        if: matrix.name == 'backend'
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
