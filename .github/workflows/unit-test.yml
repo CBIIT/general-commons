@@ -6,9 +6,9 @@ permissions:
 on:
   workflow_dispatch:
     inputs:
-      environment:
-        description: Choose the environment to build
-        type: environment
+      #environment:
+        #description: Choose the environment to build
+        #type: environment
       unit_test:
         description: "Run Unit Test"
         required: true
