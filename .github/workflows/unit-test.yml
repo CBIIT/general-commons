@@ -85,7 +85,7 @@ jobs:
     if: (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && inputs.unit_test == true) 
     strategy:
       fail-fast: false
-       matrix:
+      matrix:
         include:
           - name: backend
             context: backend
