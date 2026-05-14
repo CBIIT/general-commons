@@ -29,7 +29,7 @@ jobs:
   # Job 1: PR opened → run on source (head) branch
   # ──────────────────────────────────────────────
 
-  pr-unit-test-npm:
+  pr-unit-test:
     name: PR Unit Test (npm) - ${{ matrix.name }}
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && github.event.pull_request.action != 'closed'
@@ -79,7 +79,7 @@ jobs:
   # Job 2: PR merged / workflow_dispatch → run on target (base) branch
   # ──────────────────────────────────────────────
 
-  merged-unit-test-npm:
+  merged-unit-test:
     name: Merged Unit Test (npm) - ${{ matrix.name }}
     runs-on: ubuntu-latest
     if: (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && inputs.unit_test == true) 
@@ -131,7 +131,7 @@ jobs:
   notify:
     name: Slack Notification
     runs-on: ubuntu-latest
-    needs: [pr-unit-test-npm, pr-unit-test-python, merged-unit-test-npm, merged-unit-test-python]
+    needs: [pr-unit-test, merged-unit-test]
     if: always()
     steps:
       - name: Slack Notification
