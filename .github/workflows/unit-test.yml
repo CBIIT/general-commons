@@ -64,6 +64,11 @@ jobs:
         with:
           node-version: '26'
 
+      - name: Install dependencies
+        if: matrix.name != 'backend'
+        working-directory: ${{ matrix.context }}
+        run: npm ci
+
       - name: Set up Java
         if: matrix.name == 'backend'
         uses: actions/setup-java@v4
