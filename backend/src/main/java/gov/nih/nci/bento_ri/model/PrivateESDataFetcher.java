@@ -60,6 +60,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     final String GS_PARTICIPANT_COUNT_END_POINT = "/gs_participant/_count";
     final String GS_SAMPLE_END_POINT = "/gs_sample/_search";
     final String GS_SAMPLE_COUNT_END_POINT = "/gs_sample/_count";
+    final String GS_PROTOCOL_END_POINT = "/gs_protocol/_search";
+    final String GS_PROTOCOL_COUNT_END_POINT = "/gs_protocol/_count";
     final String GS_FILE_END_POINT = "/gs_file/_search";
     final String GS_FILE_COUNT_END_POINT = "/gs_file/_count";
     final String GS_PROGRAM_END_POINT = "/gs_program/_search";
@@ -809,6 +811,24 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                         new String[]{"subject_ids_filter", "subject_ids_filter"}
                 },
                 GS_CATEGORY_TYPE, "sample"
+        ));
+        // gs_protocol index - fields: protocol_pk_id_gs, protocol_name_gs, protocol_type_gs, doi_gs, doi_url_gs
+        searchCategories.add(Map.of(
+                GS_END_POINT, GS_PROTOCOL_END_POINT,
+                GS_COUNT_ENDPOINT, GS_PROTOCOL_COUNT_END_POINT,
+                GS_COUNT_RESULT_FIELD, "protocol_count",
+                GS_RESULT_FIELD, "protocols",
+                GS_SEARCH_FIELD, List.of("protocol_pk_id_gs", "protocol_name_gs", "protocol_type_gs", "doi_gs", "doi_url_gs"),
+                GS_SORT_FIELD, "protocol_pk_id",
+                GS_COLLECT_FIELDS, new String[][]{
+                        new String[]{"protocol_pk_id", "protocol_pk_id"},
+                        new String[]{"protocol_name", "protocol_name_gs"},
+                        new String[]{"protocol_type", "protocol_type_gs"},
+                        new String[]{"doi", "doi_gs"},
+                        new String[]{"doi_url", "doi_url_gs"},
+                        new String[]{"subject_ids_filter", "subject_ids_filter"}
+                },
+                GS_CATEGORY_TYPE, "protocol"
         ));
         // gs_file index - all GS_File fields from GraphQL schema
         searchCategories.add(Map.of(

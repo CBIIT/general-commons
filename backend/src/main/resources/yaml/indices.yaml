@@ -3201,6 +3201,50 @@ indices:
             sample_id,
             CASE WHEN size(participant_ids) = 0 THEN [na] ELSE participant_ids END AS subject_ids_filter
         page_size: 5000
+  - index_name: "gs_protocol"
+    id_field: "protocol_pk_id"
+    mapping:
+      keyword:
+        - protocol_pk_id
+        - subject_ids_filter
+      search_as_you_type:
+        - protocol_name_gs
+        - protocol_type_gs
+        - doi_gs
+        - doi_url_gs
+    initial_query:
+      # protocol_pk_id
+      # protocol_name_gs
+      # protocol_type_gs
+      # doi_gs
+      # doi_url_gs
+      query: |
+        MATCH (proto:Protocol)
+        WITH DISTINCT proto, "Not specified in data" AS nsd
+        ORDER BY proto.protocol_pk_id
+        RETURN DISTINCT
+          proto.protocol_pk_id AS protocol_pk_id,
+          COALESCE(proto.protocol_name, nsd) AS protocol_name_gs,
+          COALESCE(proto.protocol_type, nsd) AS protocol_type_gs,
+          COALESCE(proto.doi, nsd) AS doi_gs,
+          COALESCE(proto.doi_url, nsd) AS doi_url_gs
+        SKIP $skip LIMIT $limit
+      page_size: 5000
+    update_queries:
+      # Subject IDs Filter
+      - name: "Subject IDs Filter"
+        # subject_ids_filter
+        query: |
+          MATCH (proto:Protocol)
+          WITH DISTINCT proto
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (proto)-->(samp:sample)-[:of_participant]->(p:participant)
+          WITH proto.protocol_pk_id AS protocol_pk_id,
+          COLLECT(DISTINCT p.participant_id) AS participant_ids, "Not Applicable" AS na
+          RETURN DISTINCT
+            protocol_pk_id,
+            CASE WHEN size(participant_ids) = 0 THEN [na] ELSE participant_ids END AS subject_ids_filter
+        page_size: 5000
   - index_name: "gs_file"
     id_field: "file_id"
     mapping:
