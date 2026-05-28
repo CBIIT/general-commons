@@ -48,6 +48,7 @@ const ProtocolCard = ({ data, classes, index }) => {
         </div>
         {propertiesWithLinks.map((prop, idx) => (
           <PropertyItem
+            key={prop.dataField}
             index={idx}
             label={prop.label}
             value={data[prop.dataField]}
