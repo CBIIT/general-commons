@@ -15,6 +15,7 @@ import FileCard from './cards/FileCard';
 import ProgramCard from './cards/ProgramCard';
 import StudyCard from './cards/StudyCard';
 import AboutCard from './cards/AboutCard';
+import ProtocolCard from './cards/ProtocolCard';
 import usePageTitle from '../../components/Analytics/usePageTitle';
 
 /**
@@ -32,6 +33,7 @@ async function getAllQueryField(searchText, calcOffset, pageSize, isPublic) {
     : [{ countField: 'subject_count', nameField: 'subjects' },
       { countField: 'sample_count', nameField: 'samples' },
       { countField: 'file_count', nameField: 'files' },
+      { countField: 'protocol_count', nameField: 'protocols' },
       { countField: 'program_count', nameField: 'programs' },
       { countField: 'study_count', nameField: 'studies' },
       { countField: 'model_count', nameField: 'model' },
@@ -187,7 +189,7 @@ function searchView(props) {
         let calcOffset2 = (currentPage - 1) * pageSize + data.length;
 
         // eslint-disable-next-line max-len
-        while (apiQueries < 5 && data.length !== count && calcOffset2 < count && data.length !== pageSize) {
+        while (apiQueries < 6 && data.length !== count && calcOffset2 < count && data.length !== pageSize) {
           // eslint-disable-next-line no-await-in-loop
           const data2 = await queryAllAPI(searchText, calcOffset2, pageSize, isPublic);
           data = [...data, ...data2];
@@ -228,6 +230,7 @@ function searchView(props) {
     subject: CaseCard,
     sample: SampleCard,
     file: FileCard,
+    protocol: ProtocolCard,
     program: ProgramCard,
     study: StudyCard,
     about: AboutCard,
@@ -290,6 +293,16 @@ function searchView(props) {
       value: `${!authCheck() ? 'inactive-' : ''}5`,
     },
     {
+      name: 'Protocols',
+      field: 'protocols',
+      classes: {
+        root: classes.buttonRoot,
+        wrapper: classes.tabColor,
+      },
+      count: searchCounts.protocol_count || 0,
+      value: `${!authCheck() ? 'inactive-' : ''}6`,
+    },
+    {
       name: 'Studies',
       field: 'studies',
       classes: {
@@ -297,7 +310,7 @@ function searchView(props) {
         wrapper: classes.tabColor,
       },
       count: searchCounts.study_count || 0,
-      value: `${!authCheck() ? 'inactive-' : ''}6`,
+      value: `${!authCheck() ? 'inactive-' : ''}7`,
     },
     {
       name: 'Data Model',
@@ -307,7 +320,7 @@ function searchView(props) {
         wrapper: classes.tabColor,
       },
       count: searchCounts.model_count || 0,
-      value: `${!authCheck() ? 'inactive-' : ''}7`,
+      value: `${!authCheck() ? 'inactive-' : ''}8`,
     },
     {
       name: 'About',
@@ -317,7 +330,7 @@ function searchView(props) {
         wrapper: classes.tabColor,
       },
       count: searchCounts.about_count || 0,
-      value: '8',
+      value: '9',
     }],
     config: {
       resultCardMap: customCardMap,
