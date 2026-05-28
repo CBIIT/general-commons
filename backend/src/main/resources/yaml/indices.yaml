@@ -3208,6 +3208,7 @@ indices:
         - protocol_pk_id
         - subject_ids_filter
       search_as_you_type:
+        - protocol_pk_id_gs
         - protocol_name_gs
         - protocol_type_gs
         - doi_gs
@@ -3224,6 +3225,7 @@ indices:
         ORDER BY proto.protocol_pk_id
         RETURN DISTINCT
           proto.protocol_pk_id AS protocol_pk_id,
+          proto.protocol_pk_id AS protocol_pk_id_gs,
           COALESCE(proto.protocol_name, nsd) AS protocol_name_gs,
           COALESCE(proto.protocol_type, nsd) AS protocol_type_gs,
           COALESCE(proto.doi, nsd) AS doi_gs,

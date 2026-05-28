@@ -254,10 +254,10 @@ type GS_Sample {
 type GS_Protocol {
     type: String
     protocol_pk_id: String
-    protocol_name_gs: String
-    protocol_type_gs: String
-    doi_gs: String
-    doi_url_gs: String
+    protocol_name: String
+    protocol_type: String
+    doi: String
+    doi_url: String
     subject_ids_filter: [String]
 }
 
