@@ -13,12 +13,12 @@ export const programListingIcon = {
 /** used by the Global Search header autocomplete */
 export const SEARCH_KEYS = {
   public: [],
-  private: ['programs', 'studies', 'subjects', 'samples', 'files'],
+  private: ['programs', 'studies', 'subjects', 'samples', 'files', 'protocols'],
 };
 
 export const SEARCH_DATAFIELDS = {
   public: [],
-  private: ['program_name', 'study_name', 'subject_id', 'sample_id', 'file_name', 'node_name'],
+  private: ['program_name', 'study_name', 'subject_id', 'sample_id', 'file_name', 'protocol_name'],
 };
 
 /** used by the Global Search page results */
@@ -143,6 +143,9 @@ query globalSearch($input: String){
         }
         files {
           file_name
+        }
+        protocols {
+          protocol_name
         }
         model {
           node_name
@@ -296,12 +299,34 @@ query globalSearch($input: String, $first: Int, $offset: Int){
         subject_count
         sample_count
         file_count
+        protocol_count
         model_count
         about_count
         program_count
 }
 }
 `;
+
+export const SEARCH_PAGE_RESULT_PROTOCOLS = gql`
+query globalSearch($input: String, $first: Int, $offset: Int){
+  globalSearch(
+    input: $input
+    first: $first
+    offset: $offset
+  ) {
+    protocols {
+      type
+      protocol_pk_id
+      protocol_name
+      protocol_type
+      doi
+      doi_url
+      subject_ids_filter
+    }
+}
+}
+`;
+
 
 /**
  * Maps a datafield to the correct search query
@@ -319,6 +344,8 @@ export function getResultQueryByField(field, isPublic) {
       return SEARCH_PAGE_RESULT_SAMPLES;
     case 'files':
       return SEARCH_PAGE_RESULT_FILES;
+    case 'protocols':
+      return SEARCH_PAGE_RESULT_PROTOCOLS;
     case 'programs':
       return isPublic ? SEARCH_PAGE_RESULT_PROGRAM_PUBLIC : SEARCH_PAGE_RESULT_PROGRAM;
     case 'studies':
