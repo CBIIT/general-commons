@@ -37,6 +37,14 @@ const ProtocolCard = ({ data, classes, index }) => {
       <Grid item xs={11} className={classes.propertyContainer}>
         <div>
           <span className={classes.detailContainerHeader}>PROTOCOL</span>
+          <span className={classes.cardTitle}>
+            <Link
+              to={`/data/${encodeSubjectIds(data.subject_ids_filter)}`}
+              className={classes.cardTitle}
+            >
+              {data.protocol_pk_id}
+            </Link>
+          </span>
         </div>
         {propertiesWithLinks.map((prop, idx) => (
           <PropertyItem
