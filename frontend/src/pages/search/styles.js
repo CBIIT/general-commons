@@ -10,8 +10,14 @@ const styles = () => ({
   },
   tabContainter: {
     display: 'flex',
-    maxWidth: '900px',
-    margin: '0 auto',
+    "& .MuiTabs-flexContainer": {
+      margin: '0 auto',
+      display: 'flex',
+      position: 'relative',
+      maxWidth: '1400px',
+      alignItems: 'end',
+      justifyContent: 'center',
+    }
   },
   tabColor: { color: '#142D64' },
   buttonRoot: {
