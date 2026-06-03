@@ -1,11 +1,11 @@
 ARG ECR_REPO
-FROM maven:3.9.6-eclipse-temurin-17 as build
+FROM maven:3.9.16-eclipse-temurin-17-noble as build
 WORKDIR /usr/src/app
 COPY . .
 #COPY backend/ .
 RUN mvn package -DskipTests
 # Stage 2: Production
-FROM tomcat:10.1.54-jdk25 as fnl_base_image
+FROM tomcat:10.1.55-jdk25 as fnl_base_image
 ENV JAVA_OPTS $JAVA_OPTS -XX:InitialRAMPercentage=25 -XX:MaxRAMPercentage=70
 ENV TZ America/New_York
 
