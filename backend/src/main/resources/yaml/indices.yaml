@@ -103,7 +103,7 @@ indices:
         RETURN DISTINCT
           p.study_participant_id as study_participant_id,
           COALESCE(p.participant_id, nsd) as participant_id,
-          COALESCE(p.race, nsd) as race,
+          COALESCE(replace(replace(replace(p.race, '[', ''), ']', ''), '"', ''), nsd) as race,
           COALESCE(p.sex, nsd) as sex,
           COALESCE(p.ethnicity, nsd) as ethnicity,
           COALESCE(p.participant_id, nsd) as subject_ids,
@@ -1635,7 +1635,7 @@ indices:
           WITH f.file_id AS file_id, p, "Not specified in data" AS nsd, "Not Applicable" AS na
           WITH file_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.sex, nsd) END) AS sex,
-            COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.race, nsd) END) AS races,
+            COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(replace(replace(replace(p.race, '[', ''), ']', ''), '"', ''), nsd) END) AS races,
             COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.participant_id, nsd) END) AS participant_ids,
             COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.study_participant_id, nsd) END) AS study_participant_ids
           WITH file_id, nsd, na,
