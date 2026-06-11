@@ -105,7 +105,7 @@ indices:
           COALESCE(p.participant_id, nsd) as participant_id,
           COALESCE(replace(replace(replace(p.race, '[', ''), ']', ''), '"', ''), nsd) as race,
           COALESCE(p.sex, nsd) as sex,
-          COALESCE(p.ethnicity, nsd) as ethnicity,
+          COALESCE(replace(replace(replace(p.ethnicity, '[', ''), ']', ''), '"', ''), nsd) as ethnicity,
           COALESCE(p.participant_id, nsd) as subject_ids,
           COALESCE(p.dbGaP_subject_id, nsd) as dbGaP_subject_id
         SKIP $skip LIMIT $limit
