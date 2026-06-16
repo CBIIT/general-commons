@@ -117,10 +117,10 @@ function searchView(props) {
 
     if (activeVal === 'inactive') {
       if (isSignedIn && !isAuthorized) {
-        history.push(`/request?redirect=/search/${searchText}`);
+        history.push(`/request?redirect=/search/${encodeURIComponent(searchText)}`);
         return;
       }
-      history.push(`/login?redirect=/search/${searchText}`);
+      history.push(`/login?redirect=/search/${encodeURIComponent(searchText)}`);
     }
   };
 
@@ -138,7 +138,7 @@ function searchView(props) {
     queryCountAPI(value, !authCheck()).then((d) => {
       setSearchText(value);
       setSearchCounts(d);
-      history.push(`/search/${value}`);
+      history.push(`/search/${encodeURIComponent(value)}`);
     });
   };
 

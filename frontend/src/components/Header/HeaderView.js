@@ -43,6 +43,13 @@ const ICDCHeader = ({ classes }) => {
       placeholder: "SEARCH GC",
       ariaLabel: "Search GC",
     },
+    functions: {
+      onChange: (value, ...args) => {
+        if (!value || typeof value !== 'string') { return; }
+        if (!args || !args.length) { return; }
+        args[1].push(`${args[0]}/${encodeURIComponent(value)}`);
+      },
+    },
     classes,
   };
 

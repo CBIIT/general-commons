@@ -4,6 +4,18 @@ import { PUBLIC_ACCESS } from '../../bento/siteWideConfig';
 import { accessLevelTypes } from '@bento-core/authentication';
 import SearchView from './searchView';
 
+const safeDecode = (value) => {
+  if (!value) {
+    return "";
+  }
+
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+};
+
 const SearchViewController = ({ match }) => {
   const isSignedIn = useSelector((state) => state.login.isSignedIn);
   const isAdmin = useSelector((state) => state.login && state.login.role && state.login.role === 'admin');
@@ -17,7 +29,7 @@ const SearchViewController = ({ match }) => {
       publicAccessEnabled={PUBLIC_ACCESS === accessLevelTypes.METADATA_ONLY}
       isAuthorized={isAuthorized}
       isSignedIn={isSignedIn}
-      searchparam={match.params.id}
+      searchparam={safeDecode(match.params.id)}
     />
   );
 };
