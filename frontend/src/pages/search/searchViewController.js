@@ -17,7 +17,7 @@ const SearchViewController = ({ match }) => {
       publicAccessEnabled={PUBLIC_ACCESS === accessLevelTypes.METADATA_ONLY}
       isAuthorized={isAuthorized}
       isSignedIn={isSignedIn}
-      searchparam={match.params.id}
+      searchparam={match.params.id ? decodeURIComponent(match.params.id) : ''}
     />
   );
 };
