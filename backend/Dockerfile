@@ -9,7 +9,9 @@ FROM tomcat:10.1.54-jdk25 as fnl_base_image
 ENV JAVA_OPTS $JAVA_OPTS -XX:InitialRAMPercentage=25 -XX:MaxRAMPercentage=70
 ENV TZ America/New_York
 
-RUN apt-get update && apt-get install -y unzip  
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends unzip openssl \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN rm -rf /usr/local/tomcat/webapps/ROOT
 COPY --from=build /usr/src/app/target/CDS-2.2.0.war /usr/local/tomcat/webapps/ROOT.war
