@@ -1,5 +1,5 @@
 ARG ECR_REPO
-FROM maven:3.9.6-eclipse-temurin-17 as build
+FROM maven:3.9.16-eclipse-temurin-17-noble as build
 WORKDIR /usr/src/app
 COPY . .
 #COPY backend/ .
