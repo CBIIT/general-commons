@@ -1,0 +1,11 @@
+Notes: Service Versions
+project: gc
+services:
+  frontend:
+    version: 4.7.2.6
+  backend:
+    version: 4.7.2.6
+  interoperation:
+    version: 4.7.2.6
+  memgraph:
+    version: 3.2.1
