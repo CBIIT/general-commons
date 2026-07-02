@@ -1,0 +1,9 @@
+.env
+.env.*
+*.sh
+target/
+.git
+.idea
+.vscode
+Dockerfile
+.dockerignore
