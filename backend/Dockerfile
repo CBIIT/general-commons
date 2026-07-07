@@ -31,6 +31,7 @@ RUN apt update \
     && apt install -y libsystemd0=255.4-1ubuntu8.16 \
     && apt install -y libgcrypt20=1.10.3-2ubuntu0.1 \
     && apt install -y liblzma5=5.6.1+really5.4.5-1ubuntu0.3 \
-    && apt install -y libtinfo6=6.4+20240113-1ubuntu2.1
+    && apt install -y libtinfo6=6.4+20240113-1ubuntu2.1 \
+    && apt install -y gzip=1.12-1ubuntu3.2
 # switch to nonroot user
 USER nonrootuser
