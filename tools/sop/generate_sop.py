@@ -6,7 +6,8 @@ import fnmatch
 import json
 import os
 import re
-from datetime import datetime, timezone
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 from typing import Any
 
@@ -82,8 +83,9 @@ def scan_repo(repo: Path, cdk_dir: str, config: dict[str, Any]) -> dict[str, Any
     workflows = find_files(repo, [".github/workflows/*.yml", ".github/workflows/*.yaml"])
     runtime_files = find_files(repo, ["**/package.json", "**/pom.xml", "**/requirements*.txt", "**/pyproject.toml", "**/go.mod"])
     cdk_root = repo / cdk_dir
-    cdk_files = find_files(cdk_root if cdk_root.exists() else repo, ["**/*.py", "**/*.ts"])
+    cdk_files = find_files(cdk_root, ["**/*.py", "**/*.ts"]) if cdk_root.exists() else []
     services = merge_by_name(config.get("services", []), discover_services(repo, dockerfiles, cdk_files))
+    aws_resources = discover_aws_resources(repo, cdk_files)
 
     return {
         "repo": str(repo),
@@ -91,7 +93,8 @@ def scan_repo(repo: Path, cdk_dir: str, config: dict[str, Any]) -> dict[str, Any
         "dockerfiles": [rel(repo, p) for p in dockerfiles],
         "runtime_files": [summarize_runtime(repo, p) for p in runtime_files],
         "workflows": [summarize_workflow(repo, p) for p in workflows],
-        "aws_resources": discover_aws_resources(repo, cdk_files),
+        "aws_resources": aws_resources,
+        "aws_resource_names": sorted({resource["resource"] for resource in aws_resources}),
         "cdk_files": [rel(repo, p) for p in cdk_files],
         "environments": merge_environments(config.get("environments", []), discover_envs(workflows), config)
     }
@@ -309,7 +312,7 @@ def build_docx(config: dict[str, Any], discovered: dict[str, Any], out: Path) ->
     project = config.get("project", {})
 
     title(doc, f"{project.get('name', 'Project')} SOP")
-    paragraph(doc, f"Generated {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}", italic=True, center=True)
+    paragraph(doc, f"Generated {datetime.now(ZoneInfo('America/New_York')).strftime('%Y-%m-%d %H:%M %Z')}", italic=True, center=True)
 
     heading(doc, "1. Project Overview")
     labeled_bullets(doc, [
@@ -332,26 +335,11 @@ def build_docx(config: dict[str, Any], discovered: dict[str, Any], out: Path) ->
         for service in discovered["services"]
     ])
 
-    heading(doc, "3. AWS Resources From CDK")
-    table(doc, ["AWS Resource", "CDK Construct", "Construct ID", "Source File"], [
-        [
-            resource["resource"],
-            resource["construct"],
-            resource["construct_id"],
-            resource["source"]
-        ]
-        for resource in discovered["aws_resources"]
-    ])
+    heading(doc, "3. AWS Resources")
+    table(doc, ["AWS Resource"], [[name] for name in discovered.get("aws_resource_names", [])])
 
-    heading(doc, "4. Dockerfiles And Runtime Files")
-    subheading(doc, "Dockerfiles")
+    heading(doc, "4. Dockerfiles")
     simple_bullets(doc, discovered["dockerfiles"] or ["TBD"])
-
-    subheading(doc, "Runtime Files")
-    table(doc, ["File", "Type", "Name", "Details"], [
-        [runtime["file"], runtime["type"], runtime["name"], runtime["details"]]
-        for runtime in discovered["runtime_files"]
-    ])
 
     heading(doc, "5. Environments And URLs")
     table(doc, ["Environment", "Purpose", "URL", "Notes"], [
@@ -360,13 +348,11 @@ def build_docx(config: dict[str, Any], discovered: dict[str, Any], out: Path) ->
     ])
 
     heading(doc, "6. Build And Deploy Workflows")
-    table(doc, ["Category", "Workflow", "File", "Triggers", "Jobs"], [
+    table(doc, ["Category", "Workflow", "File"], [
         [
             workflow["category"],
             workflow["name"],
-            workflow["file"],
-            ", ".join(workflow["triggers"]) or "TBD",
-            ", ".join(workflow["jobs"]) or "TBD"
+            workflow["file"]
         ]
         for workflow in discovered["workflows"]
     ])

@@ -1,0 +1,567 @@
+import boto3
+from configparser import ConfigParser
+from constructs import Construct
+from cdk_ec2_key_pair import KeyPair, PublicKeyFormat
+from aws_cdk import Stack
+from aws_cdk import RemovalPolicy
+from aws_cdk import SecretValue
+from aws_cdk import aws_elasticloadbalancingv2 as elbv2
+from aws_cdk import aws_ec2 as ec2
+from aws_cdk import aws_ecs as ecs
+from aws_cdk import aws_opensearchservice as opensearch
+from aws_cdk import aws_kms as kms
+from aws_cdk import aws_secretsmanager as secretsmanager
+from aws_cdk import aws_certificatemanager as acm
+from aws_cdk import aws_rds as rds
+from aws_cdk import aws_cloudfront as cloudfront
+from aws_cdk import aws_cloudfront_origins as origins
+from aws_cdk import aws_s3 as s3
+from aws_cdk import aws_ssm as ssm
+from aws_cdk import aws_iam as iam
+from aws_cdk import aws_efs as efs
+from aws_cdk import Duration
+from aws_cdk import RemovalPolicy
+from services import memgraph, frontend, backend, interoperation
+import aws_cdk as cdk
+
+class Stack(Stack):
+    def __init__(self, scope: Construct, **kwargs) -> None:
+        super().__init__(scope, **kwargs)
+
+        ### Read config
+        config = ConfigParser()
+        config.read('config.ini')
+        
+        self.namingPrefix = "{}-{}".format(config['main']['resource_prefix'], config['main']['tier'])
+
+        if config.has_option('main', 'subdomain'):
+            self.app_url = "https://{}.{}".format(config['main']['subdomain'], config['main']['domain'])
+        else:
+            self.app_url = "https://{}".format(config['main']['domain'])
+        
+        ### Import VPC
+        self.VPC = ec2.Vpc.from_lookup(self, "VPC",
+            vpc_id = config['main']['vpc_id']
+        )
+
+        ### Opensearch Cluster
+        if config['os']['endpoint_type'] == 'vpc':
+            vpc = self.VPC
+            vpc_subnets=[{
+                'subnets': [self.VPC.private_subnets[0]],
+            }]
+        else:
+            vpc = None
+            vpc_subnets=[{}]
+
+        self.osDomain = opensearch.Domain(self,
+            "opensearch",
+            version=opensearch.EngineVersion.open_search(config['os']['version']),
+            vpc=vpc,
+            domain_name=f"{config['main']['resource_prefix']}-{config['main']['tier']}-opensearch",
+            zone_awareness=opensearch.ZoneAwarenessConfig(
+                enabled=False
+            ),
+            capacity=opensearch.CapacityConfig(
+                data_node_instance_type=config['os']['data_node_instance_type'],
+                multi_az_with_standby_enabled=False
+            ),
+            vpc_subnets=vpc_subnets,
+            removal_policy=RemovalPolicy.DESTROY,
+            #advanced_options={"override_main_response_version" : "true"}
+        )
+
+        # Policy to allow access for dataloader instances
+        os_policy = iam.PolicyStatement(
+            actions=[
+                "es:ESHttpGet",
+                "es:ESHttpPut",
+                "es:ESHttpPost",
+                "es:ESHttpPatch",
+                "es:ESHttpHead",
+                "es:ESHttpGet",
+                "es:ESHttpDelete",
+            ],
+            resources=["{}/*".format(self.osDomain.domain_arn)],
+            principals=[iam.AnyPrincipal()],
+        )
+        self.osDomain.add_access_policies(os_policy)
+        security_group = self.osDomain.connections.security_groups[0]
+        
+        #os_cidr_ranges = [
+            #"10.208.8.0/21",
+            #"10.208.0.0/21"
+        #]
+
+        os_cidr_ranges = [
+            cidr.strip()
+            for cidr in config["main"]["os_cidr_ranges"].split(",")
+        ]
+        
+        for cidr in os_cidr_ranges:
+            security_group.add_ingress_rule(
+                peer=ec2.Peer.ipv4(cidr),
+                connection=ec2.Port.tcp(443),
+                description=f"Allow HTTPS from {cidr}"
+            )
+        #self.osDomain.connections.allow_from(ec2.Peer.ipv4("10.208.0.0/21"), ec2.Port.HTTPS)
+        #self.osDomain.connections.allow_from(ec2.Peer.ipv4("10.210.0.0/24"), ec2.Port.HTTPS)
+
+
+        ## Task Role
+        #self.policy_statements = [
+            #iam.PolicyStatement(
+                #actions=["ecs:ExecuteCommand"],
+                #effect=iam.Effect.ALLOW,
+                #resources=[f"arn:aws:ecs:us-east-1:339649878709:cluster/{config['main']['resource_prefix']}-{config['main']['tier']}-ecs"]
+            #),
+            #iam.PolicyStatement(
+                #actions=[
+                    #"ecr:UploadLayerPart", "ecr:PutImage", "ecr:ListTagsForResource", "ecr:InitiateLayerUpload",
+                    #"ecr:GetRepositoryPolicy", "ecr:GetLifecyclePolicy", "ecr:GetDownloadUrlForLayer", "ecr:DescribeRepositories",
+                    #"ecr:CompleteLayerUpload", "ecr:BatchGetImage", "ecr:BatchCheckLayerAvailability"
+                #],
+                #effect=iam.Effect.ALLOW,
+                #resources=["arn:aws:ecr:us-east-1:339649878709:repository/*"]
+            #),
+            #iam.PolicyStatement(
+                #actions=["ecr:GetAuthorizationToken"],
+                #effect=iam.Effect.ALLOW,
+                #resources=["*"]
+            #),
+            #iam.PolicyStatement(
+                #actions=["ssmmessages:OpenDataChannel", "ssmmessages:OpenControlChannel", "ssmmessages:CreateDataChannel", "ssmmessages:CreateControlChannel"],
+                #effect=iam.Effect.ALLOW,
+                #resources=["*"]
+            #),
+            #iam.PolicyStatement(
+                #actions=["logs:CreateLogStream", "logs:CreateLogGroup"],
+                #effect=iam.Effect.ALLOW,
+                #resources=["*"]
+            #),
+            #iam.PolicyStatement(
+                #actions=["logs:PutLogEvents"],
+                #effect=iam.Effect.ALLOW,
+                #resources=["arn:aws:logs:*:339649878709:log-group:*:log-stream:*"]
+            #),
+            #iam.PolicyStatement(
+                #actions=["kms:GenerateDataKey", "kms:Decrypt"],
+                #effect=iam.Effect.ALLOW,
+                #resources=["arn:aws:kms:us-east-1:339649878709:key/f8233482-56b4-4dfa-a1f6-58870d78f1ec"]
+            #),
+            #iam.PolicyStatement(
+                #actions=[
+                    #"secretsmanager:ListSecrets", "secretsmanager:ListSecretVersionIds", "secretsmanager:GetSecretValue",
+                    #"secretsmanager:GetResourcePolicy", "secretsmanager:DescribeSecret"
+                #],
+                #effect=iam.Effect.ALLOW,
+                #resources=["arn:aws:secretsmanager:us-east-1:339649878709:secret/*"]
+            #),
+            #iam.PolicyStatement(
+                #actions=["es:ESHttp*"],
+                #effect=iam.Effect.ALLOW,
+                #resources=[f"arn:aws:es:*:339649878709:domain/{config['main']['resource_prefix']}-{config['main']['tier']}-opensearch/*"]
+            #),
+            #iam.PolicyStatement(
+                #actions=["s3:ListBucket"],
+                #effect=iam.Effect.ALLOW,
+                #resources=["arn:aws:s3:::crdc-cds-nonprod-interoperation-files"],
+                #sid="AllowBucketAccess"
+            #),
+            #iam.PolicyStatement(
+                #actions=["s3:PutObject", "s3:GetObject", "s3:DeleteObject"],
+                #effect=iam.Effect.ALLOW,
+                #resources=["arn:aws:s3:::crdc-cds-nonprod-interoperation-files/*", "arn:aws:s3:::crdc-cds-nonprod-interoperation-files"],
+                #sid="AllowObjectAccess"
+            #),
+            #iam.PolicyStatement(
+                #actions=[
+                    #"elasticfilesystem:DescribeFileSystems",
+                    #"elasticfilesystem:DescribeMountTargets"
+                #],
+                #effect=iam.Effect.ALLOW,
+                #resources=["*"],
+                #sid="AllowEFSAccess"
+            #),
+            #iam.PolicyStatement(
+                #actions=[
+                    #"elasticfilesystem:ClientMount",
+                    #"elasticfilesystem:ClientWrite",
+                    #"elasticfilesystem:ClientRootAccess"
+                #],
+                #effect=iam.Effect.ALLOW,
+                #resources=["arn:aws:elasticfilesystem:*:*:file-system/*"],
+                #sid="AllowEFSFileAccess"
+            #)
+        #]
+        
+        #self.policy_ecr_statements = [
+            #iam.PolicyStatement(
+                #actions=["ecs:ExecuteCommand"],
+                #effect=iam.Effect.ALLOW,
+                #resources=[f"arn:aws:ecs:us-east-1:339649878709:cluster/{config['main']['resource_prefix']}-{config['main']['tier']}-ecs"]
+            #),
+            #iam.PolicyStatement(
+                #actions=[
+                    #"ecr:UploadLayerPart", "ecr:PutImage", "ecr:ListTagsForResource", "ecr:InitiateLayerUpload",
+                    #"ecr:GetRepositoryPolicy", "ecr:GetLifecyclePolicy", "ecr:GetDownloadUrlForLayer", "ecr:DescribeRepositories",
+                    #"ecr:CompleteLayerUpload", "ecr:BatchGetImage", "ecr:BatchCheckLayerAvailability"
+                #],
+                #effect=iam.Effect.ALLOW,
+                #resources=["arn:aws:ecr:us-east-1:986019062625:repository/*"]
+            #),
+            #iam.PolicyStatement(
+                #actions=["ecr:GetAuthorizationToken"],
+                #effect=iam.Effect.ALLOW,
+                #resources=["*"]
+            #),
+            #iam.PolicyStatement(
+                #actions=["ssmmessages:OpenDataChannel", "ssmmessages:OpenControlChannel", "ssmmessages:CreateDataChannel", "ssmmessages:CreateControlChannel"],
+                #effect=iam.Effect.ALLOW,
+                #resources=["*"]
+            #),
+            #iam.PolicyStatement(
+                #actions=["logs:CreateLogStream", "logs:CreateLogGroup"],
+                #effect=iam.Effect.ALLOW,
+                #resources=["*"]
+            #),
+            #iam.PolicyStatement(
+                #actions=["logs:PutLogEvents"],
+                #effect=iam.Effect.ALLOW,
+                #resources=["arn:aws:logs:*:339649878709:log-group:*:log-stream:*"]
+            #),
+            #iam.PolicyStatement(
+                #actions=["kms:GenerateDataKey", "kms:Decrypt"],
+                #effect=iam.Effect.ALLOW,
+                #resources=["arn:aws:kms:us-east-1:339649878709:key/*"]
+            #),
+            #iam.PolicyStatement(
+                #actions=[
+                    #"secretsmanager:ListSecrets", "secretsmanager:ListSecretVersionIds", "secretsmanager:GetSecretValue",
+                    #"secretsmanager:GetResourcePolicy", "secretsmanager:DescribeSecret"
+                #],
+                #effect=iam.Effect.ALLOW,
+                #resources=["arn:aws:secretsmanager:us-east-1:339649878709:secret/*"]
+            #),
+            #iam.PolicyStatement(
+                #actions=["sqs:*"],
+                #effect=iam.Effect.ALLOW,
+                #resources=["arn:aws:sqs:us-east-1:339649878709:*"]
+            #),
+            #iam.PolicyStatement(
+                #actions=[
+                    #"elasticfilesystem:DescribeFileSystems",
+                    #"elasticfilesystem:DescribeMountTargets"
+                #],
+                #effect=iam.Effect.ALLOW,
+                #resources=["*"],
+                #sid="AllowEFSAccess"
+            #),
+            #iam.PolicyStatement(
+                #actions=[
+                    #"elasticfilesystem:ClientMount",
+                    #"elasticfilesystem:ClientWrite",
+                    #"elasticfilesystem:ClientRootAccess"
+                #],
+                #effect=iam.Effect.ALLOW,
+                #resources=["arn:aws:elasticfilesystem:*:*:file-system/*"],
+                #sid="AllowEFSFileAccess"
+            #)
+        #]
+        
+        #task_role = iam.Role(
+                #self, 'EcsTaskRole',
+                #assumed_by=iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
+                #inline_policies={
+                    #'EcsTaskPolicy': iam.PolicyDocument(statements=self.policy_statements)
+                #}
+        #)
+        
+        #task_execution_role = iam.Role(
+                #self, 'EcsTaskExecutionRole',
+                #assumed_by=iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
+                #inline_policies={
+                    #'EcsTaskPolicy': iam.PolicyDocument(statements=self.policy_ecr_statements)
+                #}
+        #) 
+        
+        ### Cloudfront
+        
+        #cdk.Aspects.of(task_role).add(RoleNameAspect(
+            #f"{config['iam']['role_prefix']}-{config['main']['resource_prefix']}-{config['main']['tier']}-ecs-task-role"
+        #))
+        
+        #cdk.Aspects.of(task_execution_role).add(RoleNameAspect(
+            #f"{config['iam']['role_prefix']}-{config['main']['resource_prefix']}-{config['main']['tier']}-ecs-task-execution-role"
+        #))
+        
+        if(config['cloudfront']['deploy'] == "true"):
+            self.cfOrigin = s3.Bucket.from_bucket_name(
+            self, "CFBucket",
+            #bucket_name="crdc-cds-nonprod-interoperation-files"
+            bucket_name=config["cloudfront"]["bucket_name"]
+            )
+
+            self.cfKeys = KeyPair(self, "CFKeyPair",
+                key_pair_name="CF-key-{}-{}".format(config['main']['resource_prefix'], config['main']['tier']),
+                expose_public_key=True,
+                public_key_format=PublicKeyFormat.PEM
+            )
+
+            CFPublicKey = cloudfront.PublicKey(self, "CFPublicKey",
+                encoded_key=self.cfKeys.public_key_value
+            )
+            CFKeyGroup = cloudfront.KeyGroup(self, "CFKeyGroup",
+                items=[CFPublicKey]
+            )
+        
+            tier = config['main']['tier']
+            self.cfDistribution = cloudfront.Distribution(self, "CFDistro",
+                default_behavior=cloudfront.BehaviorOptions(
+                    origin=origins.S3Origin(self.cfOrigin),
+                    allowed_methods=cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
+                    trusted_key_groups=[CFKeyGroup]
+                ),
+                comment=f"({config['main']['resource_prefix']}-{config['env'][tier]})"
+            )
+        
+        
+        ### RDS
+        # Create the serverless cluster
+        # self.auroraCluster = rds.ServerlessCluster(self, "AuroraCluster",
+        #     engine=rds.DatabaseClusterEngine.AURORA_MYSQL,
+        #     vpc=vpc,
+        #     credentials=rds.Credentials.from_username(config['db']['mysql_user']),
+        #     default_database_name=config['db']['mysql_database']
+        # )
+        
+        ### Secrets
+        
+        
+        if(config['cloudfront']['deploy'] == "true"):
+            public_key_id = CFPublicKey.public_key_id
+            cf_domain = self.cfDistribution.distribution_domain_name
+        else:
+            #public_key_id = "K2JHABMC4EI0Q9"
+            #cf_domain = "https://d2krihsuecuuhu.cloudfront.net"
+            public_key_id = config["cloudfront"].get("public_key_id")
+            cf_domain = config["cloudfront"].get("cf_domain")
+            
+        self.secret = secretsmanager.Secret(self, "Secret",
+            secret_name="{}/{}".format(config['main']['secret_prefix'], config['main']['tier']),
+            secret_object_value={
+                "neo4j_user": SecretValue.unsafe_plain_text(config['db']['neo4j_user']),
+                "neo4j_password": SecretValue.unsafe_plain_text(config['db']['neo4j_password']),
+                "neo4j_ip": SecretValue.unsafe_plain_text(config['db']['neo4j_ip']),
+                # "es_host": SecretValue.unsafe_plain_text(self.osDomain.domain_endpoint),
+                "memgraph_user": SecretValue.unsafe_plain_text(config['db']['memgraph_user']),
+                "memgraph_password": SecretValue.unsafe_plain_text(config['db']['memgraph_password']),
+                "newrelic_license_key": SecretValue.unsafe_plain_text(config['secrets']['newrelic_license_key']),
+                "sumo_collector_endpoint": SecretValue.unsafe_plain_text(config['secrets']['sumo_collector_endpoint']),
+                "sumo_collector_token_backend": SecretValue.unsafe_plain_text(config['secrets']['sumo_collector_token_backend']),
+ 
+                "cf_key_pair_id": SecretValue.unsafe_plain_text(public_key_id),
+                "cf_url": SecretValue.unsafe_plain_text("https://{}".format(cf_domain)),
+                "es_host": SecretValue.unsafe_plain_text(self.osDomain.domain_endpoint),
+                
+                "cookie_secret": SecretValue.unsafe_plain_text(config['secrets']['cookie_secret']),
+                "token_secret": SecretValue.unsafe_plain_text(config['secrets']['token_secret']),
+                "email_user": SecretValue.unsafe_plain_text(config['secrets']['email_user']),
+                "email_password": SecretValue.unsafe_plain_text(config['secrets']['email_password']),
+                "google_client_id": SecretValue.unsafe_plain_text(config['secrets']['google_client_id']),
+                "google_client_secret": SecretValue.unsafe_plain_text(config['secrets']['google_client_secret']),
+                "nih_client_id": SecretValue.unsafe_plain_text(config['secrets']['nih_client_id']),
+                "nih_client_secret": SecretValue.unsafe_plain_text(config['secrets']['nih_client_secret']),
+
+                # MySQL secrets will be taken from the secret entry created by the cluster creation
+
+            }
+        )
+
+        #security group
+        cidr_ranges = config.get('network_range', 'allowed_cidrs').split(',')
+        allowed_ports = config.get('app_ports', 'allowed_ports').split(',')
+        
+        alb_security_group = ec2.SecurityGroup(
+            self, 
+            "ALBSecurityGroup",
+            vpc=vpc,
+            description="Security Group for Application Load Balancer",
+            allow_all_outbound=True,
+            security_group_name=f"{config['main']['resource_prefix']}-{config['main']['tier']}-alb-sg",
+        )
+        
+        app_security_group = ec2.SecurityGroup(
+            self, 
+            "AppSecurityGroup",
+            vpc=vpc,
+            description="Security Group for Application Servers",
+            allow_all_outbound=True,
+            security_group_name=f"{config['main']['resource_prefix']}-{config['main']['tier']}-app-sg",
+        )
+
+        
+        for cidr in cidr_ranges:
+            alb_security_group.add_ingress_rule(
+                ec2.Peer.ipv4(cidr),
+                ec2.Port.tcp(80),  # HTTP
+                "Allow HTTP traffic from specified IP ranges"
+            )
+            alb_security_group.add_ingress_rule(
+                ec2.Peer.ipv4(cidr),
+                ec2.Port.tcp(443),  # HTTPS
+                "Allow HTTPS traffic from specified IP ranges"
+            )
+        
+        for port in allowed_ports:
+            app_security_group.add_ingress_rule(
+                alb_security_group,
+                ec2.Port.tcp(int(port)),
+                f"Allow traffic from ALB on port {port}"
+            )
+        
+        ### ALB
+        # Extract subnet IDs
+        subnet1 = config.get('Subnets', 'subnet1')
+        subnet2 = config.get('Subnets', 'subnet2')
+        selected_subnets = ec2.SubnetSelection(
+            subnets=[
+                ec2.Subnet.from_subnet_id(self, "Subnet1", subnet1),
+                ec2.Subnet.from_subnet_id(self, "Subnet2", subnet2)
+            ]
+        )
+        self.ALB = elbv2.ApplicationLoadBalancer(self,
+            "alb",
+            load_balancer_name = f"{config['main']['resource_prefix']}-{config['main']['tier']}-alb",
+            vpc=self.VPC,
+            internet_facing=config.getboolean('alb', 'internet_facing'),
+            vpc_subnets=selected_subnets,
+            security_group=alb_security_group
+        )
+
+        self.ALB.add_redirect(
+            source_protocol=elbv2.ApplicationProtocol.HTTP,
+            source_port=80,
+            target_protocol=elbv2.ApplicationProtocol.HTTPS,
+            target_port=443)
+
+        # Get certificate ARN for specified domain name
+        
+        cert_arn = config['alb']['certificate_arn']
+        alb_cert = acm.Certificate.from_certificate_arn(self, "alb-cert",
+            certificate_arn=cert_arn)
+
+        self.listener = self.ALB.add_listener("PublicListener",
+            certificates=[
+                alb_cert
+            ],
+            port=443)
+
+        ### ALB Access log
+        log_bucket = s3.Bucket.from_bucket_name(self, "AlbAccessLogsBucket", config['main']['alb_log_bucket_name'])
+        log_prefix = f"{config['main']['program']}/{config['main']['tier']}/{config['main']['resource_prefix']}/alb-access-logs"
+ 
+        self.ALB.log_access_logs(
+            bucket=log_bucket,
+            prefix=log_prefix
+#            bucket=self.alb_logs_bucket,
+#            prefix="alb-logs/"
+        )
+
+        # Add a fixed error message when browsing an invalid URL
+        #self.listener.add_action("ECS-Content-Not-Found",
+            #action=elbv2.ListenerAction.fixed_response(200,
+                #message_body="The requested resource is not available"))
+
+        ### ECS Cluster
+        self.kmsKey = kms.Key(self, "ECSExecKey")
+
+        self.ECSCluster = ecs.Cluster(self,
+            "ecs",
+            cluster_name = f"{config['main']['resource_prefix']}-{config['main']['tier']}-ecs",
+            vpc=self.VPC,
+            execute_command_configuration=ecs.ExecuteCommandConfiguration(
+                kms_key=self.kmsKey
+            ),
+        )
+        
+        ### EFS - Memgraph
+        EFSSecurityGroup = ec2.SecurityGroup(self, "EFSSecurityGroup", vpc=self.VPC, allow_all_outbound=True,)
+        EFSSecurityGroup.add_ingress_rule(peer=ec2.Peer.ipv4(self.VPC.vpc_cidr_block),
+            connection=ec2.Port.tcp(2049),
+        )
+
+        # Extracts Subnets
+        subnet_efs1 = config.get('Subnets', 'subnet_efs1')
+        subnet_efs2 = config.get('Subnets', 'subnet_efs2')
+        subnets_efs = ec2.SubnetSelection(
+            subnets=[
+                ec2.Subnet.from_subnet_id(self, "Subnet_efs1", subnet_efs1),
+                ec2.Subnet.from_subnet_id(self, "Subnet_efs2", subnet_efs2)
+            ]
+        )
+
+        self.fileSystem = efs.FileSystem(self, "EfsFileSystem",
+            vpc=self.VPC,
+            encrypted=True,
+            enable_automatic_backups=True,
+            security_group=EFSSecurityGroup,
+            file_system_name=f"gen-{config['main']['tier']}-efs",
+            removal_policy=RemovalPolicy.DESTROY,
+            vpc_subnets=subnets_efs
+        )
+        self.EFSAccessPoint = self.fileSystem.add_access_point("EFSAccessPoint",
+            path="/{}".format(config['main']['tier']),
+            create_acl=efs.Acl(
+                owner_uid="101",
+                owner_gid="103",
+                permissions="755"
+            ),
+            posix_user=efs.PosixUser(
+                uid="101",
+                gid="103"
+            )
+        ) 
+        
+         # Define the policy AFTER the file system exists
+        file_system_policy = iam.PolicyDocument(
+            statements=[iam.PolicyStatement(
+                actions=[
+                    "elasticfilesystem:ClientWrite", 
+                    "elasticfilesystem:ClientMount",
+                    "elasticfilesystem:ClientRootAccess",
+                    "elasticfilesystem:DescribeFileSystems",
+                    "elasticfilesystem:DescribeMountTargets"
+                ],
+                principals=[iam.AnyPrincipal()],
+                resources=["*"],  # Now it's available
+                conditions={
+                    "Bool": {
+                        "elasticfilesystem:AccessedViaMountTarget": "true"
+                    }
+                }
+            )]
+        )
+        # Apply policy using CfnFileSystem
+        efs_cfn = self.fileSystem.node.default_child
+        efs_cfn.add_property_override("FileSystemPolicy", file_system_policy.to_json())
+        ### Fargate
+        # Memgraph Service
+        memgraph.memgraphService.createService(self, config)
+
+        # Frontend Service
+        frontend.frontendService.createService(self, config,[app_security_group])
+
+        # Backend Service
+        backend.backendService.createService(self, config,[app_security_group])
+
+        # Memgraph Service
+        #memgraph.memgraphService.createService(self, config)
+
+        # Interoperation Service
+        interoperation.interoperationService.createService(self, config,[app_security_group])
+
+        # Add a fixed error message when browsing an invalid URL
+        self.listener.add_action("ECS-Content-Not-Found",
+            action=elbv2.ListenerAction.fixed_response(200,
+                message_body="The requested resource is not available"))

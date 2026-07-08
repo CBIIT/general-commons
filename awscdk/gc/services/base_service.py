@@ -1,0 +1,165 @@
+from aws_cdk import Duration
+from aws_cdk import aws_iam as iam
+from aws_cdk import aws_elasticloadbalancingv2 as elbv2
+from aws_cdk import aws_ecs as ecs
+from aws_cdk import aws_ecr as ecr
+from aws_cdk import aws_ec2 as ec2
+from datetime import date
+
+
+class BaseService:
+  def createService(self, stack, config, security_group, service, environment, secrets):
+      account = config['main']['account_id']
+      region  = config['main']['region']
+      bucket_name  = config['cloudfront']['bucket_name']
+      prefix    = f"{config['main']['resource_prefix']}-{config['main']['tier']}"
+
+      #command = [config[service]['command']] if config.has_option(service, 'command') else None
+      if config.has_option(service, 'command'):
+          command = [config[service]['command']]
+      else:
+          command = None
+
+      # Task Definition
+      taskDefinition = ecs.FargateTaskDefinition(stack,
+          f"{stack.namingPrefix}-{service}-taskDef",
+          family=f"{prefix}-{service}",
+          cpu=config.getint(service, 'cpu'),
+          memory_limit_mib=config.getint(service, 'memory')
+      )
+
+      ecr_repo = ecr.Repository.from_repository_arn(
+          stack, f"{service}_repo", repository_arn=config[service]['repo']
+      )
+
+      taskDefinition.add_container(
+          service,
+          image=ecs.ContainerImage.from_ecr_repository(repository=ecr_repo, tag=config[service]['image']),
+          cpu=config.getint(service, 'cpu'),
+          memory_limit_mib=config.getint(service, 'memory'),
+          port_mappings=[ecs.PortMapping(
+              app_protocol=ecs.AppProtocol.http,
+              container_port=config.getint(service, 'port'),
+              name=service
+          )],
+          command=command,
+          environment=environment,
+          secrets=secrets,
+          logging=ecs.LogDrivers.aws_logs(stream_prefix=f"{stack.namingPrefix}-{service}")
+      )
+
+      # IAM Policies
+      policies = [
+          iam.PolicyStatement(
+              effect=iam.Effect.ALLOW,
+              actions=["ecs:ExecuteCommand"],
+              resources=[f"arn:aws:ecs:{region}:{account}:cluster/*"] 
+          ),
+          iam.PolicyStatement(
+              effect=iam.Effect.ALLOW,
+              actions=[
+                  "ecr:UploadLayerPart", "ecr:PutImage", "ecr:BatchCheckLayerAvailability",
+                  "ecr:BatchGetImage", "ecr:CompleteLayerUpload", "ecr:DescribeRepositories",
+                  "ecr:GetDownloadUrlForLayer", "ecr:GetLifecyclePolicy", "ecr:GetRepositoryPolicy",
+                  "ecr:InitiateLayerUpload", "ecr:ListTagsForResource"
+              ],
+              resources=["arn:aws:ecr:us-east-1:986019062625:repository/*"]
+          ),
+          iam.PolicyStatement(
+              effect=iam.Effect.ALLOW,
+              actions=[
+                  "ecr:GetAuthorizationToken", "logs:CreateLogGroup", "logs:CreateLogStream",
+                  "ssmmessages:CreateControlChannel", "ssmmessages:CreateDataChannel",
+                  "ssmmessages:OpenControlChannel", "ssmmessages:OpenDataChannel"
+              ],
+              resources=["*"]
+          ),
+          iam.PolicyStatement(
+              effect=iam.Effect.ALLOW,
+              actions=["logs:PutLogEvents"],
+              resources=[f"arn:aws:logs:*:{account}:log-group:*:log-stream:*"]
+          ),
+          iam.PolicyStatement(
+              effect=iam.Effect.ALLOW,
+              actions=["kms:Decrypt", "kms:GenerateDataKey"],
+              resources=[f"arn:aws:kms:{region}:{account}:key/*"]
+          ),
+          iam.PolicyStatement(
+              effect=iam.Effect.ALLOW,
+              actions=[
+                  "secretsmanager:DescribeSecret", "secretsmanager:GetResourcePolicy",
+                  "secretsmanager:GetSecretValue", "secretsmanager:ListSecretVersionIds",
+                  "secretsmanager:ListSecrets"
+              ],
+              resources=[f"arn:aws:secretsmanager:{region}:{account}:secret/*"]
+          ),
+          iam.PolicyStatement(
+              effect=iam.Effect.ALLOW,
+              actions=["es:ESHttp*"],
+              resources=[f"arn:aws:es:*:{account}:domain/*"]
+          ),
+          iam.PolicyStatement(
+              effect=iam.Effect.ALLOW,
+              actions=["s3:ListBucket", "s3:DeleteObject", "s3:GetObject", "s3:PutObject"],
+              resources=[f"arn:aws:s3:::{bucket_name}", f"arn:aws:s3:::{bucket_name}/*"]
+          ),
+          iam.PolicyStatement(
+              effect=iam.Effect.ALLOW,
+              actions=["elasticfilesystem:DescribeFileSystems", "elasticfilesystem:DescribeMountTargets"],
+              resources=["*"]
+          ),
+          iam.PolicyStatement(
+              effect=iam.Effect.ALLOW,
+              actions=[
+                  "elasticfilesystem:ClientMount", "elasticfilesystem:ClientRootAccess",
+                  "elasticfilesystem:ClientWrite"
+              ],
+              resources=["arn:aws:elasticfilesystem:*:*:file-system/*"]
+          ),
+          iam.PolicyStatement(
+              effect=iam.Effect.ALLOW,
+              actions=["sqs:*"],
+              resources=[f"arn:aws:sqs:{region}:{account}:*"]
+          ),
+      ]
+
+      for policy in policies:
+          taskDefinition.task_role.add_to_policy(policy)
+          taskDefinition.execution_role.add_to_policy(policy)
+
+
+      # ECS Service
+      ecsService = ecs.FargateService(stack,
+          f"{stack.namingPrefix}-{service}-service",
+          service_name=f"{prefix}-{service}",
+          cluster=stack.ECSCluster,
+          task_definition=taskDefinition,
+          enable_execute_command=True,
+          min_healthy_percent=50,
+          max_healthy_percent=200,
+          circuit_breaker=ecs.DeploymentCircuitBreaker(enable=True, rollback=True),
+          vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS),
+          security_groups=security_group
+      )
+
+      # ALB
+      ecsTarget = stack.listener.add_targets(f"ECS-{service}-Target",
+          port=config.getint(service, 'port'),
+          protocol=elbv2.ApplicationProtocol.HTTP,
+          target_group_name=f"{prefix}-{service}",
+          health_check=elbv2.HealthCheck(
+              path=config[service]['health_check_path'],
+              timeout=Duration.seconds(config.getint(service, 'health_check_timeout')),
+              interval=Duration.seconds(config.getint(service, 'health_check_interval')),
+          ) if config.has_option(service, 'health_check_timeout') else elbv2.HealthCheck(
+              path=config[service]['health_check_path']
+          ),
+          targets=[ecsService]
+      )
+
+      elbv2.ApplicationListenerRule(stack, id=f"alb-{service}-rule",
+          conditions=[elbv2.ListenerCondition.path_patterns(config[service]['path'].split(','))],
+          priority=config.getint(service, 'priority_rule_number'),
+          listener=stack.listener,
+          target_groups=[ecsTarget]
+      )
