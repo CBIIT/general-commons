@@ -1,7 +1,7 @@
 ﻿{
   "project": {
     "name": "General Commons",
-    "owner": "CBIIT",
+    "owner": "",
     "description": "General Commons application and AWS deployment automation.",
     "primary_contact": "Amanda Bell, Austin Muller",
     "support_channel": "N/A"
