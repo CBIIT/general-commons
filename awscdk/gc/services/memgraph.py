@@ -65,8 +65,8 @@ class memgraphService:
     dbContainer = taskDefinition.add_container(
         service,
         #image=ecs.ContainerImage.from_registry(config[service]['image']),
-        image=ecs.ContainerImage.from_registry("{}:{}".format(config[service]['repo'], config[service]['image'])),
-        #image=ecs.ContainerImage.from_ecr_repository(repository=ecr_repo, tag=config[service]['image']),
+        #image=ecs.ContainerImage.from_registry("{}:{}".format(config[service]['repo'], config[service]['image'])),
+        image=ecs.ContainerImage.from_ecr_repository(repository=ecr_repo, tag=config[service]['image']),
         cpu=config.getint(service, 'cpu'),
         memory_limit_mib=config.getint(service, 'memory'),
         port_mappings=[ecs.PortMapping(container_port=config.getint(service, 'port'), name=service), ecs.PortMapping(container_port=7444, name="mg-7444")],
