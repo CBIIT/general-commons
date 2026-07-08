@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 from __future__ import annotations
 
 import argparse
@@ -63,7 +63,7 @@ def main() -> int:
     args = parser.parse_args()
 
     repo = Path(args.repo).resolve()
-    config = json.loads(Path(args.config).read_text(encoding="utf-8"))
+    config = json.loads(Path(args.config).read_text(encoding="utf-8-sig"))
     discovered = scan_repo(repo, args.cdk_dir, config)
 
     if args.print_discovery:
