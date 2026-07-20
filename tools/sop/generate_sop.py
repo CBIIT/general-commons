@@ -53,6 +53,58 @@ AWS_RESOURCE_PATTERNS = {
     "EventBridge Rule": [("events.Rule", r"\bevents\.Rule\s*\(")]
 }
 
+CFN_TEMPLATE_PATTERNS = [
+    "**/*.template.json",
+    "**/*.template.yaml",
+    "**/*.template.yml"
+]
+
+CFN_RESOURCE_LABELS = {
+    "AWS::ACM::Certificate": "ACM Certificate",
+    "AWS::ApiGateway::ApiKey": "API Gateway API Key",
+    "AWS::ApiGateway::Deployment": "API Gateway Deployment",
+    "AWS::ApiGateway::Method": "API Gateway Method",
+    "AWS::ApiGateway::RestApi": "API Gateway REST API",
+    "AWS::ApiGateway::Stage": "API Gateway Stage",
+    "AWS::ApiGatewayV2::Api": "API Gateway V2 API",
+    "AWS::ApiGatewayV2::Integration": "API Gateway V2 Integration",
+    "AWS::ApiGatewayV2::Route": "API Gateway V2 Route",
+    "AWS::ApiGatewayV2::Stage": "API Gateway V2 Stage",
+    "AWS::CloudFront::Distribution": "CloudFront Distribution",
+    "AWS::CloudFront::KeyGroup": "CloudFront Key Group",
+    "AWS::CloudFront::PublicKey": "CloudFront Public Key",
+    "AWS::CloudWatch::Alarm": "CloudWatch Alarm",
+    "AWS::DynamoDB::Table": "DynamoDB Table",
+    "AWS::EC2::SecurityGroup": "Security Group",
+    "AWS::EC2::Subnet": "Subnet",
+    "AWS::EC2::VPC": "VPC",
+    "AWS::ECR::Repository": "ECR Repository",
+    "AWS::ECS::Cluster": "ECS Cluster",
+    "AWS::ECS::Service": "ECS Service",
+    "AWS::ECS::TaskDefinition": "ECS Task Definition",
+    "AWS::EFS::AccessPoint": "EFS Access Point",
+    "AWS::EFS::FileSystem": "EFS File System",
+    "AWS::ElasticLoadBalancingV2::Listener": "Load Balancer Listener",
+    "AWS::ElasticLoadBalancingV2::ListenerRule": "Load Balancer Listener Rule",
+    "AWS::ElasticLoadBalancingV2::LoadBalancer": "Load Balancer",
+    "AWS::ElasticLoadBalancingV2::TargetGroup": "Target Group",
+    "AWS::Events::Rule": "EventBridge Rule",
+    "AWS::IAM::ManagedPolicy": "IAM Managed Policy",
+    "AWS::IAM::Policy": "IAM Policy",
+    "AWS::IAM::Role": "IAM Role",
+    "AWS::KMS::Key": "KMS Key",
+    "AWS::Lambda::Function": "Lambda Function",
+    "AWS::Logs::LogGroup": "CloudWatch Log Group",
+    "AWS::OpenSearchService::Domain": "OpenSearch Domain",
+    "AWS::RDS::DBCluster": "RDS DB Cluster",
+    "AWS::RDS::DBInstance": "RDS DB Instance",
+    "AWS::Route53::RecordSet": "Route53 Record Set",
+    "AWS::S3::Bucket": "S3 Bucket",
+    "AWS::SecretsManager::Secret": "Secrets Manager Secret",
+    "AWS::SNS::Topic": "SNS Topic",
+    "AWS::SQS::Queue": "SQS Queue"
+}
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Generate SOP DOCX from project metadata and repo/CDK scan.")
@@ -84,8 +136,9 @@ def scan_repo(repo: Path, cdk_dir: str, config: dict[str, Any]) -> dict[str, Any
     runtime_files = find_files(repo, ["**/package.json", "**/pom.xml", "**/requirements*.txt", "**/pyproject.toml", "**/go.mod"])
     cdk_root = repo / cdk_dir
     cdk_files = find_files(cdk_root, ["**/*.py", "**/*.ts"]) if cdk_root.exists() else []
+    cfn_templates = find_cloudformation_templates(repo, cdk_root)
     services = merge_by_name(config.get("services", []), discover_services(repo, dockerfiles, cdk_files))
-    aws_resources = discover_aws_resources(repo, cdk_files)
+    aws_resources = discover_aws_resources(repo, cdk_files, cfn_templates)
 
     return {
         "repo": str(repo),
@@ -96,6 +149,7 @@ def scan_repo(repo: Path, cdk_dir: str, config: dict[str, Any]) -> dict[str, Any
         "aws_resources": aws_resources,
         "aws_resource_names": sorted({resource["resource"] for resource in aws_resources}),
         "cdk_files": [rel(repo, p) for p in cdk_files],
+        "cfn_templates": [rel(repo, p) for p in cfn_templates],
         "environments": merge_environments(config.get("environments", []), discover_envs(workflows), config)
     }
 
@@ -174,7 +228,109 @@ def infer_runtime(folder: Path) -> str:
     return ""
 
 
-def discover_aws_resources(repo: Path, cdk_files: list[Path]) -> list[dict[str, str]]:
+def find_cloudformation_templates(repo: Path, cdk_root: Path) -> list[Path]:
+    templates: dict[Path, Path] = {}
+
+    for cdk_out_dir in find_cdk_out_dirs(repo):
+        for template in find_files(cdk_out_dir, CFN_TEMPLATE_PATTERNS):
+            templates[template.resolve()] = template
+
+    if cdk_root.exists():
+        for template in find_files(cdk_root, CFN_TEMPLATE_PATTERNS):
+            templates[template.resolve()] = template
+
+    return sorted(templates.values())
+
+
+def find_cdk_out_dirs(repo: Path) -> list[Path]:
+    found: dict[Path, Path] = {}
+
+    if not repo.exists():
+        return []
+
+    for current, dirnames, _ in os.walk(repo):
+        current_path = Path(current)
+
+        for dirname in dirnames:
+            if dirname == "cdk.out":
+                path = current_path / dirname
+                found[path.resolve()] = path
+
+        dirnames[:] = [
+            dirname for dirname in dirnames
+            if dirname not in SKIP_DIRS and dirname != "cdk.out"
+        ]
+
+    return sorted(found.values())
+
+
+def discover_aws_resources(repo: Path, cdk_files: list[Path], cfn_templates: list[Path]) -> list[dict[str, str]]:
+    from_templates = discover_aws_resources_from_templates(repo, cfn_templates)
+    if from_templates:
+        return from_templates
+
+    return discover_aws_resources_from_cdk_source(repo, cdk_files)
+
+
+def discover_aws_resources_from_templates(repo: Path, cfn_templates: list[Path]) -> list[dict[str, str]]:
+    found: dict[str, dict[str, str]] = {}
+
+    for path in cfn_templates:
+        for cfn_type in extract_cfn_resource_types(path):
+            found[cfn_type] = {
+                "resource": cfn_resource_label(cfn_type),
+                "cfn_type": cfn_type,
+                "source": rel(repo, path),
+                "discovery": "cloudformation-template"
+            }
+
+    return sorted(found.values(), key=lambda item: (item["resource"], item["cfn_type"]))
+
+
+def extract_cfn_resource_types(path: Path) -> list[str]:
+    text = read(path)
+    data = parse_json_template(text) if path.suffix.lower() == ".json" else None
+
+    if isinstance(data, dict):
+        resources = data.get("Resources", {})
+        if isinstance(resources, dict):
+            return sorted({
+                resource.get("Type")
+                for resource in resources.values()
+                if isinstance(resource, dict)
+                and isinstance(resource.get("Type"), str)
+                and resource["Type"].startswith("AWS::")
+            })
+
+    return sorted(set(re.findall(
+        r"(?m)^\s*Type\s*:\s*[\"']?(AWS::[A-Za-z0-9:]+)[\"']?\s*(?:#.*)?$",
+        text
+    )))
+
+
+def parse_json_template(text: str) -> dict[str, Any] | None:
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return None
+
+
+def cfn_resource_label(cfn_type: str) -> str:
+    if cfn_type in CFN_RESOURCE_LABELS:
+        return CFN_RESOURCE_LABELS[cfn_type]
+
+    parts = cfn_type.split("::")
+    if len(parts) >= 3 and parts[0] == "AWS":
+        return " ".join(split_words(part) for part in parts[1:])
+
+    return cfn_type
+
+
+def split_words(value: str) -> str:
+    return re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", value).replace("_", " ")
+
+
+def discover_aws_resources_from_cdk_source(repo: Path, cdk_files: list[Path]) -> list[dict[str, str]]:
     found: dict[tuple[str, str, str, str], dict[str, str]] = {}
 
     for path in cdk_files:
