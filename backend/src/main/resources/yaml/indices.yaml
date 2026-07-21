@@ -103,9 +103,9 @@ indices:
         RETURN DISTINCT
           p.study_participant_id as study_participant_id,
           COALESCE(p.participant_id, nsd) as participant_id,
-          COALESCE(p.race, nsd) as race,
+          COALESCE(replace(replace(replace(p.race, '[', ''), ']', ''), '"', ''), nsd) as race,
           COALESCE(p.sex, nsd) as sex,
-          COALESCE(p.ethnicity, nsd) as ethnicity,
+          COALESCE(replace(replace(replace(p.ethnicity, '[', ''), ']', ''), '"', ''), nsd) as ethnicity,
           COALESCE(p.participant_id, nsd) as subject_ids,
           COALESCE(p.dbGaP_subject_id, nsd) as dbGaP_subject_id
         SKIP $skip LIMIT $limit
@@ -1635,7 +1635,7 @@ indices:
           WITH f.file_id AS file_id, p, "Not specified in data" AS nsd, "Not Applicable" AS na
           WITH file_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.sex, nsd) END) AS sex,
-            COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.race, nsd) END) AS races,
+            COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(replace(replace(replace(p.race, '[', ''), ']', ''), '"', ''), nsd) END) AS races,
             COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.participant_id, nsd) END) AS participant_ids,
             COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.study_participant_id, nsd) END) AS study_participant_ids
           WITH file_id, nsd, na,
@@ -3199,6 +3199,52 @@ indices:
             "Not Applicable" AS na
           RETURN DISTINCT
             sample_id,
+            CASE WHEN size(participant_ids) = 0 THEN [na] ELSE participant_ids END AS subject_ids_filter
+        page_size: 5000
+  - index_name: "gs_protocol"
+    id_field: "protocol_pk_id"
+    mapping:
+      keyword:
+        - protocol_pk_id
+        - subject_ids_filter
+      search_as_you_type:
+        - protocol_pk_id_gs
+        - protocol_name_gs
+        - protocol_type_gs
+        - doi_gs
+        - doi_url_gs
+    initial_query:
+      # protocol_pk_id
+      # protocol_name_gs
+      # protocol_type_gs
+      # doi_gs
+      # doi_url_gs
+      query: |
+        MATCH (proto:Protocol)
+        WITH DISTINCT proto, "Not specified in data" AS nsd
+        ORDER BY proto.protocol_pk_id
+        RETURN DISTINCT
+          proto.protocol_pk_id AS protocol_pk_id,
+          proto.protocol_pk_id AS protocol_pk_id_gs,
+          COALESCE(proto.protocol_name, nsd) AS protocol_name_gs,
+          COALESCE(proto.protocol_type, nsd) AS protocol_type_gs,
+          COALESCE(proto.doi, nsd) AS doi_gs,
+          COALESCE(proto.doi_url, nsd) AS doi_url_gs
+        SKIP $skip LIMIT $limit
+      page_size: 5000
+    update_queries:
+      # Subject IDs Filter
+      - name: "Subject IDs Filter"
+        # subject_ids_filter
+        query: |
+          MATCH (proto:Protocol)
+          WITH DISTINCT proto
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (proto)-->(samp:sample)-[:of_participant]->(p:participant)
+          WITH proto.protocol_pk_id AS protocol_pk_id,
+          COLLECT(DISTINCT p.participant_id) AS participant_ids, "Not Applicable" AS na
+          RETURN DISTINCT
+            protocol_pk_id,
             CASE WHEN size(participant_ids) = 0 THEN [na] ELSE participant_ids END AS subject_ids_filter
         page_size: 5000
   - index_name: "gs_file"

@@ -34,6 +34,7 @@ class frontendService(BaseService):
             "REACT_APP_FILE_SERVICE_API":f"{stack.app_url}/api/files/",
             "REACT_APP_GA_TRACKING_ID":config[service]['ga_tracking_id'],
             "REACT_APP_USER_SERVICE_API":f"{stack.app_url}/api/users/",
+            "REACT_APP_DMN_URL":config[service]['react_app_dmn_url'],
     }
 
     secrets={

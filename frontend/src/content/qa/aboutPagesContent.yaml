@@ -4,12 +4,6 @@
   content:
     - paragraph: "Bento is an open source framework developed by the Frederick National Laboratory for Cancer Research to support data sharing. It provides a structure to enable groups to quickly stand up and then configure a data sharing environment for life science data - groups can use Bento to share data amongst themselves or with a larger community. Bento's reference implementation contains a data model that is compatible with the Cancer Research Data Commons' Harmonized model (CRDC-H) such that Bento instances can be connected into and inter-operate with the CRDC. Users can customize the data model for their own needs. Bento also contains a User Interface and an API for programmatic access."
     - paragraph: "$$*CONTACT:*$$ bento-help@nih.gov"
-- page: "/resources"
-  primaryContentImage: <%= CDS_CONTENT_IMAGE %>
-  title: "Data Model"
-  content:
-    - paragraph: "The model works with various data types, offering robust yet flexible infrastructure while adhering to FAIR (Findability, Accessibility, Interoperability, and Reuse) data principles. CRDC Data Submission portal continues to evolve to meet the data needs for various NCI-funded programs."
-    - paragraph: "All code necessary to use the $$[Bento platform](https://bento-tools.org/#/ title: 'Visit the Bento platform')$$ on which the CRDC Data Submission portal is built is provided in the form of Docker containers. However, the Bento code is also available to the public for research and forking and pull requests. The General Commons (GC) model can be viewed under the CRDC Data Submissions:  $$[https://hub.datacommons.cancer.gov/model-navigator/GC/latest](https://hub.datacommons.cancer.gov/model-navigator/GC/latest title: 'Visit the GC-model on CRDC')$$."
   secondaryZoomImageTitle: "The Core Data Model"
   secondaryZoomImage: 'https://raw.githubusercontent.com/CBIIT/cds-model/main/docs/model-desc/cds-model.svg'
 - page: '/graphql'
