@@ -1,0 +1,54 @@
+name: Generate SOP
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generate-sop:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r tools/sop/requirements.txt
+
+      - name: Set SOP artifact name
+        shell: python
+        run: |
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          config = json.loads(Path("tools/sop/project-info.json").read_text(encoding="utf-8-sig"))
+          project_name = config.get("project", {}).get("name", "project-sop").strip() or "project-sop"
+          artifact_name = re.sub(r'[\\/:*?"<>|]+', "-", project_name).strip() or "project-sop"
+
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write(f"SOP_ARTIFACT_NAME={artifact_name}\n")
+
+      - name: Generate SOP
+        run: |
+          mkdir -p artifacts
+          python tools/sop/generate_sop.py \
+            --config tools/sop/project-info.json \
+            --repo . \
+            --out "artifacts/${SOP_ARTIFACT_NAME}.docx"
+
+      - name: Upload SOP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.SOP_ARTIFACT_NAME }}
+          path: artifacts/${{ env.SOP_ARTIFACT_NAME }}.docx
