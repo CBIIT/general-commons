@@ -1,0 +1,63 @@
+﻿{
+  "project": {
+    "name": "General Commons",
+    "owner": "",
+    "description": "General Commons application and AWS deployment automation.",
+    "primary_contact": "Amanda Bell, Austin Muller",
+    "support_channel": "N/A"
+  },
+  "url": "https://general-{env}.datacommons.cancer.gov",
+  "prod_url": "https://general.datacommons.cancer.gov",
+  "services": [
+    {
+      "name": "frontend",
+      "description": "Frontend web application.",
+      "runtime": "Node.js",
+      "artifact": "Docker image in ECR"
+    },
+    {
+      "name": "backend",
+      "description": "Backend API service.",
+      "runtime": "Java/Maven/Tomcat",
+      "artifact": "Docker image in ECR"
+    },
+    {
+      "name": "interoperation",
+      "description": "Interoperation and file manifest service.",
+      "runtime": "Node.js",
+      "artifact": "Docker image in ECR"
+    }
+  ],
+  "environments": [
+    { "name": "dev", "purpose": "Development tier", "url": "https://general-dev.datacommons.cancer.gov" },
+    { "name": "dev2", "purpose": "Secondary development tier", "url": "https://general-dev2.datacommons.cancer.gov" },
+    { "name": "qa", "purpose": "QA tier", "url": "https://general-qa.datacommons.cancer.gov" },
+    { "name": "qa2", "purpose": "Secondary QA tier", "url": "https://general-qa2.datacommons.cancer.gov" },
+    { "name": "stage", "purpose": "Pre-production tier", "url": "https://general-stage.datacommons.cancer.gov" },
+    { "name": "prod", "purpose": "Production", "url": "https://general.datacommons.cancer.gov" }
+  ],
+  "runbooks": {
+    "build": [
+      "Select the source branch or release tag.",
+      "Run the project build workflow in GitHub Actions.",
+      "Confirm Docker images are built successfully.",
+      "Confirm Docker images are pushed to ECR.",
+      "Record the generated image tag."
+    ],
+    "deploy": [
+      "Select the target environment.",
+      "Confirm the image tag or release number to deploy.",
+      "Run the deployment workflow in GitHub Actions.",
+      "Confirm CDK completes successfully.",
+      "Confirm ECS services reach a stable state."
+    ],
+    "verify": [
+      "Confirm the GitHub Actions workflow completed successfully.",
+      "Confirm ECS services are stable in the target environment.",
+      "Confirm load balancer target groups are healthy.",
+      "Smoke test the frontend URL.",
+      "Smoke test backend and interoperation health or API endpoints.",
+      "Review CloudWatch logs for startup errors."
+    ]
+  }
+}
