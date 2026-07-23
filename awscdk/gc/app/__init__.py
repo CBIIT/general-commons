@@ -12,6 +12,8 @@ def build_stack(app, config, synthesizer=None):
   default synthesizer is used.
   """
   app.node.set_context("@aws-cdk/core:stackRelativeExports", "true")
+  if not config.has_option('main', 'project'):
+    config.set('main', 'project', config['main']['resource_prefix'])
 
   kwargs = dict(
     stack_name="{}-{}".format(config['main']['resource_prefix'], config['main']['tier']),

@@ -19,6 +19,7 @@ from aws_cdk import aws_s3 as s3
 from aws_cdk import aws_ssm as ssm
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_efs as efs
+from aws_cdk import aws_logs as logs
 from aws_cdk import Duration
 from aws_cdk import RemovalPolicy
 from services import memgraph
@@ -48,6 +49,47 @@ class Stack(Stack):
             vpc_id = config['main']['vpc_id']
         )
 
+        # Security groups
+        cidr_ranges = config.get('network_range', 'allowed_cidrs').split(',')
+        allowed_ports = config.get('app_ports', 'allowed_ports').split(',')
+
+        alb_security_group = ec2.SecurityGroup(
+            self,
+            "ALBSecurityGroup",
+            vpc=self.VPC,
+            description="Security Group for Application Load Balancer",
+            allow_all_outbound=True,
+            security_group_name=f"{config['main']['resource_prefix']}-{config['main']['tier']}-alb-sg",
+        )
+
+        app_security_group = ec2.SecurityGroup(
+            self,
+            "AppSecurityGroup",
+            vpc=self.VPC,
+            description="Security Group for Application Servers",
+            allow_all_outbound=True,
+            security_group_name=f"{config['main']['resource_prefix']}-{config['main']['tier']}-app-sg",
+        )
+
+        for cidr in cidr_ranges:
+            alb_security_group.add_ingress_rule(
+                ec2.Peer.ipv4(cidr),
+                ec2.Port.tcp(80),
+                "Allow HTTP traffic from specified IP ranges"
+            )
+            alb_security_group.add_ingress_rule(
+                ec2.Peer.ipv4(cidr),
+                ec2.Port.tcp(443),
+                "Allow HTTPS traffic from specified IP ranges"
+            )
+
+        for port in allowed_ports:
+            app_security_group.add_ingress_rule(
+                alb_security_group,
+                ec2.Port.tcp(int(port)),
+                f"Allow traffic from ALB on port {port}"
+            )
+
         ### Opensearch Cluster
         if config['os']['endpoint_type'] == 'vpc':
             vpc = self.VPC
@@ -59,6 +101,30 @@ class Stack(Stack):
         else:
             vpc = None
             vpc_subnets=[{}]
+
+        os_security_group = ec2.SecurityGroup(
+            self,
+            "OpenSearchSecurityGroup",
+            vpc=self.VPC,
+            description="Security Group for OpenSearch",
+            allow_all_outbound=True,
+            disable_inline_rules=True,
+            security_group_name=f"{config['main']['resource_prefix']}-{config['main']['tier']}-opensearch-sg",
+        )
+
+        os_slow_search_log_group = logs.LogGroup(
+            self,
+            "OpenSearchSlowSearchLogGroup",
+            retention=logs.RetentionDays.ONE_MONTH,
+            removal_policy=RemovalPolicy.DESTROY,
+        )
+
+        os_slow_index_log_group = logs.LogGroup(
+            self,
+            "OpenSearchSlowIndexLogGroup",
+            retention=logs.RetentionDays.ONE_MONTH,
+            removal_policy=RemovalPolicy.DESTROY,
+        )
 
         self.osDomain = opensearch.Domain(self,
             "opensearch",
@@ -75,7 +141,15 @@ class Stack(Stack):
             vpc_subnets=vpc_subnets,
             removal_policy=RemovalPolicy.DESTROY,
             node_to_node_encryption=True,
+            encryption_at_rest=opensearch.EncryptionAtRestOptions(enabled=True),
             enforce_https=True,
+            security_groups=[os_security_group],
+            logging=opensearch.LoggingOptions(
+                slow_search_log_enabled=True,
+                slow_search_log_group=os_slow_search_log_group,
+                slow_index_log_enabled=True,
+                slow_index_log_group=os_slow_index_log_group,
+            ),
             #advanced_options={"override_main_response_version" : "true"}
         )
 
@@ -94,7 +168,7 @@ class Stack(Stack):
             principals=[iam.AnyPrincipal()],
         )
         self.osDomain.add_access_policies(os_policy)
-        security_group = self.osDomain.connections.security_groups[0]
+        security_group = os_security_group
         
         #os_cidr_ranges = [
             #"10.208.8.0/21",
@@ -112,6 +186,11 @@ class Stack(Stack):
                 connection=ec2.Port.tcp(443),
                 description=f"Allow HTTPS from {cidr}"
             )
+        security_group.add_ingress_rule(
+            peer=app_security_group,
+            connection=ec2.Port.tcp(443),
+            description="Allow HTTPS from application services"
+        )
         #self.osDomain.connections.allow_from(ec2.Peer.ipv4("10.208.0.0/21"), ec2.Port.HTTPS)
         #self.osDomain.connections.allow_from(ec2.Peer.ipv4("10.210.0.0/24"), ec2.Port.HTTPS)
 
@@ -194,48 +273,6 @@ class Stack(Stack):
             }
         )
 
-        #security group
-        cidr_ranges = config.get('network_range', 'allowed_cidrs').split(',')
-        allowed_ports = config.get('app_ports', 'allowed_ports').split(',')
-        
-        alb_security_group = ec2.SecurityGroup(
-            self, 
-            "ALBSecurityGroup",
-            vpc=vpc,
-            description="Security Group for Application Load Balancer",
-            allow_all_outbound=True,
-            security_group_name=f"{config['main']['resource_prefix']}-{config['main']['tier']}-alb-sg",
-        )
-        
-        app_security_group = ec2.SecurityGroup(
-            self, 
-            "AppSecurityGroup",
-            vpc=vpc,
-            description="Security Group for Application Servers",
-            allow_all_outbound=True,
-            security_group_name=f"{config['main']['resource_prefix']}-{config['main']['tier']}-app-sg",
-        )
-
-        
-        for cidr in cidr_ranges:
-            alb_security_group.add_ingress_rule(
-                ec2.Peer.ipv4(cidr),
-                ec2.Port.tcp(80),  # HTTP
-                "Allow HTTP traffic from specified IP ranges"
-            )
-            alb_security_group.add_ingress_rule(
-                ec2.Peer.ipv4(cidr),
-                ec2.Port.tcp(443),  # HTTPS
-                "Allow HTTPS traffic from specified IP ranges"
-            )
-        
-        for port in allowed_ports:
-            app_security_group.add_ingress_rule(
-                alb_security_group,
-                ec2.Port.tcp(int(port)),
-                f"Allow traffic from ALB on port {port}"
-            )
-        
         ### ALB
         # Extract subnet IDs
         #subnet1 = config.get('Subnets', 'subnet1')
@@ -299,6 +336,7 @@ class Stack(Stack):
             "ecs",
             cluster_name = f"{config['main']['resource_prefix']}-{config['main']['tier']}-ecs",
             vpc=self.VPC,
+            container_insights=True,
             execute_command_configuration=ecs.ExecuteCommandConfiguration(
                 kms_key=self.kmsKey
             ),
