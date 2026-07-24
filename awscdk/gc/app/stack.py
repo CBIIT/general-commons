@@ -143,6 +143,7 @@ class Stack(Stack):
             node_to_node_encryption=True,
             encryption_at_rest=opensearch.EncryptionAtRestOptions(enabled=True),
             enforce_https=True,
+            tls_security_policy=opensearch.TLSSecurityPolicy.TLS_1_2,
             security_groups=[os_security_group],
             logging=opensearch.LoggingOptions(
                 slow_search_log_enabled=True,
