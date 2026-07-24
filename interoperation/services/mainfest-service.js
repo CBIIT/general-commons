@@ -25,7 +25,7 @@ class ManifestService{
             if (!manifestJSON || !Array.isArray(manifestJSON)) {
                 throw new Error(ERROR.MALFORMED_FILE_MANIFEST);
             }
-            const manifestCSV = await converter.json2csv(manifestJSON);
+            const manifestCSV = converter.json2csv(manifestJSON);
             tempCsvFileName = `${randomUUID()}.csv`;
             tempCsvFilePath = path.join(os.tmpdir(), tempCsvFileName);
             await fs.writeFile(tempCsvFilePath, manifestCSV, {
