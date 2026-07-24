@@ -1,9 +1,11 @@
 from aws_cdk import Duration
+from aws_cdk import RemovalPolicy
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_elasticloadbalancingv2 as elbv2
 from aws_cdk import aws_ecs as ecs
 from aws_cdk import aws_ecr as ecr
 from aws_cdk import aws_ec2 as ec2
+from aws_cdk import aws_logs as logs
 from datetime import date
 
 
@@ -32,6 +34,13 @@ class BaseService:
           stack, f"{service}_repo", repository_arn=config[service]['repo']
       )
 
+      log_group = logs.LogGroup(
+          stack,
+          f"{stack.namingPrefix}-{service}-log-group",
+          retention=logs.RetentionDays.ONE_MONTH,
+          removal_policy=RemovalPolicy.DESTROY,
+      )
+
       taskDefinition.add_container(
           service,
           image=ecs.ContainerImage.from_ecr_repository(repository=ecr_repo, tag=config[service]['image']),
@@ -45,7 +54,10 @@ class BaseService:
           command=command,
           environment=environment,
           secrets=secrets,
-          logging=ecs.LogDrivers.aws_logs(stream_prefix=f"{stack.namingPrefix}-{service}")
+          logging=ecs.LogDrivers.aws_logs(
+              stream_prefix=f"{stack.namingPrefix}-{service}",
+              log_group=log_group,
+          )
       )
 
       # IAM Policies

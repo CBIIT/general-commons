@@ -4,9 +4,11 @@ from aws_cdk import aws_ecr as ecr
 from aws_cdk import aws_ec2 as ec2
 from aws_cdk import aws_secretsmanager as secretsmanager
 from aws_cdk import aws_iam as iam
+from aws_cdk import RemovalPolicy
 from datetime import date
 from aws_cdk import Duration
 from aws_cdk import aws_cloudwatch as cloudwatch
+from aws_cdk import aws_logs as logs
 
 class memgraphService:
   def createService(self, config):
@@ -62,6 +64,13 @@ class memgraphService:
     # ecr_repo = ecr.Repository.from_repository_arn(self, "{}_repo".format(service), repository_arn=config[service]['repo'])
     ecr_repo = ecr.Repository.from_repository_arn(self, "{}_repo".format(service), repository_arn=config[service]['repo'])
 
+    log_group = logs.LogGroup(
+        self,
+        "{}-{}-log-group".format(self.namingPrefix, service),
+        retention=logs.RetentionDays.ONE_MONTH,
+        removal_policy=RemovalPolicy.DESTROY,
+    )
+
     dbContainer = taskDefinition.add_container(
         service,
         #image=ecs.ContainerImage.from_registry(config[service]['image']),
@@ -75,7 +84,8 @@ class memgraphService:
         #secrets=secrets,
         environment=environment,
         logging=ecs.LogDrivers.aws_logs(
-            stream_prefix="{}-{}".format(self.namingPrefix, service)
+            stream_prefix="{}-{}".format(self.namingPrefix, service),
+            log_group=log_group,
         )
     )
     containerVolumeMountPoint = ecs.MountPoint(
