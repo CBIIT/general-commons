@@ -151,12 +151,13 @@ jobs:
   # Job 3: Twistlock Scan - runs after build/push completes
   # ──────────────────────────────────────────────
   twistlock_scan:
-    name: Create Git Tag
+    name: Twistlock Scan - ${{ matrix.name }}
     runs-on: 
       group: cbiit-global-runners
       labels: [self-hosted]
     needs: [prepare, build]
     if: needs.build.result == 'success'
+    environment: ${{ inputs.environment }}
     env:
       IMAGE_TAG: ${{ needs.prepare.outputs.image_tag }}
       REGION: "us-east-1"
