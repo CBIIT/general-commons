@@ -186,9 +186,15 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
           role-to-assume: ${{ secrets.AWS_BUILD_ROLE_TO_ASSUME }}
 
-      - name: Get ECR login password
+      - name: Login to Amazon ECR
         run: |
-          echo "ECR_PASSWORD=$(aws ecr get-login-password --region ${{ secrets.AWS_REGION }})" >> $GITHUB_ENV
+          REGISTRY_URL="${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com"
+          aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $REGISTRY_URL
+
+      - name: Pull Image from ECR
+        run: |
+          echo "Pulling: $IMAGE_NAME"
+          docker pull $IMAGE_NAME
 
       - name: Download Twistlock CLI (twistcli) to runner
         run: |
@@ -220,9 +226,6 @@ jobs:
             --address "${TWISTLOCK_URL}" \
             --user "${{ secrets.TWISTLOCK_USERNAME }}" \
             --password "${{ secrets.TWISTLOCK_PASSWORD }}" \
-            --pull \
-            --registry-username AWS \
-            --registry-password "${ECR_PASSWORD}" \
             --output-file "scan-${{ matrix.name }}.json" \
             "$IMAGE_NAME" \
           | tee scan-output-${{ matrix.name }}.log
