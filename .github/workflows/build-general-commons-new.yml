@@ -20,6 +20,11 @@ on:
         required: true
         type: boolean
         default: true
+      twistlock_scan:
+        description: "Run Twistlock Scan"
+        required: true
+        type: boolean
+        default: true
 run-name: "Build Docker Images for GC"
 
 jobs:
@@ -156,7 +161,7 @@ jobs:
       group: cbiit-global-runners
       labels: [nonprod-org-runner]
     needs: [prepare, build]
-    if: needs.build.result == 'success'
+    if: needs.build.result == 'success' && inputs.twistlock_scan == true
     environment: ${{ inputs.environment }}
     env:
       IMAGE_TAG: ${{ needs.prepare.outputs.image_tag }}
@@ -165,6 +170,7 @@ jobs:
       TWISTLOCK_PATH: "/opt/twistlock/twistcli"
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         include:
           - name: backend
@@ -203,27 +209,26 @@ jobs:
         run: |
           set -Eeuo pipefail
 
-          if [ -x "${TWISTLOCK_PATH}" ]; then
-            echo "twistcli already present at ${TWISTLOCK_PATH}, checking version:"
-            "${TWISTLOCK_PATH}" --version || true
-          else
-            echo "twistcli not found at ${TWISTLOCK_PATH}, downloading from ${TWISTLOCK_URL}"
-            sudo mkdir -p "$(dirname "${TWISTLOCK_PATH}")"
+          TWISTLOCK_PATH="${RUNNER_TEMP}/twistcli"
 
-            curl -sSk -u "${{ secrets.TWISTLOCK_USERNAME }}:${{ secrets.TWISTLOCK_PASSWORD }}" --output /tmp/twistcli "${TWISTLOCK_URL}/api/v1/util/twistcli"
-            if [ ! -s /tmp/twistcli ]; then
-              echo "ERROR: twistcli failed to download (file is empty or missing)"
-              exit 1
-            fi
-            sudo mv /tmp/twistcli "${TWISTLOCK_PATH}"
-            sudo chmod +x "${TWISTLOCK_PATH}"
-            echo "twistcli downloaded successfully:"
-            "${TWISTLOCK_PATH}" --version || true
-          fi
+          curl --fail --silent --show-error --location --insecure -u "${{ secrets.TWISTLOCK_USERNAME }}:${{ secrets.TWISTLOCK_PASSWORD }}" --output "${TWISTLOCK_PATH}" "${TWISTLOCK_URL}/api/v1/util/twistcli"
+          test -s "${TWISTLOCK_PATH}"
+          chmod 0755 "${TWISTLOCK_PATH}"
+
+          echo "TWISTLOCK_PATH=${TWISTLOCK_PATH}" >> "$GITHUB_ENV"
+
+          echo "Downloaded TwistCLI:"
+          ls -lh "${TWISTLOCK_PATH}"
+          "${TWISTLOCK_PATH}" --version
 
       - name: Run Twistlock Scan
         id: twistlock_scan
         run: |
+          set -uo pipefail
+          SCAN_LOG="scan-output-${{ matrix.name }}.log"
+          SCAN_JSON="scan-${{ matrix.name }}.json"
+
+          set +e
           echo "========================================"
           echo "Scanning: $IMAGE_NAME"
           echo "========================================"
@@ -233,7 +238,109 @@ jobs:
             --password "${{ secrets.TWISTLOCK_PASSWORD }}" \
             --output-file "scan-${{ matrix.name }}.json" \
             "$IMAGE_NAME" \
-          | tee scan-output-${{ matrix.name }}.log
+            2>&1 | tee scan-output-${{ matrix.name }}.log
+
+            SCAN_EXIT_CODE=${PIPESTATUS[0]}
+
+          set -e
+
+          {
+            echo
+            echo "========================================"
+            echo "End: $(date --utc --iso-8601=seconds)"
+            echo "TwistCLI exit code: $SCAN_EXIT_CODE"
+            echo "========================================"
+          } | tee -a "$SCAN_LOG"
+
+          echo "Checking Console immediately after scan:"
+          POST_SCAN_HTTP_CODE=$(
+            curl --silent \
+              --show-error \
+              --insecure \
+              --connect-timeout 10 \
+              --max-time 30 \
+              --output /dev/null \
+              --write-out '%{http_code}' \
+              -u "${{ secrets.TWISTLOCK_USERNAME }}:${{ secrets.TWISTLOCK_PASSWORD }}" \
+              "${TWISTLOCK_URL}/api/v1/version" \
+              || true
+          )
+
+          echo "Post-scan Console HTTP status: ${POST_SCAN_HTTP_CODE:-unreachable}" \
+            | tee -a "$SCAN_LOG"
+
+          echo "SCAN_EXIT_CODE=$SCAN_EXIT_CODE" >> "$GITHUB_ENV"
+          exit "$SCAN_EXIT_CODE"
+
+
+      - name: Format scan results as table
+        if: always()
+        run: |
+          python3 - "scan-${{ matrix.name }}.json" "${{ matrix.name }}" << 'PYEOF'
+          import json
+          import sys
+
+          scan_file, image_label = sys.argv[1], sys.argv[2]
+
+          try:
+              with open(scan_file) as f:
+                  data = json.load(f)
+          except Exception as e:
+              print(f"Could not read/parse {scan_file}: {e}")
+              sys.exit(0)
+
+          results = data if isinstance(data, list) else data.get("results", [data])
+
+          rows = []
+          sev_counts = {"critical": 0, "high": 0, "medium": 0, "low": 0}
+
+          for result in results:
+              vulns = result.get("vulnerabilities") or []
+              for v in vulns:
+                  sev = (v.get("severity") or "unknown").lower()
+                  if sev in sev_counts:
+                      sev_counts[sev] += 1
+                  rows.append({
+                      "package": v.get("packageName", v.get("id", "")),
+                      "cve": v.get("cve") or v.get("id", ""),
+                      "severity": (v.get("severity") or "").upper(),
+                      "status": v.get("status", "fixed" if v.get("fixDate") else "affected"),
+                      "installed": v.get("packageVersion", ""),
+                      "fixed": v.get("fixedVersion") or v.get("fixDate", "not fixed"),
+                  })
+
+          total = len(rows)
+          summary = f"Total: {total} (CRITICAL: {sev_counts['critical']}, HIGH: {sev_counts['high']}, MEDIUM: {sev_counts['medium']}, LOW: {sev_counts['low']})"
+
+          print("=" * 100)
+          print(f"Twistlock Scan Results: {image_label}")
+          print("=" * 100)
+          print(summary)
+          print()
+
+          if not rows:
+              print("No vulnerabilities found.")
+          else:
+              cols = ["package", "cve", "severity", "status", "installed", "fixed"]
+              headers = ["Library", "Vulnerability", "Severity", "Status", "Installed Version", "Fixed Version"]
+              widths = [max(len(h), max((len(str(r[c])) for r in rows), default=0)) for h, c in zip(headers, cols)]
+
+              def line(char="-"):
+                  return "+" + "+".join(char * (w + 2) for w in widths) + "+"
+
+              def fmt_row(vals):
+                  return "| " + " | ".join(str(v).ljust(w) for v, w in zip(vals, widths)) + " |"
+
+              print(line())
+              print(fmt_row(headers))
+              print(line())
+              for r in rows:
+                  print(fmt_row([r[c] for c in cols]))
+              print(line())
+
+          with open(f"scan-table-{image_label}.txt", "w") as out:
+              out.write(summary + "\n")
+          PYEOF
 
       - name: Set scan result output
         id: set_scan_output
@@ -258,6 +365,7 @@ jobs:
           path: |
             scan-${{ matrix.name }}.json
             scan-output-${{ matrix.name }}.log
+            scan-table-${{ matrix.name }}.txt
           retention-days: 2 
 
 
