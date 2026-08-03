@@ -154,7 +154,7 @@ jobs:
     name: Twistlock Scan - ${{ matrix.name }}
     runs-on: 
       group: cbiit-global-runners
-      labels: [self-hosted]
+      labels: [nonprod-org-runner]
     needs: [prepare, build]
     if: needs.build.result == 'success'
     environment: ${{ inputs.environment }}
