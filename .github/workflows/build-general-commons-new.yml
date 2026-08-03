@@ -297,7 +297,6 @@ jobs:
             --address "${TWISTLOCK_URL}" \
             --user "${{ secrets.TWISTLOCK_USERNAME }}" \
             --password "${{ secrets.TWISTLOCK_PASSWORD }}" \
-            --debug \
             --output-file "scan-${{ matrix.name }}.json" \
             "$IMAGE_NAME" \
             2>&1 | tee scan-output-${{ matrix.name }}.log
