@@ -178,6 +178,9 @@ jobs:
     steps:
       - name: Set image name
         run: |
+          uname -a
+          cat /etc/os-release
+          systemctl status docker
           echo "IMAGE_NAME=${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ matrix.ecr_repo }}:${{ env.IMAGE_TAG }}" >> $GITHUB_ENV
 
       - name: Configure AWS credentials (OIDC)
