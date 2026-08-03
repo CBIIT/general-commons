@@ -285,6 +285,12 @@ jobs:
           free -h
           docker system df
 
+          set -x
+          env | sort | grep -i proxy || true
+          nslookup twistlock.nci.nih.gov || dig twistlock.nci.nih.gov || true
+          nc -vz twistlock.nci.nih.gov 443 || true
+          curl -vkI https://twistlock.nci.nih.gov/ --max-time 20 || true
+
       - name: Run Twistlock Scan
         id: twistlock_scan
         run: |
