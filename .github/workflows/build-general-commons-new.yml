@@ -277,6 +277,9 @@ jobs:
           docker history "$IMAGE_NAME" \
             --format 'Size={{.Size}} CreatedBy={{.CreatedBy}}'
 
+          docker image prune --all --force --filter "until=24h"
+
+
           echo "===== Runner resources ====="
           df -h
           free -h
