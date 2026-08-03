@@ -165,14 +165,15 @@ jobs:
       TWISTLOCK_PATH: "/opt/twistlock/twistcli"
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         include:
           - name: backend
             ecr_repo: crdc-gen-backend
-          - name: frontend
-            ecr_repo: crdc-gen-frontend
-          - name: interoperation 
-            ecr_repo: crdc-gen-interoperation
+          #- name: frontend
+            #ecr_repo: crdc-gen-frontend
+          #- name: interoperation 
+            #ecr_repo: crdc-gen-interoperation
     outputs:
       backend_scan_result: ${{ steps.set_scan_output.outputs.scan_result }}
     steps:
@@ -203,27 +204,101 @@ jobs:
         run: |
           set -Eeuo pipefail
 
-          if [ -x "${TWISTLOCK_PATH}" ]; then
-            echo "twistcli already present at ${TWISTLOCK_PATH}, checking version:"
-            "${TWISTLOCK_PATH}" --version || true
-          else
-            echo "twistcli not found at ${TWISTLOCK_PATH}, downloading from ${TWISTLOCK_URL}"
-            sudo mkdir -p "$(dirname "${TWISTLOCK_PATH}")"
+          #if [ -x "${TWISTLOCK_PATH}" ]; then
+            #echo "twistcli already present at ${TWISTLOCK_PATH}, checking version:"
+            #"${TWISTLOCK_PATH}" --version || true
+          #else
+            #echo "twistcli not found at ${TWISTLOCK_PATH}, downloading from ${TWISTLOCK_URL}"
+            #sudo mkdir -p "$(dirname "${TWISTLOCK_PATH}")"
 
-            curl -sSk -u "${{ secrets.TWISTLOCK_USERNAME }}:${{ secrets.TWISTLOCK_PASSWORD }}" --output /tmp/twistcli "${TWISTLOCK_URL}/api/v1/util/twistcli"
-            if [ ! -s /tmp/twistcli ]; then
-              echo "ERROR: twistcli failed to download (file is empty or missing)"
-              exit 1
-            fi
-            sudo mv /tmp/twistcli "${TWISTLOCK_PATH}"
-            sudo chmod +x "${TWISTLOCK_PATH}"
-            echo "twistcli downloaded successfully:"
-            "${TWISTLOCK_PATH}" --version || true
-          fi
+            #curl -sSk -u "${{ secrets.TWISTLOCK_USERNAME }}:${{ secrets.TWISTLOCK_PASSWORD }}" --output /tmp/twistcli "${TWISTLOCK_URL}/api/v1/util/twistcli"
+            #if [ ! -s /tmp/twistcli ]; then
+              #echo "ERROR: twistcli failed to download (file is empty or missing)"
+              #exit 1
+            #fi
+            #sudo mv /tmp/twistcli "${TWISTLOCK_PATH}"
+            #sudo chmod +x "${TWISTLOCK_PATH}"
+            #echo "twistcli downloaded successfully:"
+            #"${TWISTLOCK_PATH}" --version || true
+          #fi
+          TWISTLOCK_PATH="${RUNNER_TEMP}/twistcli"
+
+          curl --fail --silent --show-error --location --insecure  -u "${{ secrets.TWISTLOCK_USERNAME }}:${{ secrets.TWISTLOCK_PASSWORD }}" --output "${TWISTLOCK_PATH}"  "${TWISTLOCK_URL}/api/v1/util/twistcli"
+          test -s "${TWISTLOCK_PATH}"
+          chmod 0755 "${TWISTLOCK_PATH}"
+
+          echo "TWISTLOCK_PATH=${TWISTLOCK_PATH}" >> "$GITHUB_ENV"
+
+          echo "Downloaded TwistCLI:"
+          ls -lh "${TWISTLOCK_PATH}"
+          "${TWISTLOCK_PATH}" --version
+
+      - name: Collect pre-scan diagnostics
+        run: |
+          set -Eeuo pipefail
+
+          DIAG_FILE="diagnostics-${{ matrix.name }}.log"
+          exec > >(tee -a "$DIAG_FILE") 2>&1
+
+          echo "===== Time ====="
+          date --utc --iso-8601=seconds
+
+          echo "===== Runner ====="
+          uname -a
+          cat /etc/os-release
+
+          echo "===== TwistCLI ====="
+          "${TWISTLOCK_PATH}" --version
+
+          echo "===== Console DNS ====="
+          TWISTLOCK_HOST="${TWISTLOCK_URL#https://}"
+          TWISTLOCK_HOST="${TWISTLOCK_HOST%%/*}"
+          getent ahostsv4 "$TWISTLOCK_HOST" || true
+
+          echo "===== Console version/API connectivity ====="
+          curl --fail \
+            --silent \
+            --show-error \
+            --insecure \
+            --connect-timeout 10 \
+            --max-time 30 \
+            -u "${{ secrets.TWISTLOCK_USERNAME }}:${{ secrets.TWISTLOCK_PASSWORD }}" \
+            "${TWISTLOCK_URL}/api/v1/version"
+          echo
+
+          echo "===== Docker version ====="
+          docker version
+
+          echo "===== Image information ====="
+          docker image inspect "$IMAGE_NAME" \
+            --format 'ID={{.Id}} SizeBytes={{.Size}} Layers={{len .RootFS.Layers}} Architecture={{.Architecture}} OS={{.Os}}'
+
+          echo "===== Image layers ====="
+          docker history "$IMAGE_NAME" \
+            --format 'Size={{.Size}} CreatedBy={{.CreatedBy}}'
+
+          docker image prune --all --force --filter "until=24h"
+
+
+          echo "===== Runner resources ====="
+          df -h
+          free -h
+          docker system df
+
+          set -x
+          env | sort | grep -i proxy || true
+          nslookup twistlock.nci.nih.gov || dig twistlock.nci.nih.gov || true
+          nc -vz twistlock.nci.nih.gov 443 || true
+          curl -vkI https://twistlock.nci.nih.gov/ --max-time 20 || true
 
       - name: Run Twistlock Scan
         id: twistlock_scan
         run: |
+          set -uo pipefail
+          SCAN_LOG="scan-output-${{ matrix.name }}.log"
+          SCAN_JSON="scan-${{ matrix.name }}.json"
+
+          set +e
           echo "========================================"
           echo "Scanning: $IMAGE_NAME"
           echo "========================================"
@@ -233,7 +308,38 @@ jobs:
             --password "${{ secrets.TWISTLOCK_PASSWORD }}" \
             --output-file "scan-${{ matrix.name }}.json" \
             "$IMAGE_NAME" \
-          | tee scan-output-${{ matrix.name }}.log
+            2>&1 | tee scan-output-${{ matrix.name }}.log
+
+            SCAN_EXIT_CODE=${PIPESTATUS[0]}
+
+          set -e
+
+          {
+            echo
+            echo "========================================"
+            echo "End: $(date --utc --iso-8601=seconds)"
+            echo "TwistCLI exit code: $SCAN_EXIT_CODE"
+            echo "========================================"
+          } | tee -a "$SCAN_LOG"
+
+          echo "Checking Console immediately after scan:"
+          POST_SCAN_HTTP_CODE=$(
+            curl --silent \
+              --show-error \
+              --insecure \
+              --connect-timeout 10 \
+              --max-time 30 \
+              --output /dev/null \
+              --write-out '%{http_code}' \
+              -u "${{ secrets.TWISTLOCK_USERNAME }}:${{ secrets.TWISTLOCK_PASSWORD }}" \
+              "${TWISTLOCK_URL}/api/v1/version" \
+              || true
+          )
+
+          echo "Post-scan Console HTTP status: ${POST_SCAN_HTTP_CODE:-unreachable}" \
+            | tee -a "$SCAN_LOG"
+
+          exit "$SCAN_EXIT_CODE"
 
       - name: Set scan result output
         id: set_scan_output
@@ -258,6 +364,7 @@ jobs:
           path: |
             scan-${{ matrix.name }}.json
             scan-output-${{ matrix.name }}.log
+            diagnostics-${{ matrix.name }}.log
           retention-days: 2 
 
 
