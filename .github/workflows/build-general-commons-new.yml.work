@@ -154,7 +154,7 @@ jobs:
     name: Twistlock Scan - ${{ matrix.name }}
     runs-on: 
       group: cbiit-global-runners
-      labels: [self-hosted]
+      labels: [nonprod-org-runner]
     needs: [prepare, build]
     if: needs.build.result == 'success'
     environment: ${{ inputs.environment }}
@@ -169,15 +169,18 @@ jobs:
         include:
           - name: backend
             ecr_repo: crdc-gen-backend
-          - name: frontend
-            ecr_repo: crdc-gen-frontend
-          - name: interoperation 
-            ecr_repo: crdc-gen-interoperation
+          #- name: frontend
+            #ecr_repo: crdc-gen-frontend
+          #- name: interoperation 
+            #ecr_repo: crdc-gen-interoperation
     outputs:
       backend_scan_result: ${{ steps.set_scan_output.outputs.scan_result }}
     steps:
       - name: Set image name
         run: |
+          uname -a
+          cat /etc/os-release
+          systemctl status docker
           echo "IMAGE_NAME=${{ secrets.AWS_ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ matrix.ecr_repo }}:${{ env.IMAGE_TAG }}" >> $GITHUB_ENV
 
       - name: Configure AWS credentials (OIDC)
@@ -198,6 +201,8 @@ jobs:
 
       - name: Download Twistlock CLI (twistcli) to runner
         run: |
+          set -Eeuo pipefail
+
           if [ -x "${TWISTLOCK_PATH}" ]; then
             echo "twistcli already present at ${TWISTLOCK_PATH}, checking version:"
             "${TWISTLOCK_PATH}" --version || true
