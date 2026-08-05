@@ -30,12 +30,18 @@ const getDashData = (states) => {
     return result;
   }
   const [dashData, setDashData] = useState(null);
+  const filters = getFilters(filterState);
+  // protocolOverview uses protocol_pk_id (singular); facet path from ProtocolCard
+  // sets protocol_pk_ids for searchSubjects/subjectOverview.
   const activeFilters = {
-    ...getFilters(filterState),
+    ...filters,
     subject_ids: [
       ...(localFindUpload || []).map((obj) => obj.subject_id),
       ...(localFindAutocomplete || []).map((obj) => obj.title),
     ],
+    ...(filters.protocol_pk_ids && filters.protocol_pk_ids.length
+      ? { protocol_pk_id: filters.protocol_pk_ids }
+      : {}),
   };
   useEffect(() => {
     const controller = new AbortController();
@@ -53,8 +59,10 @@ const DashTemplateController = ((props) => {
   const { match, history } = props;
   if (match.params.filterQuery) {
     setActiveFilterByPathQuery(match);
-    const redirectUrl = '/data';
-    history.replace(redirectUrl);
+    // Preserve selectedTab so ProtocolCard can open the Protocols tab
+    // (which runs protocolOverview).
+    const selectedTab = new URLSearchParams(history.location.search).get('selectedTab');
+    history.replace(selectedTab ? `/data?selectedTab=${selectedTab}` : '/data');
   }
   const { dashData, activeFilters, tabIndex } = getDashData(props);
   if (!dashData) {
