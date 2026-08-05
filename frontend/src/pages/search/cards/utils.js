@@ -20,9 +20,9 @@ export function encodeSubjectIds(subjectIdsArray) {
  *
  * Example URL payload: {"protocol_pk_ids":["114131145"]}
  */
-export function encodeProtocolIds(protocolIdsArray) {
-  const ids = Array.isArray(protocolIdsArray)
-    ? protocolIdsArray
-    : [protocolIdsArray].filter((id) => id != null && id !== '');
+export function encodeProtocolIds(protocolIds) {
+  const ids = (Array.isArray(protocolIds) ? protocolIds : [protocolIds])
+    .filter((id) => id != null && String(id).trim() !== '')
+    .map((id) => String(id));
   return encodeURIComponent(JSON.stringify({ protocol_pk_ids: ids }));
 }

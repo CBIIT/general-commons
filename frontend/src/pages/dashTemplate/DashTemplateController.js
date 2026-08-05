@@ -62,7 +62,7 @@ const DashTemplateController = ((props) => {
     // Preserve selectedTab so ProtocolCard can open the Protocols tab
     // (which runs protocolOverview).
     const selectedTab = new URLSearchParams(history.location.search).get('selectedTab');
-    history.replace(selectedTab ? `/data?selectedTab=${selectedTab}` : '/data');
+    history.replace(selectedTab ? `/data?selectedTab=${encodeURIComponent(selectedTab)}` : '/data');
   }
   const { dashData, activeFilters, tabIndex } = getDashData(props);
   if (!dashData) {
