@@ -68,6 +68,7 @@ indices:
         - proteomic_instrument_models # proteomic.proteomic_instrument_model - array
         - proteomic_design_descriptions # proteomic.proteomic_design_description - array
         # caNanoLab Protocol
+        - protocol_pk_ids # Protocol.protocol_pk_id - protocol_pk_ids_filter - array
         - protocol_names # Protocol.protocol_name - protocol_names_filter - array
         - protocol_types # Protocol.protocol_type - protocol_types_filter - array
         - doi_urls # Protocol.doi_url - doi_url_filter - array
@@ -553,6 +554,7 @@ indices:
         page_size: 5000
       # caNanoLab Protocol
       - name: "caNanoLab Protocol"
+        # protocol_pk_ids
         # protocol_names
         # protocol_types
         # doi_urls
@@ -564,12 +566,14 @@ indices:
           WITH p, "Not specified in data" AS nsd, "Not Applicable" AS na
           OPTIONAL MATCH (p)<-[*]-(proto:Protocol)
           WITH p, nsd, na,
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_pk_id, nsd) END) AS protocol_pk_ids_raw,
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_name, nsd) END) AS protocol_names_raw,
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_type, nsd) END) AS protocol_types_raw,
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi_url, nsd) END) AS doi_urls_raw,
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi, nsd) END) AS dois_raw
           RETURN DISTINCT
             p.study_participant_id AS study_participant_id,
+            CASE WHEN size(protocol_pk_ids_raw)=0 THEN [na] ELSE protocol_pk_ids_raw END AS protocol_pk_ids,
             CASE WHEN size(protocol_names_raw)=0 THEN [na] ELSE protocol_names_raw END AS protocol_names,
             CASE WHEN size(protocol_types_raw)=0 THEN [na] ELSE protocol_types_raw END AS protocol_types,
             CASE WHEN size(doi_urls_raw)=0 THEN [na] ELSE doi_urls_raw END AS doi_urls,
@@ -711,6 +715,7 @@ indices:
         - proteomic_instrument_models # proteomic.proteomic_instrument_model - array
         - proteomic_design_descriptions # proteomic.proteomic_design_description - array
         # caNanoLab Protocol
+        - protocol_pk_ids # Protocol.protocol_pk_id - protocol_pk_ids_filter - array
         - protocol_names # Protocol.protocol_name - protocol_names_filter - array
         - protocol_types # Protocol.protocol_type - protocol_types_filter - array
         - doi_urls # Protocol.doi_url - doi_urls_filter - array
@@ -1221,12 +1226,14 @@ indices:
           OPTIONAL MATCH (samp)<-[*]-(proto:Protocol)
           WITH samp, nsd, na,
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_name, nsd) END) AS protocol_names_raw,
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_pk_id, nsd) END) AS protocol_pk_ids_raw,
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_type, nsd) END) AS protocol_types_raw,
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi_url, nsd) END) AS doi_urls_raw,
             COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi, nsd) END) AS dois_raw
           RETURN DISTINCT
             samp.sample_id AS sample_id,
             CASE WHEN size(protocol_names_raw)=0 THEN [na] ELSE protocol_names_raw END AS protocol_names,
+            CASE WHEN size(protocol_pk_ids_raw)=0 THEN [na] ELSE protocol_pk_ids_raw END AS protocol_pk_ids,
             CASE WHEN size(protocol_types_raw)=0 THEN [na] ELSE protocol_types_raw END AS protocol_types,
             CASE WHEN size(doi_urls_raw)=0 THEN [na] ELSE doi_urls_raw END AS doi_urls,
             CASE WHEN size(dois_raw)=0 THEN [na] ELSE dois_raw END AS dois
@@ -3272,6 +3279,11 @@ indices:
         - reference_genome_assemblies_gs
         - sites_gs
         - is_supplementary_file_gs
+        - protocol_pk_id_gs
+        - protocol_name_gs
+        - protocol_types_gs
+        - doi_gs
+        - doi_url_gs
     initial_query:
       # file_id
       # file_id_gs
@@ -3393,6 +3405,29 @@ indices:
             CASE WHEN size(platforms) = 0 THEN [na] ELSE platforms END AS platforms_gs,
             CASE WHEN size(instrument_models) = 0 THEN [na] ELSE instrument_models END AS instrument_models_gs,
             CASE WHEN size(reference_genome_assemblies) = 0 THEN [na] ELSE reference_genome_assemblies END AS reference_genome_assemblies_gs
+        page_size: 5000
+      # Protocols GS
+      - name: "Protocols"
+        # protocol_pk_id_gs
+        query: |
+          MATCH (f:file)
+          WITH DISTINCT f
+          SKIP $skip LIMIT $limit
+          WITH f, "Not specified in data" AS nsd, "Not Applicable" AS na
+          OPTIONAL MATCH (f)<-[*]-(proto:Protocol)
+          WITH f.file_id AS file_id, nsd, na,
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_pk_id, nsd) END) AS protocol_pk_ids,
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_name, nsd) END) AS protocol_names,
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.protocol_type, nsd) END) AS protocol_types,
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi, nsd) END) AS dois,
+            COLLECT(DISTINCT CASE WHEN proto IS NULL THEN null ELSE COALESCE(proto.doi_url, nsd) END) AS doi_urls
+          RETURN DISTINCT
+            file_id,
+            CASE WHEN size(protocol_pk_ids) = 0 THEN [na] ELSE protocol_pk_ids END AS protocol_pk_id_gs,
+            CASE WHEN size(protocol_names) = 0 THEN [na] ELSE protocol_names END AS protocol_name_gs,
+            CASE WHEN size(protocol_types) = 0 THEN [na] ELSE protocol_types END AS protocol_types_gs,
+            CASE WHEN size(dois) = 0 THEN [na] ELSE dois END AS doi_gs,
+            CASE WHEN size(doi_urls) = 0 THEN [na] ELSE doi_urls END AS doi_url_gs
         page_size: 5000
       # Sites GS
       - name: "Sites GS"
@@ -3948,6 +3983,7 @@ indices:
       - doi # Protocol.doi - single value
       - doi_url # Protocol.doi_url - single value
       # Protocols
+      - protocol_pk_ids # alias of protocol_pk_id for cross-index facet filter compatibility - array
       - protocol_types # Protocol.protocol_type - protocol_types_filter - array
       - protocol_names # Protocol.protocol_name - protocol_names_filter - array
       - doi_urls # Protocol.doi_url - doi_urls_filter - array
@@ -4013,6 +4049,7 @@ indices:
         - files_is_supplementary_file_filter # file.is_supplementary_file - array
     initial_query:
       # protocol_pk_id
+      # protocol_pk_ids
       # protocol_name
       # protocol_type
       # doi
@@ -4031,6 +4068,7 @@ indices:
           COALESCE(proto.protocol_type, nsd) AS protocol_type,
           COALESCE(proto.doi, nsd) AS doi,
           COALESCE(proto.doi_url, nsd) AS doi_url,
+          [COALESCE(proto.protocol_pk_id, nsd)] AS protocol_pk_ids,
           [COALESCE(proto.protocol_type, nsd)] AS protocol_types,
           [COALESCE(proto.protocol_name, nsd)] AS protocol_names,
           [COALESCE(proto.doi_url, nsd)] AS doi_urls,

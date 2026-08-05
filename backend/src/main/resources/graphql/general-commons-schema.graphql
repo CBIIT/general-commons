@@ -980,6 +980,7 @@ type QueryType {
         imaging_assay_type: [String] = []
         is_supplementary_file: [String] = []
         # Protocol filters
+        protocol_pk_ids: [String] = []
         protocol_names: [String] = []
         protocol_types: [String] = []
         dois: [String] = []
@@ -1030,6 +1031,7 @@ type QueryType {
         imaging_assay_type: [String] = []
         is_supplementary_file: [String] = []
         # Protocol filters
+        protocol_pk_ids: [String] = []
         protocol_names: [String] = []
         protocol_types: [String] = []
         dois: [String] = []
