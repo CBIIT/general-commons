@@ -55,47 +55,53 @@ const theme = {
         '&.studyCheckedOdd': {
           backgroundColor: '#FFF5FF',
         },
-        '&.samplesCheckedEven': {
+        '&.data_accessCheckedEven': {
           backgroundColor: '#F3ECE5',
+        },
+        '&.data_accessCheckedOdd': {
+          backgroundColor: '#FFFCFA',
+        },
+        '&.samplesCheckedEven': {
+          backgroundColor: '#DCE9EF',
         },
         '&.samplesCheckedOdd': {
-          backgroundColor: '#FFFCFA',
+          backgroundColor: '#F2FBFF',
         },
         '&.genomicCheckedEven': {
-          backgroundColor: '#DCE9EF',
+          backgroundColor: '#F4E7F3',
         },
         '&.genomicCheckedOdd': {
-          backgroundColor: '#F2FBFF',
+          backgroundColor: '#FFF5FF',
         },
         '&.imagingCheckedEven': {
-          backgroundColor: '#F4E7F3',
+          backgroundColor: '#F3ECE5',
         },
         '&.imagingCheckedOdd': {
-          backgroundColor: '#FFF5FF',
+          backgroundColor: '#FFFCFA',
         },
         '&.diagnosisCheckedEven': {
-          backgroundColor: '#F3ECE5',
-        },
-        '&.diagnosisCheckedOdd': {
-          backgroundColor: '#FFFCFA',
-        },
-        '&.filesCheckedEven': {
           backgroundColor: '#DCE9EF',
         },
-        '&.filesCheckedOdd': {
+        '&.diagnosisCheckedOdd': {
           backgroundColor: '#F2FBFF',
         },
-        '&.proteomicCheckedEven': {
+        '&.filesCheckedEven': {
           backgroundColor: '#F4E7F3',
         },
-        '&.proteomicCheckedOdd': {
+        '&.filesCheckedOdd': {
           backgroundColor: '#FFF5FF',
         },
-        '&.cancer_nanotechnologyCheckedEven': {
+        '&.proteomicCheckedEven': {
           backgroundColor: '#F3ECE5',
         },
-        '&.cancer_nanotechnologyCheckedOdd': {
+        '&.proteomicCheckedOdd': {
           backgroundColor: '#FFFCFA',
+        },
+        '&.cancer_nanotechnologyCheckedEven': {
+          backgroundColor: '#DCE9EF',
+        },
+        '&.cancer_nanotechnologyCheckedOdd': {
+          backgroundColor: '#F2FBFF',
         },
       },      
     },
@@ -107,26 +113,29 @@ const theme = {
         '&.studyCheckedIcon': {
           color: '#942A90',
         },
-        '&.samplesCheckedIcon': {
+        '&.data_accessCheckedIcon': {
           color: '#A35719',
+        },
+        '&.samplesCheckedIcon': {
+          color: '#0E6292',
         },
         '&.genomicCheckedIcon': {
-          color: '#0E6292',
+          color: '#942A90',
         },
         '&.imagingCheckedIcon': {
-          color: '#942A90',
+          color: '#A35719',
         },
         '&.diagnosisCheckedIcon': {
-          color: '#A35719',
-        },
-        '&.filesCheckedIcon': {
           color: '#0E6292',
         },
-        '&.proteomicCheckedIcon': {
+        '&.filesCheckedIcon': {
           color: '#942A90',
         },
-        '&.cancer_nanotechnologyCheckedIcon': {
+        '&.proteomicCheckedIcon': {
           color: '#A35719',
+        },
+        '&.cancer_nanotechnologyCheckedIcon': {
+          color: '#0E6292',
         },
       },
     },
@@ -144,44 +153,50 @@ const theme = {
           fontFamily: 'Nunito',
           marginRight: '0px',
         },
-        '&.samplesSubjects': {
+        '&.data_accessSubjects': {
           color: '#A35719',
+          fontSize: '12px',
+          fontFamily: 'Nunito',
+          marginRight: '0px',
+        },
+        '&.samplesSubjects': {
+          color: '#0E6292',
           fontSize: '12px',
           fontFamily: 'Nunito',
           marginRight: '0px',
         },
         '&.genomicSubjects': {
-          color: '#0E6292',
+          color: '#942A90',
           fontSize: '12px',
           fontFamily: 'Nunito',
           marginRight: '0px',
         },
         '&.imagingSubjects': {
-          color: '#942A90',
+          color: '#A35719',
           fontSize: '12px',
           fontFamily: 'Nunito',
           marginRight: '0px',
         },
         '&.diagnosisSubjects': {
-          color: '#A35719',
-          fontSize: '12px',
-          fontFamily: 'Nunito',
-          marginRight: '0px',
-        },
-        '&.filesSubjects': {
           color: '#0E6292',
           fontSize: '12px',
           fontFamily: 'Nunito',
           marginRight: '0px',
         },
-        '&.proteomicSubjects': {
+        '&.filesSubjects': {
           color: '#942A90',
           fontSize: '12px',
           fontFamily: 'Nunito',
           marginRight: '0px',
         },
-        '&.cancer_nanotechnologySubjects': {
+        '&.proteomicSubjects': {
           color: '#A35719',
+          fontSize: '12px',
+          fontFamily: 'Nunito',
+          marginRight: '0px',
+        },
+        '&.cancer_nanotechnologySubjects': {
+          color: '#0E6292',
           fontSize: '12px',
           fontFamily: 'Nunito',
           marginRight: '0px',
