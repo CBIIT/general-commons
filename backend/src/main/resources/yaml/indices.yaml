@@ -1526,7 +1526,7 @@ indices:
           f.md5sum AS md5sum,
           f.file_url_in_cds AS file_url_in_cds,
           'drs://nci-crdc.datacommons.io/' + f.file_id AS drs_uri,
-          COALESCE(f.is_supplementary_file, nsd) AS is_supplementary_file,
+          COALESCE(f.is_supplementary_file, false) AS is_supplementary_file,
           f.release_datetime AS release_datetime,
           sorted_experimental_strategies AS experimental_strategies,
           [file_type] AS file_types,
