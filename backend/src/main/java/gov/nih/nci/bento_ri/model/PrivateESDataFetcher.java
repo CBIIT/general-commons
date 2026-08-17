@@ -784,7 +784,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 GS_COUNT_ENDPOINT, GS_PARTICIPANT_COUNT_END_POINT,
                 GS_COUNT_RESULT_FIELD, "subject_count",
                 GS_RESULT_FIELD, "subjects",
-                GS_SEARCH_FIELD, List.of("study_gs", "subject_id_gs", "site_gs", "sex_gs"),
+                GS_SEARCH_FIELD, List.of("study_gs", "subject_id_gs", "site_gs", "sex_gs", "study_phs_accession_gs"),
                 GS_SORT_FIELD, "study_participant_id",
                 GS_COLLECT_FIELDS, new String[][]{
                         new String[]{"study", "study_gs"},
@@ -792,7 +792,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                         new String[]{"site", "site_gs"},
                         new String[]{"sex", "sex_gs"},
                         new String[]{"study_participant_id", "study_participant_id"},
-                        new String[]{"subject_ids_filter", "subject_ids_filter"}
+                        new String[]{"subject_ids_filter", "subject_ids_filter"},
+                        new String[]{"study_phs_accession", "study_phs_accession_gs"}
                 },
                 GS_CATEGORY_TYPE, "subject"
         ));
@@ -802,13 +803,15 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 GS_COUNT_ENDPOINT, GS_SAMPLE_COUNT_END_POINT,
                 GS_COUNT_RESULT_FIELD, "sample_count",
                 GS_RESULT_FIELD, "samples",
-                GS_SEARCH_FIELD, List.of("sample_id_gs", "is_tumor_gs", "analyte_type_gs"),
+                GS_SEARCH_FIELD, List.of("sample_id_gs", "is_tumor_gs", "analyte_type_gs", "study_gs","study_phs_accession_gs"),
                 GS_SORT_FIELD, "sample_id",
                 GS_COLLECT_FIELDS, new String[][]{
                         new String[]{"sample_id", "sample_id"},
                         new String[]{"is_tumor", "is_tumor_gs"},
                         new String[]{"analyte_type", "analyte_type_gs"},
-                        new String[]{"subject_ids_filter", "subject_ids_filter"}
+                        new String[]{"subject_ids_filter", "subject_ids_filter"},
+                        new String[]{"study", "study_gs"},
+                        new String[]{"study_phs_accession", "study_phs_accession_gs"}
                 },
                 GS_CATEGORY_TYPE, "sample"
         ));
