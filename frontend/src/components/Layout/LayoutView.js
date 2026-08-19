@@ -40,7 +40,6 @@ import DashTemplate from '../../pages/dashTemplate/DashTemplateController';
 import ReleaseNotes from '../../pages/ReleaseNotes';
 import TextBanner from '../TextBanner';
 import axios from 'axios';
-import DataModelNavigator from '../DataModelNavigator';
 
 
 
@@ -155,7 +154,6 @@ const Layout = ({ classes, isSidebarOpened }) => {
                 )}
                 <Route path="/releases" component={ReleaseNotes} />
                 <Route path="/data-dictionary" component={DataDictonary} />
-                <Route path="/resources" component={DataModelNavigator} />
                 <Route path="/graphql" component={GraphqlClient} />
                 <LoginRoute path="/login" component={Login} />
                 <Route path="/sysinfo" component={SysInfoView} />
