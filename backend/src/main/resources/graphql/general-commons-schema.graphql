@@ -251,6 +251,16 @@ type GS_Sample {
     subject_ids_filter: [String]
 }
 
+type GS_Protocol {
+    type: String
+    protocol_pk_id: String
+    protocol_name: String
+    protocol_type: String
+    doi: String
+    doi_url: String
+    subject_ids_filter: [String]
+}
+
 type GS_File {
     type: String
     subject_id: String
@@ -310,6 +320,9 @@ type GlobalSearchResult {
 
     sample_count: Int
     samples: [GS_Sample]
+
+    protocol_count: Int
+    protocols: [GS_Protocol]
 
     file_count: Int
     files: [GS_File]

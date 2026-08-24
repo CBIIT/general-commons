@@ -60,6 +60,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     final String GS_PARTICIPANT_COUNT_END_POINT = "/gs_participant/_count";
     final String GS_SAMPLE_END_POINT = "/gs_sample/_search";
     final String GS_SAMPLE_COUNT_END_POINT = "/gs_sample/_count";
+    final String GS_PROTOCOL_END_POINT = "/gs_protocol/_search";
+    final String GS_PROTOCOL_COUNT_END_POINT = "/gs_protocol/_count";
     final String GS_FILE_END_POINT = "/gs_file/_search";
     final String GS_FILE_COUNT_END_POINT = "/gs_file/_count";
     final String GS_PROGRAM_END_POINT = "/gs_program/_search";
@@ -782,7 +784,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 GS_COUNT_ENDPOINT, GS_PARTICIPANT_COUNT_END_POINT,
                 GS_COUNT_RESULT_FIELD, "subject_count",
                 GS_RESULT_FIELD, "subjects",
-                GS_SEARCH_FIELD, List.of("study_gs", "subject_id_gs", "site_gs", "sex_gs"),
+                GS_SEARCH_FIELD, List.of("study_gs", "subject_id_gs", "site_gs", "sex_gs", "study_phs_accession_gs"),
                 GS_SORT_FIELD, "study_participant_id",
                 GS_COLLECT_FIELDS, new String[][]{
                         new String[]{"study", "study_gs"},
@@ -790,7 +792,8 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                         new String[]{"site", "site_gs"},
                         new String[]{"sex", "sex_gs"},
                         new String[]{"study_participant_id", "study_participant_id"},
-                        new String[]{"subject_ids_filter", "subject_ids_filter"}
+                        new String[]{"subject_ids_filter", "subject_ids_filter"},
+                        new String[]{"study_phs_accession", "study_phs_accession_gs"}
                 },
                 GS_CATEGORY_TYPE, "subject"
         ));
@@ -800,15 +803,35 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 GS_COUNT_ENDPOINT, GS_SAMPLE_COUNT_END_POINT,
                 GS_COUNT_RESULT_FIELD, "sample_count",
                 GS_RESULT_FIELD, "samples",
-                GS_SEARCH_FIELD, List.of("sample_id_gs", "is_tumor_gs", "analyte_type_gs"),
+                GS_SEARCH_FIELD, List.of("sample_id_gs", "is_tumor_gs", "analyte_type_gs", "study_gs","study_phs_accession_gs"),
                 GS_SORT_FIELD, "sample_id",
                 GS_COLLECT_FIELDS, new String[][]{
                         new String[]{"sample_id", "sample_id"},
                         new String[]{"is_tumor", "is_tumor_gs"},
                         new String[]{"analyte_type", "analyte_type_gs"},
-                        new String[]{"subject_ids_filter", "subject_ids_filter"}
+                        new String[]{"subject_ids_filter", "subject_ids_filter"},
+                        new String[]{"study", "study_gs"},
+                        new String[]{"study_phs_accession", "study_phs_accession_gs"}
                 },
                 GS_CATEGORY_TYPE, "sample"
+        ));
+        // gs_protocol index - fields: protocol_pk_id_gs, protocol_name_gs, protocol_type_gs, doi_gs, doi_url_gs
+        searchCategories.add(Map.of(
+                GS_END_POINT, GS_PROTOCOL_END_POINT,
+                GS_COUNT_ENDPOINT, GS_PROTOCOL_COUNT_END_POINT,
+                GS_COUNT_RESULT_FIELD, "protocol_count",
+                GS_RESULT_FIELD, "protocols",
+                GS_SEARCH_FIELD, List.of("protocol_pk_id_gs", "protocol_name_gs", "protocol_type_gs", "doi_gs", "doi_url_gs"),
+                GS_SORT_FIELD, "protocol_pk_id",
+                GS_COLLECT_FIELDS, new String[][]{
+                        new String[]{"protocol_pk_id", "protocol_pk_id"},
+                        new String[]{"protocol_name", "protocol_name_gs"},
+                        new String[]{"protocol_type", "protocol_type_gs"},
+                        new String[]{"doi", "doi_gs"},
+                        new String[]{"doi_url", "doi_url_gs"},
+                        new String[]{"subject_ids_filter", "subject_ids_filter"}
+                },
+                GS_CATEGORY_TYPE, "protocol"
         ));
         // gs_file index - all GS_File fields from GraphQL schema
         searchCategories.add(Map.of(

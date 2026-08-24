@@ -15,7 +15,22 @@ import FileCard from './cards/FileCard';
 import ProgramCard from './cards/ProgramCard';
 import StudyCard from './cards/StudyCard';
 import AboutCard from './cards/AboutCard';
+import ProtocolCard from './cards/ProtocolCard';
 import usePageTitle from '../../components/Analytics/usePageTitle';
+
+const ALL_TAB_QUERY_CONFIG = {
+  public: [{ countField: 'about_count', nameField: 'about_page' }],
+  private: [
+    { countField: 'subject_count', nameField: 'subjects' },
+    { countField: 'sample_count', nameField: 'samples' },
+    { countField: 'file_count', nameField: 'files' },
+    { countField: 'protocol_count', nameField: 'protocols' },
+    { countField: 'program_count', nameField: 'programs' },
+    { countField: 'study_count', nameField: 'studies' },
+    { countField: 'model_count', nameField: 'model' },
+    { countField: 'about_count', nameField: 'about_page' },
+  ],
+};
 
 /**
  * Determine the correct datafield and offset for the All tab based
@@ -28,14 +43,9 @@ import usePageTitle from '../../components/Analytics/usePageTitle';
  */
 async function getAllQueryField(searchText, calcOffset, pageSize, isPublic) {
   const searchResp = await queryCountAPI(searchText, isPublic);
-  const custodianConfigForTabData = isPublic ? [{ countField: 'about_count', nameField: 'about_page' }]
-    : [{ countField: 'subject_count', nameField: 'subjects' },
-      { countField: 'sample_count', nameField: 'samples' },
-      { countField: 'file_count', nameField: 'files' },
-      { countField: 'program_count', nameField: 'programs' },
-      { countField: 'study_count', nameField: 'studies' },
-      { countField: 'model_count', nameField: 'model' },
-      { countField: 'about_count', nameField: 'about_page' }];
+  const custodianConfigForTabData = isPublic
+    ? ALL_TAB_QUERY_CONFIG.public
+    : ALL_TAB_QUERY_CONFIG.private;
 
   let acc = 0;
   const mapCountAndName = custodianConfigForTabData.map((obj) => {
@@ -107,10 +117,10 @@ function searchView(props) {
 
     if (activeVal === 'inactive') {
       if (isSignedIn && !isAuthorized) {
-        history.push(`/request?redirect=/search/${searchText}`);
+        history.push(`/request?redirect=/search/${encodeURIComponent(searchText)}`);
         return;
       }
-      history.push(`/login?redirect=/search/${searchText}`);
+      history.push(`/login?redirect=/search/${encodeURIComponent(searchText)}`);
     }
   };
 
@@ -128,7 +138,7 @@ function searchView(props) {
     queryCountAPI(value, !authCheck()).then((d) => {
       setSearchText(value);
       setSearchCounts(d);
-      history.push(`/search/${value}`);
+      history.push(`/search/${encodeURIComponent(value)}`);
     });
   };
 
@@ -174,6 +184,10 @@ function searchView(props) {
    */
   const getTabData = async (field, pageSize, currentPage) => {
     const isPublic = !authCheck();
+    const maxFollowUpQueries = Math.max(
+      0,
+      (isPublic ? ALL_TAB_QUERY_CONFIG.public : ALL_TAB_QUERY_CONFIG.private).length - 1,
+    );
 
     // Handle the 'All' tab search separately
     if (field === 'all') {
@@ -187,7 +201,7 @@ function searchView(props) {
         let calcOffset2 = (currentPage - 1) * pageSize + data.length;
 
         // eslint-disable-next-line max-len
-        while (apiQueries < 5 && data.length !== count && calcOffset2 < count && data.length !== pageSize) {
+        while (apiQueries < maxFollowUpQueries && data.length !== count && calcOffset2 < count && data.length !== pageSize) {
           // eslint-disable-next-line no-await-in-loop
           const data2 = await queryAllAPI(searchText, calcOffset2, pageSize, isPublic);
           data = [...data, ...data2];
@@ -228,6 +242,7 @@ function searchView(props) {
     subject: CaseCard,
     sample: SampleCard,
     file: FileCard,
+    protocol: ProtocolCard,
     program: ProgramCard,
     study: StudyCard,
     about: AboutCard,
@@ -290,6 +305,16 @@ function searchView(props) {
       value: `${!authCheck() ? 'inactive-' : ''}5`,
     },
     {
+      name: 'Protocols',
+      field: 'protocols',
+      classes: {
+        root: classes.buttonRoot,
+        wrapper: classes.tabColor,
+      },
+      count: searchCounts.protocol_count || 0,
+      value: `${!authCheck() ? 'inactive-' : ''}6`,
+    },
+    {
       name: 'Studies',
       field: 'studies',
       classes: {
@@ -297,7 +322,7 @@ function searchView(props) {
         wrapper: classes.tabColor,
       },
       count: searchCounts.study_count || 0,
-      value: `${!authCheck() ? 'inactive-' : ''}6`,
+      value: `${!authCheck() ? 'inactive-' : ''}7`,
     },
     {
       name: 'Data Model',
@@ -307,7 +332,7 @@ function searchView(props) {
         wrapper: classes.tabColor,
       },
       count: searchCounts.model_count || 0,
-      value: `${!authCheck() ? 'inactive-' : ''}7`,
+      value: `${!authCheck() ? 'inactive-' : ''}8`,
     },
     {
       name: 'About',
@@ -317,7 +342,7 @@ function searchView(props) {
         wrapper: classes.tabColor,
       },
       count: searchCounts.about_count || 0,
-      value: '8',
+      value: '9',
     }],
     config: {
       resultCardMap: customCardMap,

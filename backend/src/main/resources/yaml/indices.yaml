@@ -103,9 +103,9 @@ indices:
         RETURN DISTINCT
           p.study_participant_id as study_participant_id,
           COALESCE(p.participant_id, nsd) as participant_id,
-          COALESCE(p.race, nsd) as race,
+          COALESCE(replace(replace(replace(p.race, '[', ''), ']', ''), '"', ''), nsd) as race,
           COALESCE(p.sex, nsd) as sex,
-          COALESCE(p.ethnicity, nsd) as ethnicity,
+          COALESCE(replace(replace(replace(p.ethnicity, '[', ''), ']', ''), '"', ''), nsd) as ethnicity,
           COALESCE(p.participant_id, nsd) as subject_ids,
           COALESCE(p.dbGaP_subject_id, nsd) as dbGaP_subject_id
         SKIP $skip LIMIT $limit
@@ -1526,7 +1526,7 @@ indices:
           f.md5sum AS md5sum,
           f.file_url_in_cds AS file_url_in_cds,
           'drs://nci-crdc.datacommons.io/' + f.file_id AS drs_uri,
-          COALESCE(f.is_supplementary_file, nsd) AS is_supplementary_file,
+          COALESCE(f.is_supplementary_file, false) AS is_supplementary_file,
           f.release_datetime AS release_datetime,
           sorted_experimental_strategies AS experimental_strategies,
           [file_type] AS file_types,
@@ -1635,7 +1635,7 @@ indices:
           WITH f.file_id AS file_id, p, "Not specified in data" AS nsd, "Not Applicable" AS na
           WITH file_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.sex, nsd) END) AS sex,
-            COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.race, nsd) END) AS races,
+            COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(replace(replace(replace(p.race, '[', ''), ']', ''), '"', ''), nsd) END) AS races,
             COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.participant_id, nsd) END) AS participant_ids,
             COLLECT(DISTINCT CASE WHEN p IS NULL THEN null ELSE COALESCE(p.study_participant_id, nsd) END) AS study_participant_ids
           WITH file_id, nsd, na,
@@ -3094,6 +3094,7 @@ indices:
         - subject_ids_filter
       search_as_you_type:
         - study_gs
+        - study_phs_accession_gs
         - subject_id_gs
         - site_gs
         - sex_gs
@@ -3115,12 +3116,16 @@ indices:
       # Study
       - name: "Study"
         # study_gs
+        # study_phs_accession_gs
         query: |
           MATCH (p:participant)
           WITH DISTINCT p
           SKIP $skip LIMIT $limit
-          OPTIONAL MATCH (p)<-[:of_participant]-(:file)-[:of_study]-(s:study)
-          WITH p.study_participant_id AS study_participant_id, COLLECT(DISTINCT s.study_name) AS study_names, "Not Applicable" AS na
+          OPTIONAL MATCH (p)<-[:of_participant]-(:file)-[:of_study]->(s:study)
+          WITH p.study_participant_id AS study_participant_id,
+              COLLECT(DISTINCT s.study_name) AS study_names,
+              COLLECT(DISTINCT s.phs_accession) AS study_phs_accessions,
+              "Not Applicable" AS na
           CALL {
             WITH study_names
             UNWIND study_names AS study_name
@@ -3128,10 +3133,20 @@ indices:
             ORDER BY study_name
             RETURN COLLECT(study_name) AS sorted_studies
           }
-          WITH study_participant_id, CASE WHEN size(sorted_studies) = 0 THEN [na] ELSE sorted_studies END AS study_gs
+          CALL {
+            WITH study_phs_accessions
+            UNWIND study_phs_accessions AS study_phs_accession
+            WITH study_phs_accession
+            ORDER BY study_phs_accession
+            RETURN COLLECT(study_phs_accession) AS sorted_study_phs_accessions_gs
+          }
+          WITH study_participant_id,
+              CASE WHEN size(sorted_studies) = 0 THEN [na] ELSE sorted_studies END AS study_gs,
+              CASE WHEN size(sorted_study_phs_accessions_gs) = 0 THEN [na] ELSE sorted_study_phs_accessions_gs END AS study_phs_accession_gs
           RETURN DISTINCT
             study_participant_id,
-            study_gs
+            study_gs,
+            study_phs_accession_gs
         page_size: 5000
       # Site
       - name: "Site"
@@ -3169,6 +3184,8 @@ indices:
         - sample_id_gs
         - is_tumor_gs
         - analyte_type_gs
+        - study_gs
+        - study_phs_accession_gs
     initial_query:
       # sample_id
       # sample_id_gs
@@ -3199,6 +3216,86 @@ indices:
             "Not Applicable" AS na
           RETURN DISTINCT
             sample_id,
+            CASE WHEN size(participant_ids) = 0 THEN [na] ELSE participant_ids END AS subject_ids_filter
+        page_size: 5000
+      - name: "Study"
+        # study_gs
+        # study_phs_accession_gs
+        query: |
+          MATCH (samp:sample)
+          WITH DISTINCT samp
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (samp)-[*]->(s:study)
+          WITH samp.sample_id AS sample_id,
+              COLLECT(DISTINCT s.study_name) AS study_names,
+              COLLECT(DISTINCT s.phs_accession) AS study_phs_accessions,
+              "Not Applicable" AS na
+          CALL {
+            WITH study_names
+            UNWIND study_names AS study_name
+            WITH study_name
+            ORDER BY study_name
+            RETURN COLLECT(study_name) AS sorted_studies
+          }
+          CALL {
+            WITH study_phs_accessions
+            UNWIND study_phs_accessions AS study_phs_accession
+            WITH study_phs_accession
+            ORDER BY study_phs_accession
+            RETURN COLLECT(study_phs_accession) AS sorted_study_phs_accessions_gs
+          }
+          WITH sample_id,
+              CASE WHEN size(sorted_studies) = 0 THEN [na] ELSE sorted_studies END AS study_gs,
+              CASE WHEN size(sorted_study_phs_accessions_gs) = 0 THEN [na] ELSE sorted_study_phs_accessions_gs END AS study_phs_accession_gs
+          RETURN DISTINCT
+            sample_id,
+            study_gs,
+            study_phs_accession_gs
+        page_size: 5000
+  - index_name: "gs_protocol"
+    id_field: "protocol_pk_id"
+    mapping:
+      keyword:
+        - protocol_pk_id
+        - subject_ids_filter
+      search_as_you_type:
+        - protocol_pk_id_gs
+        - protocol_name_gs
+        - protocol_type_gs
+        - doi_gs
+        - doi_url_gs
+    initial_query:
+      # protocol_pk_id
+      # protocol_name_gs
+      # protocol_type_gs
+      # doi_gs
+      # doi_url_gs
+      query: |
+        MATCH (proto:Protocol)
+        WITH DISTINCT proto, "Not specified in data" AS nsd
+        ORDER BY proto.protocol_pk_id
+        RETURN DISTINCT
+          proto.protocol_pk_id AS protocol_pk_id,
+          proto.protocol_pk_id AS protocol_pk_id_gs,
+          COALESCE(proto.protocol_name, nsd) AS protocol_name_gs,
+          COALESCE(proto.protocol_type, nsd) AS protocol_type_gs,
+          COALESCE(proto.doi, nsd) AS doi_gs,
+          COALESCE(proto.doi_url, nsd) AS doi_url_gs
+        SKIP $skip LIMIT $limit
+      page_size: 5000
+    update_queries:
+      # Subject IDs Filter
+      - name: "Subject IDs Filter"
+        # subject_ids_filter
+        query: |
+          MATCH (proto:Protocol)
+          WITH DISTINCT proto
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (proto)-->(samp:sample)-[:of_participant]->(p:participant)
+          WITH proto.protocol_pk_id AS protocol_pk_id,
+          COLLECT(DISTINCT p.participant_id) AS participant_ids, "Not Applicable" AS na
+          RETURN DISTINCT
+            protocol_pk_id,
             CASE WHEN size(participant_ids) = 0 THEN [na] ELSE participant_ids END AS subject_ids_filter
         page_size: 5000
   - index_name: "gs_file"
