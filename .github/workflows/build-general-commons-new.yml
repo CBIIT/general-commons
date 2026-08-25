@@ -302,6 +302,7 @@ jobs:
                   gh_out.write("high_count=0\n")
                   gh_out.write("medium_count=0\n")
                   gh_out.write("low_count=0\n")
+                  gh_out.write("cves_json=[]\n")
                   gh_out.write("has_critical_or_high=false\n")
               sys.exit(0)
 
@@ -357,12 +358,14 @@ jobs:
           with open(f"scan-table-{image_label}.txt", "w") as out:
               out.write(summary + "\n")
 
+          cves = sorted({str(row["cve"]).strip() for row in rows if str(row["cve"]).strip()})
           has_critical_or_high = "true" if (sev_counts["critical"] > 0 or sev_counts["high"] > 0) else "false"
           with open(gh_output_path, "a") as gh_out:
               gh_out.write(f"critical_count={sev_counts['critical']}\n")
               gh_out.write(f"high_count={sev_counts['high']}\n")
               gh_out.write(f"medium_count={sev_counts['medium']}\n")
               gh_out.write(f"low_count={sev_counts['low']}\n")
+              gh_out.write(f"cves_json={json.dumps(cves)}\n")
               gh_out.write(f"has_critical_or_high={has_critical_or_high}\n")
           PYEOF
 
@@ -377,6 +380,7 @@ jobs:
             "high": ${{ steps.format_table.outputs.high_count || 0 }},
             "medium": ${{ steps.format_table.outputs.medium_count || 0 }},
             "low": ${{ steps.format_table.outputs.low_count || 0 }},
+            "cves": ${{ steps.format_table.outputs.cves_json || '[]' }},
             "has_critical_or_high": "${{ steps.format_table.outputs.has_critical_or_high || 'false' }}"
           }
           EOF
@@ -472,6 +476,16 @@ jobs:
               lines.append("\u274C **One or more images have CRITICAL or HIGH vulnerabilities.**")
           else:
               lines.append("\u2705 **No CRITICAL or HIGH vulnerabilities found across all images.**")
+
+          lines.append("")
+          lines.append("### CVEs by Service")
+          lines.append("")
+          lines.append("| Service | CVEs |")
+          lines.append("|---|---|")
+          for r in rows:
+              cves = sorted(set(r.get("cves") or []))
+              cve_text = "<br>".join(f"`{cve}`" for cve in cves) if cves else "None"
+              lines.append(f"| {r.get('service','?')} | {cve_text} |")
 
           summary_md = "\n".join(lines)
           print(summary_md)
