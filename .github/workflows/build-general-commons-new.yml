@@ -364,6 +364,7 @@ jobs:
               (
                   str(row["package"]).strip(),
                   str(row["cve"]).strip(),
+                  str(row["severity"]).strip(),
                   str(row["installed"]).strip(),
                   str(row["fixed"]).strip(),
               )
@@ -373,10 +374,11 @@ jobs:
               {
                   "library": library,
                   "cve": cve,
+                  "severity": severity,
                   "installed": installed,
                   "fixed": fixed,
               }
-              for library, cve, installed, fixed in finding_values
+              for library, cve, severity, installed, fixed in finding_values
           ]
           has_critical_or_high = "true" if (sev_counts["critical"] > 0 or sev_counts["high"] > 0) else "false"
           with open(gh_output_path, "a") as gh_out:
@@ -478,8 +480,8 @@ jobs:
 
           lines = []
           lines.append("## \U0001F512 Twistlock Scan Results\n")
-          lines.append("| Service | Image | Critical | High | Medium | Low | Library | CVEs | Installed Version | Fixed Version | Status |")
-          lines.append("|---|---|---|---|---|---|---|---|---|---|---|")
+          lines.append("| Service | Image | Critical | High | Medium | Low | Library | CVEs (Severity) | Installed Version | Status |")
+          lines.append("|---|---|---|---|---|---|---|---|---|---|")
 
           def format_finding_value(value, default="None"):
               text = str(value or default).replace("|", "\\|").replace("`", "'")
@@ -492,14 +494,16 @@ jobs:
               low = r.get("low", 0)
               findings = r.get("findings") or []
               library_text = "<br>".join(format_finding_value(f.get("library")) for f in findings) if findings else "None"
-              cve_text = "<br>".join(format_finding_value(f.get("cve")) for f in findings) if findings else "None"
+              cve_text = "<br>".join(
+                  format_finding_value(f"{f.get('cve') or 'Unknown'} ({f.get('severity') or 'UNKNOWN'})")
+                  for f in findings
+              ) if findings else "None"
               installed_text = "<br>".join(format_finding_value(f.get("installed")) for f in findings) if findings else "None"
-              fixed_text = "<br>".join(format_finding_value(f.get("fixed"), "not fixed") for f in findings) if findings else "None"
               failed = r.get("has_critical_or_high") == "true"
               if failed:
                   any_fail = True
               status = "\u274C FAIL" if failed else "\u2705 PASS"
-              lines.append(f"| {r.get('service','?')} | {r.get('image','?')} | {crit} | {high} | {med} | {low} | {library_text} | {cve_text} | {installed_text} | {fixed_text} | {status} |")
+              lines.append(f"| {r.get('service','?')} | {r.get('image','?')} | {crit} | {high} | {med} | {low} | {library_text} | {cve_text} | {installed_text} | {status} |")
 
           lines.append("")
           if any_fail:
