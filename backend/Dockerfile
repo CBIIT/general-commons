@@ -20,7 +20,7 @@ RUN useradd -r nonrootuser && rm -rf /usr/local/tomcat/webapps/ROOT
 COPY --from=build /usr/src/app/target/CDS-*.war /usr/local/tomcat/webapps/ROOT.war
 # change ownership of the tomcat directory to the nonroot user
 RUN chown -R nonrootuser:nonrootuser /usr/local/tomcat
-# base image patching
-RUN apt update && apt upgrade -y
+# base image patching - remediates CVE-2026-63072, CVE-2026-63076 (openssl/libssl3t64 >= 3.0.13-0ubuntu3.15)
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --only-upgrade openssl libssl3t64 && apt-get clean && rm -rf /var/lib/apt/lists/*
 # switch to nonroot user
 USER nonrootuser
