@@ -252,8 +252,8 @@ jobs:
     env:
       IMAGE_TAG: ${{ needs.prepare.outputs.image_tag }}
       REGION: "us-east-1"
-      #TWISTLOCK_URL: "https://twistlock.nci.nih.gov"
-      TWISTLOCK_URL: "http://nciws-p2005-v.nci.nih.gov"
+      TWISTLOCK_URL: "https://twistlock.nci.nih.gov"
+      #TWISTLOCK_URL: "http://nciws-p2005-v.nci.nih.gov"
       TWISTLOCK_PATH: "/opt/twistlock/twistcli"
     strategy:
       fail-fast: false
