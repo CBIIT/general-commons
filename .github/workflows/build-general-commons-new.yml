@@ -325,7 +325,10 @@ jobs:
           echo "========================================"
           echo "Scanning: $IMAGE_NAME"
           echo "========================================"
+          ${TWISTLOCK_PATH} images scan --help | grep disable-symbol-extraction
+
           ${TWISTLOCK_PATH} images scan \
+            --disable-symbol-extraction \
             --address "${TWISTLOCK_URL}" \
             --user "${{ secrets.TWISTLOCK_USERNAME }}" \
             --password "${{ secrets.TWISTLOCK_PASSWORD }}" \
