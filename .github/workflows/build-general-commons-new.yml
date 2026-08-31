@@ -152,7 +152,12 @@ jobs:
           import sys
 
           scan_file, service, image = sys.argv[1:4]
-          counts = {"critical": 0, "high": 0, "medium": 0, "low": 0}
+          cves_by_severity = {
+              "critical": set(),
+              "high": set(),
+              "medium": set(),
+              "low": set(),
+          }
           finding_values = set()
           scan_error = ""
 
@@ -164,12 +169,13 @@ jobs:
                   for vulnerability in result.get("Vulnerabilities") or []:
                       severity = str(vulnerability.get("Severity") or "UNKNOWN").upper()
                       severity_key = severity.lower()
-                      if severity_key in counts:
-                          counts[severity_key] += 1
+                      cve = str(vulnerability.get("VulnerabilityID") or "").strip()
+                      if severity_key in cves_by_severity and cve:
+                          cves_by_severity[severity_key].add(cve)
 
                       finding_values.add((
                           str(vulnerability.get("PkgName") or "").strip(),
-                          str(vulnerability.get("VulnerabilityID") or "").strip(),
+                          cve,
                           severity,
                           str(vulnerability.get("InstalledVersion") or "").strip(),
                       ))
@@ -177,6 +183,10 @@ jobs:
               scan_error = str(error)
               print(f"Could not read/parse {scan_file}: {error}")
 
+          counts = {
+              severity: len(cves)
+              for severity, cves in cves_by_severity.items()
+          }
           findings = [
               {
                   "library": library,
@@ -189,6 +199,7 @@ jobs:
 
           result = {
               "scanner": "Trivy",
+              "count_basis": "unique_cves",
               "service": service,
               "image": image,
               **counts,
@@ -574,6 +585,9 @@ jobs:
               if not rows:
                   lines.append(f"No {scanner} scan results were produced.\n")
                   return False
+
+              if scanner == "Trivy":
+                  lines.append("Severity totals count unique CVE IDs; all affected packages remain listed below.\n")
 
               lines.append("| Service | Image | Critical | High | Medium | Low | Library | CVEs (Severity) | Installed Version | Status |")
               lines.append("|---|---|---|---|---|---|---|---|---|---|")
