@@ -271,6 +271,12 @@ jobs:
     steps:
       - name: Set image name
         run: |
+          rm -f \
+            "scan-${{ matrix.name }}.json" \
+            "scan-output-${{ matrix.name }}.log" \
+            "scan-table-${{ matrix.name }}.txt" \
+            "result-${{ matrix.name }}.json"
+
           uname -a
           cat /etc/os-release
           systemctl status docker
