@@ -589,8 +589,8 @@ jobs:
               if scanner == "Trivy":
                   lines.append("Severity totals count unique CVE IDs; all affected packages remain listed below.\n")
 
-              lines.append("| Service | Image | Critical | High | Medium | Low | Library | CVEs (Severity) | Installed Version | Status |")
-              lines.append("|---|---|---|---|---|---|---|---|---|---|")
+              lines.append("| Service | Critical | High | Medium | Low | Library | CVEs (Severity) | Installed Version | Status |")
+              lines.append("|---|---|---|---|---|---|---|---|---|")
               scanner_failed = False
 
               for result in rows:
@@ -609,7 +609,7 @@ jobs:
                   if failed:
                       scanner_failed = True
                   status = "\u274C FAIL" if failed else "\u2705 PASS"
-                  lines.append(f"| {result.get('service','?')} | {result.get('image','?')} | {crit} | {high} | {med} | {low} | {library_text} | {cve_text} | {installed_text} | {status} |")
+                  lines.append(f"| {result.get('service','?')} | {crit} | {high} | {med} | {low} | {library_text} | {cve_text} | {installed_text} | {status} |")
 
               lines.append("")
               if scanner_failed:
