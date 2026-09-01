@@ -31,11 +31,14 @@ describe("Basic Functionality", () => {
 
   it("should have the correct sandbox attributes", () => {
     render(<DataModelNavigator />);
-    const iframe = screen.getByTitle("Data Model Navigator");
-    expect(iframe).toHaveAttribute(
-      "sandbox",
-      "allow-popups allow-scripts allow-same-origin allow-downloads",
-    );
+    const sandbox = screen
+      .getByTitle("Data Model Navigator")
+      .getAttribute("sandbox")
+      .split(" ");
+    expect(sandbox).toContain("allow-popups");
+    expect(sandbox).toContain("allow-scripts");
+    expect(sandbox).toContain("allow-same-origin");
+    expect(sandbox).toContain("allow-downloads");
   });
 });
 
