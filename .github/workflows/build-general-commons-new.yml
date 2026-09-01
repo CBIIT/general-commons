@@ -249,6 +249,7 @@ jobs:
     needs: [prepare, build]
     if: needs.build.result == 'success' && inputs.twistlock_scan == true
     environment: ${{ inputs.environment }}
+    timeout-minutes: 60
     env:
       IMAGE_TAG: ${{ needs.prepare.outputs.image_tag }}
       REGION: "us-east-1"
