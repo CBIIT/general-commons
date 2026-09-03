@@ -9,13 +9,13 @@ COPY src ./src
 RUN mvn -B package -DskipTests
 
 # Production stage
-FROM tomcat:10.1.57-jre25 AS fnl_base_image
+FROM tomcat:10.1.59-jre25 AS fnl_base_image
 # set environment variables
 ENV JAVA_OPTS="-XX:InitialRAMPercentage=25 -XX:MaxRAMPercentage=70"
 ENV TZ="America/New_York"
 EXPOSE 8080
-# remove existing webapps, copy the new war file, and run as non-root
-RUN useradd -r nonrootuser && rm -rf /usr/local/tomcat/webapps/ROOT
+# remove existing webapps (including examples), copy the new war file, and run as non-root
+RUN useradd -r nonrootuser && rm -rf /usr/local/tomcat/webapps/*
 # copy the war file
 COPY --from=build /usr/src/app/target/CDS-*.war /usr/local/tomcat/webapps/ROOT.war
 # change ownership of the tomcat directory to the nonroot user
