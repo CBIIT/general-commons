@@ -1,11 +1,12 @@
-FROM node:26.8.1-alpine3.24 AS build
+FROM node:26.8.1-trixie-slim AS build
 WORKDIR /usr/src/app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
-FROM node:26.8.1-alpine3.24 AS fnl_base_image
+FROM node:26.8.1-trixie-slim AS fnl_base_image
 WORKDIR /usr/src/app
-# CVE-2026-63073: Alpine 3.24 libssl3/libcrypto3 3.5.8-r0
+RUN apt-get update && apt-get upgrade -y && \
+    rm -rf /var/lib/apt/lists/*
 RUN rm -rf \
         /usr/local/lib/node_modules/npm \
         /usr/local/bin/npm \
