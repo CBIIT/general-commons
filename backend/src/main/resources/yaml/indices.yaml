@@ -3722,6 +3722,7 @@ indices:
         - acl
         - study_access
         - study_version
+        - program_name
       long:
         - number_of_participants
         - numberOfSubjects
@@ -3864,6 +3865,18 @@ indices:
           WHERE diag.primary_site IS NOT NULL
           WITH DISTINCT s, COUNT(DISTINCT diag.primary_site) AS number_of_disease_sites
           RETURN DISTINCT s.phs_accession AS phs_accession, number_of_disease_sites, number_of_disease_sites AS numberOfDiseaseSites
+        page_size: 1
+      # Program Name
+      - name: "Program Name"
+        # program_name
+        query: |
+          MATCH (s:study)
+          WITH DISTINCT s, "Not specified in data" AS nsd
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (s)-[:of_program]->(pr:program)
+          RETURN DISTINCT
+            s.phs_accession AS phs_accession,
+            COALESCE(pr.program_name, nsd) AS program_name
         page_size: 1
   - index_name: "subject_detail"
     id_field: "subject_id"

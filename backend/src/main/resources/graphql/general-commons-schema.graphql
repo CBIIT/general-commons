@@ -388,6 +388,7 @@ type StudyInfo {
     numberOfFiles: Int
     study_access: String
     study_version: String
+    program_name: String
 }
 
 type StudyDetail {
