@@ -1,6 +1,7 @@
 # multi-stage not needed here since there is no build step
-FROM node:26.3.1-alpine3.24 AS fnl_base_image
+FROM node:26.5.1-alpine3.24 AS fnl_base_image
 WORKDIR /usr/src/app
+RUN apk add --no-cache --upgrade libcrypto3=3.5.8-r0 libssl3=3.5.8-r0
 # copy the package files only
 COPY package.json package-lock.json ./
 # install dependencies
