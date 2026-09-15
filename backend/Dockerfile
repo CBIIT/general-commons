@@ -9,7 +9,7 @@ COPY src ./src
 RUN mvn -B package -DskipTests
 
 # Production stage
-FROM tomcat:10.1.57-jre25 AS fnl_base_image
+FROM tomcat:10.1.59-jre25-temurin-noble AS fnl_base_image
 # set environment variables
 ENV JAVA_OPTS="-XX:InitialRAMPercentage=25 -XX:MaxRAMPercentage=70"
 ENV TZ="America/New_York"
@@ -21,6 +21,18 @@ COPY --from=build /usr/src/app/target/CDS-*.war /usr/local/tomcat/webapps/ROOT.w
 # change ownership of the tomcat directory to the nonroot user
 RUN chown -R nonrootuser:nonrootuser /usr/local/tomcat
 # base image patching
-RUN apt update && apt upgrade -y
+RUN apt-get update && apt-get install -y --only-upgrade --no-install-recommends \
+    coreutils \
+    gpgv \
+    libbz2-1.0 \
+    libgcrypt20 \
+    libncursesw6 \
+    libssl3t64 \
+    libtinfo6 \
+    ncurses-base \
+    ncurses-bin \
+    openssl \
+    zlib1g \
+    && rm -rf /var/lib/apt/lists/*
 # switch to nonroot user
 USER nonrootuser
