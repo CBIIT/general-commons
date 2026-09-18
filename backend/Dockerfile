@@ -1,5 +1,5 @@
 # Build stage
-FROM maven:3.9.16-eclipse-temurin-17-noble AS build
+FROM maven:3.9.16-eclipse-temurin-25-noble AS build
 WORKDIR /usr/src/app
 # download dependencies
 COPY pom.xml .
