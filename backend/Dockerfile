@@ -21,6 +21,6 @@ COPY --from=build /usr/src/app/target/CDS-*.war /usr/local/tomcat/webapps/ROOT.w
 # change ownership of the tomcat directory to the nonroot user
 RUN chown -R nonrootuser:nonrootuser /usr/local/tomcat
 # base image patching
-RUN apt update && apt upgrade -y
+RUN apt-get update && apt-get install --only-upgrade -y perl-base=5.38.2-3.2ubuntu0.6
 # switch to nonroot user
 USER nonrootuser
