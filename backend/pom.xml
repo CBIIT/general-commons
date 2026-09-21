@@ -19,6 +19,7 @@
         <java.version>25</java.version>
         <log4j2.version>2.25.5</log4j2.version>
         <spring.version>7.0.9</spring.version>
+        <tomcat.version>11.0.25</tomcat.version>
     </properties>
     <dependencies>
         <!-- Spring Boot -->
@@ -77,11 +78,12 @@
             <version>${spring.version}</version>
         </dependency>
         <!-- Apache Tomcat -->
+        <!--
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>11.0.22</version>
-        </dependency>
+            <version>11.0.25</version>
+        </dependency>-->
         <!-- GraphQL -->
         <dependency>
             <groupId>com.graphql-java</groupId>
@@ -251,7 +253,7 @@
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-bom</artifactId>
-                <version>4.2.15.Final</version>
+                <version>4.2.17.Final</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
