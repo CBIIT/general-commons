@@ -68,6 +68,12 @@ const table = {
       display: true,
     },
     {
+      dataField: 'program_name',
+      header: 'Program Name',
+      tooltipText: 'Sort by Program Name',
+      display: true,
+    },
+    {
       dataField: 'data_type',
       header: 'Data Types',
       tooltipText: 'Sort by Data Types',
@@ -106,6 +112,7 @@ const GET_STUDIES_DATA_QUERY = gql`{
     numberOfSubjects
     numberOfFiles
     data_type
+    program_name
   }
 }
  `;
