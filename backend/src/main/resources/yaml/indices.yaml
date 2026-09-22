@@ -2577,6 +2577,7 @@ indices:
         - file_id
         - study_study_data_type_filter
         - study_data_types
+        - study_access # study.study_access - single value
         - studies # study.study_name - study_study_name_filter - array
         - phs_accession # study.phs_accession - study_phs_accession_filter - array
         - experimental_strategies # file.experimental_strategy_and_data_subtypes - files_experimental_strategy_filter - array
@@ -2630,6 +2631,7 @@ indices:
       # file_id
       # study_study_data_type_filter
       # study_data_types
+      # study_access
       query: |
         MATCH (f:file)
         WITH DISTINCT f
@@ -2645,7 +2647,8 @@ indices:
           f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
           f.file_id AS file_id,
           COALESCE(study_data_type, nsd) AS study_study_data_type_filter,
-          COALESCE(study_data_type, nsd) AS study_data_types
+          COALESCE(study_data_type, nsd) AS study_data_types,
+          COALESCE(s.study_access, nsd) AS study_access
       page_size: 5000
     update_queries:
       # Studies
