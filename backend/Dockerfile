@@ -21,6 +21,12 @@ COPY --from=build /usr/src/app/target/CDS-*.war /usr/local/tomcat/webapps/ROOT.w
 # change ownership of the tomcat directory to the nonroot user
 RUN chown -R nonrootuser:nonrootuser /usr/local/tomcat
 # base image patching
-RUN apt update && apt upgrade -y
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        libp11-kit0=0.25.3-4ubuntu2.2 \
+        p11-kit=0.25.3-4ubuntu2.2 \
+        p11-kit-modules=0.25.3-4ubuntu2.2 \
+        perl-base=5.38.2-3.2ubuntu0.4 \
+    && rm -rf /var/lib/apt/lists/*
 # switch to nonroot user
 USER nonrootuser
