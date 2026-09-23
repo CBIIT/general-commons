@@ -1,5 +1,5 @@
 # Build stage
-FROM maven:3.9.16-eclipse-temurin-17-noble AS build
+FROM maven:3.9.16-eclipse-temurin-25-noble AS build
 WORKDIR /usr/src/app
 # download dependencies
 COPY pom.xml .
@@ -9,7 +9,7 @@ COPY src ./src
 RUN mvn -B package -DskipTests
 
 # Production stage
-FROM tomcat:10.1.59-jre25 AS fnl_base_image
+FROM tomcat:11.0.25-jre25 AS fnl_base_image
 # set environment variables
 ENV JAVA_OPTS="-XX:InitialRAMPercentage=25 -XX:MaxRAMPercentage=70"
 ENV TZ="America/New_York"
