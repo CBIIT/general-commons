@@ -6,7 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
-@SpringBootApplication(scanBasePackages = {"gov.nih.nci"})
+@SpringBootApplication(
+		scanBasePackages = {"gov.nih.nci"},
+		excludeName = "org.springframework.boot.neo4j.autoconfigure.Neo4jAutoConfiguration"
+)
 public class BentoApplication extends SpringBootServletInitializer {
 	private static final Logger logger = LogManager.getLogger(BentoApplication.class);
 

@@ -6,8 +6,10 @@ import gov.nih.nci.bento.service.ESService;
 import gov.nih.nci.bento_ri.model.GeneralCommonsRuntimeWiring;
 import gov.nih.nci.bento_ri.model.MemgraphDataFetcher;
 import org.junit.jupiter.api.Test;
+import org.neo4j.driver.Driver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -29,6 +31,9 @@ class BentoApplicationContextTest {
     private BentoGraphQL bentoGraphQL;
 
     @Autowired
+    private ApplicationContext applicationContext;
+
+    @Autowired
     private Environment environment;
 
     @Autowired
@@ -44,5 +49,6 @@ class BentoApplicationContextTest {
         assertEquals("graphql/general-commons-schema.graphql", environment.getProperty("graphql.schema"));
         assertEquals("localhost", environment.getProperty("memgraph.endpoint"));
         assertEquals("false", environment.getProperty("es.filter.enabled"));
+        assertEquals(0, applicationContext.getBeanNamesForType(Driver.class).length);
     }
 }
