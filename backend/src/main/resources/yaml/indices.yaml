@@ -2577,6 +2577,7 @@ indices:
         - file_id
         - study_study_data_type_filter
         - study_data_types
+        - accesses
         - studies # study.study_name - study_study_name_filter - array
         - phs_accession # study.phs_accession - study_phs_accession_filter - array
         - experimental_strategies # file.experimental_strategy_and_data_subtypes - files_experimental_strategy_filter - array
@@ -2654,6 +2655,7 @@ indices:
         # phs_accession
         # number_of_study_participants
         # number_of_study_samples
+        # accesses
         query: |
           MATCH (f:file)
           WITH DISTINCT f
@@ -2678,6 +2680,7 @@ indices:
             COLLECT(DISTINCT CASE WHEN s IS NULL THEN null ELSE COALESCE(s.study_name, nsd) END) AS studies,
             COLLECT(DISTINCT CASE WHEN s IS NULL THEN null ELSE COALESCE(s.phs_accession, nsd) END) AS phs_accession,
             COALESCE(study_data_type, nsd) AS study_data_types,
+            COALESCE(s.study_access, nsd) AS accesses,
             number_of_study_participants,
             number_of_study_samples
         page_size: 5000
