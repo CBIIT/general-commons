@@ -2631,7 +2631,6 @@ indices:
       # file_id
       # study_study_data_type_filter
       # study_data_types
-      # study_access
       query: |
         MATCH (f:file)
         WITH DISTINCT f
