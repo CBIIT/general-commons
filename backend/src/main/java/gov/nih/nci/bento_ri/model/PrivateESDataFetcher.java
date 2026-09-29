@@ -843,7 +843,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                         "file_type_gs", "accesses_gs", "acl_gs", "experimental_strategies_gs", "instrument_models_gs",
                         "library_layouts_gs", "library_selections_gs", "library_source_materials_gs",
                         "library_source_molecules_gs", "library_strategies_gs", "platforms_gs",
-                        "reference_genome_assemblies_gs", "sites_gs", "is_supplementary_file_gs"),
+                        "reference_genome_assemblies_gs", "sites_gs", "is_supplementary_file_gs", "study_phs_accession_gs", "study_gs"),
                 GS_SORT_FIELD, "file_id",
                 GS_COLLECT_FIELDS, new String[][]{
                         new String[]{"subject_id", "subject_id_gs"},
