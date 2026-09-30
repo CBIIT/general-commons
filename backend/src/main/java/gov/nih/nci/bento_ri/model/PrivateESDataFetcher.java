@@ -821,7 +821,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 GS_COUNT_ENDPOINT, GS_PROTOCOL_COUNT_END_POINT,
                 GS_COUNT_RESULT_FIELD, "protocol_count",
                 GS_RESULT_FIELD, "protocols",
-                GS_SEARCH_FIELD, List.of("protocol_pk_id_gs", "protocol_name_gs", "protocol_type_gs", "doi_gs", "doi_url_gs"),
+                GS_SEARCH_FIELD, List.of("protocol_pk_id_gs", "protocol_name_gs", "protocol_type_gs", "doi_gs", "doi_url_gs", "study_phs_accession_gs", "study_gs", "sample_id_gs", "accesses_gs", "acl_gs"),
                 GS_SORT_FIELD, "protocol_pk_id",
                 GS_COLLECT_FIELDS, new String[][]{
                         new String[]{"protocol_pk_id", "protocol_pk_id"},
