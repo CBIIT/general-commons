@@ -538,6 +538,7 @@ query searchSubjects(
 export const GET_CASES_OVERVIEW_QUERY = gql`
 query subjectOverview(
   $subject_ids: [String],
+  $file_ids: [String],
   $accesses:[String],
   $acl:[String],
   $experimental_strategies:[String],
@@ -587,6 +588,7 @@ query subjectOverview(
 ){
   subjectOverview(
       subject_ids: $subject_ids,
+      file_ids: $file_ids,
       accesses:$accesses,
       acl:$acl,
       experimental_strategies:$experimental_strategies,
@@ -778,6 +780,7 @@ export const GET_SAMPLES_OVERVIEW_QUERY = gql`
 query sampleOverview(
   $subject_ids: [String],
   $sample_ids: [String],
+  $file_ids: [String],
   $accesses:[String],
   $acl:[String],
   $experimental_strategies:[String],
@@ -828,6 +831,7 @@ query sampleOverview(
   sampleOverview(
       subject_ids: $subject_ids,
       sample_ids: $sample_ids,
+      file_ids: $file_ids,
       accesses:$accesses,
       acl:$acl,
       experimental_strategies:$experimental_strategies,
@@ -901,6 +905,8 @@ query protocolOverview(
   $doi: [String],
   $doi_url: [String],
   $file_names: [String],
+  $file_ids: [String],
+  $files: [String],
   $acl: [String],
   $accesses: [String],
   $experimental_strategies: [String],
@@ -954,6 +960,8 @@ query protocolOverview(
       doi: $doi,
       doi_url: $doi_url,
       file_names: $file_names,
+      file_ids: $file_ids,
+      files: $files,
       acl: $acl,
       accesses: $accesses,
       experimental_strategies: $experimental_strategies,

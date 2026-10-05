@@ -1001,6 +1001,7 @@ type QueryType {
     subjectOverview (
         # id filters
         subject_ids: [String] = []
+        file_ids: [String] = []
         # standard filters
         accesses: [String] = []
         acl: [String] = []
@@ -1067,6 +1068,8 @@ type QueryType {
         experimental_strategies: [String] = []
         file_types: [String] = []
         file_names: [String] = []
+        file_ids: [String] = []
+        files: [String] = []
         sex: [String] = []
         image_modality: [String] = []
         instrument_models: [String] = []
@@ -1119,6 +1122,7 @@ type QueryType {
         # id filters
         subject_ids: [String] = []
         sample_ids: [String] = []
+        file_ids: [String] = []
         # standard filters
         accesses: [String] = []
         acl: [String] = []

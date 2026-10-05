@@ -465,6 +465,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"site", "site"},
                 new String[]{"samples", "samples"},
                 new String[]{"files", "files"},
+                new String[]{"file_ids", "file_ids"},
                 new String[]{"analyte_type", "analyte_type"},
                 new String[]{"race", "race"},
                 new String[]{"ethnicity", "ethnicity"},
@@ -499,7 +500,9 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"protocol_type", "protocol_type"},
                 new String[]{"doi", "doi"},
                 new String[]{"doi_url", "doi_url"},
-                new String[]{"file_names", "file_names"}
+                new String[]{"file_names", "file_names"},
+                new String[]{"file_ids", "file_ids"},
+                new String[]{"files", "files"}
         };
 
         String defaultSort = "protocol_pk_id"; // Default sort order
@@ -525,6 +528,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"is_tumor", "is_tumor"},
                 new String[]{"analyte_type", "analyte_type"},
                 new String[]{"files", "files"},
+                new String[]{"file_ids", "file_ids"},
                 new String[]{"sample_type", "analyte_type"},
                 new String[]{"sample_tumor_status", "is_tumor"},
                 new String[]{"organ_or_tissue", "organ_or_tissue"},
