@@ -3280,6 +3280,11 @@ indices:
         - protocol_type_gs
         - doi_gs
         - doi_url_gs
+        - study_gs
+        - study_phs_accession_gs
+        - accesses_gs
+        - acl_gs
+        - sample_id_gs
     initial_query:
       # protocol_pk_id
       # protocol_name_gs
@@ -3314,6 +3319,71 @@ indices:
             protocol_pk_id,
             CASE WHEN size(participant_ids) = 0 THEN [na] ELSE participant_ids END AS subject_ids_filter
         page_size: 5000
+      # Sample ID
+      - name: "Sample ID"
+        # sample_id_gs
+        query: |
+          MATCH (proto:Protocol)
+          WITH DISTINCT proto
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (proto)-[:from_sample]->(samp:sample)
+          WITH proto.protocol_pk_id AS protocol_pk_id,
+            COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE samp.sample_id END) AS sample_ids,
+            "Not Applicable" AS na
+          CALL {
+            WITH sample_ids
+            UNWIND sample_ids AS sample_id
+            WITH sample_id
+            ORDER BY sample_id
+            RETURN COLLECT(sample_id) AS sorted_sample_ids
+          }
+          WITH protocol_pk_id,
+            CASE WHEN size(sorted_sample_ids) = 0 THEN [na] ELSE sorted_sample_ids END AS sample_id_gs
+          RETURN DISTINCT
+            protocol_pk_id,
+            sample_id_gs
+        page_size: 5000
+      # Study
+      - name: "Study Info"
+        # study_gs
+        # study_phs_accession_gs
+        # accesses_gs
+        # acl_gs
+        query: |
+          MATCH (proto:Protocol)
+          WITH DISTINCT proto
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (proto)-[:of_study]->(s:study)
+          WITH proto.protocol_pk_id AS protocol_pk_id, s, "Not specified in data" AS nsd, "Not Applicable" AS na
+          WITH protocol_pk_id, nsd, na,
+            COLLECT(DISTINCT CASE WHEN s IS NULL THEN null ELSE COALESCE(s.study_access, nsd) END) AS accesses,
+            CASE WHEN s.acl = '[]' THEN nsd ELSE replace(replace(replace(s.acl, '[', ''), ']', ''), '"', '') END AS acl,
+            COLLECT(DISTINCT s.study_name) AS study_names,
+            COLLECT(DISTINCT s.phs_accession) AS study_phs_accessions
+          CALL {
+            WITH study_names
+            UNWIND study_names AS study_name
+            WITH study_name
+            ORDER BY study_name
+            RETURN COLLECT(study_name) AS sorted_studies
+          }
+          CALL {
+            WITH study_phs_accessions
+            UNWIND study_phs_accessions AS study_phs_accession
+            WITH study_phs_accession
+            ORDER BY study_phs_accession
+            RETURN COLLECT(study_phs_accession) AS sorted_study_phs_accessions_gs
+          }
+          WITH protocol_pk_id, nsd, na, accesses, acl,
+            CASE WHEN size(sorted_studies) = 0 THEN [na] ELSE sorted_studies END AS study_gs,
+            CASE WHEN size(sorted_study_phs_accessions_gs) = 0 THEN [na] ELSE sorted_study_phs_accessions_gs END AS study_phs_accession_gs
+          RETURN DISTINCT
+            protocol_pk_id,
+            CASE WHEN size(accesses) = 0 THEN [na] ELSE accesses END AS accesses_gs,
+            CASE WHEN acl IS NULL THEN na ELSE COALESCE(acl, nsd) END AS acl_gs,
+            study_gs,
+            study_phs_accession_gs
+        page_size: 5000
   - index_name: "gs_file"
     id_field: "file_id"
     mapping:
@@ -3328,6 +3398,8 @@ indices:
         - file_type_gs
         - accesses_gs
         - acl_gs
+        - study_gs
+        - study_phs_accession_gs
         - experimental_strategies_gs
         - instrument_models_gs
         - library_layouts_gs
@@ -3403,6 +3475,8 @@ indices:
       - name: "Study Info"
         # accesses_gs
         # acl_gs
+        # study_gs
+        # study_phs_accession_gs
         query: |
           MATCH (f:file)
           WITH DISTINCT f
@@ -3411,11 +3485,32 @@ indices:
           WITH f.file_id AS file_id, s, "Not specified in data" AS nsd, "Not Applicable" AS na
           WITH file_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN s IS NULL THEN null ELSE COALESCE(s.study_access, nsd) END) AS accesses,
-            CASE WHEN s.acl = '[]' THEN nsd ELSE replace(replace(replace(s.acl, '[', ''), ']', ''), '"', '') END AS acl
+            CASE WHEN s.acl = '[]' THEN nsd ELSE replace(replace(replace(s.acl, '[', ''), ']', ''), '"', '') END AS acl,
+            COLLECT(DISTINCT s.study_name) AS study_names,
+            COLLECT(DISTINCT s.phs_accession) AS study_phs_accessions
+          CALL {
+            WITH study_names
+            UNWIND study_names AS study_name
+            WITH study_name
+            ORDER BY study_name
+            RETURN COLLECT(study_name) AS sorted_studies
+          }
+          CALL {
+            WITH study_phs_accessions
+            UNWIND study_phs_accessions AS study_phs_accession
+            WITH study_phs_accession
+            ORDER BY study_phs_accession
+            RETURN COLLECT(study_phs_accession) AS sorted_study_phs_accessions_gs
+          }
+          WITH file_id, nsd, na, accesses, acl,
+            CASE WHEN size(sorted_studies) = 0 THEN [na] ELSE sorted_studies END AS study_gs,
+            CASE WHEN size(sorted_study_phs_accessions_gs) = 0 THEN [na] ELSE sorted_study_phs_accessions_gs END AS study_phs_accession_gs
           RETURN DISTINCT
             file_id,
             CASE WHEN size(accesses) = 0 THEN [na] ELSE accesses END AS accesses_gs,
-            CASE WHEN acl IS NULL THEN na ELSE COALESCE(acl, nsd) END AS acl_gs
+            CASE WHEN acl IS NULL THEN na ELSE COALESCE(acl, nsd) END AS acl_gs,
+            study_gs,
+            study_phs_accession_gs
         page_size: 5000
       # Experimental Strategies
       - name: "Experimental Strategies"
