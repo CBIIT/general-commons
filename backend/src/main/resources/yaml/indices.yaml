@@ -25,6 +25,7 @@ indices:
         - acl # study.acl - array
         # Files
         - files # file.file_id - array
+        - file_ids # alias for files - for GraphQL parameter compatibility
         - experimental_strategies # file.experimental_strategy_and_data_subtypes - files_experimental_strategy_filter - array
         - file_types # file.file_type - files_file_type_filter - array
         - experimental_strategies_sort # derived from experimental_strategies - single value
@@ -225,6 +226,7 @@ indices:
       # Files
       - name: "Files"
         # files
+        # file_ids
         # experimental_strategies
         # file_types
         # files_is_supplementary_file_filter
@@ -285,6 +287,7 @@ indices:
           }
           RETURN DISTINCT
             sorted_files AS files,
+            sorted_files AS file_ids,
             study_participant_id,
             sorted_experimental_strategies AS experimental_strategies,
             sorted_file_types AS file_types,
@@ -670,6 +673,7 @@ indices:
         - acl # study.acl - array
         # Files
         - files # file.file_id - array
+        - file_ids # alias for files - for GraphQL parameter compatibility
         - experimental_strategies # file.experimental_strategy_and_data_subtypes - array
         - file_types # file.file_type - array
         - experimental_strategies_sort # derived from experimental_strategies - single value
@@ -884,6 +888,7 @@ indices:
       # Files
       - name: "Files"
         # files
+        # file_ids
         # experimental_strategies
         # file_types
         # files_is_supplementary_file_filter
@@ -941,6 +946,7 @@ indices:
           RETURN DISTINCT
             sample_id,
             sorted_files AS files,
+            sorted_files AS file_ids,
             sorted_experimental_strategies AS experimental_strategies,
             sorted_file_types AS file_types,
             files_is_supplementary_file_filter,
@@ -4166,6 +4172,7 @@ indices:
       - analyte_type # sample.sample_type - array
       # Files
       - files # file.file_id - array
+      - file_ids # alias for files - for GraphQL parameter compatibility
       - experimental_strategies # file.experimental_strategy_and_data_subtypes - array
       - file_types # file.file_type - array
       - file_types_sort # derived from file_types - single value
@@ -4300,6 +4307,7 @@ indices:
       # Files
       - name: "Files"
         # files
+        # file_ids
         # experimental_strategies
         # file_types
         # files_is_supplementary_file_filter
@@ -4311,6 +4319,13 @@ indices:
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f:file)<-[*]-(proto)
           WITH proto.protocol_pk_id AS protocol_pk_id, COLLECT(DISTINCT f) AS fs, COLLECT(DISTINCT f.file_id) AS files, "Not specified in data" AS nsd, "Not Applicable" AS na
+          CALL {
+            WITH files
+            UNWIND CASE WHEN files IS NULL OR size(files) = 0 THEN [null] ELSE files END AS file_id
+            WITH file_id
+            ORDER BY file_id
+            RETURN collect(file_id) AS sorted_file_ids
+          }
           CALL {
             WITH protocol_pk_id, fs, nsd, na
             WITH protocol_pk_id, nsd, na, fs
@@ -4341,6 +4356,8 @@ indices:
           }
           RETURN DISTINCT
             protocol_pk_id,
+            sorted_file_ids AS file_ids,
+            sorted_file_ids AS files,
             experimental_strategies,
             file_types,
             files_is_supplementary_file_filter,

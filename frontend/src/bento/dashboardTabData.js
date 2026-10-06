@@ -85,7 +85,8 @@ export const tabIndex = [
 
 export const DASHBOARD_QUERY = gql`
 query searchSubjects(
-  $subject_ids: [String], 
+  $subject_ids: [String],
+  $file_ids: [String],
   $accesses: [String], 
   $acl: [String], 
   $experimental_strategies: [String], 
@@ -159,6 +160,7 @@ query searchSubjects(
     tissue_fixative: $tissue_fixative, 
     imaging_assay_type: $imaging_assay_type, 
     is_supplementary_file: $is_supplementary_file,
+    file_ids: $file_ids,
     protocol_pk_ids: $protocol_pk_ids,
     protocol_names: $protocol_names,
     protocol_types: $protocol_types,
@@ -536,6 +538,7 @@ query searchSubjects(
 export const GET_CASES_OVERVIEW_QUERY = gql`
 query subjectOverview(
   $subject_ids: [String],
+  $file_ids: [String],
   $accesses:[String],
   $acl:[String],
   $experimental_strategies:[String],
@@ -585,6 +588,7 @@ query subjectOverview(
 ){
   subjectOverview(
       subject_ids: $subject_ids,
+      file_ids: $file_ids,
       accesses:$accesses,
       acl:$acl,
       experimental_strategies:$experimental_strategies,
@@ -651,6 +655,7 @@ export const GET_FILES_OVERVIEW_QUERY = gql`
 query fileOverview(
   $subject_ids: [String],
   $sample_ids: [String],
+  $file_ids: [String],
   $accesses:[String],
   $acl:[String],
   $experimental_strategies:[String],
@@ -681,6 +686,7 @@ query fileOverview(
   $tissue_fixative:[String],
   $imaging_assay_type:[String],
   $is_supplementary_file: [String],
+  $protocol_pk_ids: [String],
   $protocol_names: [String],
   $protocol_types: [String],
   $dois: [String],
@@ -700,6 +706,7 @@ query fileOverview(
   fileOverview(
       subject_ids: $subject_ids,
       sample_ids: $sample_ids,
+      file_ids: $file_ids,
       accesses:$accesses,
       acl:$acl,
       experimental_strategies:$experimental_strategies,
@@ -730,6 +737,7 @@ query fileOverview(
       tissue_fixative:$tissue_fixative,
       imaging_assay_type:$imaging_assay_type,
       is_supplementary_file: $is_supplementary_file,
+      protocol_pk_ids: $protocol_pk_ids,
       protocol_names: $protocol_names,
       protocol_types: $protocol_types,
       dois: $dois,
@@ -772,6 +780,7 @@ export const GET_SAMPLES_OVERVIEW_QUERY = gql`
 query sampleOverview(
   $subject_ids: [String],
   $sample_ids: [String],
+  $file_ids: [String],
   $accesses:[String],
   $acl:[String],
   $experimental_strategies:[String],
@@ -802,6 +811,7 @@ query sampleOverview(
   $tissue_fixative:[String],
   $imaging_assay_type:[String],
   $is_supplementary_file: [String],
+  $protocol_pk_ids: [String],
   $protocol_names: [String],
   $protocol_types: [String],
   $dois: [String],
@@ -821,6 +831,7 @@ query sampleOverview(
   sampleOverview(
       subject_ids: $subject_ids,
       sample_ids: $sample_ids,
+      file_ids: $file_ids,
       accesses:$accesses,
       acl:$acl,
       experimental_strategies:$experimental_strategies,
@@ -851,6 +862,7 @@ query sampleOverview(
       tissue_fixative:$tissue_fixative,
       imaging_assay_type:$imaging_assay_type,
       is_supplementary_file: $is_supplementary_file,
+      protocol_pk_ids: $protocol_pk_ids,
       protocol_names: $protocol_names,
       protocol_types: $protocol_types,
       dois: $dois,
@@ -893,6 +905,8 @@ query protocolOverview(
   $doi: [String],
   $doi_url: [String],
   $file_names: [String],
+  $file_ids: [String],
+  $files: [String],
   $acl: [String],
   $accesses: [String],
   $experimental_strategies: [String],
@@ -946,6 +960,8 @@ query protocolOverview(
       doi: $doi,
       doi_url: $doi_url,
       file_names: $file_names,
+      file_ids: $file_ids,
+      files: $files,
       acl: $acl,
       accesses: $accesses,
       experimental_strategies: $experimental_strategies,
@@ -1143,6 +1159,7 @@ query sampleOverview(
   $site:[String],
   $studies:[String],
   $study_data_types:[String],
+  $protocol_pk_ids: [String],
 
   $order_by: String,
   $sort_direction: String,
@@ -1175,6 +1192,7 @@ query sampleOverview(
       site:$site,
       studies:$studies,
       study_data_types:$study_data_types,
+      protocol_pk_ids: $protocol_pk_ids,
 
       order_by:$order_by,
       sort_direction:$sort_direction,
@@ -1192,6 +1210,7 @@ export const GET_ALL_FILEIDS_FROM_FILESTAB_FOR_ADD_ALL_CART = gql`
 query fileOverview(
   $subject_ids: [String],
   $sample_ids: [String],
+  $file_ids: [String],
   $accesses:[String],
   $acl:[String],
   $experimental_strategies:[String],
@@ -1222,6 +1241,7 @@ query fileOverview(
   $tissue_fixative:[String],
   $imaging_assay_type:[String],
   $is_supplementary_file: [String],
+  $protocol_pk_ids: [String],
   $protocol_names: [String],
   $protocol_types: [String],
   $dois: [String],
@@ -1241,6 +1261,7 @@ query fileOverview(
   fileOverview(
       subject_ids: $subject_ids,
       sample_ids: $sample_ids,
+      file_ids: $file_ids,
       accesses:$accesses,
       acl:$acl,
       experimental_strategies:$experimental_strategies,
@@ -1271,6 +1292,7 @@ query fileOverview(
       tissue_fixative:$tissue_fixative,
       imaging_assay_type:$imaging_assay_type,
       is_supplementary_file: $is_supplementary_file,
+      protocol_pk_ids: $protocol_pk_ids,
       protocol_names: $protocol_names,
       protocol_types: $protocol_types,
       dois: $dois,

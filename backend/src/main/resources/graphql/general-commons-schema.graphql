@@ -950,6 +950,7 @@ type QueryType {
     searchSubjects (
         # standard filters
         subject_ids: [String] = []
+        file_ids: [String] = []
         accesses: [String] = []
         acl: [String] = []
         experimental_strategies: [String] = []
@@ -1000,6 +1001,7 @@ type QueryType {
     subjectOverview (
         # id filters
         subject_ids: [String] = []
+        file_ids: [String] = []
         # standard filters
         accesses: [String] = []
         acl: [String] = []
@@ -1066,6 +1068,8 @@ type QueryType {
         experimental_strategies: [String] = []
         file_types: [String] = []
         file_names: [String] = []
+        file_ids: [String] = []
+        files: [String] = []
         sex: [String] = []
         image_modality: [String] = []
         instrument_models: [String] = []
@@ -1118,6 +1122,7 @@ type QueryType {
         # id filters
         subject_ids: [String] = []
         sample_ids: [String] = []
+        file_ids: [String] = []
         # standard filters
         accesses: [String] = []
         acl: [String] = []
@@ -1150,6 +1155,7 @@ type QueryType {
         imaging_assay_type: [String] = []
         is_supplementary_file: [String] = []
         # Protocol filters
+        protocol_pk_ids: [String] = []
         protocol_names: [String] = []
         protocol_types: [String] = []
         dois: [String] = []
@@ -1207,6 +1213,7 @@ type QueryType {
         imaging_assay_type: [String] = []
         is_supplementary_file: [String] = []
         # Protocol filters
+        protocol_pk_ids: [String] = []
         protocol_names: [String] = []
         protocol_types: [String] = []
         dois: [String] = []
