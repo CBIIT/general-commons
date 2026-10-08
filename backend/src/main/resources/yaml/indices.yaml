@@ -3137,7 +3137,7 @@ indices:
           MATCH (p:participant)
           WITH DISTINCT p
           SKIP $skip LIMIT $limit
-          OPTIONAL MATCH (p)<-[:of_participant]-(:file)-[:of_study]->(s:study)
+          OPTIONAL MATCH (p)-->(s:study)
           WITH p.study_participant_id AS study_participant_id,
               COLLECT(DISTINCT s.study_name) AS study_names,
               COLLECT(DISTINCT s.phs_accession) AS study_phs_accessions,
