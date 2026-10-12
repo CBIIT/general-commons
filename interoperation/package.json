@@ -39,6 +39,6 @@
     "supertest": "^7.1.4"
   },
   "overrides": {
-
+    "proxy-addr": "2.0.8"
   }
 }

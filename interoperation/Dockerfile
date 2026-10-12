@@ -3,6 +3,8 @@ FROM node:26.3.1-alpine3.24 AS fnl_base_image
 WORKDIR /usr/src/app
 # copy the package files only
 COPY package.json package-lock.json ./
+# install the patched zlib package
+RUN apk add --no-cache 'zlib=1.3.2-r1'
 # install dependencies
 # clear the npm cache
 # remove npm
