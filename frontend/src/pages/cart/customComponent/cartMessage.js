@@ -6,9 +6,9 @@ const cartMessage = (props) => {
   return (
     <Grid>
       <Grid item xs={12} className={classes.marginTopNegative}>
-        <div class={classes.text}>
+        <div className={classes.text}>
           To access and analyze files, choose "Download Manifest" from the "Export and Download" menu and upload the resulting file to{' '}
-          <a class={classes.sbgLink} target="_blank" href="https://www.cancergenomicscloud.org" rel="noreferrer">
+          <a className={classes.sbgLink} target="_blank" href="https://www.cancergenomicscloud.org" rel="noreferrer">
             Seven Bridges Genomics
           </a>{' '}
           account
