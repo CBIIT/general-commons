@@ -28,7 +28,7 @@ export const myFilesPageData = {
   tooltipIcon: 'https://raw.githubusercontent.com/google/material-design-icons/master/src/action/help/materialicons/24px.svg',
   tooltipAlt: 'tooltip icon',
   tooltipMessage:
-    'To access and analyze files: select and remove unwanted files, choose “Download Manifest” from the Export and Download menu, and upload the resulting Manifest file to your Seven Bridges Genomics account.',
+    'To access and analyze files: select and remove unwanted files, choose “Download Manifest” from the “Export and Download” menu, and upload the resulting Manifest file to your Seven Bridges Genomics account.',
   errorMessage: 'An error has occurred in loading CART',
   layout: [
     {
