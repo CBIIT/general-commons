@@ -13,9 +13,25 @@ const removeColumn = {
   tooltipText: 'Remove an entry from the cart.',
 };
 
-const [configured] = configColumn({
-  columns: [removeColumn],
-  deleteCartFile: jest.fn(),
+const listColumn = {
+  dataField: 'study_acronym',
+  header: 'Study',
+  cellType: cellTypes.CUSTOM_ELEM,
+  headerType: cellTypes.CUSTOM_ELEM,
+  display: true,
+};
+
+const plainColumn = {
+  dataField: 'file_name',
+  header: 'File Name',
+  display: true,
+};
+
+const deleteCartFile = jest.fn();
+
+const [configured, listConfigured, plainConfigured] = configColumn({
+  columns: [removeColumn, listColumn, plainColumn],
+  deleteCartFile,
 });
 
 let toggleDialog;
@@ -56,5 +72,37 @@ describe('Implementation Requirements', () => {
     render(configured.customColHeaderRender(toggleDialog));
 
     expect(toggleDialog).not.toHaveBeenCalled();
+  });
+
+  it('should delete the File from the Cart when a Remove cell is activated', () => {
+    expect(configured.cellEventHandler).toBe(deleteCartFile);
+  });
+
+  it('should list every value of a list cell', () => {
+    render(listConfigured.customCellRender({ label: ['ABC', 'XYZ'] }));
+
+    expect(screen.getByText('ABC, XYZ')).toBeInTheDocument();
+  });
+
+  it('should truncate a list cell after five values', () => {
+    render(listConfigured.customCellRender({ label: ['A', 'B', 'C', 'D', 'E', 'F'] }));
+
+    expect(screen.getByText('A, B, C, D, E, ...')).toBeInTheDocument();
+  });
+
+  it('should render nothing for a custom cell whose value is not a list', () => {
+    const { container } = render(listConfigured.customCellRender({ label: 'ABC' }));
+
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('should render nothing for a custom column header', () => {
+    const { container } = render(listConfigured.customColHeaderRender({}));
+
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('should leave columns without a custom cell or header unchanged', () => {
+    expect(plainConfigured).toBe(plainColumn);
   });
 });

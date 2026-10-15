@@ -8,9 +8,11 @@ import { CartContext, downloadJson } from '@bento-core/cart';
 import ExportButton from './exportButtonController';
 
 const mockQuery = jest.fn();
+const mockUseQuery = jest.fn();
+const mockGetManifestData = jest.fn();
 
 jest.mock('@apollo/client', () => ({
-  useQuery: () => ({ data: undefined }),
+  useQuery: (...args) => mockUseQuery(...args),
   useApolloClient: () => ({ query: (...args) => mockQuery(...args) }),
 }));
 
@@ -20,11 +22,11 @@ jest.mock('@bento-core/cart', () => ({
 }));
 
 jest.mock('./util/TableService', () => ({
-  getManifestData: () => ({ data: null }),
+  getManifestData: (...args) => mockGetManifestData(...args),
 }));
 
 jest.mock('../../../../bento/fileCentricCartWorkflowData', () => ({
-  manifestData: { keysToInclude: ['file_id'], header: ['drs_uri'] },
+  manifestData: { keysToInclude: ['file_id', 'file_name', 'study_acronym'], header: ['drs_uri', 'name', 'study'] },
   myFilesPageData: { tooltipMessage: 'Choose Download Manifest from the Export and Download menu.' },
 }));
 
@@ -82,6 +84,10 @@ const openMenu = async () => {
 };
 
 beforeEach(() => {
+  mockUseQuery.mockReset();
+  mockUseQuery.mockReturnValue({ data: undefined });
+  mockGetManifestData.mockReset();
+  mockGetManifestData.mockReturnValue({ data: null });
   mockQuery.mockReset();
   mockQuery.mockResolvedValue({
     data: {
@@ -239,5 +245,65 @@ describe('Implementation Requirements', () => {
     fireEvent.keyDown(screen.getByRole('menu'), { key: 'Tab' });
 
     expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
+  });
+
+  it('should keep the menu open on keys other than Tab', async () => {
+    render(<ExportButton />, { wrapper });
+
+    await openMenu();
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'ArrowDown' });
+
+    expect(screen.getAllByRole('menuitem')).toHaveLength(2);
+  });
+
+  it('should close the menu when the control is activated again', async () => {
+    render(<ExportButton />, { wrapper });
+
+    await openMenu();
+    fireEvent.click(getExportButton());
+
+    expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
+  });
+
+  it('should not store a Manifest until the Cart files have loaded', () => {
+    render(<ExportButton />, { wrapper });
+
+    expect(mockUseQuery.mock.calls[0][1].skip).toBe(true);
+  });
+
+  it('should store a Manifest of the Cart files with DRS URIs', () => {
+    mockGetManifestData.mockReturnValue({
+      data: {
+        filesInList: [
+          { file_id: 'file-1', file_name: 'reads.bam', study_acronym: ['ABC', 'XYZ'] },
+          { file_id: '', file_name: 'calls.vcf' },
+        ],
+      },
+    });
+
+    render(<ExportButton />, { wrapper });
+
+    const { variables, skip } = mockUseQuery.mock.calls[0][1];
+    expect(skip).toBe(false);
+    expect(JSON.parse(variables.manifestString)).toEqual([
+      { drs_uri: 'drs://nci-crdc.datacommons.io/file-1', name: 'reads.bam', study: 'ABC, XYZ' },
+      { drs_uri: '', name: 'calls.vcf', study: '' },
+    ]);
+  });
+
+  it('should send the stored Manifest URL to Cancer Genomics Cloud', async () => {
+    const manifestUrl = 'https://bucket.s3.amazonaws.com/manifest.csv?X-Amz-Signature=abc&X-Amz-Expires=60';
+    mockUseQuery.mockReturnValue({ data: { storeManifest: manifestUrl } });
+
+    render(<ExportButton />, { wrapper });
+
+    await openMenu();
+    fireEvent.click(screen.getByRole('menuitem', { name: /export to cancer genomics cloud/i }));
+
+    expect(openSpy).toHaveBeenCalledWith(
+      `https://cgc.sbgenomics.com/import-redirect/drs/csv?URL=${encodeURIComponent(manifestUrl)}`,
+      '_blank',
+      'noopener,noreferrer',
+    );
   });
 });
