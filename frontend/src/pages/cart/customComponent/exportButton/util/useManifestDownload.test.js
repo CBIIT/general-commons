@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import gql from 'graphql-tag';
 import { CartContext, downloadJson } from '@bento-core/cart';
 import { useManifestDownload } from './useManifestDownload';
@@ -45,21 +45,26 @@ const buildCart = (overrides = {}) => ({
 });
 
 // @testing-library/react 12 has no renderHook, so the hook is captured through a probe component.
-const renderDownload = (cart) => {
-  let download;
-  const Probe = () => {
-    download = useManifestDownload();
-    return null;
-  };
-  render(
-    <CartContext.Provider value={{ context: { cart }, dispatch: jest.fn() }}>
-      <Probe />
-    </CartContext.Provider>,
-  );
-  return download;
+let hook;
+const Probe = () => {
+  hook = useManifestDownload();
+  return null;
+};
+
+let cart;
+
+const wrapper = ({ children }) => <CartContext.Provider value={{ context: { cart } }}>{children}</CartContext.Provider>;
+
+const downloadManifest = async () => {
+  let result;
+  await act(async () => {
+    result = await hook.downloadManifest();
+  });
+  return result;
 };
 
 beforeEach(() => {
+  cart = buildCart();
   mockQuery.mockReset();
   mockQuery.mockResolvedValue({
     data: {
@@ -74,23 +79,27 @@ beforeEach(() => {
 
 describe('useManifestDownload', () => {
   it('should query the manifest API when the table defines one', async () => {
-    await renderDownload(buildCart())();
+    render(<Probe />, { wrapper });
+
+    await downloadManifest();
 
     expect(mockQuery).toHaveBeenCalledTimes(1);
     expect(mockQuery.mock.calls[0][0].query).toBe(MANIFEST_QUERY);
   });
 
   it('should fall back to the table API when no manifest API is defined', async () => {
-    const cart = buildCart();
     cart.table = { ...cart.table, manifestAPI: undefined };
+    render(<Probe />, { wrapper });
 
-    await renderDownload(cart)();
+    await downloadManifest();
 
     expect(mockQuery.mock.calls[0][0].query).toBe(TABLE_QUERY);
   });
 
   it('should request every cart file in a single page', async () => {
-    await renderDownload(buildCart())();
+    render(<Probe />, { wrapper });
+
+    await downloadManifest();
 
     expect(mockQuery.mock.calls[0][0].variables).toEqual({
       file_ids: ['file-1', 'file-2'],
@@ -100,7 +109,9 @@ describe('useManifestDownload', () => {
   });
 
   it('should prefix only the columns that define an appendString', async () => {
-    await renderDownload(buildCart())();
+    render(<Probe />, { wrapper });
+
+    await downloadManifest();
 
     expect(downloadJson.mock.calls[0][0].tableData).toEqual([
       { file_id: 'drs://nci-crdc.datacommons.io/file-1', file_name: 'reads.bam' },
@@ -111,16 +122,17 @@ describe('useManifestDownload', () => {
   it('should leave the query result untouched', async () => {
     const records = [{ file_id: 'file-1', file_name: 'reads.bam' }];
     mockQuery.mockResolvedValue({ data: { filesInList: records } });
+    render(<Probe />, { wrapper });
 
-    await renderDownload(buildCart())();
+    await downloadManifest();
 
     expect(records[0].file_id).toBe('file-1');
   });
 
   it('should pass the rest of the cart through to the download', async () => {
-    const cart = buildCart();
+    render(<Probe />, { wrapper });
 
-    await renderDownload(cart)();
+    await downloadManifest();
 
     expect(downloadJson).toHaveBeenCalledTimes(1);
     expect(downloadJson.mock.calls[0][0]).toMatchObject({
@@ -133,14 +145,41 @@ describe('useManifestDownload', () => {
 
   it('should resolve with the result of the download', async () => {
     downloadJson.mockReturnValue('downloaded');
+    render(<Probe />, { wrapper });
 
-    await expect(renderDownload(buildCart())()).resolves.toBe('downloaded');
+    expect(await downloadManifest()).toBe('downloaded');
   });
 
-  it('should not download when the query fails', async () => {
+  it('should report a failure instead of rejecting when the query fails', async () => {
     mockQuery.mockRejectedValue(new Error('network down'));
+    render(<Probe />, { wrapper });
 
-    await expect(renderDownload(buildCart())()).rejects.toThrow('network down');
+    expect(hook.failed).toBe(false);
+
+    await downloadManifest();
+
+    expect(hook.failed).toBe(true);
     expect(downloadJson).not.toHaveBeenCalled();
+  });
+
+  it('should clear the failure once a retry succeeds', async () => {
+    mockQuery.mockRejectedValueOnce(new Error('network down'));
+    render(<Probe />, { wrapper });
+
+    await downloadManifest();
+    await downloadManifest();
+
+    expect(hook.failed).toBe(false);
+    expect(downloadJson).toHaveBeenCalledTimes(1);
+  });
+
+  it('should clear the failure when it is dismissed', async () => {
+    mockQuery.mockRejectedValue(new Error('network down'));
+    render(<Probe />, { wrapper });
+
+    await downloadManifest();
+    act(() => hook.dismissFailure());
+
+    expect(hook.failed).toBe(false);
   });
 });

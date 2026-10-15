@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import gql from 'graphql-tag';
-import { Paper, Button, ClickAwayListener, Grow, MenuItem, MenuList, withStyles } from '@material-ui/core';
+import { Paper, Button, ClickAwayListener, Grow, MenuItem, MenuList, Portal, Snackbar, withStyles } from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ToolTip from '@bento-core/tool-tip';
 import clsx from 'clsx';
@@ -22,7 +23,7 @@ const StyledMenuItem = withStyles(() => ({
 const ExportButtonView = (props) => {
   const { classes, filesId } = props;
 
-  const downloadManifest = useManifestDownload();
+  const { downloadManifest, failed, dismissFailure } = useManifestDownload();
   const [sbgUrl, setSBGUrl] = useState('');
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
@@ -171,6 +172,13 @@ const ExportButtonView = (props) => {
           </ClickAwayListener>
         </Paper>
       </Grow>
+      <Portal>
+        <Snackbar open={failed} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+          <Alert severity="error" onClose={dismissFailure}>
+            The Manifest could not be downloaded. Please try again.
+          </Alert>
+        </Snackbar>
+      </Portal>
     </div>
   );
 };

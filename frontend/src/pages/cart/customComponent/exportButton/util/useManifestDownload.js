@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useApolloClient } from '@apollo/client';
 import { CartContext, downloadJson } from '@bento-core/cart';
 
@@ -10,15 +10,23 @@ const MANIFEST_PAGE_SIZE = 10000;
 export const useManifestDownload = () => {
   const { context } = useContext(CartContext);
   const client = useApolloClient();
+  const [failed, setFailed] = useState(false);
 
-  return async () => {
+  const downloadManifest = async () => {
     const { cart } = context;
     const { table, queryVariables } = cart;
 
-    const { data } = await client.query({
-      query: table.manifestAPI ? table.manifestAPI : table.api,
-      variables: { ...queryVariables, offset: 0, first: MANIFEST_PAGE_SIZE },
-    });
+    let data;
+    try {
+      ({ data } = await client.query({
+        query: table.manifestAPI ? table.manifestAPI : table.api,
+        variables: { ...queryVariables, offset: 0, first: MANIFEST_PAGE_SIZE },
+      }));
+    } catch (error) {
+      setFailed(true);
+      return undefined;
+    }
+    setFailed(false);
 
     const columnsToAppendString = table.columns.filter((column) => column.appendString);
     const tableData = data.filesInList.map((record) => {
@@ -31,4 +39,6 @@ export const useManifestDownload = () => {
 
     return downloadJson({ ...cart, tableData });
   };
+
+  return { downloadManifest, failed, dismissFailure: () => setFailed(false) };
 };
