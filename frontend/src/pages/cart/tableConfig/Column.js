@@ -3,38 +3,37 @@ import { Typography } from '@material-ui/core';
 import { cellTypes, headerTypes } from '@bento-core/table';
 
 export const CustomCellView = (props) => {
-  const {
-    label,
-  } = props;
+  const { label } = props;
 
   if (Array.isArray(label)) {
-    if (label.length > 5){
-      return (<Typography>{label.slice(0,5).join(", ") + ", ..."}</Typography>);
+    if (label.length > 5) {
+      return <Typography>{label.slice(0, 5).join(', ') + ', ...'}</Typography>;
     }
-    return (<Typography>{label.join(", ")}</Typography>);
+    return <Typography>{label.join(', ')}</Typography>;
   }
 
   // other custom elem
-  return (<></>);
+  return <></>;
 };
 
+export const CustomHeaderCellView = () => <></>;
 
-export const CustomHeaderCellView = () => (<></>);
+export const RemoveHeaderCellView = ({ label }) => (
+  <Typography component="span" className="del_all_row_text">
+    {label}
+  </Typography>
+);
 
 /**
-* set column configuration
-* @param {*} columns
-* @returns config columns
-*/
-export const configColumn = ({
-  columns,
-  deleteAllFiles,
-  deleteCartFile,
-}) => {
+ * set column configuration
+ * @param {*} columns
+ * @returns config columns
+ */
+export const configColumn = ({ columns, deleteCartFile }) => {
   /**
-  * display columns as configuration
-  * set custom cell render for column
-  */
+   * display columns as configuration
+   * set custom cell render for column
+   */
   const displayCustomView = [...columns].map((column) => {
     if (column.cellType === cellTypes.CUSTOM_ELEM) {
       return {
@@ -52,8 +51,8 @@ export const configColumn = ({
   });
 
   /**
-  * custom header view configuration
-  */
+   * custom header view configuration
+   */
   const displayCustomHeader = [...displayCustomView].map((column) => {
     if (column.headerType === headerTypes.CUSTOM_ELEM) {
       return {
@@ -63,12 +62,12 @@ export const configColumn = ({
     }
 
     /*
-    * props deleteAllFiles
-    */
+     * The Remove column header is a label only. Emptying the Cart lives in the toolbar
+     */
     if (column.headerType === headerTypes.DELETE) {
       return {
         ...column,
-        headerEventHandler: deleteAllFiles,
+        customColHeaderRender: () => <RemoveHeaderCellView label={column.header} />,
       };
     }
     return column;
