@@ -1,41 +1,33 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {
-  onDeleteAllCartFile,
-  onDeleteCartFile,
-  CartContextProvider,
-} from '@bento-core/cart';
+import { onDeleteCartFile, CartContextProvider } from '@bento-core/cart';
 import { TableContextProvider } from '@bento-core/paginated-table';
 import { table } from '../../bento/fileCentricCartWorkflowData';
 import CartView from './cartView';
 import usePageTitle from '../../components/Analytics/usePageTitle';
 
 const CartController = (props) => {
-  usePageTitle("File Centric Cart");
+  usePageTitle('File Centric Cart');
 
   return (
     <CartContextProvider>
       <TableContextProvider>
-        <CartView
-          {...props}
-          config={table}
-        />
+        <CartView {...props} config={table} />
       </TableContextProvider>
     </CartContextProvider>
   );
-}
+};
 
 const mapStateToProps = (state) => ({
   filesId: state.cartReducer.filesId,
 });
 
 /**
-* return file id to delete (attr file_id)
-*/
+ * return file id to delete (attr file_id)
+ */
 const getFileId = (row) => row.file_id;
 
 const mapDispatchToProps = (dispatch) => ({
-  deleteAllFiles: () => dispatch(onDeleteAllCartFile()),
   deleteCartFile: (row) => dispatch(onDeleteCartFile(getFileId(row))),
 });
 

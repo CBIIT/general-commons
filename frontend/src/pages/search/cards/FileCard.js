@@ -50,12 +50,7 @@ const FileCard = ({ data, classes, index }) => {
           </span>
         </div>
         {propertiesWithLinks.map((prop, idx) => (
-          <PropertyItem
-            index={idx}
-            label={prop.label}
-            value={data[prop.dataField]}
-            link={prop.link}
-          />
+          <PropertyItem key={prop.label} index={idx} label={prop.label} value={data[prop.dataField]} link={prop.link} />
         ))}
       </Grid>
       <Grid item xs={3}>

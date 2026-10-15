@@ -25,7 +25,6 @@ export const tblHeader = {
       color: '#13344A',
       '&.del_all_row': {
         minWidth: '150px',
-        cursor: 'pointer',
       },
     },
   },
@@ -45,27 +44,9 @@ export const tblHeader = {
       },
     },
   },
-  MuiIconButton: {
-    root: {
-      '&.del_all_row_btn': {
-        paddingLeft: '5px',
-      },
-    },
-  },
   MuiTypography: {
     root: {
       color: '#A61401',
-      '&.remove_all_tooltip': {
-        width: '110px',
-        border: '2px solid #A61401',
-        height: '48px',
-        padding: '5px 10px',
-        fontSize: '12px',
-        background: '#fff',
-        textAlign: 'center',
-        fontWeight: '500',
-        borderRadius: '7px',
-      },
       '&.del_all_row_text': {
         float: 'left',
         fontSize: '11pt',
@@ -132,7 +113,7 @@ export const tblContainer = {
       transform: 'rotateX(180deg)',
       boxShadow: 'none',
       borderRadius: '0',
-    }
+    },
   },
   MuiTable: {
     root: {
