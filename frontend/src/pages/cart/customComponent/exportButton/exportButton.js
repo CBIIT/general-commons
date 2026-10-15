@@ -1,213 +1,177 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import gql from 'graphql-tag';
-import { Paper, Popper, Button, ClickAwayListener, Grow, MenuItem, MenuList, withStyles } from '@material-ui/core';
-import { noop } from 'lodash';
+import { Paper, Button, ClickAwayListener, Grow, MenuItem, MenuList, withStyles } from '@material-ui/core';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import ToolTip from '@bento-core/tool-tip';
+import clsx from 'clsx';
 import { useQuery } from '@apollo/client';
-import { MY_CART_MANIFEST_QUERY } from '../../../../bento/tableDownloadCSV'
-import { manifestData } from '../../../../bento/fileCentricCartWorkflowData'
-import arrowDownPng from './assets/arrowDown.png';
+import { MY_CART_MANIFEST_QUERY } from '../../../../bento/tableDownloadCSV';
+import { manifestData, myFilesPageData } from '../../../../bento/fileCentricCartWorkflowData';
 import cgcIcon from './assets/cgc.svg';
 import { getManifestData } from './util/TableService';
+import { useManifestDownload } from './util/useManifestDownload';
 import { exportStyles } from './exportStyles';
 
+const StyledMenuItem = withStyles(() => ({
+  root: {
+    padding: '2px 21px',
+    whiteSpace: 'normal',
+  },
+}))(MenuItem);
 
+const ExportButtonView = (props) => {
+  const { classes, filesId } = props;
 
-const ExportButtonView = (props,) => {
-    const { classes, filesId } = props;
-    const LABEL = 'Available Export Options';
-    const {
-        EXPORT_TO_CANCER_GENOMICS_CLOUD,
-      } = {
-        EXPORT_TO_CANCER_GENOMICS_CLOUD: 'Export to Cancer Genomics Cloud',
-      };
-    const OPTIONS = [
-        EXPORT_TO_CANCER_GENOMICS_CLOUD,
-    ];     
+  const downloadManifest = useManifestDownload();
+  const [sbgUrl, setSBGUrl] = useState('');
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef(null);
 
+  const handleToggle = () => {
+    setOpen((prevOpen) => !prevOpen);
+  };
 
-    const [sbgUrl, setSBGUrl] = useState('');
-    const [open, setOpen] = useState(false);
-    const [isLoading] = React.useState(false);
-    const [label] = useState(LABEL);
-    const anchorRef = useRef(null);
-
-    const handleToggle = () => {
-        setOpen((prevOpen) => !prevOpen);
-    };
-
-    const handleClose = (event) => {
-        if (anchorRef.current && anchorRef.current.contains(event.target)) {
-            return;
-        }
-        setOpen(false);
-    };
-    function handleListKeyDown(event) {
-        if (event.key === 'Tab') {
-          event.preventDefault();
-          setOpen(false);
-        }
+  const handleClose = (event) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+      return;
     }
+    setOpen(false);
+  };
+  function handleListKeyDown(event) {
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      setOpen(false);
+    }
+  }
 
-    const StyledMenuItem = withStyles(() => ({
-        root: {
-          padding: '2px 26px',
-          color: '#fff',
-          overflow: 'auto',
-          whiteSpace: 'wrap',
-        },
-      }))(MenuItem);
+  const STORE_MANIFEST_QUERY = gql`
+    query storeManifest($manifestString: String!) {
+      storeManifest(manifest: $manifestString)
+    }
+  `;
 
-    const STORE_MANIFEST_QUERY = gql`
-      query storeManifest($manifestString: String!) {
-          storeManifest(manifest: $manifestString)
+  const getManifestPayload = () => {
+    const { data } = getManifestData(MY_CART_MANIFEST_QUERY, filesId);
+
+    if (!data) {
+      return null;
+    }
+    const appendString = 'drs://nci-crdc.datacommons.io/';
+    const processedStoreManifestPayload = data.filesInList.map((el) => {
+      const obj = {};
+      for (let i = 0; i < manifestData.keysToInclude.length; i++) {
+        if (manifestData.keysToInclude[i] === 'file_id') {
+          obj[manifestData.header[i]] = el && el[manifestData.keysToInclude[i]] ? appendString + el[manifestData.keysToInclude[i]] : '';
+        } else {
+          const val = el && el[manifestData.keysToInclude[i]] ? el[manifestData.keysToInclude[i]] : '';
+          obj[manifestData.header[i]] = Array.isArray(val) ? val.join(', ') : val;
+        }
       }
-    `;
-      
-    const getManifestPayload = () => {
-        const { data } = getManifestData(MY_CART_MANIFEST_QUERY, filesId);
-    
-        if (!data) {
-          return null;
-        }
-        const appendString = 'drs://nci-crdc.datacommons.io/'
-        const processedStoreManifestPayload = data.filesInList.map((el) => {
-          const obj = {}
-          for (let i = 0; i < manifestData.keysToInclude.length; i++) {
-            if (manifestData.keysToInclude[i] === 'file_id') {
-              obj[manifestData.header[i]] = el && el[manifestData.keysToInclude[i]] ? 
-                appendString + el[manifestData.keysToInclude[i]] 
-                : 
-                "";
-            }
-            else {
-              const val = el && el[manifestData.keysToInclude[i]] ? 
-              el[manifestData.keysToInclude[i]] 
-              : 
-              "";
-              obj[manifestData.header[i]] = Array.isArray(val) ? val.join(', ') : val;
-            }
-          }
-          return obj;
-          });
-        return processedStoreManifestPayload;
-    };
-    
-    const { data } = useQuery(STORE_MANIFEST_QUERY, {
-        variables: { manifestString: JSON.stringify(getManifestPayload()) },
-        context: { clientName: 'interopService' },
-        skip: !getManifestPayload(),
-        fetchPolicy: 'no-cache',
+      return obj;
     });
+    return processedStoreManifestPayload;
+  };
 
-    useEffect(() => {
-        if (data && data.storeManifest) {
-          setSBGUrl(data.storeManifest);
-        }
-      }, [data]);      
-    
-    const initiateDownload = (currLabel) => {
-        switch (currLabel) {
-        case 'Export to Cancer Genomics Cloud': 
-            window.open(`https://cgc.sbgenomics.com/import-redirect/drs/csv?URL=${encodeURIComponent(sbgUrl)}`, '_blank');
-            break;
-          default: noop(data);
-            break;
-        }
-        noop();
-    };
+  const { data } = useQuery(STORE_MANIFEST_QUERY, {
+    variables: { manifestString: JSON.stringify(getManifestPayload()) },
+    context: { clientName: 'interopService' },
+    skip: !getManifestPayload(),
+    fetchPolicy: 'no-cache',
+  });
 
-    
+  useEffect(() => {
+    if (data && data.storeManifest) {
+      setSBGUrl(data.storeManifest);
+    }
+  }, [data]);
 
-    const getMenuItem = (type) => {
-        let icon;
-        switch (type) {
-          case EXPORT_TO_CANCER_GENOMICS_CLOUD:
-            icon = cgcIcon;
-            break;
-          default:
-            icon = undefined;
-            break;
-        }
-        return (
-          <StyledMenuItem onClick={() => {
-            initiateDownload(type);
-            setOpen(false);
-          }}
-          key={type}
-          className={classes.styledMenuItem}
-          >
-            {
-              icon && (
-              <span>
-                <img src={icon} alt="icon" />
-              </span>
-              )
-            }
-            <div style={{ paddingLeft: icon ? '10px' : '0' }}>{type}</div>
-          </StyledMenuItem>
-        );
-      };
-    
+  const exportOptions = [
+    {
+      label: 'Export to Cancer Genomics Cloud',
+      icon: cgcIcon,
+      onSelect: () =>
+        window.open(
+          `https://cgc.sbgenomics.com/import-redirect/drs/csv?URL=${encodeURIComponent(sbgUrl)}`,
+          '_blank',
+          'noopener,noreferrer',
+        ),
+    },
+    {
+      label: 'Download Manifest',
+      guidance: myFilesPageData.tooltipMessage,
+      itemClassName: classes.manifestMenuItem,
+      onSelect: downloadManifest,
+    },
+  ];
 
-    const options = OPTIONS.map((item) => getMenuItem(item));
-
-    return (
-        <>
-            <Button
-              classes={{
-                root: open
-                  ? classes.availableDownloadDropdownBtnIsOpen
-                  : classes.availableDownloadDropdownBtn,
-                label: classes.availableDownloadDropdownBtnLabel,
-                contained: classes.availableDownloadBtnContained,
-                startIcon: classes.availableDownloadDropdownBtnStartIcon,
-              }}
-              startIcon={<img style={{ marginRight: '8px' }} src={arrowDownPng} alt="arrow down icon" />}
-              ref={anchorRef}
-              aria-controls={open ? 'menu-list-grow' : undefined}
-              aria-haspopup="true"
-              onClick={handleToggle}
-            >
-              {isLoading ? (<p>Loading...</p>) : (
-                <>
-                  {label}
-                </>
-              )}
-            </Button>
-            <Popper
-              open={open}
-              anchorEl={anchorRef.current}
-              role={undefined}
-              transition
-              disablePortal
-            >
-              {({ TransitionProps, placement }) => (
-                <Grow
-                  {...TransitionProps}
-                  style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
-                >
-                  <Paper
-                    className={classes.dropdownPaper}
-                  >
-                    <ClickAwayListener onClickAway={handleClose}>
-                      <MenuList
-                        autoFocusItem={open}
-                        id="menu-list-grow"
-                        onKeyDown={handleListKeyDown}
-                        classes={{
-                          root: classes.dropdownMenuList,
-                        }}
-                      >
-                        {options}
-                      </MenuList>
-                    </ClickAwayListener>
-                  </Paper>
-                </Grow>
-              )}
-            </Popper>
-        </>
+  const options = exportOptions.map(({ label, icon, guidance, itemClassName, onSelect }) => {
+    const menuItem = (
+      <StyledMenuItem
+        key={label}
+        className={clsx(classes.styledMenuItem, itemClassName)}
+        onClick={() => {
+          onSelect();
+          setOpen(false);
+        }}
+      >
+        {icon && <img className={classes.menuItemIcon} src={icon} alt="" />}
+        {label}
+      </StyledMenuItem>
     );
 
-}
+    if (!guidance) {
+      return menuItem;
+    }
+
+    return (
+      <ToolTip
+        key={label}
+        title={guidance}
+        placement="right"
+        arrow
+        classes={{
+          tooltip: classes.guidanceTooltip,
+          arrow: classes.guidanceTooltipArrow,
+        }}
+      >
+        {menuItem}
+      </ToolTip>
+    );
+  });
+
+  return (
+    <div className={classes.dropdownWrapper}>
+      <Button
+        classes={{
+          root: open ? classes.availableDownloadDropdownBtnIsOpen : classes.availableDownloadDropdownBtn,
+          startIcon: classes.availableDownloadDropdownBtnStartIcon,
+        }}
+        startIcon={<ArrowDropDownIcon className={open ? classes.caretOpen : classes.caret} />}
+        ref={anchorRef}
+        aria-controls={open ? 'menu-list-grow' : undefined}
+        aria-haspopup="true"
+        aria-expanded={open}
+        onClick={handleToggle}
+      >
+        Export and Download
+      </Button>
+      <Grow in={open} unmountOnExit style={{ transformOrigin: 'center top' }}>
+        <Paper className={classes.dropdownPaper}>
+          <ClickAwayListener onClickAway={handleClose}>
+            <MenuList
+              autoFocusItem={open}
+              id="menu-list-grow"
+              onKeyDown={handleListKeyDown}
+              classes={{
+                root: classes.dropdownMenuList,
+              }}
+            >
+              {options}
+            </MenuList>
+          </ClickAwayListener>
+        </Paper>
+      </Grow>
+    </div>
+  );
+};
 export default withStyles(exportStyles)(ExportButtonView);
