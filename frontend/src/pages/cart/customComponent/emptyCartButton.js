@@ -85,6 +85,7 @@ const dialogTheme = createTheme({
     MuiDialogActions: {
       root: {
         justifyContent: 'center',
+        flexWrap: 'wrap',
         gap: '24px',
         padding: '20px 0px 0px 0px',
       },
