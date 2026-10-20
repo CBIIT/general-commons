@@ -1,0 +1,75 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { TextField } from '@material-ui/core';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import { getParticipantIdSuggestions } from './BentoFilterUtils';
+
+const SUGGESTION_DELAY_MS = 300;
+const MIN_PREFIX_LENGTH = 2;
+
+function ParticipantIdSearchBox({ value = [], onChange = () => {} }) {
+  const [options, setOptions] = useState([]);
+  const [open, setOpen] = useState(false);
+  const timer = useRef(null);
+  const requestId = useRef(0);
+
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  const handleInputChange = (event, nextValue, reason) => {
+    if (reason !== 'input') {
+      return;
+    }
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(async () => {
+      const prefix = (nextValue || '').trim();
+      const id = requestId.current + 1;
+      requestId.current = id;
+      if (prefix.length < MIN_PREFIX_LENGTH) {
+        setOptions([]);
+        setOpen(false);
+        return;
+      }
+      const ids = await getParticipantIdSuggestions(prefix);
+      if (id !== requestId.current) {
+        return;
+      }
+      setOptions(ids.map((title) => ({ type: 'subjectIds', title })));
+      setOpen(true);
+    }, SUGGESTION_DELAY_MS);
+  };
+
+  return (
+    <Autocomplete
+      id="local_find_input"
+      aria-label="Search by Participant IDs"
+      multiple
+      disableClearable
+      open={open}
+      onOpen={() => setOpen(true)}
+      onClose={() => setOpen(false)}
+      value={value}
+      options={options}
+      filterOptions={(serverOptions) => serverOptions}
+      getOptionLabel={(option) => option.title || ''}
+      getOptionSelected={(option, selected) => option.title === selected.title}
+      onChange={(event, nextValue) => onChange(nextValue)}
+      onInputChange={handleInputChange}
+      noOptionsText="No matching items found"
+      renderTags={() => null}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          placeholder="e.g. PARTICIPANT-10102"
+          InputProps={{
+            ...params.InputProps,
+            inputProps: {
+              ...params.inputProps,
+              'aria-label': 'Search by Participant IDs',
+            },
+          }}
+        />
+      )}
+    />
+  );
+}
+
+export default ParticipantIdSearchBox;

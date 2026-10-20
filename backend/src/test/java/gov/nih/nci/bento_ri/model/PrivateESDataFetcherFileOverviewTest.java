@@ -35,6 +35,7 @@ class PrivateESDataFetcherFileOverviewTest {
     private ArgumentCaptor<Integer> pageSizeCaptor;
     private ArgumentCaptor<Integer> offsetCaptor;
 
+    // Spy ESService so the query is built for real, and stub collectPage so no search is sent.
     @BeforeEach
     void setUp() throws Exception {
         ConfigurationDAO config = mock(ConfigurationDAO.class);
@@ -54,6 +55,7 @@ class PrivateESDataFetcherFileOverviewTest {
         );
     }
 
+    // fileOverview searches /dashboard_file/_search and calls collectPage once.
     @Test
     void shouldSearchDashboardFileIndex() throws Exception {
         fetcher.fileOverview(createBaseParams());
@@ -62,6 +64,7 @@ class PrivateESDataFetcherFileOverviewTest {
         verify(esService).collectPage(any(Request.class), any(), any(String[][].class), anyInt(), anyInt());
     }
 
+    // A non-empty file_ids list is added as a terms filter.
     @Test
     void shouldFilterByFileIds() throws Exception {
         Map<String, Object> params = createBaseParams();
@@ -73,6 +76,7 @@ class PrivateESDataFetcherFileOverviewTest {
                 List.of("dg.4DFC/12345678")));
     }
 
+    // An empty file_ids list is left out of the query.
     @Test
     void shouldIgnoreEmptyFileIds() throws Exception {
         Map<String, Object> params = createBaseParams();
@@ -83,6 +87,7 @@ class PrivateESDataFetcherFileOverviewTest {
         assertFalse(hasTermsField(queryCaptor.getValue(), "file_ids"));
     }
 
+    // subject_ids and sample_ids are both passed through as terms filters.
     @Test
     void shouldPassSubjectAndSampleFilters() throws Exception {
         Map<String, Object> params = createBaseParams();
@@ -96,6 +101,7 @@ class PrivateESDataFetcherFileOverviewTest {
         assertTrue(hasTermsFilter(query, "sample_ids", List.of("SAMP-001", "SAMP-002")));
     }
 
+    // With no order_by, results are sorted by file_name ascending.
     @Test
     void shouldSortByFileNameByDefault() throws Exception {
         fetcher.fileOverview(createBaseParams());
@@ -103,6 +109,7 @@ class PrivateESDataFetcherFileOverviewTest {
         assertEquals(Map.of("file_name", "asc"), queryCaptor.getValue().get("sort"));
     }
 
+    // order_by and sort_direction set the query sort field and direction.
     @Test
     void shouldSortByRequestedFileField() throws Exception {
         Map<String, Object> params = createBaseParams();
@@ -114,6 +121,7 @@ class PrivateESDataFetcherFileOverviewTest {
         assertEquals(Map.of("file_id", "desc"), queryCaptor.getValue().get("sort"));
     }
 
+    // Fields from a stubbed hit, such as file_id and file_name, are returned as-is.
     @Test
     void shouldReturnMappedFileFields() throws Exception {
         Map<String, Object> file = createSampleFile("dg.4DFC/example", "example.bam");
@@ -128,6 +136,7 @@ class PrivateESDataFetcherFileOverviewTest {
         assertEquals("BAM", results.get(0).get("file_type"));
     }
 
+    // No matching hits come back as an empty list, not null.
     @Test
     void shouldReturnEmptyListWhenNoFilesMatch() throws Exception {
         List<Map<String, Object>> results = fetcher.fileOverview(createBaseParams());
@@ -136,6 +145,7 @@ class PrivateESDataFetcherFileOverviewTest {
         assertTrue(results.isEmpty());
     }
 
+    // Every stubbed hit is returned, in the same order.
     @Test
     void shouldReturnMultipleFiles() throws Exception {
         doReturn(List.of(
@@ -150,6 +160,7 @@ class PrivateESDataFetcherFileOverviewTest {
         assertEquals("dg.4DFC/two", results.get(1).get("file_id"));
     }
 
+    // first and offset are the page size and offset, and are not query filters.
     @Test
     void shouldPassPaginationToSearch() throws Exception {
         Map<String, Object> params = createBaseParams();

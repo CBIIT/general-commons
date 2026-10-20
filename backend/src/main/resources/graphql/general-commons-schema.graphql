@@ -928,6 +928,7 @@ type QueryType {
     numberOfImages: Int
     numberOfProteomics: Int
     idsLists: IdsLists
+    participantIdSuggestions(prefix: String!, first: Int = 20): [String]
 
     programDetail(
         program_name: String!
