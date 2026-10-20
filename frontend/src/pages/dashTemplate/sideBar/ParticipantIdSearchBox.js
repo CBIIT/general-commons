@@ -43,7 +43,11 @@ function ParticipantIdSearchBox({ value = [], onChange = () => {} }) {
       disableClearable
       open={open}
       onOpen={() => setOpen(true)}
-      onClose={() => setOpen(false)}
+      onClose={() => {
+        window.clearTimeout(timer.current);
+        requestId.current += 1;
+        setOpen(false);
+      }}
       value={value}
       options={options}
       filterOptions={(serverOptions) => serverOptions}
