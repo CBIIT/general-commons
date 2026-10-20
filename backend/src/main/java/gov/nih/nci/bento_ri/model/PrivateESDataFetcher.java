@@ -1400,6 +1400,9 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         if (trimmed.length() < SUGGESTION_PREFIX_MIN) {
             return List.of();
         }
+        if (first <= 0) {
+            return List.of();
+        }
         int size = Math.min(first, SUGGESTION_PAGE_MAX);
         Map<String, Object> query = new HashMap<>();
         query.put("size", 0);
