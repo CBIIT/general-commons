@@ -15,19 +15,17 @@ function ParticipantIdSearchBox({ value = [], onChange = () => {} }) {
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
   const handleInputChange = (event, nextValue, reason) => {
-    if (reason !== 'input') {
+    window.clearTimeout(timer.current);
+    const id = requestId.current + 1;
+    requestId.current = id;
+    const prefix = (nextValue || '').trim();
+    if (reason !== 'input' || prefix.length < MIN_PREFIX_LENGTH) {
+      setOptions([]);
+      setOpen(false);
       return;
     }
-    window.clearTimeout(timer.current);
+    setOptions([]);
     timer.current = window.setTimeout(async () => {
-      const prefix = (nextValue || '').trim();
-      const id = requestId.current + 1;
-      requestId.current = id;
-      if (prefix.length < MIN_PREFIX_LENGTH) {
-        setOptions([]);
-        setOpen(false);
-        return;
-      }
       const ids = await getParticipantIdSuggestions(prefix);
       if (id !== requestId.current) {
         return;
