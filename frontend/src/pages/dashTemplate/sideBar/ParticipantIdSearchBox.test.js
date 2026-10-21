@@ -12,6 +12,30 @@ jest.mock('../../../utils/graphqlClient', () => ({
   },
 }));
 
+// The real multiple Autocomplete follows each keystroke with a 'reset' and can close the list.
+// Both cancel the 300ms search timer, so this stand-in only emits reason 'input' and renders the open options as given.
+jest.mock('@material-ui/lab/Autocomplete', () => {
+  const React = require('react');
+  return function MockAutocomplete(props) {
+    const label = props['aria-label'];
+    return React.createElement(
+      'div',
+      { role: 'combobox', 'aria-label': label },
+      React.createElement('input', {
+        'aria-label': label,
+        onChange: (event) => props.onInputChange(event, event.target.value, 'input'),
+      }),
+      props.open
+        ? props.options.map((option) => {
+          const text = props.getOptionLabel(option);
+          return React.createElement('div', { key: text }, text);
+        })
+        : null,
+    );
+  };
+});
+
+// Printed GraphQL documents, so a call can be recognized as idsLists or participantIdSuggestions.
 function queryNames() {
   return client.query.mock.calls.map((call) => print(call[0].query));
 }
@@ -20,6 +44,7 @@ function searchInput() {
   return screen.getByRole('combobox', { name: 'Search by Participant IDs' }).querySelector('input');
 }
 
+// Runs the 300ms suggestion timer and the promise that applies the response.
 async function flushDebounce() {
   await act(async () => {
     jest.advanceTimersByTime(300);
@@ -30,6 +55,7 @@ async function flushDebounce() {
 }
 
 describe('Participant id search box', () => {
+  // Fake timers control the debounce. The client returns two ids unless a test replaces that page.
   beforeEach(() => {
     document.createRange = () => ({
       setStart: () => {},
@@ -50,6 +76,7 @@ describe('Participant id search box', () => {
     client.query.mockReset();
   });
 
+  // Opening the box has no prefix yet, so it must not download idsLists or any other query.
   it('does not load every id when the box opens', () => {
     render(<ParticipantIdSearchBox />);
 
@@ -57,6 +84,7 @@ describe('Participant id search box', () => {
     expect(client.query).not.toHaveBeenCalled();
   });
 
+  // One character is too broad. After the debounce, the box still must not query.
   it('does not search a one character prefix', async () => {
     render(<ParticipantIdSearchBox />);
 
@@ -68,6 +96,7 @@ describe('Participant id search box', () => {
     expect(client.query).not.toHaveBeenCalled();
   });
 
+  // A burst of keystrokes collapses into one participantIdSuggestions query for the latest prefix.
   it('searches the last prefix after rapid typing', async () => {
     render(<ParticipantIdSearchBox />);
     const input = searchInput();
@@ -84,6 +113,7 @@ describe('Participant id search box', () => {
     expect(printed).not.toContain('idsLists');
   });
 
+  // The dropdown shows the server page unchanged, including an id that does not contain the typed text.
   it('shows the server page without client filtering', async () => {
     client.query.mockResolvedValue({
       data: { participantIdSuggestions: ['PART-001', 'OTHER-999'] },
