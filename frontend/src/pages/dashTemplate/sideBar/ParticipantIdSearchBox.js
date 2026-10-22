@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { TextField } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import debounce from 'lodash/debounce';
 import { getParticipantIdSuggestions } from './BentoFilterUtils';
 
 const SUGGESTION_DELAY_MS = 300;
@@ -9,13 +10,21 @@ const MIN_PREFIX_LENGTH = 2;
 function ParticipantIdSearchBox({ value = [], onChange = () => {} }) {
   const [options, setOptions] = useState([]);
   const [open, setOpen] = useState(false);
-  const timer = useRef(null);
   const requestId = useRef(0);
 
-  useEffect(() => () => window.clearTimeout(timer.current), []);
+  const search = useMemo(() => debounce(async (prefix, id) => {
+    const ids = await getParticipantIdSuggestions(prefix);
+    if (id !== requestId.current) {
+      return;
+    }
+    setOptions(ids.map((title) => ({ type: 'subjectIds', title })));
+    setOpen(true);
+  }, SUGGESTION_DELAY_MS), []);
+
+  useEffect(() => () => search.cancel(), [search]);
 
   const handleInputChange = (event, nextValue, reason) => {
-    window.clearTimeout(timer.current);
+    search.cancel();
     const id = requestId.current + 1;
     requestId.current = id;
     const prefix = (nextValue || '').trim();
@@ -25,14 +34,7 @@ function ParticipantIdSearchBox({ value = [], onChange = () => {} }) {
       return;
     }
     setOptions([]);
-    timer.current = window.setTimeout(async () => {
-      const ids = await getParticipantIdSuggestions(prefix);
-      if (id !== requestId.current) {
-        return;
-      }
-      setOptions(ids.map((title) => ({ type: 'subjectIds', title })));
-      setOpen(true);
-    }, SUGGESTION_DELAY_MS);
+    search(prefix, id);
   };
 
   return (
@@ -44,7 +46,7 @@ function ParticipantIdSearchBox({ value = [], onChange = () => {} }) {
       open={open}
       onOpen={() => setOpen(true)}
       onClose={() => {
-        window.clearTimeout(timer.current);
+        search.cancel();
         requestId.current += 1;
         setOpen(false);
       }}

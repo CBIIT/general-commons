@@ -44,9 +44,13 @@ function searchInput() {
   return screen.getByRole('combobox', { name: 'Search by Participant IDs' }).querySelector('input');
 }
 
+// Lodash debounce waits on Date.now(), so the fake clock has to move with the timer.
+let now = 0;
+
 // Runs the 300ms suggestion timer and the promise that applies the response.
 async function flushDebounce() {
   await act(async () => {
+    now += 300;
     jest.advanceTimersByTime(300);
   });
   await act(async () => {
@@ -65,7 +69,9 @@ describe('Participant id search box', () => {
         ownerDocument: document,
       },
     });
+    now = 0;
     jest.useFakeTimers();
+    jest.spyOn(Date, 'now').mockImplementation(() => now);
     client.query.mockResolvedValue({
       data: { participantIdSuggestions: ['PART-001', 'PART-002'] },
     });
@@ -73,6 +79,9 @@ describe('Participant id search box', () => {
 
   afterEach(() => {
     jest.useRealTimers();
+    if (Date.now.mockRestore) {
+      Date.now.mockRestore();
+    }
     client.query.mockReset();
   });
 
