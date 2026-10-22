@@ -1388,4 +1388,34 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         return result;
     }
 
+    private static final int SUGGESTION_PAGE_MAX = 50;
+    private static final int SUGGESTION_PREFIX_MIN = 2;
+
+    /**
+     * Unique participant ids that start with the given prefix.
+     * Returns at most {@link #SUGGESTION_PAGE_MAX} ids and does not query when the prefix is shorter than two characters.
+     */
+    List<String> participantIdSuggestions(String prefix, int first) throws IOException {
+        String trimmed = prefix == null ? "" : prefix.trim();
+        if (trimmed.length() < SUGGESTION_PREFIX_MIN) {
+            return List.of();
+        }
+        if (first <= 0) {
+            return List.of();
+        }
+        int size = Math.min(first, SUGGESTION_PAGE_MAX);
+        Map<String, Object> query = new HashMap<>();
+        query.put("size", 0);
+        query.put("query", Map.of("prefix", Map.of("participant_id", trimmed)));
+        query.put("aggregations", Map.of(
+                "participant_id", Map.of(
+                        "terms", Map.of("field", "participant_id", "size", size)
+                )
+        ));
+        Request request = new Request("GET", "/dashboard_participant_ids/_search");
+        request.setJsonEntity(gson.toJson(query));
+        JsonObject jsonObject = esService.send(request);
+        return esService.collectTerms(jsonObject, "participant_id");
+    }
+
 }

@@ -17,3 +17,9 @@ export const GET_IDS_BY_TYPE = (type) => gql`{
   }
 }
 `;
+
+export const GET_PARTICIPANT_ID_SUGGESTIONS = gql`
+  query participantIdSuggestions($prefix: String!, $first: Int) {
+    participantIdSuggestions(prefix: $prefix, first: $first)
+  }
+`;

@@ -32,6 +32,11 @@ public class GeneralCommonsRuntimeWiring {
                         .dataFetcher("idsLists", env -> {
                             return privateESDataFetcher.idsLists();
                         })
+                        .dataFetcher("participantIdSuggestions", env -> {
+                            String prefix = env.getArgument("prefix");
+                            Integer first = env.getArgument("first");
+                            return privateESDataFetcher.participantIdSuggestions(prefix, first == null ? 20 : first);
+                        })
                         .dataFetcher("searchSubjects", env -> {
                             Map<String, Object> args = env.getArguments();
                             return privateESDataFetcher.searchSubjects(args);

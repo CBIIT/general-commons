@@ -9,7 +9,7 @@ import {
   updateUploadMetadata,
 } from '@bento-core/local-find';
 import {
-  GET_IDS_BY_TYPE, GET_SUBJECT_IDS,
+  GET_IDS_BY_TYPE, GET_PARTICIPANT_ID_SUGGESTIONS, GET_SUBJECT_IDS,
 } from '../../../bento/localSearchData';
 import store from '../../../store';
 import client from '../../../utils/graphqlClient';
@@ -41,6 +41,27 @@ export async function getAllIds(type) {
     .then((result) => result.data.idsLists)
     .catch(() => []);
   return allids;
+}
+
+/**
+ * Participant ids that start with the typed prefix.
+ * The backend returns one small page, not the full id list.
+ *
+ * @param {string} prefix
+ * @returns {Promise<string[]>}
+ */
+export async function getParticipantIdSuggestions(prefix) {
+  const suggestions = await client
+    .query({
+      query: GET_PARTICIPANT_ID_SUGGESTIONS,
+      variables: {
+        prefix,
+        first: 20,
+      },
+    })
+    .then((result) => result.data.participantIdSuggestions)
+    .catch(() => []);
+  return suggestions || [];
 }
 
 /**
