@@ -132,26 +132,29 @@ export default () => ({
   activeFacetStudy: {
     color: '#942A90',
   },
-  activeFacetSamples: {
+  activeFacetData_Access: {
     color: '#A35719',
+  },
+  activeFacetSamples: {
+    color: '#0E6292',
   },
   activeFacetGenomic: {
-    color: '#0E6292',
+    color: '#942A90',
   },
   activeFacetImaging: {
-    color: '#942A90',
+    color: '#A35719',
   },
   activeFacetDiagnosis: {
-    color: '#A35719',
-  },
-  activeFacetFiles: {
     color: '#0E6292',
   },
-  activeFacetProteomic: {
+  activeFacetFiles: {
     color: '#942A90',
   },
-  activeFacetCancer_Nanotechnology: {
+  activeFacetProteomic: {
     color: '#A35719',
+  },
+  activeFacetCancer_Nanotechnology: {
+    color: '#0E6292',
   },
   searchContainer: {
     margin: '0 2px',

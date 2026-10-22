@@ -2,6 +2,7 @@ import { sortType, InputTypes } from '@bento-core/facet-filter';
 
 const DEMOGRAPHICS = 'Demographics'; 
 const STUDY = 'Study';
+const DATA_ACCESS = 'Data Access';
 const SAMPLES = 'Samples';
 const GENOMIC = 'Genomic'; 
 const IMAGING = 'Imaging';
@@ -25,6 +26,9 @@ export const facetSectionVariables = {
     hasSearch: true,
   },
   Study: {
+    isExpanded: true,
+  },
+  "Data Access": {
     isExpanded: true,
   },
   Samples: {
@@ -137,6 +141,19 @@ export const facetsConfig = [
     minLowerBound: 0,
     maxUpperBound: 25445,
     quantifier: "Study Participants",
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
+  },
+  //DATA ACCESS
+  {
+    section: DATA_ACCESS,
+    label: "Access Type",
+    apiPath: "filterSubjectCountByAccess",
+    apiForFiltering: "filterSubjectCountByAccess",
+    datafield: "accesses",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
     customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   //SAMPLES

@@ -101,7 +101,9 @@ export const tblBody = {
     body: {
       color: '#004C73',
       borderBottom: 'none',
+      minWidth: '150px',
       maxWidth: '150px',
+      overflowWrap: 'break-word',
       '&.file_name': {
         // maxWidth: '300px',
         // minWidth: '210px',

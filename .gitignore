@@ -3,7 +3,7 @@
 # Environment variables
 backend/.env
 .env
-
+/.cursor
 # Scripts
 scripts/
 backend/src/main/resources/application-local.properties

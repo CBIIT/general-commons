@@ -76,14 +76,14 @@ describe("Implementation Requirements", () => {
     const href = protocolIdLink.getAttribute("href");
     expect(href).toBeTruthy();
     expect(href).toMatch(/^\/data\//);
+    expect(href).toContain("selectedTab=protocols");
 
-    const payload = href.replace("/data/", "");
+    const pathOnly = href.split("?")[0];
+    const payload = pathOnly.replace("/data/", "");
     const decodedPayload = decodeURIComponent(payload);
     expect(decodedPayload).toBe(
       JSON.stringify({
-        autocomplete: [
-          { type: "subjectIds", title: baseData.subject_ids_filter[0] },
-        ],
+        protocol_pk_ids: [baseData.protocol_pk_id],
       }),
     );
   });

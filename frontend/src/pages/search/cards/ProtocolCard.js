@@ -3,7 +3,7 @@ import { Grid, withStyles } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { prepareLinks } from "@bento-core/util";
 import PropertyItem from "./PropertyItem";
-import { encodeSubjectIds } from "./utils";
+import { encodeProtocolIds } from "./utils";
 
 const CARD_PROPERTIES = [
   {
@@ -39,7 +39,7 @@ const ProtocolCard = ({ data, classes, index }) => {
           <span className={classes.detailContainerHeader}>PROTOCOL</span>
           <span className={classes.cardTitle}>
             <Link
-              to={`/data/${encodeSubjectIds(data.subject_ids_filter)}`}
+              to={`/data/${encodeProtocolIds([data.protocol_pk_id])}?selectedTab=protocols`}
               className={classes.cardTitle}
             >
               {data.protocol_pk_id}
