@@ -84,6 +84,9 @@ indices:
         # caNanoLab Characterization
         - characterization_types # Characterization.Characterization_Type - characterization_types_filter - array
         - characterization_names # Characterization.Characterization_Name - characterization_names_filter - array
+        # program
+        - program_name # program.program_name - program_name_filter - single value
+        - program_acronym # program.program_acronym - program_acronym_filter - single value
       long:
         - number_of_study_participants # study_num_of_study_participants - single value
         - number_of_study_samples # study_num_of_study_samples - single value
@@ -113,6 +116,20 @@ indices:
         SKIP $skip LIMIT $limit
       page_size: 5000
     update_queries:
+      # program
+      - name: "Program"
+        # program_name
+        # program_acronym
+        query: |
+          MATCH (p:participant)
+          WITH DISTINCT p, "Not Applicable" AS na
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (p)-[:of_study]->(s:study)-[:of_program]->(pr:program)
+          RETURN DISTINCT
+            p.study_participant_id AS study_participant_id,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_name, na) END) AS program_name,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_acronym, na) END) AS program_acronym
+        page_size: 5000
       # Participant Samples
       - name: "Participant Samples"
         # samples
@@ -734,6 +751,9 @@ indices:
         # caNanoLab Characterization
         - characterization_types # Characterization.Characterization_Type - characterization_types_filter - array
         - characterization_names # Characterization.Characterization_Name - characterization_names_filter - array
+        # program
+        - program_name # program.program_name - program_name_filter - single value
+        - program_acronym # program.program_acronym - program_acronym_filter - single value
       long:
         - number_of_study_participants # calculated - single value
         - number_of_study_samples # calculated - single value
@@ -776,6 +796,30 @@ indices:
         SKIP $skip LIMIT $limit
       page_size: 5000
     update_queries:
+      # program
+      - name: "Program"
+        # program_name
+        # program_acronym
+        query: |
+          MATCH (samp:sample)
+          WITH DISTINCT samp, "Not Applicable" AS na
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (samp)-[:of_study]->(:study)-[:of_program]->(pr_direct:program)
+          OPTIONAL MATCH (samp)-[:of_participant]->(:participant)-[:of_study]->(:study)-[:of_program]->(pr_via:program)
+          WITH samp, na,
+            collect(DISTINCT pr_direct) AS direct_programs,
+            collect(DISTINCT pr_via) AS via_programs
+          WITH samp, na,
+            CASE
+              WHEN size(direct_programs) > 0 THEN direct_programs[0]
+              WHEN size(via_programs) > 0 THEN via_programs[0]
+              ELSE null
+            END AS pr
+          RETURN DISTINCT
+            samp.sample_id AS sample_id,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_name, na) END) AS program_name,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_acronym, na) END) AS program_acronym
+        page_size: 5000
       # Sample Participants
       - name: "Sample Participants"
         # participant_ids
@@ -1492,6 +1536,9 @@ indices:
         # caNanoLab Characterization
         - characterization_types # Characterization.Characterization_Type - characterization_types_filter - array
         - characterization_names # Characterization.Characterization_Name - characterization_names_filter - array
+        # Programs
+        - program_name # program.program_name - program_name_filter - single value
+        - program_acronym # program.program_acronym - program_acronym_filter - single value
       long:
         - file_size # file.file_size - single value
         - number_of_study_participants # calculated - single value
@@ -1546,6 +1593,20 @@ indices:
           experimental_strategies_sort
       page_size: 20000
     update_queries:
+      # program
+      - name: "Program"
+        # program_name
+        # program_acronym
+        query: |
+          MATCH (f:file)
+          WITH DISTINCT f, "Not Applicable" AS na
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (f)-[:of_study]->(s:study)-[:of_program]->(pr:program)
+          RETURN DISTINCT
+            f.file_id AS file_id,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_name, na) END) AS program_name,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_acronym, na) END) AS program_acronym
+        page_size: 5000
       # Studies
       - name: Studies
         # accesses
@@ -2202,6 +2263,9 @@ indices:
         # caNanoLab Characterization
         - characterization_types # Characterization.Characterization_Type - characterization_types_filter - array
         - characterization_names # Characterization.Characterization_Name - characterization_names_filter - array
+        # Programs
+        - program_name # program.program_name - program_name_filter - single value
+        - program_acronym # program.program_acronym - program_acronym_filter - single value
       long:
         - number_of_study_participants # calculated - single value
         - number_of_study_samples # calculated - single value
@@ -2229,6 +2293,27 @@ indices:
           COALESCE(f.is_supplementary_file, false) AS is_supplementary_file
       page_size: 50000
     update_queries:
+      # program
+      - name: Program
+        # program_name
+        # program_acronym
+        query: |
+          MATCH (f:file)
+          WITH DISTINCT f, "Not Applicable" AS na, "Not specified in data" AS nsd
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (f)-[:of_study]->(s:study)-[:of_program]->(pr:program)
+          WITH f, nsd,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_name, na) END) AS program_name,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_acronym, na) END) AS program_acronym,
+            split(replace(replace(replace(f.experimental_strategy_and_data_subtypes, '[', ''), ']', ''), '"', ''), ", ") AS experimental_strategies
+          WITH f, nsd, program_name, program_acronym,
+            CASE WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
+          UNWIND experimental_strategies AS experimental_strategy
+          RETURN DISTINCT
+            f.file_id + "_" + COALESCE(experimental_strategy, nsd) AS file_id_experimental_strategy,
+            program_name,
+            program_acronym
+        page_size: 5000
       # Studies
       - name: Studies
         # accesses
@@ -2626,6 +2711,9 @@ indices:
         # caNanoLab Characterization
         - characterization_types # Characterization.Characterization_Type - characterization_types_filter - array
         - characterization_names # Characterization.Characterization_Name - characterization_names_filter - array
+        # Programs
+        - program_name # program.program_name - program_name_filter - single value
+        - program_acronym # program.program_acronym - program_acronym_filter - single value
       long:
         - number_of_study_participants # calculated - single value
         - number_of_study_samples # calculated - single value
@@ -2655,6 +2743,29 @@ indices:
           COALESCE(study_data_type, nsd) AS study_data_types
       page_size: 5000
     update_queries:
+      # program
+      - name: Program
+        # program_name
+        # program_acronym
+        query: |
+          MATCH (f:file)
+          WITH DISTINCT f, "Not Applicable" AS na
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (f)-[:of_study]->(s:study)
+          OPTIONAL MATCH (s)-[:of_program]->(pr:program)
+          WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, na,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_name, na) END) AS program_name,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_acronym, na) END) AS program_acronym,
+            split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
+          WITH s, fs, nsd, program_name, program_acronym,
+            CASE WHEN study_data_types IS NULL OR size(study_data_types)=0 THEN [nsd] ELSE study_data_types END AS study_data_types
+          UNWIND study_data_types AS study_data_type
+          UNWIND fs AS f
+          RETURN DISTINCT
+            f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
+            program_name,
+            program_acronym
+        page_size: 5000
       # Studies
       - name: Studies
         # studies
@@ -3975,12 +4086,12 @@ indices:
         # program_name
         query: |
           MATCH (s:study)
-          WITH DISTINCT s, "Not specified in data" AS nsd
+          WITH DISTINCT s, "Not Applicable" AS na
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (s)-[:of_program]->(pr:program)
           RETURN DISTINCT
             s.phs_accession AS phs_accession,
-            COALESCE(pr.program_name, nsd) AS program_name
+            COALESCE(pr.program_name, na) AS program_name
         page_size: 1
   - index_name: "subject_detail"
     id_field: "subject_id"
@@ -4211,6 +4322,9 @@ indices:
       # caNanoLab Characterization
       - characterization_types # Characterization.Characterization_Type - characterization_types_filter - array
       - characterization_names # Characterization.Characterization_Name - characterization_names_filter - array
+      # Programs
+      - program_name # program.program_name - program_name_filter - single value
+      - program_acronym # program.program_acronym - program_acronym_filter - single value
       long:
         - number_of_study_participants # calculated - single value
         - number_of_study_samples # calculated - single value
@@ -4245,6 +4359,20 @@ indices:
         SKIP $skip LIMIT $limit
       page_size: 5000
     update_queries:
+      # Programs
+      - name: Programs
+        # program_name
+        # program_acronym
+        query: |
+          MATCH (proto:Protocol)
+          WITH DISTINCT proto, "Not Applicable" AS na
+          SKIP $skip LIMIT $limit
+          OPTIONAL MATCH (proto)-[:of_study]->(s:study)-[:of_program]->(pr:program)
+          RETURN DISTINCT
+            proto.protocol_pk_id AS protocol_pk_id,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_name, na) END) AS program_name,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_acronym, na) END) AS program_acronym
+        page_size: 5000
       # Studies
       - name: Studies
         # accesses

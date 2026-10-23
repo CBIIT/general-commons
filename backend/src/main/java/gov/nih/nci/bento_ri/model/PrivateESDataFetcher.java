@@ -270,6 +270,18 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 FILTER_COUNT_QUERY, "filterSubjectCountByIsSupplementaryFile",
                 AGG_ENDPOINT, FILES_END_POINT
         ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "program_name",
+                WIDGET_QUERY, "subjectCountByProgramName",
+                FILTER_COUNT_QUERY, "filterSubjectCountByProgramName",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "program_acronym",
+                WIDGET_QUERY, "subjectCountByProgramAcronym",
+                FILTER_COUNT_QUERY, "filterSubjectCountByProgramAcronym",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
         // caNanoLab Protocol filters
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "protocol_names",
