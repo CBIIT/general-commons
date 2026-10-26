@@ -39,6 +39,8 @@
   },
   "overrides": {
     "qs": "^6.16.0",
-    "proxy-addr": "2.0.8"
+    "proxy-addr": "2.0.8",
+    "body-parser": "^1.20.9",
+    "fast-copy": "^3.1.0"
   }
 }
