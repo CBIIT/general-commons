@@ -20,7 +20,7 @@ RUN useradd -r nonrootuser && rm -rf /usr/local/tomcat/webapps/*
 COPY --from=build /usr/src/app/target/CDS-*.war /usr/local/tomcat/webapps/ROOT.war
 # change ownership of the tomcat directory to the nonroot user
 RUN chown -R nonrootuser:nonrootuser /usr/local/tomcat
-# base image patching
-RUN apt update && apt upgrade -y
+# remediate CVE-2026-85091
+RUN apt-get update && apt-get install --only-upgrade -y zlib1g=1:1.3.dfsg-3.1ubuntu2.3
 # switch to nonroot user
 USER nonrootuser
