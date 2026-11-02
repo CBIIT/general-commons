@@ -14,7 +14,7 @@ const CARD_PROPERTIES = [
     dataField: 'study_code',
   },
   {
-    label: 'Accession',
+    label: 'Study Accession',
     dataField: 'phs_accession',
   },
 ];
