@@ -142,7 +142,7 @@ export const manifestData = {
     'Associated File DRS URI',
     'Associated File md5sum',
     'Study Name',
-    'Accession',
+    'Study Accession',
     'Sample Id',
     'Study Access',
     'File Type',
@@ -261,7 +261,7 @@ export const table = {
     },
     {
       dataField: 'phs_accession',
-      header: 'Accession',
+      header: 'Study Accession',
       display: true,
       tooltipText: 'Unique study accession.',
       role: cellTypes.DISPLAY,

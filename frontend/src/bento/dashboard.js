@@ -124,7 +124,7 @@ export const facetsConfig = [
   },
   {
     section: STUDY,
-    label: "PHS Accession",
+    label: "Study Accession",
     apiPath: "filterSubjectCountByPhsAccession",
     apiForFiltering: "filterSubjectCountByPhsAccession",
     datafield: "phs_accession",

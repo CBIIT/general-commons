@@ -1405,7 +1405,7 @@ export const tabContainers = [
       },
       {
         dataField: 'phs_accession',
-        header: 'Accession',
+        header: 'Study Accession',
         linkAttr: {
           rootPath: '/study',
           pathParams: ['phs_accession'],
@@ -1526,7 +1526,7 @@ export const tabContainers = [
       },
       {
         dataField: 'phs_accession',
-        header: 'Accession',
+        header: 'Study Accession',
         linkAttr: {
           rootPath: '/study',
           pathParams: ['phs_accession'],
@@ -1649,7 +1649,7 @@ export const tabContainers = [
       },
       {
         dataField: 'phs_accession',
-        header: 'Accession',
+        header: 'Study Accession',
         cellType: cellTypes.CUSTOM_ELEM,
         linkAttr: {
           rootPath: '/study',
