@@ -2,6 +2,7 @@ import { sortType, InputTypes } from '@bento-core/facet-filter';
 
 const DEMOGRAPHICS = 'Demographics'; 
 const STUDY = 'Study';
+const PROGRAMS = 'Programs';
 const DATA_ACCESS = 'Data Access';
 const SAMPLES = 'Samples';
 const GENOMIC = 'Genomic'; 
@@ -26,6 +27,9 @@ export const facetSectionVariables = {
     hasSearch: true,
   },
   Study: {
+    isExpanded: true,
+  },
+  Programs: {
     isExpanded: true,
   },
   "Data Access": {
@@ -69,6 +73,37 @@ export const facetsConfig = [
     type: InputTypes.CHECKBOX,
     sort_type: sortType.ALPHABET,
     show: true,
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
+  },
+  // PROGRAMS
+  {
+    section: PROGRAMS,
+    label: "Program Name",
+    apiPath: "filterSubjectCountByProgramName",
+    apiForFiltering: "filterSubjectCountByProgramName",
+    datafield: "program_name",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+    search: true,
+    disableSearchModal: true,
+    searchPlaceholder: "e.g. Program Name",
+    customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
+  },
+  {
+    section: PROGRAMS,
+    label: "Program Acronym",
+    apiPath: "filterSubjectCountByProgramAcronym",
+    apiForFiltering: "filterSubjectCountByProgramAcronym",
+    datafield: "program_acronym",
+    field: "group",
+    type: InputTypes.CHECKBOX,
+    sort_type: sortType.ALPHABET,
+    show: true,
+    search: true,
+    disableSearchModal: true,
+    searchPlaceholder: "e.g. Program Acronym",
     customCount: (val) => `(${Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val || 0)})`,
   },
   // STUDY
