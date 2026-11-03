@@ -1,3 +1,5 @@
+import { facetSectionThemes } from '../../../bento/facetSectionTheme';
+
 export const customStyles = {
   facetSectionCases: {
     color: '#0B7562',
@@ -9,106 +11,22 @@ export const customStyles = {
     backgroundColor: '#DCEFEC',
     border: '1px solid #0B7562',
   },
-  facetSectionDemographics: {
-    color: '#0E6292',
-    backgroundColor: '#FFFFFF',
-    border: '1px solid #898989',
-  },
-  facetSectionDemographicsBackground: {
-    color: '#0E3151',
-    backgroundColor: '#DCE9EF',
-    border: '1px solid #5FA5C5',
-  },
-  facetSectionStudy: {
-    color: '#942A90',
-    backgroundColor: '#FFFFFF',
-    border: '1px solid #898989',
-  },
-  facetSectionStudyBackground: {
-    color: '#0E3151',
-    backgroundColor: '#F4E7F3',
-    border: '1px solid #942A90',
-  },
-  facetSectionDataAccess: {
-    color: '#A35719',
-    backgroundColor: '#FFFFFF',
-    border: '1px solid #898989',
-  },
-  facetSectionDataAccessBackground: {
-    color: '#0E3151',
-    backgroundColor: '#F3ECE5',
-    border: '1px solid #A35719',
-  },
-  facetSectionSamples: {
-    color: '#0E6292',
-    backgroundColor: '#FFFFFF',
-    border: '1px solid #898989',
-  },
-  facetSectionSamplesBackground: {
-    color: '#0E3151',
-    backgroundColor: '#DCE9EF',
-    border: '1px solid #5FA5C5',
-  },
-  facetSectionGenomic: {
-    color: '#942A90',
-    backgroundColor: '#FFFFFF',
-    border: '1px solid #898989',
-  },
-  facetSectionGenomicBackground: {
-    color: '#0E3151',
-    backgroundColor: '#F4E7F3',
-    border: '1px solid #942A90',
-  },
-  facetSectionImaging: {
-    color: '#A35719',
-    backgroundColor: '#FFFFFF',
-    border: '1px solid #898989',
-  },
-  facetSectionImagingBackground: {
-    color: '#0E3151',
-    backgroundColor: '#F3ECE5',
-    border: '1px solid #A35719',
-  },
-  facetSectionDiagnosis: {
-    color: '#0E6292',
-    backgroundColor: '#FFFFFF',
-    border: '1px solid #898989',
-  },
-  facetSectionDiagnosisBackground: {
-    color: '#0E3151',
-    backgroundColor: '#DCE9EF',
-    border: '1px solid #5FA5C5',
-  },
-  facetSectionFiles: {
-    color: '#942A90',
-    backgroundColor: '#FFFFFF',
-    border: '1px solid #898989',
-  },
-  facetSectionFilesBackground: {
-    color: '#0E3151',
-    backgroundColor: '#F4E7F3',
-    border: '1px solid #942A90',
-  },
-  facetSectionProteomic: {
-    color: '#A35719',
-    backgroundColor: '#FFFFFF',
-    border: '1px solid #898989',
-  },
-  facetSectionProteomicBackground: {
-    color: '#0E3151',
-    backgroundColor: '#F3ECE5',
-    border: '1px solid #A35719',
-  },
-  facetSectionCancerNanotechnology: {
-    color: '#0E6292',
-    backgroundColor: '#FFFFFF',
-    border: '1px solid #898989',
-  },
-  facetSectionCancerNanotechnologyBackground: {
-    color: '#0E3151',
-    backgroundColor: '#DCE9EF',
-    border: '1px solid #5FA5C5',
-  },
+  ...facetSectionThemes.reduce((styles, { section, color, checkedEven, chipBorder }) => {
+    const name = section.replace(/\s+/g, '');
+    return {
+      ...styles,
+      [`facetSection${name}`]: {
+        color,
+        backgroundColor: '#FFFFFF',
+        border: '1px solid #898989',
+      },
+      [`facetSection${name}Background`]: {
+        color: '#0E3151',
+        backgroundColor: checkedEven,
+        border: `1px solid ${chipBorder}`,
+      },
+    };
+  }, {}),
   operators: {
     fontSize: '10px',
   },
@@ -131,4 +49,3 @@ export const customStyles = {
     },
   },
 };
-

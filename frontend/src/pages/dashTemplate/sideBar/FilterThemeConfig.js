@@ -1,7 +1,8 @@
 import React from 'react';
 import { ThemeProvider, createTheme } from '@material-ui/core/styles';
+import { facetSectionThemes } from '../../../bento/facetSectionTheme';
 
-const theme = {
+export const theme = {
   overrides: {
     Mui: {
       '&$expanded': {
@@ -43,164 +44,35 @@ const theme = {
     },
     MuiListItem: {
       root: {
-        '&.demographicsCheckedEven': {
-          backgroundColor: '#DCE9EF',
-        },
-        '&.demographicsCheckedOdd': {
-          backgroundColor: '#F2FBFF',
-        },
-        '&.studyCheckedEven': {
-          backgroundColor: '#F4E7F3',
-        },
-        '&.studyCheckedOdd': {
-          backgroundColor: '#FFF5FF',
-        },
-        '&.data_accessCheckedEven': {
-          backgroundColor: '#F3ECE5',
-        },
-        '&.data_accessCheckedOdd': {
-          backgroundColor: '#FFFCFA',
-        },
-        '&.samplesCheckedEven': {
-          backgroundColor: '#DCE9EF',
-        },
-        '&.samplesCheckedOdd': {
-          backgroundColor: '#F2FBFF',
-        },
-        '&.genomicCheckedEven': {
-          backgroundColor: '#F4E7F3',
-        },
-        '&.genomicCheckedOdd': {
-          backgroundColor: '#FFF5FF',
-        },
-        '&.imagingCheckedEven': {
-          backgroundColor: '#F3ECE5',
-        },
-        '&.imagingCheckedOdd': {
-          backgroundColor: '#FFFCFA',
-        },
-        '&.diagnosisCheckedEven': {
-          backgroundColor: '#DCE9EF',
-        },
-        '&.diagnosisCheckedOdd': {
-          backgroundColor: '#F2FBFF',
-        },
-        '&.filesCheckedEven': {
-          backgroundColor: '#F4E7F3',
-        },
-        '&.filesCheckedOdd': {
-          backgroundColor: '#FFF5FF',
-        },
-        '&.proteomicCheckedEven': {
-          backgroundColor: '#F3ECE5',
-        },
-        '&.proteomicCheckedOdd': {
-          backgroundColor: '#FFFCFA',
-        },
-        '&.cancer_nanotechnologyCheckedEven': {
-          backgroundColor: '#DCE9EF',
-        },
-        '&.cancer_nanotechnologyCheckedOdd': {
-          backgroundColor: '#F2FBFF',
-        },
+        ...facetSectionThemes.reduce((styles, { section, checkedEven, checkedOdd }) => {
+          const name = section.toLowerCase().replace(/\s+/g, '_');
+          return {
+            ...styles,
+            [`&.${name}CheckedEven`]: { backgroundColor: checkedEven },
+            [`&.${name}CheckedOdd`]: { backgroundColor: checkedOdd },
+          };
+        }, {}),
       },      
     },
     MuiSvgIcon: {
       root: {
-        '&.demographicsCheckedIcon': {
-          color: '#0E6292',
-        },
-        '&.studyCheckedIcon': {
-          color: '#942A90',
-        },
-        '&.data_accessCheckedIcon': {
-          color: '#A35719',
-        },
-        '&.samplesCheckedIcon': {
-          color: '#0E6292',
-        },
-        '&.genomicCheckedIcon': {
-          color: '#942A90',
-        },
-        '&.imagingCheckedIcon': {
-          color: '#A35719',
-        },
-        '&.diagnosisCheckedIcon': {
-          color: '#0E6292',
-        },
-        '&.filesCheckedIcon': {
-          color: '#942A90',
-        },
-        '&.proteomicCheckedIcon': {
-          color: '#A35719',
-        },
-        '&.cancer_nanotechnologyCheckedIcon': {
-          color: '#0E6292',
-        },
+        ...facetSectionThemes.reduce((styles, { section, color }) => ({
+          ...styles,
+          [`&.${section.toLowerCase().replace(/\s+/g, '_')}CheckedIcon`]: { color },
+        }), {}),
       },
     },
     MuiTypography: {
       root: {
-        '&.demographicsSubjects': {
-          color: '#0E6292',
-          fontSize: '12px',
-          fontFamily: 'Nunito',
-          marginRight: '0px',
-        },
-        '&.studySubjects': {
-          color: '#942A90',
-          fontSize: '12px',
-          fontFamily: 'Nunito',
-          marginRight: '0px',
-        },
-        '&.data_accessSubjects': {
-          color: '#A35719',
-          fontSize: '12px',
-          fontFamily: 'Nunito',
-          marginRight: '0px',
-        },
-        '&.samplesSubjects': {
-          color: '#0E6292',
-          fontSize: '12px',
-          fontFamily: 'Nunito',
-          marginRight: '0px',
-        },
-        '&.genomicSubjects': {
-          color: '#942A90',
-          fontSize: '12px',
-          fontFamily: 'Nunito',
-          marginRight: '0px',
-        },
-        '&.imagingSubjects': {
-          color: '#A35719',
-          fontSize: '12px',
-          fontFamily: 'Nunito',
-          marginRight: '0px',
-        },
-        '&.diagnosisSubjects': {
-          color: '#0E6292',
-          fontSize: '12px',
-          fontFamily: 'Nunito',
-          marginRight: '0px',
-        },
-        '&.filesSubjects': {
-          color: '#942A90',
-          fontSize: '12px',
-          fontFamily: 'Nunito',
-          marginRight: '0px',
-        },
-        '&.proteomicSubjects': {
-          color: '#A35719',
-          fontSize: '12px',
-          fontFamily: 'Nunito',
-          marginRight: '0px',
-        },
-        '&.cancer_nanotechnologySubjects': {
-          color: '#0E6292',
-          fontSize: '12px',
-          fontFamily: 'Nunito',
-          marginRight: '0px',
-        },
+        ...facetSectionThemes.reduce((styles, { section, color }) => ({
+          ...styles,
+          [`&.${section.toLowerCase().replace(/\s+/g, '_')}Subjects`]: {
+            color,
+            fontSize: '12px',
+            fontFamily: 'Nunito',
+            marginRight: '0px',
+          },
+        }), {}),
       },
     },
     MuiDivider: {
@@ -210,42 +82,10 @@ const theme = {
       },
       root: {
         height: '5px',
-        '&.divider0': {
-          backgroundColor: '#0E6292',
-        },
-        '&.divider1': {
-          backgroundColor: '#942A90',
-        },
-        '&.divider2': {
-          backgroundColor: '#A35719',
-        },
-        '&.divider3': {
-          backgroundColor: '#0E6292',
-        },
-        '&.divider4': {
-          backgroundColor: '#942A90',
-        },
-        '&.divider5': {
-          backgroundColor: '#A35719',
-        },
-        '&.divider6': {
-          backgroundColor: '#0E6292',
-        },
-        '&.divider7': {
-          backgroundColor: '#942A90',
-        },
-        '&.divider8': {
-          backgroundColor: '#A35719',
-        },
-        '&.divider9': {
-          backgroundColor: '#0E6292',
-        },
-        '&.divider10': {
-          backgroundColor: '#942A90',
-        },
-        '&.divider11': {
-          backgroundColor: '#A35719',
-        },
+        ...facetSectionThemes.reduce((styles, { color }, index) => ({
+          ...styles,
+          [`&.divider${index}`]: { backgroundColor: color },
+        }), {}),
       },
     },
     checkboxRoot: {

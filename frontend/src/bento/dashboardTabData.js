@@ -85,6 +85,8 @@ export const tabIndex = [
 
 export const DASHBOARD_QUERY = gql`
 query searchSubjects(
+  $program_name: [String],
+  $program_acronym: [String],
   $subject_ids: [String],
   $file_ids: [String],
   $accesses: [String], 
@@ -129,6 +131,8 @@ query searchSubjects(
   $characterization_names: [String],
   ){
     searchSubjects(
+    program_name: $program_name,
+    program_acronym: $program_acronym,
     subject_ids: $subject_ids, 
     accesses: $accesses, 
     acl: $acl, 
@@ -204,6 +208,14 @@ query searchSubjects(
             subjects
         }
         subjectCountByStudy{
+            group
+            subjects
+        }
+        subjectCountByProgramName{
+            group
+            subjects
+        }
+        subjectCountByProgramAcronym{
             group
             subjects
         }
@@ -364,6 +376,14 @@ query searchSubjects(
             subjects
         }
         filterSubjectCountByStudy{
+            group
+            subjects
+        }
+        filterSubjectCountByProgramName{
+            group
+            subjects
+        }
+        filterSubjectCountByProgramAcronym{
             group
             subjects
         }
@@ -537,6 +557,8 @@ query searchSubjects(
 
 export const GET_CASES_OVERVIEW_QUERY = gql`
 query subjectOverview(
+  $program_name: [String],
+  $program_acronym: [String],
   $subject_ids: [String],
   $file_ids: [String],
   $accesses:[String],
@@ -587,6 +609,8 @@ query subjectOverview(
   $offset: Int
 ){
   subjectOverview(
+      program_name: $program_name,
+      program_acronym: $program_acronym,
       subject_ids: $subject_ids,
       file_ids: $file_ids,
       accesses:$accesses,
@@ -653,6 +677,8 @@ query subjectOverview(
 
 export const GET_FILES_OVERVIEW_QUERY = gql`
 query fileOverview(
+  $program_name: [String],
+  $program_acronym: [String],
   $subject_ids: [String],
   $sample_ids: [String],
   $file_ids: [String],
@@ -704,6 +730,8 @@ query fileOverview(
   $offset: Int
 ){
   fileOverview(
+      program_name: $program_name,
+      program_acronym: $program_acronym,
       subject_ids: $subject_ids,
       sample_ids: $sample_ids,
       file_ids: $file_ids,
@@ -778,6 +806,8 @@ query fileOverview(
 
 export const GET_SAMPLES_OVERVIEW_QUERY = gql`
 query sampleOverview(
+  $program_name: [String],
+  $program_acronym: [String],
   $subject_ids: [String],
   $sample_ids: [String],
   $file_ids: [String],
@@ -829,6 +859,8 @@ query sampleOverview(
   $offset: Int
 ){
   sampleOverview(
+      program_name: $program_name,
+      program_acronym: $program_acronym,
       subject_ids: $subject_ids,
       sample_ids: $sample_ids,
       file_ids: $file_ids,
@@ -899,6 +931,8 @@ query sampleOverview(
 
 export const GET_PROTOCOLS_OVERVIEW_QUERY = gql`
 query protocolOverview(
+  $program_name: [String],
+  $program_acronym: [String],
   $protocol_pk_id: [String],
   $protocol_name: [String],
   $protocol_type: [String],
@@ -954,6 +988,8 @@ query protocolOverview(
   $offset: Int
 ){
   protocolOverview(
+      program_name: $program_name,
+      program_acronym: $program_acronym,
       protocol_pk_id: $protocol_pk_id,
       protocol_name: $protocol_name,
       protocol_type: $protocol_type,
@@ -1821,5 +1857,4 @@ export const tabContainers = [
     addSelectedFilesQuery: GET_ALL_FILEIDS_PROTOCOLSTAB_FOR_SELECT_ALL,
   },
 ];
-
 

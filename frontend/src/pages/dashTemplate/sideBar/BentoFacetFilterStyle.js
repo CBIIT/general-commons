@@ -1,4 +1,5 @@
 import { resetIcon } from '../../../bento/dashboard';
+import { facetSectionThemes } from '../../../bento/facetSectionTheme';
 
 export default () => ({
   clearAllButtonRoot: {
@@ -126,36 +127,10 @@ export default () => ({
     fontSize: '14px',
     marginRight: '0px',
   },
-  activeFacetDemographics: {
-    color: '#0E6292',
-  },
-  activeFacetStudy: {
-    color: '#942A90',
-  },
-  activeFacetData_Access: {
-    color: '#A35719',
-  },
-  activeFacetSamples: {
-    color: '#0E6292',
-  },
-  activeFacetGenomic: {
-    color: '#942A90',
-  },
-  activeFacetImaging: {
-    color: '#A35719',
-  },
-  activeFacetDiagnosis: {
-    color: '#0E6292',
-  },
-  activeFacetFiles: {
-    color: '#942A90',
-  },
-  activeFacetProteomic: {
-    color: '#A35719',
-  },
-  activeFacetCancer_Nanotechnology: {
-    color: '#0E6292',
-  },
+  ...facetSectionThemes.reduce((styles, { section, color }) => ({
+    ...styles,
+    [`activeFacet${section.replace(/\s+/g, '_')}`]: { color },
+  }), {}),
   searchContainer: {
     margin: '0 2px',
     marginRight: 6,
