@@ -1244,6 +1244,8 @@ query sampleOverview(
 
 export const GET_ALL_FILEIDS_FROM_FILESTAB_FOR_ADD_ALL_CART = gql`
 query fileOverview(
+  $program_name: [String],
+  $program_acronym: [String],
   $subject_ids: [String],
   $sample_ids: [String],
   $file_ids: [String],
@@ -1295,6 +1297,8 @@ query fileOverview(
   $offset: Int
 ){
   fileOverview(
+      program_name: $program_name,
+      program_acronym: $program_acronym,
       subject_ids: $subject_ids,
       sample_ids: $sample_ids,
       file_ids: $file_ids,
@@ -1857,4 +1861,3 @@ export const tabContainers = [
     addSelectedFilesQuery: GET_ALL_FILEIDS_PROTOCOLSTAB_FOR_SELECT_ALL,
   },
 ];
-
