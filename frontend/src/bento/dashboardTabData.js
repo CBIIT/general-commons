@@ -87,6 +87,7 @@ export const DASHBOARD_QUERY = gql`
 query searchSubjects(
   $subject_ids: [String],
   $file_ids: [String],
+  $sample_ids: [String],
   $accesses: [String], 
   $acl: [String], 
   $experimental_strategies: [String], 
@@ -161,6 +162,7 @@ query searchSubjects(
     imaging_assay_type: $imaging_assay_type, 
     is_supplementary_file: $is_supplementary_file,
     file_ids: $file_ids,
+    sample_ids: $sample_ids,
     protocol_pk_ids: $protocol_pk_ids,
     protocol_names: $protocol_names,
     protocol_types: $protocol_types,
@@ -539,6 +541,7 @@ export const GET_CASES_OVERVIEW_QUERY = gql`
 query subjectOverview(
   $subject_ids: [String],
   $file_ids: [String],
+  $sample_ids: [String],
   $accesses:[String],
   $acl:[String],
   $experimental_strategies:[String],
@@ -589,6 +592,7 @@ query subjectOverview(
   subjectOverview(
       subject_ids: $subject_ids,
       file_ids: $file_ids,
+      sample_ids: $sample_ids,
       accesses:$accesses,
       acl:$acl,
       experimental_strategies:$experimental_strategies,
@@ -907,6 +911,7 @@ query protocolOverview(
   $file_names: [String],
   $file_ids: [String],
   $files: [String],
+  $sample_ids: [String],
   $acl: [String],
   $accesses: [String],
   $experimental_strategies: [String],
@@ -962,6 +967,7 @@ query protocolOverview(
       file_names: $file_names,
       file_ids: $file_ids,
       files: $files,
+      sample_ids: $sample_ids,
       acl: $acl,
       accesses: $accesses,
       experimental_strategies: $experimental_strategies,
