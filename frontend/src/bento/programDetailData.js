@@ -131,8 +131,8 @@ const table = {
   columns: [
     {
       dataField: 'accession',
-      header: 'Study',
-      tooltipText: 'Sort by Study',
+      header: 'Study Accession',
+      tooltipText: 'Sort by Study Accession',
       cellType: cellTypes.LINK,
       linkAttr: {
         rootPath: '/study',
