@@ -13,6 +13,7 @@ indices:
         - dbGaP_subject_id # participant.dbGaP_subject_id - single value
         # Participant Samples
         - samples # sample.sample_id - sample_ids - array
+        - sample_ids # alias for samples - for GraphQL parameter compatibility
         - is_tumor # sample.sample_tumor_status - samples_sample_tumor_status_filter - array
         - sample_types # sample.sample_type - samples_sample_type_filter - array
         - is_tumor_sort # derived from is_tumor - single value
@@ -133,6 +134,7 @@ indices:
       # Participant Samples
       - name: "Participant Samples"
         # samples
+        # sample_ids
         # is_tumor
         # sample_types
         # is_tumor_sort
@@ -174,6 +176,7 @@ indices:
           RETURN DISTINCT
             study_participant_id,
             sorted_samples AS samples,
+            sorted_samples AS sample_ids,
             sorted_is_tumor AS is_tumor,
             sorted_sample_types AS sample_types,
             is_tumor_sort,
@@ -2676,6 +2679,7 @@ indices:
         - sex # participant.sex - demographics_sex_filter - single value
         - is_tumor # sample.sample_tumor_status - samples_sample_tumor_status_filter - array
         - sample_types # sample.sample_type - samples_sample_type_filter - array
+        - sample_ids # sample.sample_id - array
         # File Diagnoses
         - primary_diagnoses # diagnosis.primary_diagnosis - diagnosis_primary_diagnosis_filter - array
         #- diagnosis_primary_diagnosis_filter # diagnosis.primary_diagnosis - array
@@ -2866,6 +2870,7 @@ indices:
       - name: Samples
         # is_tumor
         # sample_types
+        # sample_ids
         query: |
           MATCH (f:file)
           WITH DISTINCT f
@@ -2879,16 +2884,20 @@ indices:
           UNWIND fs AS f
           OPTIONAL MATCH (f)-[:of_participant]->(p:participant)
           OPTIONAL MATCH (p)<-[:of_participant]-(samp:sample)
+          OPTIONAL MATCH (f)-[:from_sample]->(samp_direct:sample)
           WITH f, study_data_type, nsd, na,
             COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_tumor_status, nsd) END) AS is_tumor,
-            COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_type, nsd) END) AS sample_types
+            COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_type, nsd) END) AS sample_types,
+            COLLECT(DISTINCT CASE WHEN samp_direct IS NULL THEN null ELSE COALESCE(samp_direct.sample_id, nsd) END) AS sample_ids
           WITH f, study_data_type, nsd, na,
             CASE WHEN size(is_tumor) = 0 THEN [na] ELSE is_tumor END AS is_tumor,
-            CASE WHEN size(sample_types) = 0 THEN [na] ELSE sample_types END AS sample_types
+            CASE WHEN size(sample_types) = 0 THEN [na] ELSE sample_types END AS sample_types,
+            CASE WHEN size(sample_ids) = 0 THEN [na] ELSE sample_ids END AS sample_ids
           RETURN DISTINCT
             f.file_id + "_" + COALESCE(study_data_type, nsd) AS file_id_study_data_type,
             is_tumor,
-            sample_types
+            sample_types,
+            sample_ids
         page_size: 5000
       # Diagnoses
       - name: Diagnoses
@@ -4277,7 +4286,7 @@ indices:
       - sex # participant.sex - array
       - subject_ids # participant.participant_id - array
       # Samples
-      - sample_id # sample.sample_id - array
+      - sample_ids # sample.sample_id - array
       - is_tumor # sample.sample_tumor_status - array
       - sample_types # sample.sample_type - array
       - analyte_type # sample.sample_type - array
@@ -4518,7 +4527,7 @@ indices:
         # is_tumor
         # sample_types
         # analyte_type
-        # sample_id
+        # sample_ids
         query: |
           MATCH (proto:Protocol)
           WITH DISTINCT proto
@@ -4528,24 +4537,24 @@ indices:
           WITH protocol_pk_id, nsd, na,
             COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_tumor_status, nsd) END) AS sample_tumor_status,
             COLLECT(DISTINCT samp.sample_type) AS raw_sample_types,
-            COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_id, nsd) END) AS sample_id
+            COLLECT(DISTINCT CASE WHEN samp IS NULL THEN null ELSE COALESCE(samp.sample_id, nsd) END) AS sample_ids
           CALL {
             WITH raw_sample_types, nsd
             UNWIND (CASE WHEN size(raw_sample_types) = 0 THEN [null] ELSE raw_sample_types END) AS raw_sample_type
             WITH CASE WHEN raw_sample_type IS NULL THEN null ELSE COALESCE(TRIM(LAST(split(raw_sample_type, ':'))), nsd) END AS processed_sample_type
             RETURN COLLECT(DISTINCT processed_sample_type) AS sample_type
           }
-          WITH protocol_pk_id, nsd, na, sample_tumor_status, sample_id, sample_type
+          WITH protocol_pk_id, nsd, na, sample_tumor_status, sample_ids, sample_type
           WITH protocol_pk_id, nsd, na, 
             CASE WHEN size(sample_tumor_status) = 0 THEN [na] ELSE sample_tumor_status END AS is_tumor,
             CASE WHEN size(sample_type) = 0 THEN [na] ELSE sample_type END AS sample_types,
-            CASE WHEN size(sample_id) = 0 THEN [na] ELSE sample_id END AS sample_id
+            CASE WHEN size(sample_ids) = 0 THEN [na] ELSE sample_ids END AS sample_ids
           RETURN 
             protocol_pk_id,
             sample_types,
             sample_types AS analyte_type,
             is_tumor,
-            sample_id
+            sample_ids
         page_size: 25000
       # Diagnoses
       - name: "Diagnoses"
