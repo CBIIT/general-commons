@@ -3740,6 +3740,7 @@ indices:
       # type_gs
       query: |
         MATCH (p:program)
+        WHERE p.program_acronym != "NA"
         WITH DISTINCT p, "Not specified in data" AS nsd
         ORDER BY p.program_sort_order
         RETURN DISTINCT
@@ -3826,6 +3827,7 @@ indices:
         # num_disease_sites
         query: |
           MATCH (pr:program)
+          WHERE pr.program_acronym != "NA"
           WITH DISTINCT pr
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (pr)<-[*]-(s:study)
