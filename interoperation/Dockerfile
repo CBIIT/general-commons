@@ -1,11 +1,13 @@
-FROM node:26.10.0-trixie-slim AS build
+FROM node:26.13.0-trixie-slim AS build
 WORKDIR /usr/src/app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
-FROM node:26.10.0-trixie-slim AS fnl_base_image
+FROM node:26.13.0-trixie-slim AS fnl_base_image
 WORKDIR /usr/src/app
-RUN apt-get update && apt-get upgrade -y && \
+RUN apt-get update && \
+    apt-get install -y --only-upgrade --no-install-recommends \
+        zlib1g=1:1.3.dfsg+really1.3.1-1+deb13u1 && \
     rm -rf /var/lib/apt/lists/*
 RUN rm -rf \
         /usr/local/lib/node_modules/npm \
