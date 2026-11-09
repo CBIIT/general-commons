@@ -20,7 +20,11 @@ RUN useradd -r nonrootuser && rm -rf /usr/local/tomcat/webapps/*
 COPY --from=build /usr/src/app/target/CDS-*.war /usr/local/tomcat/webapps/ROOT.war
 # change ownership of the tomcat directory to the nonroot user
 RUN chown -R nonrootuser:nonrootuser /usr/local/tomcat
-# base image patching
-RUN apt update && apt upgrade -y
+# patch vulnerable base image packages
+RUN apt-get update && apt-get install -y --no-install-recommends --only-upgrade \
+    apt=2.8.4ubuntu0.1 \
+    libapt-pkg6.0t64=2.8.4ubuntu0.1 \
+    libpcre2-8-0=10.42-4ubuntu2.2 \
+    && rm -rf /var/lib/apt/lists/*
 # switch to nonroot user
 USER nonrootuser
