@@ -3828,6 +3828,7 @@ indices:
         # num_disease_sites
         query: |
           MATCH (pr:program)
+          WHERE pr.program_acronym != "NA"
           WITH DISTINCT pr
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (pr)<-[*]-(s:study)
@@ -3856,6 +3857,7 @@ indices:
         # study_participants
         query: |
           MATCH (pr:program)
+          WHERE pr.program_acronym != "NA"
           WITH DISTINCT pr
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (pr:program)<-[:of_program]-(s:study)
@@ -3875,6 +3877,7 @@ indices:
         # studies
         query: |
           MATCH (pr:program)
+          WHERE pr.program_acronym != "NA"
           WITH DISTINCT pr
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (pr:program)<-[:of_program]-(s:study)
