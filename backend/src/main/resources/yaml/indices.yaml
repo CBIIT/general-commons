@@ -3797,6 +3797,7 @@ indices:
       # program_sort_order
       query: |
         MATCH (p:program)
+        WHERE p.program_acronym != "NA"
         WITH DISTINCT p, "Not specified in data" AS nsd
         SKIP $skip LIMIT $limit
         WITH 
@@ -3827,7 +3828,6 @@ indices:
         # num_disease_sites
         query: |
           MATCH (pr:program)
-          WHERE pr.program_acronym != "NA"
           WITH DISTINCT pr
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (pr)<-[*]-(s:study)
