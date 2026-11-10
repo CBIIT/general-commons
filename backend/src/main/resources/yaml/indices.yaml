@@ -3877,7 +3877,7 @@ indices:
         # studies
         query: |
           MATCH (pr:program)
-          WHERE p.program_acronym != "NA"
+          WHERE pr.program_acronym != "NA"
           WITH DISTINCT pr
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (pr:program)<-[:of_program]-(s:study)
