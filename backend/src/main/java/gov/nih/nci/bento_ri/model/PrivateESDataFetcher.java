@@ -533,7 +533,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
 
     List<Map<String, Object>> sampleOverview(Map<String, Object> params) throws IOException {
         final String[][] PROPERTIES = new String[][]{
-                new String[]{"study_acronym", "study_acronym"},
+                new String[]{"study_acronym", "study_name"},
                 new String[]{"phs_accession", "phs_accession"},
                 new String[]{"subject_id", "subject_ids"},
                 new String[]{"sample_id", "sample_id"},
@@ -552,7 +552,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         String defaultSort = "sample_id"; // Default sort order
 
         Map<String, String> sortFieldMapping = Map.ofEntries(
-                Map.entry("study_acronym", "study_acronym_sort"),
+                Map.entry("study_acronym", "study_name"),
                 Map.entry("phs_accession", "phs_accession"),
                 Map.entry("subject_id", "subject_ids"),
                 Map.entry("sample_id", "sample_id"),
