@@ -123,13 +123,13 @@ indices:
         # program_acronym
         query: |
           MATCH (p:participant)
-          WITH DISTINCT p, "Not Applicable" AS na
+          WITH DISTINCT p, "Not Applicable" AS na, "NA" as pa_na
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (p)-[:of_study]->(s:study)-[:of_program]->(pr:program)
           RETURN DISTINCT
             p.study_participant_id AS study_participant_id,
             COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_name, na) END) AS program_name,
-            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_acronym, na) END) AS program_acronym
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN pa_na ELSE COALESCE(pr.program_acronym, pa_na) END) AS program_acronym
         page_size: 5000
       # Participant Samples
       - name: "Participant Samples"
@@ -805,14 +805,14 @@ indices:
         # program_acronym
         query: |
           MATCH (samp:sample)
-          WITH DISTINCT samp, "Not Applicable" AS na
+          WITH DISTINCT samp, "Not Applicable" AS na, "NA" as pa_na
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (samp)-[:of_study]->(:study)-[:of_program]->(pr_direct:program)
           OPTIONAL MATCH (samp)-[:of_participant]->(:participant)-[:of_study]->(:study)-[:of_program]->(pr_via:program)
-          WITH samp, na,
+          WITH samp, na, pa_na,
             collect(DISTINCT pr_direct) AS direct_programs,
             collect(DISTINCT pr_via) AS via_programs
-          WITH samp, na,
+          WITH samp, na, pa_na,
             CASE
               WHEN size(direct_programs) > 0 THEN direct_programs[0]
               WHEN size(via_programs) > 0 THEN via_programs[0]
@@ -821,7 +821,7 @@ indices:
           RETURN DISTINCT
             samp.sample_id AS sample_id,
             COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_name, na) END) AS program_name,
-            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_acronym, na) END) AS program_acronym
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN pa_na ELSE COALESCE(pr.program_acronym, pa_na) END) AS program_acronym
         page_size: 5000
       # Sample Participants
       - name: "Sample Participants"
@@ -1602,13 +1602,13 @@ indices:
         # program_acronym
         query: |
           MATCH (f:file)
-          WITH DISTINCT f, "Not Applicable" AS na
+          WITH DISTINCT f, "Not Applicable" AS na, "NA" as pa_na
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-[:of_study]->(s:study)-[:of_program]->(pr:program)
           RETURN DISTINCT
             f.file_id AS file_id,
             COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_name, na) END) AS program_name,
-            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_acronym, na) END) AS program_acronym
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN pa_na ELSE COALESCE(pr.program_acronym, pa_na) END) AS program_acronym
         page_size: 5000
       # Studies
       - name: Studies
@@ -2302,12 +2302,12 @@ indices:
         # program_acronym
         query: |
           MATCH (f:file)
-          WITH DISTINCT f, "Not Applicable" AS na, "Not specified in data" AS nsd
+          WITH DISTINCT f, "Not Applicable" AS na, "Not specified in data" AS nsd, "NA" as pa_na
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-[:of_study]->(s:study)-[:of_program]->(pr:program)
-          WITH f, nsd,
+          WITH f, nsd, pa_na, na,
             COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_name, na) END) AS program_name,
-            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_acronym, na) END) AS program_acronym,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN pa_na ELSE COALESCE(pr.program_acronym, pa_na) END) AS program_acronym,
             split(replace(replace(replace(f.experimental_strategy_and_data_subtypes, '[', ''), ']', ''), '"', ''), ", ") AS experimental_strategies
           WITH f, nsd, program_name, program_acronym,
             CASE WHEN experimental_strategies IS NULL OR size(experimental_strategies)=0 THEN [nsd] ELSE experimental_strategies END AS experimental_strategies
@@ -2753,13 +2753,13 @@ indices:
         # program_acronym
         query: |
           MATCH (f:file)
-          WITH DISTINCT f, "Not Applicable" AS na
+          WITH DISTINCT f, "Not Applicable" AS na, "NA" as pa_na
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (f)-[:of_study]->(s:study)
           OPTIONAL MATCH (s)-[:of_program]->(pr:program)
           WITH DISTINCT s, COLLECT(DISTINCT f) AS fs, "Not specified in data" AS nsd, na,
             COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_name, na) END) AS program_name,
-            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_acronym, na) END) AS program_acronym,
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN pa_na ELSE COALESCE(pr.program_acronym, pa_na) END) AS program_acronym,
             split(replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', ''), ", ") AS study_data_types
           WITH s, fs, nsd, program_name, program_acronym,
             CASE WHEN study_data_types IS NULL OR size(study_data_types)=0 THEN [nsd] ELSE study_data_types END AS study_data_types
@@ -4379,13 +4379,13 @@ indices:
         # program_acronym
         query: |
           MATCH (proto:Protocol)
-          WITH DISTINCT proto, "Not Applicable" AS na
+          WITH DISTINCT proto, "Not Applicable" AS na, "NA" as pa_na
           SKIP $skip LIMIT $limit
           OPTIONAL MATCH (proto)-[:of_study]->(s:study)-[:of_program]->(pr:program)
           RETURN DISTINCT
             proto.protocol_pk_id AS protocol_pk_id,
             COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_name, na) END) AS program_name,
-            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_acronym, na) END) AS program_acronym
+            COLLECT(DISTINCT CASE WHEN pr IS NULL THEN na ELSE COALESCE(pr.program_acronym, pa_na) END) AS program_acronym
         page_size: 5000
       # Studies
       - name: Studies
