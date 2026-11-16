@@ -38,6 +38,7 @@
     "supertest": "^7.1.4"
   },
   "overrides": {
+    "fast-xml-parser": "5.12.0",
     "qs": "^6.16.0",
     "proxy-addr": "2.0.8"
   }
