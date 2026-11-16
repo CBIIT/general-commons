@@ -19,7 +19,7 @@
         <java.version>25</java.version>
         <log4j2.version>2.25.5</log4j2.version>
         <spring.version>7.0.9</spring.version>
-        <tomcat.version>11.0.25</tomcat.version>
+        <tomcat.version>11.0.27</tomcat.version>
         <jackson-bom.version>3.1.7</jackson-bom.version>
     </properties>
     <dependencies>
@@ -183,7 +183,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20231013</version>
+            <version>20260719</version>
         </dependency>
         <!-- JetBrains Java Annotations -->
         <dependency>
