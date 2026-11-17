@@ -1523,7 +1523,7 @@ export const tabContainers = [
         role: cellTypes.CHECKBOX,
       },
       {
-        dataField: 'study_acronym',
+        dataField: 'study_name',
         header: 'Study Name',
         tooltipText: 'Name of the study to which the sample belongs.',
         display: true,
