@@ -667,6 +667,7 @@ query subjectOverview(
       subject_id
       study_participant_id
       study_acronym
+      study_name
       phs_accession
       sex
       site

@@ -121,6 +121,18 @@ class PrivateESDataFetcherFileOverviewTest {
         assertEquals(Map.of("file_id", "desc"), queryCaptor.getValue().get("sort"));
     }
 
+    // study_name sorts on the dedicated study_name_sort field.
+    @Test
+    void shouldSortStudyNameBySortField() throws Exception {
+        Map<String, Object> params = createBaseParams();
+        params.put("order_by", "study_name");
+        params.put("sort_direction", "ASC");
+
+        fetcher.fileOverview(params);
+
+        assertEquals(Map.of("study_name_sort", "asc"), queryCaptor.getValue().get("sort"));
+    }
+
     // Fields from a stubbed hit, such as file_id and file_name, are returned as-is.
     @Test
     void shouldReturnMappedFileFields() throws Exception {
