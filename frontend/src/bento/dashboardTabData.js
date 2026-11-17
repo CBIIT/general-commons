@@ -1403,7 +1403,7 @@ export const tabContainers = [
         tooltipText: 'Unique identifier for each participant.',
       },
       {
-        dataField: 'study_acronym',
+        dataField: 'study_name',
         header: 'Study Name',
         display: true,
         tooltipText: 'Name of the study to which the participant belongs.',
@@ -1524,7 +1524,7 @@ export const tabContainers = [
         role: cellTypes.CHECKBOX,
       },
       {
-        dataField: 'study_acronym',
+        dataField: 'study_name',
         header: 'Study Name',
         tooltipText: 'Name of the study to which the sample belongs.',
         display: true,
@@ -1647,7 +1647,7 @@ export const tabContainers = [
         role: cellTypes.CHECKBOX,
       },
       {
-        dataField: 'study_acronym',
+        dataField: 'study_name',
         header: 'Study Name',
         display: true,
         tooltipText: 'Name of the study to which the files belong.',

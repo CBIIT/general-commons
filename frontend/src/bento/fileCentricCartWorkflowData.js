@@ -114,7 +114,7 @@ export const manifestData = {
     'associated_file',
     'associated_drs_uri',
     'associated_md5sum',
-    'study_acronym',
+    'study_name',
     'phs_accession',
     'sample_id',
     'accesses',
@@ -253,7 +253,7 @@ export const table = {
       tooltipText: 'sort',
     },
     {
-      dataField: 'study_acronym',
+      dataField: 'study_name',
       header: 'Study Name',
       display: true,
       tooltipText: 'Name of the study to which the participant belongs.',
