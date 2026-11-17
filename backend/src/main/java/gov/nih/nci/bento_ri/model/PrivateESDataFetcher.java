@@ -554,7 +554,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         String defaultSort = "sample_id"; // Default sort order
 
         Map<String, String> sortFieldMapping = Map.ofEntries(
-                Map.entry("study_acronym", "study_acronym"),
+                Map.entry("study_acronym", "study_acronym_sort"),
                 Map.entry("phs_accession", "phs_accession"),
                 Map.entry("subject_id", "subject_ids"),
                 Map.entry("sample_id", "sample_id"),
