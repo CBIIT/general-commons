@@ -2,6 +2,7 @@ type SubjectOverview {
     subject_id: String
     study_participant_id: String
     study_acronym: [String]
+    study_name: [String]
     phs_accession: [String]
     sex: String
     site: [String]
@@ -83,6 +84,7 @@ type FilesInList {
     drs_uri: String
 
     study_acronym: [String]
+    study_name: [String]
     accesses: [String]
     phs_accession: [String]
     study_data_type: [String]
@@ -111,7 +113,6 @@ type FilesInList {
     associated_drs_uri: String
     associated_md5sum: String
     associated_is_supplementary_file: String
-    study_name: [String]
 }
 
 
