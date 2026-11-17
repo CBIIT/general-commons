@@ -3,6 +3,7 @@ package gov.nih.nci.bento.graphql;
 
 import gov.nih.nci.bento.model.ConfigurationDAO;
 import graphql.execution.instrumentation.InstrumentationContext;
+import graphql.execution.instrumentation.InstrumentationState;
 import graphql.execution.instrumentation.SimpleInstrumentation;
 import graphql.execution.instrumentation.parameters.InstrumentationValidationParameters;
 import graphql.language.Field;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 @Component
 public class PageSizeLimitInstrumentation extends SimpleInstrumentation {
@@ -30,11 +30,12 @@ public class PageSizeLimitInstrumentation extends SimpleInstrumentation {
     }
 
     @NotNull
-    public InstrumentationContext<List<ValidationError>> beginValidation(InstrumentationValidationParameters parameters) {
+    @Override
+    public InstrumentationContext<List<ValidationError>> beginValidation(InstrumentationValidationParameters parameters, InstrumentationState state) {
 
         return new InstrumentationContext<>() {
             @Override
-            public void onDispatched(CompletableFuture<List<ValidationError>> result) {
+            public void onDispatched() {
                 // do nothing
             }
 
