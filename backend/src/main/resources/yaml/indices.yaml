@@ -4002,16 +4002,16 @@ indices:
       # study_version
       query: |
         MATCH (s:study)<--(:file)
-        WITH DISTINCT s, "Not specified in data" AS nsd
+        WITH DISTINCT s, "Not specified in data" AS nsd, "Not Applicable" AS na
         SKIP $skip LIMIT $limit
-        WITH s, nsd, CASE WHEN s.study_data_types IS NULL OR s.study_data_types = '[]' THEN nsd ELSE replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', '') END AS study_data_types
+        WITH s, nsd, na, CASE WHEN s.study_data_types IS NULL OR s.study_data_types = '[]' THEN nsd ELSE replace(replace(replace(s.study_data_types, '[', ''), ']', ''), '"', '') END AS study_data_types
         RETURN DISTINCT
           s.study_name AS study_name,
           s.study_name AS study_code,
           COALESCE(s.study_acronym, nsd) AS study_acronym,
           COALESCE(s.study_description, nsd) AS study_description,
           COALESCE(s.short_description, nsd) AS short_description,
-          COALESCE(s.study_external_url, nsd) AS study_external_url,
+          COALESCE(replace(replace(replace(s.study_external_url, '[', ''), ']', ''), '"', ''), na) as study_external_url,
           COALESCE(s.primary_investigator_name, nsd) AS primary_investigator_name,
           COALESCE(s.primary_investigator_email, nsd) AS primary_investigator_email,
           COALESCE(s.co_investigator_name, nsd) AS co_investigator_name,
