@@ -3,9 +3,9 @@ import { TextField, withStyles } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import debounce from 'lodash/debounce';
 import { SearchList } from '@bento-core/local-find';
-import bentoSearchBoxStyles from '@bento-core/local-find/dist/SearchBox/styles';
 import ToolTip from '@bento-core/tool-tip';
 import { getParticipantIdSuggestions } from './BentoFilterUtils';
+import styles from './ParticipantIdSearchBoxStyle';
 
 const SUGGESTION_DELAY_MS = 300;
 const MIN_PREFIX_LENGTH = 2;
@@ -120,4 +120,4 @@ function ParticipantIdSearchBox({ classes = {}, value = [], onChange = () => {} 
   );
 }
 
-export default withStyles(bentoSearchBoxStyles)(ParticipantIdSearchBox);
+export default withStyles(styles)(ParticipantIdSearchBox);
