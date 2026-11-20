@@ -27,9 +27,9 @@ jest.mock('@material-ui/lab/Autocomplete', () => {
       }),
       props.open
         ? props.options.map((option) => {
-          const text = props.getOptionLabel(option);
-          return React.createElement('div', { key: text }, text);
-        })
+            const text = props.getOptionLabel(option);
+            return React.createElement('div', { key: text }, text);
+          })
         : null,
     );
   };
@@ -136,5 +136,23 @@ describe('Participant id search box', () => {
 
     expect(screen.getByText('PART-001')).toBeInTheDocument();
     expect(screen.getByText('OTHER-999')).toBeInTheDocument();
+  });
+
+  it('lists selected ids and removes one on delete', () => {
+    const onChange = jest.fn();
+    render(
+      <ParticipantIdSearchBox
+        value={[
+          { type: 'subjectIds', title: 'PART-001' },
+          { type: 'subjectIds', title: 'PART-002' },
+        ]}
+        onChange={onChange}
+      />,
+    );
+
+    expect(screen.getByText('PART-001')).toBeInTheDocument();
+    fireEvent.click(screen.getAllByAltText('close icon')[0]);
+
+    expect(onChange).toHaveBeenCalledWith([{ type: 'subjectIds', title: 'PART-002' }]);
   });
 });
