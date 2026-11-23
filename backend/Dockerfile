@@ -9,7 +9,7 @@ COPY src ./src
 RUN mvn -B package -DskipTests
 
 # Production stage
-FROM tomcat:11.0.27-jre25 AS fnl_base_image
+FROM tomcat:11.0.29-jre25 AS fnl_base_image
 # set environment variables
 ENV JAVA_OPTS="-XX:InitialRAMPercentage=25 -XX:MaxRAMPercentage=70"
 ENV TZ="America/New_York"
