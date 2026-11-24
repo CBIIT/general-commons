@@ -7,6 +7,7 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable arrow-body-style */
 import React, { useState } from 'react';
+import { connect } from 'react-redux';
 import {
   AccordionDetails,
   AccordionSummary,
@@ -21,7 +22,7 @@ import RefreshIcon from '@material-ui/icons/Refresh';
 import clsx from 'clsx';
 import {
   resetAllData, chunkSplit,
-  SearchView, SearchBoxGenerator, UploadModalGenerator,
+  SearchView, UploadModalGenerator, updateAutocompleteData,
 } from '@bento-core/local-find';
 import store from '../../../store';
 import styles, { uploadModalStyles } from './BentoFacetFilterStyle';
@@ -29,8 +30,9 @@ import { FacetFilter, ClearAllFiltersBtn } from '@bento-core/facet-filter';
 import { facetsConfig, facetSectionVariables, resetIcon } from '../../../bento/dashboard';
 import FacetFilterThemeProvider from './FilterThemeConfig';
 import {
-  getAllSubjectIds, getAllIds,
+  getAllSubjectIds,
 } from './BentoFilterUtils';
+import ParticipantIdSearchBox from './ParticipantIdSearchBox';
 
 const CustomExpansionPanelSummary = withStyles({
   root: {
@@ -60,28 +62,10 @@ const CustomAccordionDetails = withStyles({
   },
 })(AccordionDetails);
 
-// Generate SearchBox Component
-const { SearchBox } = SearchBoxGenerator({
-  functions: {
-    getSuggestions: async (searchType) => {
-      try {
-        const response = await getAllIds(searchType).catch(() => []);
-        return response && response[searchType] instanceof Array
-          ? response[searchType].map((id) => ({ type: searchType, title: id }))
-          : [];
-      } catch (e) {
-        return [];
-      }
-    },
-  },
-  config: {
-    inputPlaceholder: 'e.g. PARTICIPANT-10102',
-    noOptionsText: 'No matching items found',
-    searchType: 'subjectIds',
-    ariaLabel: 'Search by Participant IDs',
-    tooltipText: 'Enter Participant ID to search data',
-  },
-});
+const SearchBox = connect(
+  (state) => ({ value: state.localFind ? state.localFind.autocomplete : [] }),
+  { onChange: updateAutocompleteData },
+)(ParticipantIdSearchBox);
 
 // Generate UploadModal Component
 const { UploadModal } = UploadModalGenerator({

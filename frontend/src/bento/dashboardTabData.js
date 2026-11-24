@@ -85,7 +85,11 @@ export const tabIndex = [
 
 export const DASHBOARD_QUERY = gql`
 query searchSubjects(
-  $subject_ids: [String], 
+  $program_name: [String],
+  $program_acronym: [String],
+  $subject_ids: [String],
+  $file_ids: [String],
+  $sample_ids: [String],
   $accesses: [String], 
   $acl: [String], 
   $experimental_strategies: [String], 
@@ -128,6 +132,8 @@ query searchSubjects(
   $characterization_names: [String],
   ){
     searchSubjects(
+    program_name: $program_name,
+    program_acronym: $program_acronym,
     subject_ids: $subject_ids, 
     accesses: $accesses, 
     acl: $acl, 
@@ -159,6 +165,8 @@ query searchSubjects(
     tissue_fixative: $tissue_fixative, 
     imaging_assay_type: $imaging_assay_type, 
     is_supplementary_file: $is_supplementary_file,
+    file_ids: $file_ids,
+    sample_ids: $sample_ids,
     protocol_pk_ids: $protocol_pk_ids,
     protocol_names: $protocol_names,
     protocol_types: $protocol_types,
@@ -202,6 +210,14 @@ query searchSubjects(
             subjects
         }
         subjectCountByStudy{
+            group
+            subjects
+        }
+        subjectCountByProgramName{
+            group
+            subjects
+        }
+        subjectCountByProgramAcronym{
             group
             subjects
         }
@@ -362,6 +378,14 @@ query searchSubjects(
             subjects
         }
         filterSubjectCountByStudy{
+            group
+            subjects
+        }
+        filterSubjectCountByProgramName{
+            group
+            subjects
+        }
+        filterSubjectCountByProgramAcronym{
             group
             subjects
         }
@@ -535,7 +559,11 @@ query searchSubjects(
 
 export const GET_CASES_OVERVIEW_QUERY = gql`
 query subjectOverview(
+  $program_name: [String],
+  $program_acronym: [String],
   $subject_ids: [String],
+  $file_ids: [String],
+  $sample_ids: [String],
   $accesses:[String],
   $acl:[String],
   $experimental_strategies:[String],
@@ -584,7 +612,11 @@ query subjectOverview(
   $offset: Int
 ){
   subjectOverview(
+      program_name: $program_name,
+      program_acronym: $program_acronym,
       subject_ids: $subject_ids,
+      file_ids: $file_ids,
+      sample_ids: $sample_ids,
       accesses:$accesses,
       acl:$acl,
       experimental_strategies:$experimental_strategies,
@@ -635,6 +667,7 @@ query subjectOverview(
       subject_id
       study_participant_id
       study_acronym
+      study_name
       phs_accession
       sex
       site
@@ -649,8 +682,11 @@ query subjectOverview(
 
 export const GET_FILES_OVERVIEW_QUERY = gql`
 query fileOverview(
+  $program_name: [String],
+  $program_acronym: [String],
   $subject_ids: [String],
   $sample_ids: [String],
+  $file_ids: [String],
   $accesses:[String],
   $acl:[String],
   $experimental_strategies:[String],
@@ -681,6 +717,7 @@ query fileOverview(
   $tissue_fixative:[String],
   $imaging_assay_type:[String],
   $is_supplementary_file: [String],
+  $protocol_pk_ids: [String],
   $protocol_names: [String],
   $protocol_types: [String],
   $dois: [String],
@@ -698,8 +735,11 @@ query fileOverview(
   $offset: Int
 ){
   fileOverview(
+      program_name: $program_name,
+      program_acronym: $program_acronym,
       subject_ids: $subject_ids,
       sample_ids: $sample_ids,
+      file_ids: $file_ids,
       accesses:$accesses,
       acl:$acl,
       experimental_strategies:$experimental_strategies,
@@ -730,6 +770,7 @@ query fileOverview(
       tissue_fixative:$tissue_fixative,
       imaging_assay_type:$imaging_assay_type,
       is_supplementary_file: $is_supplementary_file,
+      protocol_pk_ids: $protocol_pk_ids,
       protocol_names: $protocol_names,
       protocol_types: $protocol_types,
       dois: $dois,
@@ -770,8 +811,11 @@ query fileOverview(
 
 export const GET_SAMPLES_OVERVIEW_QUERY = gql`
 query sampleOverview(
+  $program_name: [String],
+  $program_acronym: [String],
   $subject_ids: [String],
   $sample_ids: [String],
+  $file_ids: [String],
   $accesses:[String],
   $acl:[String],
   $experimental_strategies:[String],
@@ -802,6 +846,7 @@ query sampleOverview(
   $tissue_fixative:[String],
   $imaging_assay_type:[String],
   $is_supplementary_file: [String],
+  $protocol_pk_ids: [String],
   $protocol_names: [String],
   $protocol_types: [String],
   $dois: [String],
@@ -819,8 +864,11 @@ query sampleOverview(
   $offset: Int
 ){
   sampleOverview(
+      program_name: $program_name,
+      program_acronym: $program_acronym,
       subject_ids: $subject_ids,
       sample_ids: $sample_ids,
+      file_ids: $file_ids,
       accesses:$accesses,
       acl:$acl,
       experimental_strategies:$experimental_strategies,
@@ -851,6 +899,7 @@ query sampleOverview(
       tissue_fixative:$tissue_fixative,
       imaging_assay_type:$imaging_assay_type,
       is_supplementary_file: $is_supplementary_file,
+      protocol_pk_ids: $protocol_pk_ids,
       protocol_names: $protocol_names,
       protocol_types: $protocol_types,
       dois: $dois,
@@ -887,12 +936,17 @@ query sampleOverview(
 
 export const GET_PROTOCOLS_OVERVIEW_QUERY = gql`
 query protocolOverview(
+  $program_name: [String],
+  $program_acronym: [String],
   $protocol_pk_id: [String],
   $protocol_name: [String],
   $protocol_type: [String],
   $doi: [String],
   $doi_url: [String],
   $file_names: [String],
+  $file_ids: [String],
+  $files: [String],
+  $sample_ids: [String],
   $acl: [String],
   $accesses: [String],
   $experimental_strategies: [String],
@@ -940,12 +994,17 @@ query protocolOverview(
   $offset: Int
 ){
   protocolOverview(
+      program_name: $program_name,
+      program_acronym: $program_acronym,
       protocol_pk_id: $protocol_pk_id,
       protocol_name: $protocol_name,
       protocol_type: $protocol_type,
       doi: $doi,
       doi_url: $doi_url,
       file_names: $file_names,
+      file_ids: $file_ids,
+      files: $files,
+      sample_ids: $sample_ids,
       acl: $acl,
       accesses: $accesses,
       experimental_strategies: $experimental_strategies,
@@ -1143,6 +1202,7 @@ query sampleOverview(
   $site:[String],
   $studies:[String],
   $study_data_types:[String],
+  $protocol_pk_ids: [String],
 
   $order_by: String,
   $sort_direction: String,
@@ -1175,6 +1235,7 @@ query sampleOverview(
       site:$site,
       studies:$studies,
       study_data_types:$study_data_types,
+      protocol_pk_ids: $protocol_pk_ids,
 
       order_by:$order_by,
       sort_direction:$sort_direction,
@@ -1190,8 +1251,11 @@ query sampleOverview(
 
 export const GET_ALL_FILEIDS_FROM_FILESTAB_FOR_ADD_ALL_CART = gql`
 query fileOverview(
+  $program_name: [String],
+  $program_acronym: [String],
   $subject_ids: [String],
   $sample_ids: [String],
+  $file_ids: [String],
   $accesses:[String],
   $acl:[String],
   $experimental_strategies:[String],
@@ -1222,6 +1286,7 @@ query fileOverview(
   $tissue_fixative:[String],
   $imaging_assay_type:[String],
   $is_supplementary_file: [String],
+  $protocol_pk_ids: [String],
   $protocol_names: [String],
   $protocol_types: [String],
   $dois: [String],
@@ -1239,8 +1304,11 @@ query fileOverview(
   $offset: Int
 ){
   fileOverview(
+      program_name: $program_name,
+      program_acronym: $program_acronym,
       subject_ids: $subject_ids,
       sample_ids: $sample_ids,
+      file_ids: $file_ids,
       accesses:$accesses,
       acl:$acl,
       experimental_strategies:$experimental_strategies,
@@ -1271,6 +1339,7 @@ query fileOverview(
       tissue_fixative:$tissue_fixative,
       imaging_assay_type:$imaging_assay_type,
       is_supplementary_file: $is_supplementary_file,
+      protocol_pk_ids: $protocol_pk_ids,
       protocol_names: $protocol_names,
       protocol_types: $protocol_types,
       dois: $dois,
@@ -1334,7 +1403,7 @@ export const tabContainers = [
         tooltipText: 'Unique identifier for each participant.',
       },
       {
-        dataField: 'study_acronym',
+        dataField: 'study_name',
         header: 'Study Name',
         display: true,
         tooltipText: 'Name of the study to which the participant belongs.',
@@ -1343,7 +1412,7 @@ export const tabContainers = [
       },
       {
         dataField: 'phs_accession',
-        header: 'Accession',
+        header: 'Study Accession',
         linkAttr: {
           rootPath: '/study',
           pathParams: ['phs_accession'],
@@ -1455,7 +1524,7 @@ export const tabContainers = [
         role: cellTypes.CHECKBOX,
       },
       {
-        dataField: 'study_acronym',
+        dataField: 'study_name',
         header: 'Study Name',
         tooltipText: 'Name of the study to which the sample belongs.',
         display: true,
@@ -1464,7 +1533,7 @@ export const tabContainers = [
       },
       {
         dataField: 'phs_accession',
-        header: 'Accession',
+        header: 'Study Accession',
         linkAttr: {
           rootPath: '/study',
           pathParams: ['phs_accession'],
@@ -1578,7 +1647,7 @@ export const tabContainers = [
         role: cellTypes.CHECKBOX,
       },
       {
-        dataField: 'study_acronym',
+        dataField: 'study_name',
         header: 'Study Name',
         display: true,
         tooltipText: 'Name of the study to which the files belong.',
@@ -1587,7 +1656,7 @@ export const tabContainers = [
       },
       {
         dataField: 'phs_accession',
-        header: 'Accession',
+        header: 'Study Accession',
         cellType: cellTypes.CUSTOM_ELEM,
         linkAttr: {
           rootPath: '/study',
@@ -1799,5 +1868,3 @@ export const tabContainers = [
     addSelectedFilesQuery: GET_ALL_FILEIDS_PROTOCOLSTAB_FOR_SELECT_ALL,
   },
 ];
-
-

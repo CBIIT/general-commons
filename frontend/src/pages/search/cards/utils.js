@@ -26,3 +26,33 @@ export function encodeProtocolIds(protocolIds) {
     .map((id) => String(id));
   return encodeURIComponent(JSON.stringify({ protocol_pk_ids: ids }));
 }
+
+/**
+ * Encode file IDs as an Explore facet path filter.
+ *
+ * Pair with ?selectedTab=files so Explore opens the Files tab and
+ * runs fileOverview (file_ids is a keyword on dashboard_file).
+ *
+ * Example URL payload: {"file_ids":["dg.4DFC/example"]}
+ */
+export function encodeFileIds(fileIds) {
+  const ids = (Array.isArray(fileIds) ? fileIds : [fileIds])
+    .filter((id) => id != null && String(id).trim() !== '')
+    .map((id) => String(id));
+  return encodeURIComponent(JSON.stringify({ file_ids: ids }));
+}
+
+/**
+ * Encode sample IDs as an Explore facet path filter.
+ *
+ * Pair with ?selectedTab=samples so Explore opens the Samples tab and
+ * runs sampleOverview (sample_ids is a keyword on dashboard_sample).
+ *
+ * Example URL payload: {"sample_ids":["SAMPLE-1"]}
+ */
+export function encodeSampleIds(sampleIds) {
+  const ids = (Array.isArray(sampleIds) ? sampleIds : [sampleIds])
+    .filter((id) => id != null && String(id).trim() !== '')
+    .map((id) => String(id));
+  return encodeURIComponent(JSON.stringify({ sample_ids: ids }));
+}
