@@ -59,8 +59,8 @@ const DashTemplateController = ((props) => {
   const { match, history } = props;
   if (match.params.filterQuery) {
     setActiveFilterByPathQuery(match);
-    // Preserve selectedTab so ProtocolCard can open the Protocols tab
-    // (which runs protocolOverview).
+    // Preserve selectedTab so ProtocolCard opens the Protocols tab
+    // (protocolOverview) and FileCard opens the Files tab (fileOverview).
     const selectedTab = new URLSearchParams(history.location.search).get('selectedTab');
     history.replace(selectedTab ? `/data?selectedTab=${encodeURIComponent(selectedTab)}` : '/data');
   }

@@ -2,6 +2,7 @@ type SubjectOverview {
     subject_id: String
     study_participant_id: String
     study_acronym: [String]
+    study_name: [String]
     phs_accession: [String]
     sex: String
     site: [String]
@@ -83,6 +84,7 @@ type FilesInList {
     drs_uri: String
 
     study_acronym: [String]
+    study_name: [String]
     accesses: [String]
     phs_accession: [String]
     study_data_type: [String]
@@ -111,7 +113,6 @@ type FilesInList {
     associated_drs_uri: String
     associated_md5sum: String
     associated_is_supplementary_file: String
-    study_name: [String]
 }
 
 
@@ -163,6 +164,8 @@ type SearchResult {
     subjectCountByFunctionalizingEntity: [GroupCount]
     subjectCountByCharacterizationType: [GroupCount]
     subjectCountByCharacterizationName: [GroupCount]
+    subjectCountByProgramName: [GroupCount]
+    subjectCountByProgramAcronym: [GroupCount]
 
     filterSubjectCountByStudy: [GroupCount]
     filterSubjectCountByExperimentalStrategy: [GroupCount]
@@ -206,6 +209,8 @@ type SearchResult {
     filterSubjectCountByFunctionalizingEntity: [GroupCount]
     filterSubjectCountByCharacterizationType: [GroupCount]
     filterSubjectCountByCharacterizationName: [GroupCount]
+    filterSubjectCountByProgramName: [GroupCount]
+    filterSubjectCountByProgramAcronym: [GroupCount]
 
     donutCountByExperimentalStrategy: [GroupCount]
     donutCountBySex: [GroupCount]
@@ -928,6 +933,7 @@ type QueryType {
     numberOfImages: Int
     numberOfProteomics: Int
     idsLists: IdsLists
+    participantIdSuggestions(prefix: String!, first: Int = 20): [String]
 
     programDetail(
         program_name: String!
@@ -950,6 +956,8 @@ type QueryType {
     searchSubjects (
         # standard filters
         subject_ids: [String] = []
+        file_ids: [String] = []
+        sample_ids: [String] = []
         accesses: [String] = []
         acl: [String] = []
         experimental_strategies: [String] = []
@@ -972,6 +980,8 @@ type QueryType {
         sample_types: [String] = []
         site: [String] = []
         studies: [String] = []
+        program_name: [String] = []
+        program_acronym: [String] = []
         study_data_types: [String] = []
         analytical_fractions: [String] = []
         instrument_makes: [String] = []
@@ -1000,6 +1010,8 @@ type QueryType {
     subjectOverview (
         # id filters
         subject_ids: [String] = []
+        file_ids: [String] = []
+        sample_ids: [String] = []
         # standard filters
         accesses: [String] = []
         acl: [String] = []
@@ -1023,6 +1035,8 @@ type QueryType {
         sample_types: [String] = []
         site: [String] = []
         studies: [String] = []
+        program_name: [String] = []
+        program_acronym: [String] = []
         study_data_types: [String] = []
         analytical_fractions: [String] = []
         instrument_makes: [String] = []
@@ -1066,6 +1080,9 @@ type QueryType {
         experimental_strategies: [String] = []
         file_types: [String] = []
         file_names: [String] = []
+        file_ids: [String] = []
+        files: [String] = []
+        sample_ids: [String] = []
         sex: [String] = []
         image_modality: [String] = []
         instrument_models: [String] = []
@@ -1084,6 +1101,8 @@ type QueryType {
         sample_types: [String] = []
         site: [String] = []
         studies: [String] = []
+        program_name: [String] = []
+        program_acronym: [String] = []
         study_data_types: [String] = []
         analytical_fractions: [String] = []
         instrument_makes: [String] = []
@@ -1118,6 +1137,7 @@ type QueryType {
         # id filters
         subject_ids: [String] = []
         sample_ids: [String] = []
+        file_ids: [String] = []
         # standard filters
         accesses: [String] = []
         acl: [String] = []
@@ -1141,6 +1161,8 @@ type QueryType {
         sample_types: [String] = []
         site: [String] = []
         studies: [String] = []
+        program_name: [String] = []
+        program_acronym: [String] = []
         study_data_types: [String] = []
         analytical_fractions: [String] = []
         instrument_makes: [String] = []
@@ -1150,6 +1172,7 @@ type QueryType {
         imaging_assay_type: [String] = []
         is_supplementary_file: [String] = []
         # Protocol filters
+        protocol_pk_ids: [String] = []
         protocol_names: [String] = []
         protocol_types: [String] = []
         dois: [String] = []
@@ -1198,6 +1221,8 @@ type QueryType {
         sample_types: [String] = []
         site: [String] = []
         studies: [String] = []
+        program_name: [String] = []
+        program_acronym: [String] = []
         study_data_types: [String] = []
         analytical_fractions: [String] = []
         instrument_makes: [String] = []
@@ -1207,6 +1232,7 @@ type QueryType {
         imaging_assay_type: [String] = []
         is_supplementary_file: [String] = []
         # Protocol filters
+        protocol_pk_ids: [String] = []
         protocol_names: [String] = []
         protocol_types: [String] = []
         dois: [String] = []
@@ -1256,6 +1282,8 @@ type QueryType {
         sample_types: [String] = []
         site: [String] = []
         studies: [String] = []
+        program_name: [String] = []
+        program_acronym: [String] = []
         study_data_types: [String] = []
         analytical_fractions: [String] = []
         instrument_makes: [String] = []

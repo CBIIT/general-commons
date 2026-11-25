@@ -41,10 +41,11 @@ export const customTheme = {
       },
       '&.container_header': {
         maxWidth: '100%',
-        height: '75px',
         padding: '10px 0px 15px 0px',
         display: 'flex',
         alignItems: 'center',
+        justifyContent: 'flex-end',
+        gap: '20px',
         position: 'relative',
         zIndex: '1',
         '& img.tooltip_icon': {
@@ -53,18 +54,11 @@ export const customTheme = {
           height: '100%',
           paddingBottom: '30px',
         },
-        '& button:first-child': {
-          marginRight: 'auto',
-          marginLeft: '0px',
-        },
-        '& button:not(first-child)': {
-          marginLeft: '33px',
-        },
       },
       '&.tooltip_icon': {
         width: '25px',
       },
-      '&.cart_message_outer':{
+      '&.cart_message_outer': {
         paddingLeft: '0px',
       },
       '&.container_footer': {
@@ -112,7 +106,8 @@ export const customTheme = {
       boxShadow: 'none',
       boxSizing: 'border-box',
       marginTop: '6px',
-      transition: 'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+      transition:
+        'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
       verticalAlign: 'top',
       '&:hover': {
         backgroundColor: '#BB5500',
@@ -127,31 +122,6 @@ export const customTheme = {
       fontFamily: 'Lato',
       borderBottom: '1px solid #3E6886',
       textDecoration: 'none',
-    },
-  },
-  MuiDialog: {
-    paper: {
-      width: '431px',
-      height: '170px',
-      borderRadius: '25px !important',
-      textAlign: 'center',
-      backgroundColor: '#E8DFDC !important',
-      border: '2px solid #A61401',
-    },
-  },
-  MuiDialogContent: {
-    root: {
-      padding: '40px 20px 0px 20px',
-      '&.alter-content': {
-        fontFamily: 'Lato',
-        size: '16px',
-      },
-    },
-  },
-  MuiDialogActions: {
-    root: {
-      justifyContent: 'center',
-      paddingBottom: '25px',
     },
   },
 };

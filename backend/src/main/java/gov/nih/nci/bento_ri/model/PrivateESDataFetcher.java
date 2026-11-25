@@ -270,6 +270,18 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 FILTER_COUNT_QUERY, "filterSubjectCountByIsSupplementaryFile",
                 AGG_ENDPOINT, FILES_END_POINT
         ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "program_name",
+                WIDGET_QUERY, "subjectCountByProgramName",
+                FILTER_COUNT_QUERY, "filterSubjectCountByProgramName",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
+        TERM_AGGS.add(Map.of(
+                AGG_NAME, "program_acronym",
+                WIDGET_QUERY, "subjectCountByProgramAcronym",
+                FILTER_COUNT_QUERY, "filterSubjectCountByProgramAcronym",
+                AGG_ENDPOINT, FILES_END_POINT
+        ));
         // caNanoLab Protocol filters
         TERM_AGGS.add(Map.of(
                 AGG_NAME, "protocol_names",
@@ -460,11 +472,13 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"subject_id", "subject_ids"},
                 new String[]{"study_participant_id", "study_participant_id"},
                 new String[]{"study_acronym", "studies"},
+                new String[]{"study_name", "studies"},
                 new String[]{"phs_accession", "phs_accession"},
                 new String[]{"sex", "sex"},
                 new String[]{"site", "site"},
                 new String[]{"samples", "samples"},
                 new String[]{"files", "files"},
+                new String[]{"file_ids", "file_ids"},
                 new String[]{"analyte_type", "analyte_type"},
                 new String[]{"race", "race"},
                 new String[]{"ethnicity", "ethnicity"},
@@ -476,6 +490,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         Map<String, String> sortFieldMapping = Map.ofEntries(
                 Map.entry("subject_id", "subject_ids"),
                 Map.entry("study_acronym", "studies"),
+                Map.entry("study_name", "studies"),
                 Map.entry("phs_accession", "phs_accession"),
                 Map.entry("sex", "sex"),
                 Map.entry("site", "site_sort"),
@@ -499,7 +514,9 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"protocol_type", "protocol_type"},
                 new String[]{"doi", "doi"},
                 new String[]{"doi_url", "doi_url"},
-                new String[]{"file_names", "file_names"}
+                new String[]{"file_names", "file_names"},
+                new String[]{"file_ids", "file_ids"},
+                new String[]{"files", "files"}
         };
 
         String defaultSort = "protocol_pk_id"; // Default sort order
@@ -525,6 +542,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
                 new String[]{"is_tumor", "is_tumor"},
                 new String[]{"analyte_type", "analyte_type"},
                 new String[]{"files", "files"},
+                new String[]{"file_ids", "file_ids"},
                 new String[]{"sample_type", "analyte_type"},
                 new String[]{"sample_tumor_status", "is_tumor"},
                 new String[]{"organ_or_tissue", "organ_or_tissue"},
@@ -1257,6 +1275,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
     List<Map<String, Object>> filesInList(Map<String, Object> params) throws Exception {
         final String[][] PROPERTIES = new String[][]{
             new String[]{"study_acronym", "studies"},
+            new String[]{"study_name", "studies"},
             new String[]{"accesses", "accesses"},
             new String[]{"phs_accession", "phs_accession"},
             new String[]{"subject_id", "subject_ids"},
@@ -1289,6 +1308,7 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         
         Map<String, String> sortFieldMapping = Map.ofEntries(
                 Map.entry("study_acronym", "studies"),
+                Map.entry("study_name", "studies"),
                 Map.entry("accesses", "accesses"),
                 Map.entry("phs_accession", "phs_accession"),
                 Map.entry("subject_id", "subject_ids"),
@@ -1382,6 +1402,36 @@ public class PrivateESDataFetcher extends AbstractPrivateESDataFetcher {
         Map<String, Object> result = new HashMap<>();
         result.put("subjectIds", subjectIds);
         return result;
+    }
+
+    private static final int SUGGESTION_PAGE_MAX = 50;
+    private static final int SUGGESTION_PREFIX_MIN = 2;
+
+    /**
+     * Unique participant ids that start with the given prefix.
+     * Returns at most {@link #SUGGESTION_PAGE_MAX} ids and does not query when the prefix is shorter than two characters.
+     */
+    List<String> participantIdSuggestions(String prefix, int first) throws IOException {
+        String trimmed = prefix == null ? "" : prefix.trim();
+        if (trimmed.length() < SUGGESTION_PREFIX_MIN) {
+            return List.of();
+        }
+        if (first <= 0) {
+            return List.of();
+        }
+        int size = Math.min(first, SUGGESTION_PAGE_MAX);
+        Map<String, Object> query = new HashMap<>();
+        query.put("size", 0);
+        query.put("query", Map.of("prefix", Map.of("participant_id", trimmed)));
+        query.put("aggregations", Map.of(
+                "participant_id", Map.of(
+                        "terms", Map.of("field", "participant_id", "size", size)
+                )
+        ));
+        Request request = new Request("GET", "/dashboard_participant_ids/_search");
+        request.setJsonEntity(gson.toJson(query));
+        JsonObject jsonObject = esService.send(request);
+        return esService.collectTerms(jsonObject, "participant_id");
     }
 
 }

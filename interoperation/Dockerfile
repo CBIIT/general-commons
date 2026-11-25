@@ -1,11 +1,12 @@
-FROM node:26.10.0-trixie-slim AS build
+FROM node:26.12.1-trixie-slim AS build
 WORKDIR /usr/src/app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
-FROM node:26.10.0-trixie-slim AS fnl_base_image
+FROM node:26.12.1-trixie-slim AS fnl_base_image
 WORKDIR /usr/src/app
-RUN apt-get update && apt-get upgrade -y && \
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y full-upgrade && \
     rm -rf /var/lib/apt/lists/*
 RUN rm -rf \
         /usr/local/lib/node_modules/npm \
@@ -17,9 +18,8 @@ RUN rm -rf \
         /usr/local/bin/yarn \
         /usr/local/bin/yarnpkg
 COPY --from=build --chown=node:node /usr/src/app/node_modules ./node_modules
-COPY --chown=node:node package.json ./
+COPY --chown=node:node package.json app.js config.js logger.js ./
 COPY --chown=node:node bin ./bin
-COPY --chown=node:node app.js config.js logger.js ./
 COPY --chown=node:node graphql ./graphql
 COPY --chown=node:node data-management ./data-management
 COPY --chown=node:node routes ./routes
@@ -29,4 +29,4 @@ USER node
 ENV PORT=4030
 ENV NODE_ENV=production
 EXPOSE 4030
-CMD [ "node", "./bin/www" ]
+CMD [ "node", "./bin/www.js" ]
