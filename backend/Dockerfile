@@ -9,7 +9,7 @@ COPY src ./src
 RUN mvn -B package -DskipTests
 
 # Production stage
-FROM tomcat:11.0.25-jre25 AS fnl_base_image
+FROM tomcat:11.0.29-jre25 AS fnl_base_image
 # set environment variables
 ENV JAVA_OPTS="-XX:InitialRAMPercentage=25 -XX:MaxRAMPercentage=70"
 ENV TZ="America/New_York"
@@ -20,7 +20,6 @@ RUN useradd -r nonrootuser && rm -rf /usr/local/tomcat/webapps/*
 COPY --from=build /usr/src/app/target/CDS-*.war /usr/local/tomcat/webapps/ROOT.war
 # change ownership of the tomcat directory to the nonroot user
 RUN chown -R nonrootuser:nonrootuser /usr/local/tomcat
-# base image patching
-RUN apt update && apt upgrade -y
+RUN apt-get update && apt-get upgrade -y
 # switch to nonroot user
 USER nonrootuser
