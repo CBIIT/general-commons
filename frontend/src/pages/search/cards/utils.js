@@ -41,3 +41,18 @@ export function encodeFileIds(fileIds) {
     .map((id) => String(id));
   return encodeURIComponent(JSON.stringify({ file_ids: ids }));
 }
+
+/**
+ * Encode sample IDs as an Explore facet path filter.
+ *
+ * Pair with ?selectedTab=samples so Explore opens the Samples tab and
+ * runs sampleOverview (sample_ids is a keyword on dashboard_sample).
+ *
+ * Example URL payload: {"sample_ids":["SAMPLE-1"]}
+ */
+export function encodeSampleIds(sampleIds) {
+  const ids = (Array.isArray(sampleIds) ? sampleIds : [sampleIds])
+    .filter((id) => id != null && String(id).trim() !== '')
+    .map((id) => String(id));
+  return encodeURIComponent(JSON.stringify({ sample_ids: ids }));
+}

@@ -1,9 +1,9 @@
-FROM node:26.12.1-trixie-slim AS build
+FROM node:26.13.1-trixie-slim AS build
 WORKDIR /usr/src/app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
-FROM node:26.12.1-trixie-slim AS fnl_base_image
+FROM node:26.13.1-trixie-slim AS fnl_base_image
 WORKDIR /usr/src/app
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y full-upgrade && \

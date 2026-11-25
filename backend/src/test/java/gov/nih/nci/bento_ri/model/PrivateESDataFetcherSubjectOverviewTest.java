@@ -90,6 +90,17 @@ class PrivateESDataFetcherSubjectOverviewTest {
         assertFalse(hasTermsField(queryCaptor.getValue(), "subject_ids"));
     }
 
+    @Test
+    void shouldFilterBySampleIds() throws Exception {
+        Map<String, Object> params = createBaseParams();
+        params.put("sample_ids", List.of("SAMP-001", "SAMP-002"));
+
+        fetcher.subjectOverview(params);
+
+        assertTrue(hasTermsFilter(queryCaptor.getValue(), "sample_ids",
+                List.of("SAMP-001", "SAMP-002")));
+    }
+
     // With no order_by, results are sorted by subject_ids ascending.
     @Test
     void shouldSortBySubjectIdsByDefault() throws Exception {

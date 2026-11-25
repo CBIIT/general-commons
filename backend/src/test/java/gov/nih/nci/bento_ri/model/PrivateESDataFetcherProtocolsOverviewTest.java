@@ -74,6 +74,18 @@ class PrivateESDataFetcherProtocolsOverviewTest {
     }
 
     @Test
+    void shouldFilterBySampleIds() throws Exception {
+        Map<String, Object> params = createBaseParams();
+        params.put("sample_ids", List.of("SAMP-001", "SAMP-002"));
+
+        fetcher.protocolOverview(params);
+
+        assertTrue(hasTermsFilter(queryCaptor.getValue(), "sample_ids",
+                List.of("SAMP-001", "SAMP-002")));
+        assertFalse(hasTermsField(queryCaptor.getValue(), "sample_id"));
+    }
+
+    @Test
     void shouldFilterByFiles() throws Exception {
         Map<String, Object> params = createBaseParams();
         params.put("files", List.of("dg.4DFC/12345678"));
